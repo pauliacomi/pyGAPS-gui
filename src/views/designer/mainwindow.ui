@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>903</width>
+    <height>470</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,48 +19,108 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="myLabel">
-      <property name="text">
-       <string>My Label</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="3">
-     <widget class="QPushButton" name="cancelButton">
-      <property name="text">
-       <string>Cancel</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QPushButton" name="okButton">
+    <item row="0" column="10" rowspan="5">
+     <widget class="QGroupBox" name="propertiesGroup">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="text">
-       <string>OK</string>
+      <property name="title">
+       <string>Isotherm Properties</string>
       </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="adsorbateLineEdit"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="temperatureLabel">
+         <property name="text">
+          <string>Temperature</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="temperatureLineEdit"/>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QTextBrowser" name="textBrowser"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="materialBatchLineEdit"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="materialNameLineEdit"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="materialBatchLabel">
+         <property name="text">
+          <string>Material Batch</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="adsorbateLabel">
+         <property name="text">
+          <string>Adsorbate</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="materialNameLabel">
+         <property name="text">
+          <string>Material Name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QPushButton" name="cancelButton">
+         <property name="text">
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QPushButton" name="okButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Freeze -&gt;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
-    <item row="1" column="0" colspan="4">
-     <widget class="QTextBrowser" name="textBrowser"/>
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="explorerGroup">
+      <item row="0" column="0">
+       <widget class="QListView" name="isoExplorer"/>
+      </item>
+     </layout>
     </item>
-    <item row="2" column="0" colspan="2">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+    <item row="0" column="11" rowspan="5">
+     <widget class="QGroupBox" name="graphGroup">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
+      <property name="title">
+       <string>Isotherm Overlay</string>
       </property>
-     </spacer>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QGraphicsView" name="graphicsView"/>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -69,8 +129,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>23</height>
+     <width>903</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -82,11 +142,19 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
+   <widget class="QMenu" name="menuCharact">
     <property name="title">
-     <string>Edit</string>
+     <string>Characterization</string>
     </property>
-    <addaction name="actionCopy"/>
+    <addaction name="actionBET_Surface_Area"/>
+    <addaction name="actionLangmuir_Surface_Area"/>
+    <addaction name="separator"/>
+    <addaction name="actiont_plot"/>
+    <addaction name="actionalpha_s_plot"/>
+    <addaction name="separator"/>
+    <addaction name="actionMicroporous_PSD"/>
+    <addaction name="actionMesoporous_PSD"/>
+    <addaction name="actionDFT_Kernel_PSD"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -94,12 +162,24 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuModel">
+    <property name="title">
+     <string>Model</string>
+    </property>
+    <addaction name="actionModel_By"/>
+    <addaction name="actionGuess_Model"/>
+   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
+   <addaction name="menuCharact"/>
+   <addaction name="menuModel"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/res/icons/10_Search_48x48.png</normaloff>:/res/icons/10_Search_48x48.png</iconset>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
@@ -122,15 +202,6 @@
     <string>Quit</string>
    </property>
   </action>
-  <action name="actionCopy">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/res/icons/16_Copy_48x48.png</normaloff>:/res/icons/16_Copy_48x48.png</iconset>
-   </property>
-   <property name="text">
-    <string>Copy</string>
-   </property>
-  </action>
   <action name="actionAbout">
    <property name="icon">
     <iconset resource="resources.qrc">
@@ -140,12 +211,52 @@
     <string>About</string>
    </property>
   </action>
+  <action name="actionBET_Surface_Area">
+   <property name="text">
+    <string>BET Surface Area</string>
+   </property>
+  </action>
+  <action name="actionLangmuir_Surface_Area">
+   <property name="text">
+    <string>Langmuir Surface Area</string>
+   </property>
+  </action>
+  <action name="actiont_plot">
+   <property name="text">
+    <string>t-plot</string>
+   </property>
+  </action>
+  <action name="actionalpha_s_plot">
+   <property name="text">
+    <string>alpha-s plot</string>
+   </property>
+  </action>
+  <action name="actionMicroporous_PSD">
+   <property name="text">
+    <string>Microporous PSD</string>
+   </property>
+  </action>
+  <action name="actionMesoporous_PSD">
+   <property name="text">
+    <string>Mesoporous PSD</string>
+   </property>
+  </action>
+  <action name="actionDFT_Kernel_PSD">
+   <property name="text">
+    <string>DFT Kernel PSD</string>
+   </property>
+  </action>
+  <action name="actionModel_By">
+   <property name="text">
+    <string>Model Using</string>
+   </property>
+  </action>
+  <action name="actionGuess_Model">
+   <property name="text">
+    <string>Model Guess</string>
+   </property>
+  </action>
  </widget>
- <tabstops>
-  <tabstop>textBrowser</tabstop>
-  <tabstop>okButton</tabstop>
-  <tabstop>cancelButton</tabstop>
- </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>

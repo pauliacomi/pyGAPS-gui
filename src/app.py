@@ -5,11 +5,12 @@ import sys
 from PySide2.QtWidgets import QMainWindow, QApplication, QMessageBox
 from PySide2.QtCore import QCoreApplication, Signal, QThread, QFile, Qt
 
-from src.views.mainwindow import Ui_MainWindow
+from src.views.mainwindow import MainWindow
 from src.views.utility import open_files_dialog, save_file_dialog
-from src.models.mainmodel import MainModel
-from src.controllers.graphcontroller import GraphController
-from src.controllers.textinfocontroller import TextInfoController
+from src.models.main_model import MainModel
+from src.controllers.explorer_controller import ExplorerController
+from src.controllers.graph_controller import GraphController
+from src.controllers.info_controller import TextInfoController
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
@@ -24,14 +25,16 @@ class ApplicationWindow(QMainWindow):
         self.model = MainModel()
 
         # Create views
-        self.ui = Ui_MainWindow()
+        self.ui = MainWindow()
         self.ui.setupUi(self)
 
         # Create controllers
-        self.explorer_controller = GraphController(
-            self.ui.graphView, self.model)
+        self.explorer_controller = ExplorerController(
+            self.ui.isoExplorer, self.model._explorer_model)
+
         self.graph_controller = GraphController(
-            self.ui.graphView, self.model)
+            self.ui.graphicsView, self.model)
+
         self.textinfo_controller = TextInfoController(
             self.ui.textInfo, self.model)
 
@@ -50,15 +53,8 @@ class ApplicationWindow(QMainWindow):
         self.ui.actionQuit.triggered.connect(self.quit_app)
         self.ui.actionAbout.triggered.connect(self.about)
 
-        self.ui.okButton.clicked.connect(self.quit_app)
-        self.ui.cancelButton.clicked.connect(self.quit_app)
-
     def quit_app(self):
         """Close application."""
-        # answer = QMessageBox.question(self, 'Quit program', 'Are you sure?',
-        #                               QMessageBox.Yes | QMessageBox.No)
-        # if answer == QMessageBox.Yes:
-        #     self.close()
         self.close()
 
     def open_file(self):
@@ -66,7 +62,7 @@ class ApplicationWindow(QMainWindow):
         default_file_name = '.'
         filename = open_files_dialog(self, "Load an isotherm",
                                      default_file_name,
-                                     filter='pyGAPS isotherms (*.json)')
+                                     filter='pyGAPS isotherms (*.json *.csv *.xls)')
 
         if filename is not None and filename != '':
             self.model.load(filename)
@@ -76,7 +72,10 @@ class ApplicationWindow(QMainWindow):
         default_file_name = '.'
         filename = save_file_dialog(self, "Save an isotherm",
                                     default_file_name,
-                                    filter='pyGAPS Isotherm (*.json)')
+                                    filter=";;".join(
+                                        ['pyGAPS JSON Isotherm (*.json)',
+                                         'pyGAPS CSV Isotherm (*.csv)',
+                                         'pyGAPS Excel Isotherm (*.xls)']))
 
         if filename is not None and filename != '':
             self.model.save(filename)

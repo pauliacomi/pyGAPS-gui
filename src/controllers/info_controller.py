@@ -8,9 +8,9 @@ class TextInfoController():
         self.create_subscriptions()
 
     def create_subscriptions(self):
-
+        pass
         # Data subscriptions
-        self.model.iso_added.connect(self.info_iso)
+        # self.model.iso_added.connect(self.info_iso)
 
     def info_iso(self):
         pass
