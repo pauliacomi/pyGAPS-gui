@@ -33,7 +33,7 @@ class ApplicationWindow(QMainWindow):
             self.ui.isoExplorer, self.model._explorer_model)
 
         self.graph_controller = GraphController(
-            self.ui.graphicsView, self.model)
+            self.ui.graphicsView, self.model._explorer_model)
 
         self.textinfo_controller = TextInfoController(
             self.ui.textInfo, self.model)
@@ -52,6 +52,8 @@ class ApplicationWindow(QMainWindow):
         self.ui.actionSave.triggered.connect(self.save_content)
         self.ui.actionQuit.triggered.connect(self.quit_app)
         self.ui.actionAbout.triggered.connect(self.about)
+
+        self.explorer_controller.view.clicked.connect(self.model.select)
 
     def quit_app(self):
         """Close application."""

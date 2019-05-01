@@ -34,7 +34,8 @@ class MainModel(QtCore.QObject):
                 self._explorer_model.appendRow(new_iso_model)
 
     def select(self, index):
-        self.iso_selected.emit()
+        item = self._explorer_model.itemFromIndex(index)
+        print(item.data().material_name)
 
     def deselect(self, index):
         self.iso_deselected.emit()
