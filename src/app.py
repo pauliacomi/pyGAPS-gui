@@ -6,11 +6,12 @@ from PySide2.QtWidgets import QMainWindow, QApplication, QMessageBox
 from PySide2.QtCore import QCoreApplication, Signal, QThread, QFile, Qt
 
 from src.views.mainwindow import MainWindow
+from src.views.data_dialog import DataDialog
 from src.views.utility import open_files_dialog, save_file_dialog
 from src.models.main_model import MainModel
-from src.controllers.explorer_controller import ExplorerController
-from src.controllers.graph_controller import GraphController
-from src.controllers.info_controller import TextInfoController
+from src.models.isotherm_data_model import IsothermDataModel
+
+import pygaps
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
@@ -27,16 +28,14 @@ class ApplicationWindow(QMainWindow):
         # Create views
         self.ui = MainWindow()
         self.ui.setupUi(self)
+        self.data_dialog = DataDialog()
 
-        # Create controllers
-        self.explorer_controller = ExplorerController(
-            self.ui.isoExplorer, self.model._explorer_model)
-
-        self.graph_controller = GraphController(
-            self.ui.graphicsView, self.model._explorer_model)
-
-        self.textinfo_controller = TextInfoController(
-            self.ui.textInfo, self.model)
+        # Connect views and models
+        self.ui.isoExplorer.setModel(self.model.explorer_model)
+        self.ui.isoExplorer.clicked.connect(self.model.select)
+        self.model.iso_selected.connect(self.iso_info)
+        self.model.iso_selected.connect(self.iso_plot)
+        self.ui.dataButton.clicked.connect(self.iso_data)
 
         # Create and connect signals
         self.connect_signals()
@@ -52,8 +51,6 @@ class ApplicationWindow(QMainWindow):
         self.ui.actionSave.triggered.connect(self.save_content)
         self.ui.actionQuit.triggered.connect(self.quit_app)
         self.ui.actionAbout.triggered.connect(self.about)
-
-        self.explorer_controller.view.clicked.connect(self.model.select)
 
     def quit_app(self):
         """Close application."""
@@ -81,6 +78,33 @@ class ApplicationWindow(QMainWindow):
 
         if filename is not None and filename != '':
             self.model.save(filename)
+
+    def iso_plot(self):
+        indices = self.model.selected_iso_indices
+        selected_iso = [
+            self.model.explorer_model.itemFromIndex(index).data() for index in indices]
+        self.ui.graphicsView.ax.clear()
+        pygaps.plot_iso(
+            selected_iso,
+            ax=self.ui.graphicsView.ax
+        )
+        self.ui.graphicsView.ax.figure.canvas.draw()
+
+    def iso_info(self):
+        index = self.model.current_iso_index
+        isotherm = self.model.explorer_model.itemFromIndex(index).data()
+        self.ui.materialNameLineEdit.setText(isotherm.material_name)
+        self.ui.materialBatchLineEdit.setText(isotherm.material_batch)
+        self.ui.adsorbateLineEdit.setText(isotherm.adsorbate)
+        self.ui.temperatureLineEdit.setText(str(isotherm.t_iso))
+        self.ui.textInfo.setText(str(isotherm))
+
+    def iso_data(self):
+        index = self.model.current_iso_index
+        isotherm = self.model.explorer_model.itemFromIndex(index).data()
+        model = IsothermDataModel(isotherm.data())
+        self.data_dialog.tableView.setModel(model)
+        self.data_dialog.exec_()
 
     def receive_text(self, some_string):
         """Add some_string at the end of textInfo."""
@@ -113,12 +137,11 @@ class Worker(QThread):
     send_text = Signal(str)
 
     def __init__(self, parent=None):
-        super(Worker, self).__init__(parent)
+        super().__init__(parent)
 
     def run(self):
         """Start work method and take care about run-time errors in thread"""
-        result = self.work()
-        self.result.emit(result)
+        self.result.emit(self.work())
 
     def work(self):
         """Emit program arguments as 'send_text' signal."""
