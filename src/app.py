@@ -6,9 +6,9 @@ from PySide2.QtWidgets import QMainWindow, QApplication, QMessageBox
 from PySide2.QtCore import QCoreApplication, Signal, QThread, QFile, Qt
 
 from src.views.mainwindow import MainWindow
-from src.views.data_dialog import DataDialog
 from src.views.utility import open_files_dialog, save_file_dialog
 from src.models.main_model import MainModel
+from src.models.bet_model import BETModel
 from src.models.isotherm_data_model import IsothermDataModel
 
 import pygaps
@@ -22,13 +22,12 @@ class ApplicationWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # Create models
-        self.model = MainModel()
-
         # Create views
         self.ui = MainWindow()
         self.ui.setupUi(self)
-        self.data_dialog = DataDialog()
+
+        # Create models
+        self.model = MainModel()
 
         # Connect views and models
         self.ui.isoExplorer.setModel(self.model.explorer_model)
@@ -51,6 +50,7 @@ class ApplicationWindow(QMainWindow):
         self.ui.actionSave.triggered.connect(self.save_content)
         self.ui.actionQuit.triggered.connect(self.quit_app)
         self.ui.actionAbout.triggered.connect(self.about)
+        self.ui.actionBET_Surface_Area.triggered.connect(self.BETarea)
 
     def quit_app(self):
         """Close application."""
@@ -100,19 +100,35 @@ class ApplicationWindow(QMainWindow):
         self.ui.textInfo.setText(str(isotherm))
 
     def iso_data(self):
+        from src.views.data_dialog import DataDialog
         index = self.model.current_iso_index
-        isotherm = self.model.explorer_model.itemFromIndex(index).data()
-        model = IsothermDataModel(isotherm.data())
-        self.data_dialog.tableView.setModel(model)
-        self.data_dialog.exec_()
+        if index:
+            isotherm = self.model.explorer_model.itemFromIndex(index).data()
+            dialog = DataDialog()
+            dialog.tableView.setModel(IsothermDataModel(isotherm.data()))
+            dialog.exec_()
 
-    def receive_text(self, some_string):
-        """Add some_string at the end of textInfo."""
-        self.ui.textInfo.append(some_string)
+    # Menu functionality
+
+    def BETarea(self):
+        from src.views.bet_dialog import BETDialog
+        index = self.model.current_iso_index
+        if index:
+            isotherm = self.model.explorer_model.itemFromIndex(index).data()
+            dialog = BETDialog()
+            controller = BETModel(isotherm)     # TODO is it a model or a controller??
+            controller.set_view(dialog)
+            dialog.exec_()
 
     def about(self):
         """Show Help/About message box."""
         QMessageBox.about(self, 'application', 'iacomi.paul@gmail.com')
+
+    # Leftovers TODO delete
+
+    def receive_text(self, some_string):
+        """Add some_string at the end of textInfo."""
+        self.ui.textInfo.append(some_string)
 
 
 class Worker(QThread):

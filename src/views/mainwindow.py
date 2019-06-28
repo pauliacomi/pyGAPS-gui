@@ -111,6 +111,7 @@ class MainWindow(object):
         self.graphicsView.setObjectName("graphicsView")
         self.gridGraph.addWidget(self.graphicsView, 0, 0, 1, 1)
         self.mainLayout.addWidget(self.graphGroup)
+
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QMenuBar(MainWindow)
