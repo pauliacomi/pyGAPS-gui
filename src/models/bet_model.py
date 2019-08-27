@@ -1,9 +1,9 @@
 from PySide2 import QtCore
 
 import pygaps
-from pygaps.calculations.area_bet import (area_BET_raw,
-                                          bet_transform,
-                                          roq_transform)
+from pygaps.characterisation.area_bet import (area_BET_raw,
+                                              bet_transform,
+                                              roq_transform)
 from pygaps.graphing.calcgraph import bet_plot, roq_plot
 
 
