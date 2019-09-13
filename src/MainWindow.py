@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 import os
 import sys
-from PySide2.QtWidgets import QMainWindow, QApplication, QMessageBox
-from PySide2.QtCore import QCoreApplication, Signal, QThread, QFile, Qt
+from PySide2.QtWidgets import QMainWindow, QMessageBox
+from PySide2.QtCore import QCoreApplication, Signal, QThread, QFile, Slot
 
-from src.views.mainwindow import MainWindow
+from src.views.mainwindow_ui import MainWindowUI
 from src.views.utility import open_files_dialog, save_file_dialog
 from src.models.main_model import MainModel
 from src.models.bet_model import BETModel
@@ -13,20 +11,20 @@ from src.models.isotherm_data_model import IsothermDataModel
 
 import pygaps
 
-QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
-
-class ApplicationWindow(QMainWindow):
-    """Main Window."""
+class MainWindow(QMainWindow):
+    """Main Window for the entire application"""
 
     def __init__(self, parent=None):
+
+        # Initial init
         super().__init__(parent)
 
-        # Create views
-        self.ui = MainWindow()
+        # Create and attach UI
+        self.ui = MainWindowUI()
         self.ui.setupUi(self)
 
-        # Create models
+        # Create model
         self.model = MainModel()
 
         # Connect views and models
@@ -39,10 +37,8 @@ class ApplicationWindow(QMainWindow):
         # Create and connect signals
         self.connect_signals()
 
-        # Start thread
-        self.worker = Worker()
-        self.worker.send_text.connect(self.receive_text)
-        self.worker.start()
+        # Display state
+        self.ui.statusbar.showMessage('Ready', 5000)
 
     def connect_signals(self):
         """Connect signals and slots."""
@@ -93,10 +89,10 @@ class ApplicationWindow(QMainWindow):
     def iso_info(self):
         index = self.model.current_iso_index
         isotherm = self.model.explorer_model.itemFromIndex(index).data()
-        self.ui.materialNameLineEdit.setText(isotherm.material_name)
+        self.ui.materialNameLineEdit.setText(isotherm.material)
         self.ui.materialBatchLineEdit.setText(isotherm.material_batch)
-        self.ui.adsorbateLineEdit.setText(isotherm.adsorbate)
-        self.ui.temperatureLineEdit.setText(str(isotherm.t_iso))
+        self.ui.adsorbateLineEdit.setText(str(isotherm.adsorbate))
+        self.ui.temperatureLineEdit.setText(str(isotherm.temperature))
         self.ui.textInfo.setText(str(isotherm))
 
     def iso_data(self):
@@ -116,59 +112,11 @@ class ApplicationWindow(QMainWindow):
         if index:
             isotherm = self.model.explorer_model.itemFromIndex(index).data()
             dialog = BETDialog()
-            controller = BETModel(isotherm)     # TODO is it a model or a controller??
+            # TODO is it a model or a controller??
+            controller = BETModel(isotherm)
             controller.set_view(dialog)
             dialog.exec_()
 
     def about(self):
         """Show Help/About message box."""
         QMessageBox.about(self, 'application', 'iacomi.paul@gmail.com')
-
-    # Leftovers TODO delete
-
-    def receive_text(self, some_string):
-        """Add some_string at the end of textInfo."""
-        self.ui.textInfo.append(some_string)
-
-
-class Worker(QThread):
-    """
-    Worker thread.Runs work method, and create signals.
-
-    finished
-        No data
-    error
-        `tuple` (exctype, value, traceback.format_exc() )
-    result
-        `object` data returned from processing, anything
-    progress
-        `int` indicating % progress
-    send_text
-        'str' send text to textInfo
-    """
-    finished = Signal()
-    error = Signal(tuple)
-    result = Signal(object)
-    progress = Signal(int)
-    send_text = Signal(str)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-    def run(self):
-        """Start work method and take care about run-time errors in thread"""
-        self.result.emit(self.work())
-
-    def work(self):
-        """Emit program arguments as 'send_text' signal."""
-        arguments = QCoreApplication.arguments()
-        if len(arguments) > 1:
-            for arg in arguments[1:]:
-                self.send_text.emit(arg)
-
-
-def main(args=sys.argv):
-    app = QApplication(args)
-    application = ApplicationWindow()
-    application.show()
-    sys.exit(app.exec_())

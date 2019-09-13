@@ -1,13 +1,5 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file '.\src\views\designer\mainwindow.ui'
-#
-# Created: Wed May  1 02:21:54 2019
-#      by: pyside2-uic 2.0.0 running on PySide2 5.6.0~a1
-#
-# WARNING! All changes made in this file will be lost!
-
 import src.views.resources_rc
+
 from PySide2 import QtCore, QtGui
 from PySide2.QtWidgets import QApplication, QWidget
 from PySide2.QtWidgets import QHBoxLayout, QGridLayout, QGroupBox, QListView
@@ -18,18 +10,25 @@ from PySide2.QtWidgets import QMenu, QMenuBar, QAction, QStatusBar
 from src.views.graph_view import GraphView
 
 
-class MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1200, 700)
+class MainWindowUI(object):
+
+    def setupUi(self, MainWindowUI):
+
+        # First setup
+        MainWindowUI.setObjectName("MainWindowUI")
+        MainWindowUI.resize(1200, 700)
+
+        # Icon
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(
             ":/res/designer/icons/01_Warning_48x48.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
+        MainWindowUI.setWindowIcon(icon)
 
-        self.centralwidget = QWidget(MainWindow)
+        # Central widget
+        self.centralwidget = QWidget(MainWindowUI)
         self.centralwidget.setObjectName("centralwidget")
 
+        # Layout of central widget
         self.mainLayout = QHBoxLayout(self.centralwidget)
         self.mainLayout.setObjectName("mainLayout")
 
@@ -112,9 +111,11 @@ class MainWindow(object):
         self.gridGraph.addWidget(self.graphicsView, 0, 0, 1, 1)
         self.mainLayout.addWidget(self.graphGroup)
 
-        MainWindow.setCentralWidget(self.centralwidget)
+        # Now set central widget
+        MainWindowUI.setCentralWidget(self.centralwidget)
 
-        self.menubar = QMenuBar(MainWindow)
+        # Create menu bar
+        self.menubar = QMenuBar(MainWindowUI)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 900, 30))
         self.menubar.setObjectName("menubar")
         self.menuFile = QMenu(self.menubar)
@@ -125,58 +126,61 @@ class MainWindow(object):
         self.menuHelp.setObjectName("menuHelp")
         self.menuModel = QMenu(self.menubar)
         self.menuModel.setObjectName("menuModel")
-        MainWindow.setMenuBar(self.menubar)
+        MainWindowUI.setMenuBar(self.menubar)
 
-        self.statusbar = QStatusBar(MainWindow)
+        # Create status bar
+        self.statusbar = QStatusBar(MainWindowUI)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        MainWindowUI.setStatusBar(self.statusbar)
 
-        self.actionOpen = QAction(MainWindow)
+        # Defining menu actions
+
+        self.actionOpen = QAction(MainWindowUI)
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(
             ":/res/icons/10_Search_48x48.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionOpen.setIcon(icon1)
         self.actionOpen.setObjectName("actionOpen")
 
-        self.actionSave = QAction(MainWindow)
+        self.actionSave = QAction(MainWindowUI)
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/res/icons/04_Save_48x48.png"),
                         QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSave.setIcon(icon2)
         self.actionSave.setObjectName("actionSave")
 
-        self.actionQuit = QAction(MainWindow)
+        self.actionQuit = QAction(MainWindowUI)
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap(
             ":/res/icons/14_Delete_48x48.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionQuit.setIcon(icon3)
         self.actionQuit.setObjectName("actionQuit")
 
-        self.actionAbout = QAction(MainWindow)
+        self.actionAbout = QAction(MainWindowUI)
         icon4 = QtGui.QIcon()
         icon4.addPixmap(QtGui.QPixmap(":/res/icons/15_Tick_48x48.png"),
                         QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionAbout.setIcon(icon4)
         self.actionAbout.setObjectName("actionAbout")
 
-        self.actionBET_Surface_Area = QAction(MainWindow)
+        self.actionBET_Surface_Area = QAction(MainWindowUI)
         self.actionBET_Surface_Area.setObjectName("actionBET_Surface_Area")
-        self.actionLangmuir_Surface_Area = QAction(MainWindow)
+        self.actionLangmuir_Surface_Area = QAction(MainWindowUI)
         self.actionLangmuir_Surface_Area.setObjectName(
             "actionLangmuir_Surface_Area")
-        self.actiont_plot = QAction(MainWindow)
+        self.actiont_plot = QAction(MainWindowUI)
         self.actiont_plot.setObjectName("actiont_plot")
-        self.actionalpha_s_plot = QAction(MainWindow)
+        self.actionalpha_s_plot = QAction(MainWindowUI)
         self.actionalpha_s_plot.setObjectName("actionalpha_s_plot")
-        self.actionMicroporous_PSD = QAction(MainWindow)
+        self.actionMicroporous_PSD = QAction(MainWindowUI)
         self.actionMicroporous_PSD.setObjectName("actionMicroporous_PSD")
-        self.actionMesoporous_PSD = QAction(MainWindow)
+        self.actionMesoporous_PSD = QAction(MainWindowUI)
         self.actionMesoporous_PSD.setObjectName("actionMesoporous_PSD")
-        self.actionDFT_Kernel_PSD = QAction(MainWindow)
+        self.actionDFT_Kernel_PSD = QAction(MainWindowUI)
         self.actionDFT_Kernel_PSD.setObjectName("actionDFT_Kernel_PSD")
-        self.actionModel_By = QAction(MainWindow)
+        self.actionModel_By = QAction(MainWindowUI)
         self.actionModel_By.setObjectName("actionModel_By")
-        self.actionGuess_Model = QAction(MainWindow)
+        self.actionGuess_Model = QAction(MainWindowUI)
         self.actionGuess_Model.setObjectName("actionGuess_Model")
 
         self.menuFile.addAction(self.actionOpen)
@@ -200,59 +204,63 @@ class MainWindow(object):
         self.menubar.addAction(self.menuModel.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        # Finally
 
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QApplication.translate(
-            "MainWindow", "pyGAPS-gui", None, -1))
+        self.retranslateUi(MainWindowUI)
+        QtCore.QMetaObject.connectSlotsByName(MainWindowUI)
+
+    def retranslateUi(self, MainWindowUI):
+        MainWindowUI.setWindowTitle(QApplication.translate(
+            "MainWindowUI", "pyGAPS-gui", None, -1))
+        self.explorerGroup.setTitle(QApplication.translate(
+            "MainWindowUI", "Isotherm Explorer", None, -1))
         self.propertiesGroup.setTitle(QApplication.translate(
-            "MainWindow", "Isotherm Properties", None, -1))
+            "MainWindowUI", "Isotherm Properties", None, -1))
         self.temperatureLabel.setText(QApplication.translate(
-            "MainWindow", "Temperature (K)", None, -1))
+            "MainWindowUI", "Temperature (K)", None, -1))
         self.materialBatchLabel.setText(QApplication.translate(
-            "MainWindow", "Material Batch", None, -1))
+            "MainWindowUI", "Material Batch", None, -1))
         self.adsorbateLabel.setText(QApplication.translate(
-            "MainWindow", "Adsorbate", None, -1))
+            "MainWindowUI", "Adsorbate", None, -1))
         self.materialNameLabel.setText(QApplication.translate(
-            "MainWindow", "Material Name", None, -1))
+            "MainWindowUI", "Material Name", None, -1))
         self.dataButton.setText(QApplication.translate(
-            "MainWindow", "Data", None, -1))
+            "MainWindowUI", "Data", None, -1))
         self.freezeButton.setText(QApplication.translate(
-            "MainWindow", "Freeze ->", None, -1))
+            "MainWindowUI", "Freeze ->", None, -1))
         self.graphGroup.setTitle(QApplication.translate(
-            "MainWindow", "Isotherm Overlay", None, -1))
+            "MainWindowUI", "Isotherm Overlay", None, -1))
         self.menuFile.setTitle(QApplication.translate(
-            "MainWindow", "File", None, -1))
+            "MainWindowUI", "File", None, -1))
         self.menuCharact.setTitle(QApplication.translate(
-            "MainWindow", "Characterization", None, -1))
+            "MainWindowUI", "Characterization", None, -1))
         self.menuHelp.setTitle(QApplication.translate(
-            "MainWindow", "Help", None, -1))
+            "MainWindowUI", "Help", None, -1))
         self.menuModel.setTitle(QApplication.translate(
-            "MainWindow", "Model", None, -1))
+            "MainWindowUI", "Model", None, -1))
         self.actionOpen.setText(QApplication.translate(
-            "MainWindow", "Open", None, -1))
+            "MainWindowUI", "Open", None, -1))
         self.actionSave.setText(QApplication.translate(
-            "MainWindow", "Save", None, -1))
+            "MainWindowUI", "Save", None, -1))
         self.actionQuit.setText(QApplication.translate(
-            "MainWindow", "Quit", None, -1))
+            "MainWindowUI", "Quit", None, -1))
         self.actionAbout.setText(QApplication.translate(
-            "MainWindow", "About", None, -1))
+            "MainWindowUI", "About", None, -1))
         self.actionBET_Surface_Area.setText(QApplication.translate(
-            "MainWindow", "BET Surface Area", None, -1))
+            "MainWindowUI", "BET Surface Area", None, -1))
         self.actionLangmuir_Surface_Area.setText(QApplication.translate(
-            "MainWindow", "Langmuir Surface Area", None, -1))
+            "MainWindowUI", "Langmuir Surface Area", None, -1))
         self.actiont_plot.setText(QApplication.translate(
-            "MainWindow", "t-plot", None, -1))
+            "MainWindowUI", "t-plot", None, -1))
         self.actionalpha_s_plot.setText(QApplication.translate(
-            "MainWindow", "alpha-s plot", None, -1))
+            "MainWindowUI", "alpha-s plot", None, -1))
         self.actionMicroporous_PSD.setText(QApplication.translate(
-            "MainWindow", "Microporous PSD", None, -1))
+            "MainWindowUI", "Microporous PSD", None, -1))
         self.actionMesoporous_PSD.setText(QApplication.translate(
-            "MainWindow", "Mesoporous PSD", None, -1))
+            "MainWindowUI", "Mesoporous PSD", None, -1))
         self.actionDFT_Kernel_PSD.setText(QApplication.translate(
-            "MainWindow", "DFT Kernel PSD", None, -1))
+            "MainWindowUI", "DFT Kernel PSD", None, -1))
         self.actionModel_By.setText(QApplication.translate(
-            "MainWindow", "Model Using", None, -1))
+            "MainWindowUI", "Model Using", None, -1))
         self.actionGuess_Model.setText(QApplication.translate(
-            "MainWindow", "Model Guess", None, -1))
+            "MainWindowUI", "Model Guess", None, -1))

@@ -415,8 +415,8 @@
     "lab": "MADIREL",
     "machine": "Triflex",
     "material_batch": "Test",
-    "material_name": "NaY",
+    "material": "NaY",
     "t_act": 200.0,
-    "t_iso": 77.355,
+    "temperature": 77.355,
     "user": "PI"
 }

@@ -531,8 +531,8 @@
     "lab": "MADIREL",
     "machine": "Triflex",
     "material_batch": "Test",
-    "material_name": "Takeda 5A",
+    "material": "Takeda 5A",
     "t_act": 200.0,
-    "t_iso": 77.355,
+    "temperature": 77.355,
     "user": "PI"
 }
