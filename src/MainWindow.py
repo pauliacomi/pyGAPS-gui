@@ -91,9 +91,7 @@ class MainWindow(QMainWindow):
 
     def load(self):
         """Open isotherm from file."""
-        default_file_name = '.'
-        filenames = open_files_dialog(self, "Load an isotherm",
-                                      default_file_name,
+        filenames = open_files_dialog(self, "Load an isotherm", '.',
                                       filter='pyGAPS isotherms (*.json *.csv *.xls)')
 
         if filenames is not None and filenames != '':
@@ -109,18 +107,19 @@ class MainWindow(QMainWindow):
 
     def save(self):
         """Save isotherm to file."""
-        default_file_name = '.'
-        filename = save_file_dialog(self, "Save an isotherm",
-                                    default_file_name,
+        if self.isotherms_model.current_iso_index is None:
+            return
+
+        filename = save_file_dialog(self, "Save an isotherm", '.',
                                     filter=";;".join(
                                         ['pyGAPS JSON Isotherm (*.json)',
                                          'pyGAPS CSV Isotherm (*.csv)',
                                          'pyGAPS Excel Isotherm (*.xls)']))
 
         if filename is not None and filename != '':
-            fileroot, ext = os.path.splitext(filename)
+            _, ext = os.path.splitext(filename)
             try:
-                self.isotherms_model.save(fileroot, ext)
+                self.isotherms_model.save(filename, ext)
             except Exception as e:
                 errorbox = ErrorMessageBox()
                 errorbox.setText(str(e))
