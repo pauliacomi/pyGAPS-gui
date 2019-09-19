@@ -1,6 +1,6 @@
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from src.views.graph_view import GraphView
+from src.views.GraphView import GraphView
 
 
 class BETDialog(QtWidgets.QDialog):

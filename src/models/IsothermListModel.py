@@ -4,7 +4,6 @@ from PySide2 import QtGui, QtCore
 
 import pygaps
 
-from src.views.UtilityWidgets import ErrorMessageBox
 from src.models.IsothermModel import IsothermModel
 
 

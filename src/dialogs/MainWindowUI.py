@@ -1,4 +1,4 @@
-import src.views.resources_rc
+import src.dialogs.resources_rc
 
 from PySide2 import QtCore, QtGui
 from PySide2.QtWidgets import QApplication, QWidget

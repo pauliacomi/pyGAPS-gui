@@ -3,9 +3,9 @@ import sys
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 import PySide2.QtCore as QtCore
 
-from src.views.MainWindowUI import MainWindowUI
-from src.views.UtilityWidgets import open_files_dialog, save_file_dialog, ErrorMessageBox
-from src.models.bet_model import BETModel
+from src.dialogs.MainWindowUI import MainWindowUI
+from src.dialogs.BETDialog import BETDialog
+from src.dialogs.UtilityDialogs import open_files_dialog, save_file_dialog, ErrorMessageBox
 
 from src.models.IsothermListModel import IsothermListModel
 from src.models.IsothermDataTableModel import IsothermDataTableModel
