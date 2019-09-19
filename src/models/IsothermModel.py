@@ -1,7 +1,7 @@
-from PySide2.QtGui import QStandardItem
+from PySide2 import QtGui
 
 
-class IsothermModel(QStandardItem):
+class IsothermModel(QtGui.QStandardItem):
     """Overloading a standard item to store an isotherm."""
 
     def __init__(self, *args, **kwargs):

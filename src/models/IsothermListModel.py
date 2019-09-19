@@ -19,10 +19,10 @@ class IsothermListModel(QtGui.QStandardItemModel):
 
         self.itemChanged.connect(self.check_changed)
 
-    def current_iso(self):
+    def get_iso_current(self):
         return self.itemFromIndex(self.current_iso_index).data()
 
-    def data_from_iso(self, index):
+    def get_iso_index(self, index):
         return self.itemFromIndex(index).data()
 
     def select(self, index):
@@ -65,7 +65,7 @@ class IsothermListModel(QtGui.QStandardItemModel):
         self.appendRow(iso_model)
 
     def save(self, path, ext):
-        isotherm = self.current_iso()
+        isotherm = self.get_iso_current()
 
         if ext == '.csv':
             pygaps.isotherm_to_csv(isotherm, path)

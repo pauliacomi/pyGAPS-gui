@@ -23,7 +23,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # Create isotherm model-views
-        self.explorer_init()
+        self.isotherm_model_init()
 
         # Create and connect menu
         self.connect_menu()
@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
         # Display state
         self.ui.statusbar.showMessage('Ready', 5000)
 
-    def explorer_init(self):
+    def isotherm_model_init(self):
         """Create the isotherm explorer model and connect it to views."""
 
         # Create isotherm list model
@@ -56,7 +56,7 @@ class MainWindow(QMainWindow):
     ########################################################
 
     def iso_info(self):
-        isotherm = self.isotherms_model.current_iso()
+        isotherm = self.isotherms_model.get_iso_current()
 
         self.ui.materialNameLineEdit.setText(isotherm.material)
         self.ui.materialBatchLineEdit.setText(isotherm.material_batch)
@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
     def iso_data(self):
         from src.dialogs.DataDialog import DataDialog
         if self.isotherms_model.current_iso_index:
-            isotherm = self.isotherms_model.current_iso()
+            isotherm = self.isotherms_model.get_iso_current()
             dialog = DataDialog()
             dialog.tableView.setModel(IsothermDataTableModel(isotherm.data()))
             dialog.exec_()

@@ -9,7 +9,7 @@ from matplotlib.backends.backend_qt5agg import (
 import pygaps
 
 
-class GraphView(QWidget):
+class IsoGraphView(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,11 +29,11 @@ class GraphView(QWidget):
 
     def plot(self):
         selected_iso = [
-            self.model.data_from_iso(index)
+            self.model.get_iso_index(index)
             for index in self.model.selected_iso_indices
         ]
         if self.model.current_iso_index not in self.model.selected_iso_indices:
-            selected_iso.append(self.model.current_iso())
+            selected_iso.append(self.model.get_iso_current())
         self._static_ax.clear()
         pygaps.plot_iso(
             selected_iso,

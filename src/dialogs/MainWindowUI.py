@@ -2,12 +2,13 @@ import src.dialogs.resources_rc
 
 from PySide2 import QtCore, QtGui
 from PySide2.QtWidgets import QApplication, QWidget
-from PySide2.QtWidgets import QHBoxLayout, QGridLayout, QGroupBox, QListView
+from PySide2.QtWidgets import QHBoxLayout, QGridLayout, QGroupBox
 from PySide2.QtWidgets import QSizePolicy, QAbstractItemView
 from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QTextBrowser
 from PySide2.QtWidgets import QMenu, QMenuBar, QAction, QStatusBar
 
-from src.views.GraphView import GraphView
+from src.views.IsoGraphView import IsoGraphView
+from src.views.ExplorerListView import ExplorerListView
 
 
 class MainWindowUI(object):
@@ -42,7 +43,7 @@ class MainWindowUI(object):
 
         self.gridExplorer = QGridLayout(self.explorerGroup)
         self.gridExplorer.setObjectName("gridExplorer")
-        self.isoExplorer = QListView(self.explorerGroup)
+        self.isoExplorer = ExplorerListView(self.explorerGroup)
         self.isoExplorer.setEditTriggers(
             QAbstractItemView.NoEditTriggers)
         self.isoExplorer.setSelectionMode(
@@ -103,7 +104,7 @@ class MainWindowUI(object):
 
         self.graphGrid = QGridLayout(self.graphGroup)
         self.graphGrid.setObjectName("graphGrid")
-        self.isoGraph = GraphView(self.graphGroup)
+        self.isoGraph = IsoGraphView(self.graphGroup)
         self.isoGraph.setObjectName("isoGraph")
         self.graphGrid.addWidget(self.isoGraph, 0, 0, 1, 1)
         self.mainLayout.addWidget(self.graphGroup)

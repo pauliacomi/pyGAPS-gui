@@ -1,6 +1,6 @@
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from src.views.GraphView import GraphView
+from src.views.IsoGraphView import IsoGraphView
 
 
 class BETDialog(QtWidgets.QDialog):
@@ -18,17 +18,17 @@ class BETDialog(QtWidgets.QDialog):
         self.layout = QtWidgets.QVBoxLayout(Dialog)
         self.layout.setObjectName("layout")
 
-        self.isoGraph = GraphView(Dialog)
+        self.isoGraph = IsoGraphView(Dialog)
         self.isoGraph.setObjectName("isoGraph")
         self.layout.addWidget(self.isoGraph)
 
         # BET plot
-        self.betGraph = GraphView(Dialog)
+        self.betGraph = IsoGraphView(Dialog)
         self.betGraph.setObjectName("betGraph")
         self.layout.addWidget(self.betGraph)
 
         # Rouquerol plot
-        self.rouqGraph = GraphView(Dialog)
+        self.rouqGraph = IsoGraphView(Dialog)
         self.rouqGraph.setObjectName("rouqGraph")
         self.layout.addWidget(self.rouqGraph)
 
