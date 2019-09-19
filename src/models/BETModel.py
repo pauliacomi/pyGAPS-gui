@@ -9,8 +9,6 @@ from pygaps.graphing.calcgraph import bet_plot, roq_plot
 
 class BETModel(QtCore.QObject):
 
-    bet_calculated = QtCore.Signal()
-
     def __init__(self, isotherm, parent=None):
         super().__init__(parent)
         self._isotherm = isotherm
@@ -26,6 +24,7 @@ class BETModel(QtCore.QObject):
         self.pressure = self._isotherm.pressure(branch='ads',
                                                 pressure_mode='relative')
 
+        self.limits = None
         self.minimum = None
         self.maximum = None
 
@@ -39,7 +38,10 @@ class BETModel(QtCore.QObject):
 
     def set_view(self, view):
         self.view = view
-        self.bet_calculated.connect(self.plotBET)
+        self.calcBET()
+
+    def set_limits(self, left, right):
+        self.limits = [left, right]
         self.calcBET()
 
     def calcBET(self):
@@ -54,9 +56,9 @@ class BETModel(QtCore.QObject):
             self.minimum, self.maximum,
             self.corr_coef
         ) = area_BET_raw(self.pressure, self.loading,
-                         self.cross_section, limits=None)
+                         self.cross_section, limits=self.limits)
 
-        self.bet_calculated.emit()
+        self.plotBET()
 
     def plotBET(self):
 

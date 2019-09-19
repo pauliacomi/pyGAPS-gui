@@ -132,9 +132,9 @@ class MainWindow(QMainWindow):
         if index:
             isotherm = self.isotherms_model.itemFromIndex(index).data()
             dialog = BETDialog()
-            # TODO is it a model or a controller??
-            controller = BETModel(isotherm)
-            controller.set_view(dialog)
+            model = BETModel(isotherm)
+            model.set_view(dialog)
+            dialog.pSlider.rangeChanged.connect(model.set_limits)
             dialog.exec_()
 
     def about(self):
