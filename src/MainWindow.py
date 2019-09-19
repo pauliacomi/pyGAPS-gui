@@ -4,11 +4,12 @@ from PySide2.QtWidgets import QMainWindow, QMessageBox
 import PySide2.QtCore as QtCore
 
 from src.views.mainwindow_ui import MainWindowUI
-from src.views.utility import open_files_dialog, save_file_dialog
+from src.views.UtilityWidgets import open_files_dialog, save_file_dialog, ErrorMessageBox
 from src.models.bet_model import BETModel
-from src.models.explorer_model import ExplorerModel
-from src.models.isotherm_model import IsothermModel
-from src.models.isotherm_data_model import IsothermDataModel
+
+from src.models.IsothermModel import IsothermModel
+from src.models.IsothermListModel import IsothermListModel
+from src.models.IsothermDataTableModel import IsothermDataTableModel
 
 import pygaps
 
@@ -47,7 +48,7 @@ class MainWindow(QMainWindow):
 
     def explorer_init(self):
         """Create the isotherm explorer model and connect it to UI."""
-        self.explorer_model = ExplorerModel()
+        self.explorer_model = IsothermListModel()
 
         self.ui.isoExplorer.setModel(self.explorer_model)
         self.ui.isoExplorer.clicked.connect(self.select)
@@ -73,28 +74,27 @@ class MainWindow(QMainWindow):
             for filepath in filenames:
                 dirpath, filename = os.path.split(filepath)
                 filetitle, fileext = os.path.splitext(filename)
-                new_iso_model = IsothermModel(filetitle)
                 try:
                     if fileext == '.csv':
-                        new_iso_model.setData(
-                            pygaps.isotherm_from_csv(filepath))
+                        isotherm = pygaps.isotherm_from_csv(filepath)
                     elif fileext == '.json':
-                        new_iso_model.setData(
-                            pygaps.isotherm_from_jsonf(filepath))
+                        isotherm = pygaps.isotherm_from_jsonf(filepath)
                     elif fileext == '.xls' or fileext == '.xlsx':
-                        new_iso_model.setData(
-                            pygaps.isotherm_from_xl(filepath))
+                        isotherm = pygaps.isotherm_from_xl(filepath)
 
-                    # It should be checkable, but not checked
-                    new_iso_model.setCheckable(True)
-                    check = QtCore.Qt.Unchecked
-                    new_iso_model.setCheckState(check)
-                    # TODO need to make them checkable later
-
-                    self.explorer_model.appendRow(new_iso_model)
+                    # Create the model to store the isotherm
+                    iso_model = IsothermModel(filetitle)
+                    # store data
+                    iso_model.setData(isotherm)
+                    # make checkable and set unchecked
+                    iso_model.setCheckable(True)
+                    iso_model.setCheckState(QtCore.Qt.Unchecked)
+                    # Add to the explorer model
+                    self.explorer_model.appendRow(iso_model)
                 except Exception as e:
-                    # TODO Print out error details
-                    print(e)
+                    errorbox = ErrorMessageBox()
+                    errorbox.setText(str(e))
+                    errorbox.exec_()
 
     def save(self):
         """Save isotherm to file."""
@@ -118,9 +118,9 @@ class MainWindow(QMainWindow):
                 elif fileext == '.xls' or fileext == '.xlsx':
                     pygaps.isotherm_to_xl(isotherm, filename)
             except Exception as e:
-                # TODO Print error details
-                print(e)
-                pass
+                errorbox = ErrorMessageBox()
+                errorbox.setText(str(e))
+                errorbox.exec_()
 
     def iso_plot(self):
         selected_iso = [
@@ -154,7 +154,7 @@ class MainWindow(QMainWindow):
             isotherm = self.explorer_model.itemFromIndex(
                 self.current_iso_index).data()
             dialog = DataDialog()
-            dialog.tableView.setModel(IsothermDataModel(isotherm.data()))
+            dialog.tableView.setModel(IsothermDataTableModel(isotherm.data()))
             dialog.exec_()
 
     def select(self, index):

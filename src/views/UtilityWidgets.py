@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtCore
 
 
 def open_file_dialog(parent_widget, caption, directory, filter=None):
@@ -26,3 +26,27 @@ def save_file_dialog(parent_widget, caption, directory, filter=None):
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
         return str(filename[0])
     return str(filename)
+
+
+class ErrorMessageBox(QtWidgets.QDialog):
+    def __init__(self, *args, **kwargs):
+        super(ErrorMessageBox, self).__init__(*args, **kwargs)
+        self.setWindowTitle("An error occurred!")
+
+        self.text_lbl = QtWidgets.QLabel()
+        self.text_lbl.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.scroll_area = QtWidgets.QScrollArea()
+
+        self.scroll_area.setWidget(self.text_lbl)
+        self.scroll_area.setWidgetResizable(True)
+        self.ok_btn = QtWidgets.QPushButton('OK')
+
+        _layout = QtWidgets.QGridLayout()
+        _layout.addWidget(self.scroll_area, 0, 0, 1, 10)
+        _layout.addWidget(self.ok_btn, 1, 9)
+
+        self.setLayout(_layout)
+        self.ok_btn.clicked.connect(self.close)
+
+    def setText(self, text_str):
+        self.text_lbl.setText(text_str)

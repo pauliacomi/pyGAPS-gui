@@ -1,8 +1,9 @@
-
 from PySide2 import QtCore
 
 
-class IsothermDataModel(QtCore.QAbstractTableModel):
+class IsothermDataTableModel(QtCore.QAbstractTableModel):
+    """Overloading a table model to display isotherm adsorption data."""
+
     def __init__(self, data, parent=None):
         super().__init__(parent)
         self._data = data
