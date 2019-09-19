@@ -6,6 +6,8 @@ from PySide2.QtWidgets import (QVBoxLayout, QWidget)
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 
+import pygaps
+
 
 class GraphView(QWidget):
 
@@ -22,7 +24,19 @@ class GraphView(QWidget):
 
         self._static_ax = self.canvas.figure.subplots()
 
-    @property
-    def ax(self):
-        """Get main ax."""
-        return self._static_ax
+    def setModel(self, model):
+        self.model = model
+
+    def plot(self):
+        selected_iso = [
+            self.model.data_from_iso(index)
+            for index in self.model.selected_iso_indices
+        ]
+        if self.model.current_iso_index not in self.model.selected_iso_indices:
+            selected_iso.append(self.model.current_iso())
+        self._static_ax.clear()
+        pygaps.plot_iso(
+            selected_iso,
+            ax=self._static_ax
+        )
+        self._static_ax.figure.canvas.draw()

@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QSizePolicy, QAbstractItemView
 from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QTextBrowser
 from PySide2.QtWidgets import QMenu, QMenuBar, QAction, QStatusBar
 
-from src.views.graph_view import GraphView
+from src.views.GraphView import GraphView
 
 
 class MainWindowUI(object):
@@ -101,11 +101,11 @@ class MainWindowUI(object):
         sizePolicy.setHorizontalStretch(3)
         self.graphGroup.setSizePolicy(sizePolicy)
 
-        self.gridGraph = QGridLayout(self.graphGroup)
-        self.gridGraph.setObjectName("gridGraph")
-        self.graphicsView = GraphView(self.graphGroup)
-        self.graphicsView.setObjectName("graphicsView")
-        self.gridGraph.addWidget(self.graphicsView, 0, 0, 1, 1)
+        self.graphGrid = QGridLayout(self.graphGroup)
+        self.graphGrid.setObjectName("graphGrid")
+        self.isoGraph = GraphView(self.graphGroup)
+        self.isoGraph.setObjectName("isoGraph")
+        self.graphGrid.addWidget(self.isoGraph, 0, 0, 1, 1)
         self.mainLayout.addWidget(self.graphGroup)
 
         # Now set central widget
