@@ -21,8 +21,6 @@ class IsothermDataTableModel(QtCore.QAbstractTableModel):
         return None
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
-        """
-        """
         if role != QtCore.Qt.DisplayRole:
             return None
 
