@@ -4,7 +4,6 @@ from PySide2.QtWidgets import QMainWindow, QMessageBox
 import PySide2.QtCore as QtCore
 
 from src.dialogs.MainWindowUI import MainWindowUI
-from src.dialogs.BETDialog import BETDialog
 from src.dialogs.UtilityDialogs import open_files_dialog, save_file_dialog, ErrorMessageBox
 
 from src.models.IsothermListModel import IsothermListModel
@@ -23,11 +22,8 @@ class MainWindow(QMainWindow):
         self.ui = MainWindowUI()
         self.ui.setupUi(self)
 
-        # Create isotherm explorer
+        # Create isotherm model-views
         self.explorer_init()
-
-        # Create isotherm data link
-        self.ui.dataButton.clicked.connect(self.iso_data)
 
         # Create and connect menu
         self.connect_menu()
@@ -36,7 +32,7 @@ class MainWindow(QMainWindow):
         self.ui.statusbar.showMessage('Ready', 5000)
 
     def explorer_init(self):
-        """Create the isotherm explorer model and connect it to UI."""
+        """Create the isotherm explorer model and connect it to views."""
 
         # Create isotherm list model
         self.isotherms_model = IsothermListModel()
@@ -45,12 +41,40 @@ class MainWindow(QMainWindow):
         self.ui.isoExplorer.setModel(self.isotherms_model)
         self.ui.isoExplorer.clicked.connect(self.isotherms_model.select)
 
-        # Create isotherm info model
+        # Create isotherm info view
         self.isotherms_model.iso_sel_change.connect(self.iso_info)
+
+        # Create isotherm data view
+        self.ui.dataButton.clicked.connect(self.iso_data)
 
         # Connect to graph
         self.ui.isoGraph.setModel(self.isotherms_model)
         self.isotherms_model.iso_sel_change.connect(self.ui.isoGraph.plot)
+
+    ########################################################
+    # Display functionality
+    ########################################################
+
+    def iso_info(self):
+        isotherm = self.isotherms_model.current_iso()
+
+        self.ui.materialNameLineEdit.setText(isotherm.material)
+        self.ui.materialBatchLineEdit.setText(isotherm.material_batch)
+        self.ui.adsorbateLineEdit.setText(str(isotherm.adsorbate))
+        self.ui.temperatureLineEdit.setText(str(isotherm.temperature))
+        self.ui.textInfo.setText(str(isotherm))
+
+    def iso_data(self):
+        from src.dialogs.DataDialog import DataDialog
+        if self.isotherms_model.current_iso_index:
+            isotherm = self.isotherms_model.current_iso()
+            dialog = DataDialog()
+            dialog.tableView.setModel(IsothermDataTableModel(isotherm.data()))
+            dialog.exec_()
+
+    ########################################################
+    # Menu functionality
+    ########################################################
 
     def connect_menu(self):
         """Connect signals and slots of the menu."""
@@ -60,6 +84,10 @@ class MainWindow(QMainWindow):
         self.ui.actionAbout.triggered.connect(self.about)
 
         self.ui.actionBET_Surface_Area.triggered.connect(self.BETarea)
+
+    def quit_app(self):
+        """Close application."""
+        self.close()
 
     def load(self):
         """Open isotherm from file."""
@@ -98,33 +126,9 @@ class MainWindow(QMainWindow):
                 errorbox.setText(str(e))
                 errorbox.exec_()
 
-    def iso_info(self):
-        isotherm = self.isotherms_model.current_iso()
-
-        self.ui.materialNameLineEdit.setText(isotherm.material)
-        self.ui.materialBatchLineEdit.setText(isotherm.material_batch)
-        self.ui.adsorbateLineEdit.setText(str(isotherm.adsorbate))
-        self.ui.temperatureLineEdit.setText(str(isotherm.temperature))
-        self.ui.textInfo.setText(str(isotherm))
-
-    def iso_data(self):
-        from src.views.data_dialog import DataDialog
-        if self.isotherms_model.current_iso_index:
-            isotherm = self.isotherms_model.current_iso()
-            dialog = DataDialog()
-            dialog.tableView.setModel(IsothermDataTableModel(isotherm.data()))
-            dialog.exec_()
-
-    def quit_app(self):
-        """Close application."""
-        self.close()
-
-    ########################################################
-    # Menu functionality
-    ########################################################
-
     def BETarea(self):
-        from src.views.bet_dialog import BETDialog
+        from src.dialogs.BETDialog import BETDialog
+        from src.models.BETModel import BETModel
         index = self.isotherms_model.current_iso_index
         if index:
             isotherm = self.isotherms_model.itemFromIndex(index).data()

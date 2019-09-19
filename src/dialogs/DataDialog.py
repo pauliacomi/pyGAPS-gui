@@ -19,6 +19,15 @@ class DataDialog(QtWidgets.QDialog):
         self.tableView.setObjectName("tableView")
         self.layout.addWidget(self.tableView)
 
+        # QTableView Headers
+        self.horizontal_header = self.tableView.horizontalHeader()
+        self.vertical_header = self.tableView.verticalHeader()
+        self.horizontal_header.setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeToContents)
+        self.vertical_header.setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeToContents)
+        # self.horizontal_header.setStretchLastSection(True)
+
         # Button box
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
