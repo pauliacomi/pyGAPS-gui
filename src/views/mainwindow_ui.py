@@ -91,9 +91,6 @@ class MainWindowUI(object):
         self.dataButton = QPushButton(self.propertiesGroup)
         self.dataButton.setObjectName("dataButton")
         self.gridProperties.addWidget(self.dataButton, 5, 0, 1, 1)
-        self.freezeButton = QPushButton(self.propertiesGroup)
-        self.freezeButton.setObjectName("freezeButton")
-        self.gridProperties.addWidget(self.freezeButton, 5, 1, 1, 1)
         self.mainLayout.addWidget(self.propertiesGroup)
 
         # Right group
@@ -226,8 +223,6 @@ class MainWindowUI(object):
             "MainWindowUI", "Material Name", None, -1))
         self.dataButton.setText(QApplication.translate(
             "MainWindowUI", "Data", None, -1))
-        self.freezeButton.setText(QApplication.translate(
-            "MainWindowUI", "Freeze ->", None, -1))
         self.graphGroup.setTitle(QApplication.translate(
             "MainWindowUI", "Isotherm Overlay", None, -1))
         self.menuFile.setTitle(QApplication.translate(

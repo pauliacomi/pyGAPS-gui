@@ -19,8 +19,7 @@ class MainWindow(QMainWindow):
     current_iso_index = None
     selected_iso_indices = []
 
-    iso_selected = QtCore.Signal()
-    iso_deselected = QtCore.Signal()
+    iso_sel_change = QtCore.Signal()
 
     def __init__(self, parent=None):
 
@@ -34,8 +33,8 @@ class MainWindow(QMainWindow):
         # Create isotherm explorer
         self.explorer_init()
 
-        self.iso_selected.connect(self.iso_info)
-        self.iso_selected.connect(self.iso_plot)
+        self.iso_sel_change.connect(self.iso_info)
+        self.iso_sel_change.connect(self.iso_plot)
 
         # Create isotherm data link
         self.ui.dataButton.clicked.connect(self.iso_data)
@@ -51,7 +50,7 @@ class MainWindow(QMainWindow):
         self.explorer_model = ExplorerModel()
 
         self.ui.isoExplorer.setModel(self.explorer_model)
-        # self.ui.isoExplorer.clicked.connect(self.select)
+        self.ui.isoExplorer.clicked.connect(self.select)
         self.explorer_model.itemChanged.connect(self.explorer_changed)
 
     def connect_menu(self):
@@ -128,6 +127,10 @@ class MainWindow(QMainWindow):
             self.explorer_model.itemFromIndex(index).data()
             for index in self.selected_iso_indices
         ]
+        if self.current_iso_index not in self.selected_iso_indices:
+            selected_iso.append(
+                self.explorer_model.itemFromIndex(
+                    self.current_iso_index).data())
         self.ui.graphicsView.ax.clear()
         pygaps.plot_iso(
             selected_iso,
@@ -136,8 +139,9 @@ class MainWindow(QMainWindow):
         self.ui.graphicsView.ax.figure.canvas.draw()
 
     def iso_info(self):
-        index = self.current_iso_index
-        isotherm = self.explorer_model.itemFromIndex(index).data()
+        isotherm = self.explorer_model.itemFromIndex(
+            self.current_iso_index).data()
+
         self.ui.materialNameLineEdit.setText(isotherm.material)
         self.ui.materialBatchLineEdit.setText(isotherm.material_batch)
         self.ui.adsorbateLineEdit.setText(str(isotherm.adsorbate))
@@ -146,27 +150,32 @@ class MainWindow(QMainWindow):
 
     def iso_data(self):
         from src.views.data_dialog import DataDialog
-        index = self.current_iso_index
-        if index:
-            isotherm = self.explorer_model.itemFromIndex(index).data()
+        if self.current_iso_index:
+            isotherm = self.explorer_model.itemFromIndex(
+                self.current_iso_index).data()
             dialog = DataDialog()
             dialog.tableView.setModel(IsothermDataModel(isotherm.data()))
             dialog.exec_()
 
     def select(self, index):
         self.current_iso_index = index
-        self.selected_iso_indices.append(index)
-        self.iso_selected.emit()
+        self.iso_sel_change.emit()
 
-    def deselect(self, index):
+    def checked(self, index):
+        self.current_iso_index = index
+        if index not in self.selected_iso_indices:
+            self.selected_iso_indices.append(index)
+        self.iso_sel_change.emit()
+
+    def unchecked(self, index):
         self.selected_iso_indices.remove(index)
-        self.iso_selected.emit()
+        self.iso_sel_change.emit()
 
     def explorer_changed(self, item):
         if item.checkState() == QtCore.Qt.Checked:
-            self.select(item.index())
+            self.checked(item.index())
         if item.checkState() == QtCore.Qt.Unchecked:
-            self.deselect(item.index())
+            self.unchecked(item.index())
 
     def quit_app(self):
         """Close application."""
