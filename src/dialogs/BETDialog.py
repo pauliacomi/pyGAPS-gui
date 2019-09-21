@@ -4,6 +4,8 @@ from src.views.GraphView import GraphView
 from src.views.IsoGraphView import IsoGraphView
 from src.views.RangeSlider import QHSpinBoxRangeSlider
 
+from src.dialogs.UtilityDialogs import LabelAlignRight
+
 
 class BETDialog(QtWidgets.QDialog):
 
@@ -28,27 +30,36 @@ class BETDialog(QtWidgets.QDialog):
         # BET plot
         self.betGraph = GraphView(Dialog)
         self.betGraph.setObjectName("betGraph")
-        self.layout.addWidget(self.betGraph, 1, 0, 1, 1)
+        self.layout.addWidget(self.betGraph, 0, 1, 1, 1)
 
         # Rouquerol plot
         self.rouqGraph = GraphView(Dialog)
         self.rouqGraph.setObjectName("rouqGraph")
         self.layout.addWidget(self.rouqGraph, 1, 1, 1, 1)
 
-        # Tweaking parameters
-        # self.tweakingLayout = QtWidgets.QHBoxLayout(self)
+        # Options/results box
 
-        self.pSlider = QHSpinBoxRangeSlider(
-            slider_range=[0, 1, 0.02], values=[0, 1])
+        self.optionsBox = QtWidgets.QGroupBox('Range and results', Dialog)
+        self.layout.addWidget(self.optionsBox, 1, 0, 1, 1)
+
+        self.optionsLayout = QtWidgets.QGridLayout(self.optionsBox)
+        self.optionsLayout.addWidget(
+            QtWidgets.QLabel("Pressure range:"), 0, 0, 1, 2)
+        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=2,
+                                            slider_range=[0, 1, 0.01], values=[0, 1])
+        self.pSlider.setGeometry(200, 200, 200, 100)
         self.pSlider.setEmitWhileMoving(False)
-        self.layout.addWidget(self.pSlider, 0, 1, 1, 1)
-
-        # self.lSlider = QHSpinBoxRangeSlider(
-        #     slider_range=[-5.0, 5.0, 0.5], values=[-2.5, 2.5])
-        # self.lSlider.setEmitWhileMoving(True)
-        # self.tweakingLayout.addWidget(self.lSlider)
-
-        # self.layout.addWidget(self.tweakingLayout, 0, 1, 1, 1)
+        self.optionsLayout.addWidget(self.pSlider, 1, 0, 1, 4)
+        self.optionsLayout.addWidget(
+            QtWidgets.QLabel("Calculated results:"), 2, 0, 1, 2)
+        self.optionsLayout.addWidget(
+            LabelAlignRight("BET area:"), 3, 0, 1, 1)
+        self.optionsLayout.addWidget(
+            LabelAlignRight("C constant:"), 4, 0, 1, 1)
+        self.optionsLayout.addWidget(
+            LabelAlignRight("Monolayer uptake:"), 5, 0, 1, 1)
+        self.optionsLayout.addWidget(
+            LabelAlignRight("Monolayer pressure:"), 6, 0, 1, 1)
 
         # Bottom buttons
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)

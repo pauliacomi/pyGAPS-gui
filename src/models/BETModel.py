@@ -7,10 +7,10 @@ from pygaps.characterisation.area_bet import (area_BET_raw,
 from pygaps.graphing.calcgraph import bet_plot, roq_plot
 
 
-class BETModel(QtCore.QObject):
+class BETModel():
 
     def __init__(self, isotherm, parent=None):
-        super().__init__(parent)
+
         self._isotherm = isotherm
 
         # Properties
@@ -38,15 +38,19 @@ class BETModel(QtCore.QObject):
 
     def set_view(self, view):
         self.view = view
+        self.plotiso()
         self.calcBET()
+        self.resetSlider()
+        self.plotBET()
 
     def set_limits(self, left, right):
         self.limits = [left, right]
         self.calcBET()
+        self.plotBET()
 
     def calcBET(self):
 
-        # use the bet function
+        # use the BET function
         (
             self.bet_area,
             self.c_const,
@@ -58,20 +62,25 @@ class BETModel(QtCore.QObject):
         ) = area_BET_raw(self.pressure, self.loading,
                          self.cross_section, limits=self.limits)
 
-        self.plotBET()
+    def resetSlider(self):
+        self.view.pSlider.range_slider.setValues(
+            [self.pressure[self.minimum],
+             self.pressure[self.maximum]])
 
-    def plotBET(self):
-
-        # Clear plots
-        self.view.isoGraph.ax.clear()
-        self.view.betGraph.ax.clear()
-        self.view.rouqGraph.ax.clear()
-
+    def plotiso(self):
         # Generate plot of the isotherm
         pygaps.plot_iso(
             self._isotherm,
             ax=self.view.isoGraph.ax
         )
+        # Draw figure
+        self.view.isoGraph.ax.figure.canvas.draw()
+
+    def plotBET(self):
+
+        # Clear plots
+        self.view.betGraph.ax.clear()
+        self.view.rouqGraph.ax.clear()
 
         # Generate plot of the BET points chosen
         bet_plot(self.pressure,
@@ -91,6 +100,5 @@ class BETModel(QtCore.QObject):
                  ax=self.view.rouqGraph.ax)
 
         # Draw figures
-        self.view.isoGraph.ax.figure.canvas.draw()
         self.view.betGraph.ax.figure.canvas.draw()
         self.view.rouqGraph.ax.figure.canvas.draw()

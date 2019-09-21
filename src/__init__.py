@@ -2,6 +2,7 @@ import sys
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QApplication
+from qtconsole.inprocess import QtInProcessKernelManager
 from .MainWindow import MainWindow
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -29,8 +30,14 @@ def main():
     # Create application
     app = QApplication(sys.argv)
 
+    # Create kernel
+    kernel_manager = QtInProcessKernelManager()
+    kernel_manager.start_kernel(show_banner=True)
+    kernel = kernel_manager.kernel
+    kernel.gui = 'qt'
+
     # Create main window and show
-    application = MainWindow()
+    application = MainWindow(kernel_manager)
     application.show()
 
     # Execute

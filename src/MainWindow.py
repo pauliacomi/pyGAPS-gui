@@ -9,14 +9,19 @@ from src.dialogs.UtilityDialogs import open_files_dialog, save_file_dialog, Erro
 from src.models.IsothermListModel import IsothermListModel
 from src.models.IsothermDataTableModel import IsothermDataTableModel
 
+from src.views.ConsoleView import ConsoleView
+
 
 class MainWindow(QMainWindow):
     """Main Window for isotherm explorer and plotting."""
 
-    def __init__(self, parent=None):
+    def __init__(self, kernel, parent=None):
 
         # Initial init
         super().__init__(parent)
+
+        # save kernel
+        self.kernel = kernel
 
         # Create and attach UI
         self.ui = MainWindowUI()
@@ -82,6 +87,7 @@ class MainWindow(QMainWindow):
         self.ui.actionSave.triggered.connect(self.save)
         self.ui.actionQuit.triggered.connect(self.quit_app)
         self.ui.actionAbout.triggered.connect(self.about)
+        # self.ui.actionConsole.triggered.connect(self.console)
 
         self.ui.actionBET_Surface_Area.triggered.connect(self.BETarea)
 
@@ -140,3 +146,13 @@ class MainWindow(QMainWindow):
     def about(self):
         """Show Help/About message box."""
         QMessageBox.about(self, 'application', 'iacomi.paul@gmail.com')
+
+    def console(self):
+        """Display console."""
+
+        kernel_client = self.kernel.client()
+        kernel_client.start_channels()
+
+        global ipython_widget  # Prevent from being garbage collected
+        ipython_widget = ConsoleView(self.kernel, kernel_client)
+        ipython_widget.show()

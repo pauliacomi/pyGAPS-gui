@@ -50,3 +50,9 @@ class ErrorMessageBox(QtWidgets.QDialog):
 
     def setText(self, text_str):
         self.text_lbl.setText(text_str)
+
+
+class LabelAlignRight(QtWidgets.QLabel):
+    def __init__(self, *args, **kwargs):
+        super(LabelAlignRight, self).__init__(*args, **kwargs)
+        self.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)

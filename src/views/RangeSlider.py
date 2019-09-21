@@ -408,14 +408,18 @@ class QSpinBoxRangeSlider(QWidget):
     doubleClick = QtCore.Signal(bool)
     rangeChanged = QtCore.Signal(float, float)
 
-    def __init__(self, slider_range, values, parent=None):
+    def __init__(self, slider_range, values, parent=None, **kwargs):
         QWidget.__init__(self, parent)
         self.max_val = values[1]
         self.min_val = values[0]
         self.range_slider = False
 
-        # Attempt to calculate the appropriate number of decimal points.
-        dec_pnts = abs(decimal.Decimal(slider_range[2]).as_tuple().exponent)
+        if 'dec_pnts' in kwargs:
+            dec_pnts = kwargs['dec_pnts']
+        else:
+            # Attempt to calculate the appropriate number of decimal points.
+            dec_pnts = abs(decimal.Decimal(
+                slider_range[2]).as_tuple().exponent)
 
         self.min_spin_box = QDoubleSpinBox()
         self.min_spin_box.setDecimals(dec_pnts)
@@ -543,8 +547,9 @@ class QHSpinBoxRangeSlider(QSpinBoxRangeSlider):
     @param parent (Optional) The PyQt parent of this widget.
     """
 
-    def __init__(self, slider_range, values, parent=None):
-        QSpinBoxRangeSlider.__init__(self, slider_range, values, parent)
+    def __init__(self, slider_range, values, parent=None, **kwargs):
+        QSpinBoxRangeSlider.__init__(
+            self, slider_range, values, parent, **kwargs)
         self.addRangeSlider(QHRangeSlider(slider_range, values, self))
 
         if (not parent):
@@ -565,8 +570,9 @@ class QVSpinBoxRangeSlider(QSpinBoxRangeSlider):
     @param parent (Optional) The PyQt parent of this widget.
     """
 
-    def __init__(self, slider_range, values, parent=None):
-        QSpinBoxRangeSlider.__init__(self, slider_range, values, parent)
+    def __init__(self, slider_range, values, parent=None, **kwargs):
+        QSpinBoxRangeSlider.__init__(
+            self, slider_range, values, parent, **kwargs)
         self.addRangeSlider(QVRangeSlider(slider_range, values, self))
 
         if (not parent):
