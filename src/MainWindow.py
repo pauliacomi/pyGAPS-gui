@@ -111,6 +111,10 @@ class MainWindow(QMainWindow):
                     errorbox.setText(str(e))
                     errorbox.exec_()
 
+            first_iso = self.isotherms_model.index(0, 0)
+            self.ui.isoExplorer.setCurrentIndex(first_iso)
+            self.isotherms_model.select(first_iso)
+
     def save(self):
         """Save isotherm to file."""
         if self.isotherms_model.current_iso_index is None:
