@@ -232,13 +232,14 @@ class QRangeSlider(QWidget):
         if (abs(steps - round(steps)) > 0.01 * self.single_step):
             raise Exception("Slider range is not a multiple of the step size!")
 
-    def setValues(self, values):
+    def setValues(self, values, emit=True):
         """
         @param values [position of minimum slider, position of maximum slider].
         """
         self.min_val = values[0]
         self.max_val = values[1]
-        self.emitRange()
+        if emit:
+            self.emitRange()
         self.updateDisplayValues()
         self.update()
 
@@ -491,6 +492,19 @@ class QSpinBoxRangeSlider(QWidget):
         return [self.min_spin_box.value(),
                 self.max_spin_box.value()]
 
+    def setValues(self, values, emit=True):
+        """
+        @param values [position of minimum slider, position of maximum slider].
+        """
+        self.range_slider.setValues(values, emit)
+        if not emit:
+            self.min_spin_box.blockSignals(True)
+            self.max_spin_box.blockSignals(True)
+        self.handleRangeChange(values[0], values[1])
+        if not emit:
+            self.min_spin_box.blockSignals(False)
+            self.max_spin_box.blockSignals(False)
+
     def handleDoubleClick(self, boolean):
         """
         This just passes on the double click signal from the range slider.
@@ -499,7 +513,7 @@ class QSpinBoxRangeSlider(QWidget):
         """
         self.doubleClick.emit(boolean)
 
-    def handleMaxSpinBox(self, new_value):
+    def handleMaxSpinBox(self, new_value, emit=True):
         """
         @param new_value The new value of the spin box.
         """
@@ -507,9 +521,10 @@ class QSpinBoxRangeSlider(QWidget):
         if (new_value < self.min_spin_box.value()):
             self.min_spin_box.setValue(new_value)
 
-        self.emitRangeChange()
+        if emit:
+            self.emitRangeChange()
 
-    def handleMinSpinBox(self, new_value):
+    def handleMinSpinBox(self, new_value, emit=True):
         """
         @param new_value The new value of the spin box.
         """
@@ -517,7 +532,8 @@ class QSpinBoxRangeSlider(QWidget):
         if (new_value > self.max_spin_box.value()):
             self.max_spin_box.setValue(new_value)
 
-        self.emitRangeChange()
+        if emit:
+            self.emitRangeChange()
 
     def handleRangeChange(self, min_val, max_val):
         """

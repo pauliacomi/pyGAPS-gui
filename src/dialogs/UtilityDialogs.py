@@ -54,5 +54,22 @@ class ErrorMessageBox(QtWidgets.QDialog):
 
 class LabelAlignRight(QtWidgets.QLabel):
     def __init__(self, *args, **kwargs):
-        super(LabelAlignRight, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+
+
+class LabelResult(QtWidgets.QLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
+        self.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+
+
+class LabelOutput(QtWidgets.QLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
+        self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.setWordWrap(True)

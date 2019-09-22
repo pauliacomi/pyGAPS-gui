@@ -144,7 +144,6 @@ class MainWindow(QMainWindow):
             dialog = BETDialog()
             model = BETModel(isotherm)
             model.set_view(dialog)
-            dialog.pSlider.rangeChanged.connect(model.set_limits)
             dialog.exec_()
 
     def about(self):

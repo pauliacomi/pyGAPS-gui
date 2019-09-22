@@ -1,3 +1,5 @@
+import warnings
+
 from PySide2 import QtCore
 
 import pygaps
@@ -24,7 +26,6 @@ class BETModel():
         self.pressure = self._isotherm.pressure(branch='ads',
                                                 pressure_mode='relative')
 
-        self.limits = None
         self.minimum = None
         self.maximum = None
 
@@ -36,36 +37,76 @@ class BETModel():
         self.intercept = None
         self.corr_coef = None
 
-    def set_view(self, view):
-        self.view = view
-        self.plotiso()
-        self.calcBET()
-        self.resetSlider()
-        self.plotBET()
+        self.output = None
 
-    def set_limits(self, left, right):
+    def set_view(self, view):
+        """Initial actions on view connect."""
+        self.view = view
+        self.view.auto_button.clicked.connect(self.calc_auto)
+        self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
+        self.plotiso()
+        self.calc_auto()
+
+    def calc_auto(self):
+        """Automatic calculation."""
+        self.limits = None
+        self.calcBET()
+        self.output_results()
+        self.plotBET()
+        self.resetSlider()
+
+    def calc_with_limits(self, left, right):
+        """Set limits on calculation."""
         self.limits = [left, right]
         self.calcBET()
+        self.output_results()
         self.plotBET()
 
     def calcBET(self):
 
         # use the BET function
-        (
-            self.bet_area,
-            self.c_const,
-            self.n_monolayer,
-            self.p_monolayer,
-            self.slope, self.intercept,
-            self.minimum, self.maximum,
-            self.corr_coef
-        ) = area_BET_raw(self.pressure, self.loading,
-                         self.cross_section, limits=self.limits)
+        with warnings.catch_warnings(record=True) as warning:
+
+            warnings.simplefilter("always")
+
+            try:
+                (
+                    self.bet_area,
+                    self.c_const,
+                    self.n_monolayer,
+                    self.p_monolayer,
+                    self.slope, self.intercept,
+                    self.minimum, self.maximum,
+                    self.corr_coef
+                ) = area_BET_raw(self.pressure, self.loading,
+                                 self.cross_section, limits=self.limits)
+
+            # We catch any errors or warnings and display them to the user
+            except Exception as e:
+                self.output = f'<font color="red">Calculation failed! <br> {e}</font>'
+                return
+
+            if warning:
+                self.output = '<br>'.join(
+                    [f'<font color="red">Warning: {a.message}</font>' for a in warning])
+            else:
+                self.output = None
+
+    def output_results(self):
+        self.view.result_bet.setText(f'{self.bet_area:.4}')
+        self.view.result_c.setText(f'{self.c_const:.4}')
+        self.view.result_mono_n.setText(f'{self.n_monolayer:.4}')
+        self.view.result_mono_p.setText(f'{self.p_monolayer:.4}')
+        self.view.result_slope.setText(f'{self.slope:.4}')
+        self.view.result_intercept.setText(f'{self.intercept:.4}')
+        self.view.result_r.setText(f'{self.corr_coef:.4}')
+
+        self.view.output.setText(self.output)
 
     def resetSlider(self):
-        self.view.pSlider.range_slider.setValues(
+        self.view.pSlider.setValues(
             [self.pressure[self.minimum],
-             self.pressure[self.maximum]])
+             self.pressure[self.maximum]], emit=False)
 
     def plotiso(self):
         # Generate plot of the isotherm
