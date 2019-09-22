@@ -90,6 +90,8 @@ class MainWindow(QMainWindow):
         # self.ui.actionConsole.triggered.connect(self.console)
 
         self.ui.actionBET_Surface_Area.triggered.connect(self.BETarea)
+        self.ui.actionLangmuir_Surface_Area.triggered.connect(
+            self.langmuirarea)
 
     def quit_app(self):
         """Close application."""
@@ -143,6 +145,17 @@ class MainWindow(QMainWindow):
             isotherm = self.isotherms_model.itemFromIndex(index).data()
             dialog = BETDialog()
             model = BETModel(isotherm)
+            model.set_view(dialog)
+            dialog.exec_()
+
+    def langmuirarea(self):
+        from src.dialogs.LangmuirDialog import LangmuirDialog
+        from src.models.LangmuirModel import LangmuirModel
+        index = self.isotherms_model.current_iso_index
+        if index:
+            isotherm = self.isotherms_model.itemFromIndex(index).data()
+            dialog = LangmuirDialog()
+            model = LangmuirModel(isotherm)
             model.set_view(dialog)
             dialog.exec_()
 
