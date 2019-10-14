@@ -45,6 +45,10 @@ class MainWindow(QMainWindow):
         # Create isotherm explorer view
         self.ui.isoExplorer.setModel(self.isotherms_model)
         self.ui.isoExplorer.clicked.connect(self.isotherms_model.select)
+        self.ui.selectAllButton.clicked.connect(
+            self.isotherms_model.check_all)
+        self.ui.deselectAllButton.clicked.connect(
+            self.isotherms_model.uncheck_all)
 
         # Create isotherm info view
         self.isotherms_model.iso_sel_change.connect(self.iso_info)

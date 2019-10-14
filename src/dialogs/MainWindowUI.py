@@ -49,7 +49,16 @@ class MainWindowUI(object):
         self.isoExplorer.setSelectionMode(
             QAbstractItemView.ExtendedSelection)
         self.isoExplorer.setObjectName("isoExplorer")
-        self.gridExplorer.addWidget(self.isoExplorer, 0, 0, 1, 1)
+        self.gridExplorer.addWidget(self.isoExplorer, 0, 0, 1, 2)
+
+        self.selectAllButton = QPushButton(self.explorerGroup)
+        self.selectAllButton.setObjectName("selectAllButton")
+        self.gridExplorer.addWidget(self.selectAllButton, 1, 0, 1, 1)
+
+        self.deselectAllButton = QPushButton(self.explorerGroup)
+        self.deselectAllButton.setObjectName("deselectAllButton")
+        self.gridExplorer.addWidget(self.deselectAllButton, 1, 1, 1, 1)
+
         self.mainLayout.addWidget(self.explorerGroup)
 
         # Middle Group
@@ -222,6 +231,10 @@ class MainWindowUI(object):
             "MainWindowUI", "Adsorbate", None, -1))
         self.materialNameLabel.setText(QApplication.translate(
             "MainWindowUI", "Material Name", None, -1))
+        self.selectAllButton.setText(QApplication.translate(
+            "MainWindowUI", "Select All", None, -1))
+        self.deselectAllButton.setText(QApplication.translate(
+            "MainWindowUI", "Deselect All", None, -1))
         self.dataButton.setText(QApplication.translate(
             "MainWindowUI", "Data", None, -1))
         self.graphGroup.setTitle(QApplication.translate(

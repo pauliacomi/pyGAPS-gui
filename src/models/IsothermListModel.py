@@ -45,6 +45,30 @@ class IsothermListModel(QtGui.QStandardItemModel):
         if item.checkState() == QtCore.Qt.Unchecked:
             self.unchecked(item.index())
 
+    def check_all(self):
+        if self.rowCount() > 0:
+            self.blockSignals(True)
+            for iter in range(self.rowCount()):
+                item = self.item(iter)
+                if item.isCheckable() and item.checkState() == QtCore.Qt.Unchecked:
+                    item.setCheckState(QtCore.Qt.Checked)
+                index = item.index()
+                if index not in self.selected_iso_indices:
+                    self.selected_iso_indices.append(index)
+            self.blockSignals(False)
+            self.iso_sel_change.emit()
+
+    def uncheck_all(self):
+        if self.rowCount() > 0:
+            self.blockSignals(True)
+            for iter in range(self.rowCount()):
+                item = self.item(iter)
+                if item.isCheckable() and item.checkState() == QtCore.Qt.Checked:
+                    item.setCheckState(QtCore.Qt.Unchecked)
+            self.selected_iso_indices.clear()
+            self.blockSignals(False)
+            self.iso_sel_change.emit()
+
     def load(self, path, name, ext):
 
         if ext == '.csv':
