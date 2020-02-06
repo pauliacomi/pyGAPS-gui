@@ -12,7 +12,7 @@ sys._excepthook = sys.excepthook
 
 
 def exception_hook(exctype, value, traceback):
-    # Catch PySide2 exceptions
+    """Catch PySide2 exceptions."""
     # https://stackoverflow.com/questions/43039048/pyqt5-fails-with-cryptic-message
 
     # Print the error and traceback
@@ -23,7 +23,7 @@ def exception_hook(exctype, value, traceback):
 
 
 def main():
-
+    """Main app entrypoint."""
     # Set the exception hook to our wrapping function
     sys.excepthook = exception_hook
 
@@ -31,13 +31,13 @@ def main():
     app = QApplication(sys.argv)
 
     # Create kernel
-    kernel_manager = QtInProcessKernelManager()
-    kernel_manager.start_kernel(show_banner=True)
-    kernel = kernel_manager.kernel
-    kernel.gui = 'qt'
+    # kernel_manager = QtInProcessKernelManager()
+    # kernel_manager.start_kernel(show_banner=True)
+    # kernel = kernel_manager.kernel
+    # kernel.gui = 'qt'
 
     # Create main window and show
-    application = MainWindow(kernel_manager)
+    application = MainWindow(None)  # (kernel_manager)
     application.show()
 
     # Execute

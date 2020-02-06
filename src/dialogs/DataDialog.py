@@ -26,7 +26,7 @@ class DataDialog(QtWidgets.QDialog):
             QtWidgets.QHeaderView.ResizeToContents)
         self.vertical_header.setSectionResizeMode(
             QtWidgets.QHeaderView.ResizeToContents)
-        # self.horizontal_header.setStretchLastSection(True)
+        self.horizontal_header.setStretchLastSection(True)
 
         # Button box
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)

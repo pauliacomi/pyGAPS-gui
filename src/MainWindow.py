@@ -6,10 +6,13 @@ import PySide2.QtCore as QtCore
 from src.dialogs.MainWindowUI import MainWindowUI
 from src.dialogs.UtilityDialogs import open_files_dialog, save_file_dialog, ErrorMessageBox
 
-from src.models.IsothermListModel import IsothermListModel
-from src.models.IsothermDataTableModel import IsothermDataTableModel
+from src.models.IsoListModel import IsoListModel
+from src.models.IsoDataTableModel import IsoDataTableModel
+from src.models.IsoInfoTableModel import IsoInfoTableModel
 
 from src.views.ConsoleView import ConsoleView
+
+import pygaps.utilities.unit_converter as pg_units
 
 
 class MainWindow(QMainWindow):
@@ -40,7 +43,7 @@ class MainWindow(QMainWindow):
         """Create the isotherm explorer model and connect it to views."""
 
         # Create isotherm list model
-        self.isotherms_model = IsothermListModel()
+        self.isotherms_model = IsoListModel()
 
         # Create isotherm explorer view
         self.ui.isoExplorer.setModel(self.isotherms_model)
@@ -51,10 +54,14 @@ class MainWindow(QMainWindow):
             self.isotherms_model.uncheck_all)
 
         # Create isotherm info view
-        self.isotherms_model.iso_sel_change.connect(self.iso_info)
+        self.isotherms_model.iso_sel_change.connect(self.iso_info_display)
+
+        # Enable save/cancel buttons if user modifies something)
+        self.ui.removeButton.clicked.connect(
+            self.isotherms_model.remove_current)
 
         # Create isotherm data view
-        self.ui.dataButton.clicked.connect(self.iso_data)
+        self.ui.dataButton.clicked.connect(self.iso_data_display)
 
         # Connect to graph
         self.ui.isoGraph.setModel(self.isotherms_model)
@@ -64,21 +71,40 @@ class MainWindow(QMainWindow):
     # Display functionality
     ########################################################
 
-    def iso_info(self):
+    def iso_info_display(self):
         isotherm = self.isotherms_model.get_iso_current()
 
+        # Essential properties
         self.ui.materialNameLineEdit.setText(isotherm.material)
-        self.ui.materialBatchLineEdit.setText(isotherm.material_batch)
         self.ui.adsorbateLineEdit.setText(str(isotherm.adsorbate))
         self.ui.temperatureLineEdit.setText(str(isotherm.temperature))
-        self.ui.textInfo.setText(str(isotherm))
 
-    def iso_data(self):
+        # Units here
+
+        self.ui.pressureMode.addItems(list(pg_units._PRESSURE_MODE.keys()))
+        self.ui.pressureUnit.addItems(list(pg_units._PRESSURE_UNITS.keys()))
+        if isotherm.pressure_mode == "relative":
+            self.ui.pressureUnit.setEnabled(False)
+
+        self.ui.loadingBasis.addItems(list(pg_units._MATERIAL_MODE.keys()))
+        self.ui.adsorbentBasis.addItems(list(pg_units._MATERIAL_MODE.keys()))
+
+        self.ui.loadingUnit.addItems(
+            list(pg_units._MATERIAL_MODE[isotherm.loading_basis].keys()))
+        self.ui.adsorbentUnit.addItems(
+            list(pg_units._MATERIAL_MODE[isotherm.adsorbent_basis].keys()))
+
+        # Extra properties here
+
+        self.ui.otherIsoInfoTable.setModel(IsoInfoTableModel(isotherm))
+        # self.ui.textInfo.setText(str(isotherm))
+
+    def iso_data_display(self):
         from src.dialogs.DataDialog import DataDialog
         if self.isotherms_model.current_iso_index:
             isotherm = self.isotherms_model.get_iso_current()
             dialog = DataDialog()
-            dialog.tableView.setModel(IsothermDataTableModel(isotherm.data()))
+            dialog.tableView.setModel(IsoDataTableModel(isotherm.data()))
             dialog.exec_()
 
     ########################################################
@@ -106,7 +132,7 @@ class MainWindow(QMainWindow):
         filenames = open_files_dialog(self, "Load an isotherm", '.',
                                       filter='pyGAPS isotherms (*.json *.csv *.xls)')
 
-        if filenames is not None and filenames != '':
+        if filenames and filenames != '':
             for filepath in filenames:
                 dirpath, filename = os.path.split(filepath)
                 filetitle, fileext = os.path.splitext(filename)

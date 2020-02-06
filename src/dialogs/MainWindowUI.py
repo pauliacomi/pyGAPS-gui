@@ -1,19 +1,21 @@
 import src.dialogs.resources_rc
 
-from PySide2 import QtCore, QtGui
+from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtWidgets import QApplication, QWidget
 from PySide2.QtWidgets import QHBoxLayout, QGridLayout, QGroupBox
 from PySide2.QtWidgets import QSizePolicy, QAbstractItemView
-from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QTextBrowser
+from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QTextBrowser, QComboBox
 from PySide2.QtWidgets import QMenu, QMenuBar, QAction, QStatusBar
 
 from src.views.IsoGraphView import IsoGraphView
-from src.views.ExplorerListView import ExplorerListView
+from src.views.IsoListView import IsoListView
 
 
 class MainWindowUI(object):
+    """Main window user interface for pygaps."""
 
     def setupUi(self, MainWindowUI):
+        """Create the window and all its components."""
 
         # First setup
         MainWindowUI.setObjectName("MainWindowUI")
@@ -34,16 +36,37 @@ class MainWindowUI(object):
         self.mainLayout.setObjectName("mainLayout")
 
         # Left Group
+        self.setup_iso_explorer()
+        # Middle Group
+        self.setup_iso_details()
+        # Right Group
+        self.setup_iso_graph()
+
+        # Now set central widget
+        MainWindowUI.setCentralWidget(self.centralwidget)
+
+        # Menu and status bar
+        self.setup_menu_status(MainWindowUI)
+
+        # Finally
+        self.retranslateUi(MainWindowUI)
+        QtCore.QMetaObject.connectSlotsByName(MainWindowUI)
+
+    def setup_iso_explorer(self):
+        """
+        Setup all the components in the left isotherm explorer section.
+        """
 
         self.explorerGroup = QGroupBox(self.centralwidget)
         self.explorerGroup.setObjectName("explorerGroup")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(
+            QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         self.explorerGroup.setSizePolicy(sizePolicy)
 
         self.gridExplorer = QGridLayout(self.explorerGroup)
         self.gridExplorer.setObjectName("gridExplorer")
-        self.isoExplorer = ExplorerListView(self.explorerGroup)
+        self.isoExplorer = IsoListView(self.explorerGroup)
         self.isoExplorer.setEditTriggers(
             QAbstractItemView.NoEditTriggers)
         self.isoExplorer.setSelectionMode(
@@ -61,7 +84,10 @@ class MainWindowUI(object):
 
         self.mainLayout.addWidget(self.explorerGroup)
 
-        # Middle Group
+    def setup_iso_details(self):
+        """
+        Setup all the components in the middle isotherm details section.
+        """
 
         self.propertiesGroup = QGroupBox(self.centralwidget)
         self.propertiesGroup.setObjectName("propertiesGroup")
@@ -71,39 +97,83 @@ class MainWindowUI(object):
         self.gridProperties = QGridLayout(self.propertiesGroup)
         self.gridProperties.setObjectName("gridProperties")
 
-        self.materialNameLabel = QLabel(self.propertiesGroup)
-        self.materialNameLabel.setObjectName("materialNameLabel")
-        self.gridProperties.addWidget(self.materialNameLabel, 0, 0, 1, 1)
+        self.materialLabel = QLabel(self.propertiesGroup)
+        self.materialLabel.setObjectName("materialLabel")
+        self.gridProperties.addWidget(self.materialLabel, 0, 0, 1, 1)
         self.materialNameLineEdit = QLineEdit(self.propertiesGroup)
         self.materialNameLineEdit.setObjectName("materialNameLineEdit")
         self.gridProperties.addWidget(self.materialNameLineEdit, 0, 1, 1, 1)
-        self.materialBatchLabel = QLabel(self.propertiesGroup)
-        self.materialBatchLabel.setObjectName("materialBatchLabel")
-        self.gridProperties.addWidget(self.materialBatchLabel, 1, 0, 1, 1)
-        self.materialBatchLineEdit = QLineEdit(self.propertiesGroup)
-        self.materialBatchLineEdit.setObjectName("materialBatchLineEdit")
-        self.gridProperties.addWidget(self.materialBatchLineEdit, 1, 1, 1, 1)
-        self.temperatureLabel = QLabel(self.propertiesGroup)
-        self.temperatureLabel.setObjectName("temperatureLabel")
-        self.gridProperties.addWidget(self.temperatureLabel, 3, 0, 1, 1)
-        self.temperatureLineEdit = QLineEdit(self.propertiesGroup)
-        self.temperatureLineEdit.setObjectName("temperatureLineEdit")
-        self.gridProperties.addWidget(self.temperatureLineEdit, 3, 1, 1, 1)
         self.adsorbateLabel = QLabel(self.propertiesGroup)
         self.adsorbateLabel.setObjectName("adsorbateLabel")
-        self.gridProperties.addWidget(self.adsorbateLabel, 2, 0, 1, 1)
+        self.gridProperties.addWidget(self.adsorbateLabel, 1, 0, 1, 1)
         self.adsorbateLineEdit = QLineEdit(self.propertiesGroup)
         self.adsorbateLineEdit.setObjectName("adsorbateLineEdit")
-        self.gridProperties.addWidget(self.adsorbateLineEdit, 2, 1, 1, 1)
-        self.textInfo = QTextBrowser(self.propertiesGroup)
-        self.textInfo.setObjectName("textInfo")
-        self.gridProperties.addWidget(self.textInfo, 4, 0, 1, 2)
+        self.gridProperties.addWidget(self.adsorbateLineEdit, 1, 1, 1, 1)
+        self.temperatureLabel = QLabel(self.propertiesGroup)
+        self.temperatureLabel.setObjectName("temperatureLabel")
+        self.gridProperties.addWidget(self.temperatureLabel, 2, 0, 1, 1)
+        self.temperatureLineEdit = QLineEdit(self.propertiesGroup)
+        self.temperatureLineEdit.setObjectName("temperatureLineEdit")
+        self.gridProperties.addWidget(self.temperatureLineEdit, 2, 1, 1, 1)
+
+        # Modes, bases and modes for isotherm physical quantities.
+        self.unitGroup = QHBoxLayout()
+        self.pressureMode = QComboBox(self.propertiesGroup)
+        self.pressureMode.setObjectName("pressureMode")
+        self.unitGroup.addWidget(self.pressureMode)
+        self.pressureUnit = QComboBox(self.propertiesGroup)
+        self.pressureUnit.setObjectName("pressureUnit")
+        self.unitGroup.addWidget(self.pressureUnit)
+        self.loadingBasis = QComboBox(self.propertiesGroup)
+        self.loadingBasis.setObjectName("loadingBasis")
+        self.unitGroup.addWidget(self.loadingBasis)
+        self.loadingUnit = QComboBox(self.propertiesGroup)
+        self.loadingUnit.setObjectName("loadingUnit")
+        self.unitGroup.addWidget(self.loadingUnit)
+        self.adsorbentBasis = QComboBox(self.propertiesGroup)
+        self.adsorbentBasis.setObjectName("adsorbentBasis")
+        self.unitGroup.addWidget(self.adsorbentBasis)
+        self.adsorbentUnit = QComboBox(self.propertiesGroup)
+        self.adsorbentUnit.setObjectName("adsorbentUnit")
+        self.unitGroup.addWidget(self.adsorbentUnit)
+        self.gridProperties.addLayout(self.unitGroup, 3, 0, 1, 2)
+
+        # Other isotherm information
+
+        # Table View
+        self.otherIsoInfoTable = QtWidgets.QTableView(self.propertiesGroup)
+        self.otherIsoInfoTable.setObjectName("otherIsoInfoTable")
+        self.gridProperties.addWidget(self.otherIsoInfoTable, 4, 0, 1, 2)
+
+        # TableView Headers
+        self.horizontalHTable = self.otherIsoInfoTable.horizontalHeader()
+        self.verticalHTable = self.otherIsoInfoTable.verticalHeader()
+        self.horizontalHTable.setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeToContents)
+        self.verticalHTable.setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeToContents)
+        self.horizontalHTable.setStretchLastSection(True)
+
+        # self.textInfo = QTextBrowser(self.propertiesGroup)
+        # self.textInfo.setObjectName("textInfo")
+        # self.gridProperties.addWidget(self.textInfo, 4, 0, 1, 2)
+
+        # Bottom buttons
+        self.detailsBottomButtons = QHBoxLayout()
         self.dataButton = QPushButton(self.propertiesGroup)
         self.dataButton.setObjectName("dataButton")
-        self.gridProperties.addWidget(self.dataButton, 5, 0, 1, 1)
+        self.detailsBottomButtons.addWidget(self.dataButton)
+        self.detailsBottomButtons.addStretch(1)
+        self.removeButton = QPushButton(self.propertiesGroup)
+        self.removeButton.setObjectName("removeButton")
+        self.detailsBottomButtons.addWidget(self.removeButton)
+        self.gridProperties.addLayout(self.detailsBottomButtons, 5, 0, 1, 2)
         self.mainLayout.addWidget(self.propertiesGroup)
 
-        # Right group
+    def setup_iso_graph(self):
+        """
+        Setup all the components in the right isotherm graph section.
+        """
 
         self.graphGroup = QGroupBox(self.centralwidget)
         self.graphGroup.setObjectName("graphGroup")
@@ -118,8 +188,7 @@ class MainWindowUI(object):
         self.graphGrid.addWidget(self.isoGraph, 0, 0, 1, 1)
         self.mainLayout.addWidget(self.graphGroup)
 
-        # Now set central widget
-        MainWindowUI.setCentralWidget(self.centralwidget)
+    def setup_menu_status(self, MainWindowUI):
 
         # Create menu bar
         self.menubar = QMenuBar(MainWindowUI)
@@ -211,11 +280,6 @@ class MainWindowUI(object):
         self.menubar.addAction(self.menuModel.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        # Finally
-
-        self.retranslateUi(MainWindowUI)
-        QtCore.QMetaObject.connectSlotsByName(MainWindowUI)
-
     def retranslateUi(self, MainWindowUI):
         MainWindowUI.setWindowTitle(QApplication.translate(
             "MainWindowUI", "pyGAPS-gui", None, -1))
@@ -225,18 +289,18 @@ class MainWindowUI(object):
             "MainWindowUI", "Isotherm Properties", None, -1))
         self.temperatureLabel.setText(QApplication.translate(
             "MainWindowUI", "Temperature (K)", None, -1))
-        self.materialBatchLabel.setText(QApplication.translate(
-            "MainWindowUI", "Material Batch", None, -1))
         self.adsorbateLabel.setText(QApplication.translate(
             "MainWindowUI", "Adsorbate", None, -1))
-        self.materialNameLabel.setText(QApplication.translate(
-            "MainWindowUI", "Material Name", None, -1))
+        self.materialLabel.setText(QApplication.translate(
+            "MainWindowUI", "Material", None, -1))
         self.selectAllButton.setText(QApplication.translate(
             "MainWindowUI", "Select All", None, -1))
         self.deselectAllButton.setText(QApplication.translate(
             "MainWindowUI", "Deselect All", None, -1))
         self.dataButton.setText(QApplication.translate(
             "MainWindowUI", "Data", None, -1))
+        self.removeButton.setText(QApplication.translate(
+            "MainWindowUI", "Remove", None, -1))
         self.graphGroup.setTitle(QApplication.translate(
             "MainWindowUI", "Isotherm Overlay", None, -1))
         self.menuFile.setTitle(QApplication.translate(
