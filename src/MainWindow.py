@@ -3,8 +3,8 @@ import sys
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 import PySide2.QtCore as QtCore
 
-from src.dialogs.MainWindowUI import MainWindowUI
-from src.dialogs.UtilityDialogs import open_files_dialog, save_file_dialog, ErrorMessageBox
+from src.widgets.MainWindowUI import MainWindowUI
+from src.widgets.UtilityWidgets import open_files_dialog, save_file_dialog, ErrorMessageBox
 
 from src.models.IsoListModel import IsoListModel
 from src.models.IsoDataTableModel import IsoDataTableModel
@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
                 errorbox.exec_()
 
     def BETarea(self):
-        from src.dialogs.BETDialog import BETDialog
+        from src.widgets.BETDialog import BETDialog
         from src.models.BETModel import BETModel
         index = self.iso_model.current_iso_index
         if index:
@@ -107,7 +107,7 @@ class MainWindow(QMainWindow):
             dialog.exec_()
 
     def langmuirarea(self):
-        from src.dialogs.LangmuirDialog import LangmuirDialog
+        from src.widgets.LangmuirDialog import LangmuirDialog
         from src.models.LangmuirModel import LangmuirModel
         index = self.iso_model.current_iso_index
         if index:

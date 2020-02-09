@@ -28,7 +28,10 @@ class IsoListController():
         self.widget.removeButton.clicked.connect(self.delete_current)
 
         # Create isotherm data view
-        self.widget.materialLabel.changed.connect
+        self.widget.materialLineEdit.editingFinished.connect(self.modify_iso)
+        self.widget.adsorbateLineEdit.editingFinished.connect(self.modify_iso)
+        self.widget.temperatureLineEdit.editingFinished.connect(
+            self.modify_iso)
         self.widget.dataButton.clicked.connect(self.iso_data)
 
         # Connect signals for graph view
@@ -50,7 +53,7 @@ class IsoListController():
             return
 
         # Essential properties
-        self.widget.materialNameLineEdit.setText(isotherm.material)
+        self.widget.materialLineEdit.setText(isotherm.material)
         self.widget.adsorbateLineEdit.setText(str(isotherm.adsorbate))
         self.widget.temperatureLineEdit.setText(str(isotherm.temperature))
 
@@ -78,7 +81,7 @@ class IsoListController():
         """Reset all the display."""
 
         # Essential properties
-        self.widget.materialNameLineEdit.clear()
+        self.widget.materialLineEdit.clear()
         self.widget.adsorbateLineEdit.clear()
         self.widget.temperatureLineEdit.clear()
 
@@ -93,7 +96,7 @@ class IsoListController():
         self.widget.adsorbentUnit.clear()
 
     def iso_data(self):
-        from src.dialogs.DataDialog import DataDialog
+        from src.widgets.DataDialog import DataDialog
         if self.iso_model.current_iso_index:
             isotherm = self.iso_model.get_iso_current()
             dialog = DataDialog()
@@ -148,3 +151,6 @@ class IsoListController():
     def delete_current(self):
         """Remove current isotherm from model."""
         self.delete(self.list_view.currentIndex())
+
+    def modify_iso(self):
+        print('modified')

@@ -1,10 +1,10 @@
-import src.dialogs.resources_rc
+import src.widgets.resources_rc
 
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtWidgets import QApplication, QWidget
 from PySide2.QtWidgets import QHBoxLayout, QGridLayout, QGroupBox
 from PySide2.QtWidgets import QSizePolicy, QAbstractItemView
-from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QTextBrowser, QComboBox
+from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QComboBox
 from PySide2.QtWidgets import QMenu, QMenuBar, QAction, QStatusBar
 
 from src.views.IsoGraphView import IsoGraphView
@@ -103,9 +103,9 @@ class MainWindowUI(object):
         self.materialLabel = QLabel(self.propertiesGroup)
         self.materialLabel.setObjectName("materialLabel")
         self.gridProperties.addWidget(self.materialLabel, 0, 0, 1, 1)
-        self.materialNameLineEdit = QLineEdit(self.propertiesGroup)
-        self.materialNameLineEdit.setObjectName("materialNameLineEdit")
-        self.gridProperties.addWidget(self.materialNameLineEdit, 0, 1, 1, 1)
+        self.materialLineEdit = QLineEdit(self.propertiesGroup)
+        self.materialLineEdit.setObjectName("materialLineEdit")
+        self.gridProperties.addWidget(self.materialLineEdit, 0, 1, 1, 1)
         self.adsorbateLabel = QLabel(self.propertiesGroup)
         self.adsorbateLabel.setObjectName("adsorbateLabel")
         self.gridProperties.addWidget(self.adsorbateLabel, 1, 0, 1, 1)
