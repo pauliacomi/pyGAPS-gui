@@ -59,7 +59,6 @@ def main():
     application = MainWindow(None)  # (kernel_manager)
     application.show()
 
-    print(parsed_args)
     if parsed_args.file:
         filepaths = [pathlib.Path(x) for x in parsed_args.file]
         application.load(filepaths)

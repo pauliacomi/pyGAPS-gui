@@ -12,7 +12,7 @@ from src.models.IsoInfoTableModel import IsoInfoTableModel
 
 from src.views.ConsoleView import ConsoleView
 
-import pygaps.utilities.unit_converter as pg_units
+from src.controllers.IsoListController import IsoListController
 
 
 class MainWindow(QMainWindow):
@@ -30,102 +30,15 @@ class MainWindow(QMainWindow):
         self.ui = MainWindowUI()
         self.ui.setupUi(self)
 
-        # Create isotherm model-views
-        self.isotherm_model_init()
+        # Create isotherm list mvc
+        self.iso_model = IsoListModel()
+        self.iso_controller = IsoListController(self.ui, self.iso_model)
 
         # Create and connect menu
         self.connect_menu()
 
         # Display state
         self.ui.statusbar.showMessage('Ready', 5000)
-
-    def isotherm_model_init(self):
-        """Create the isotherm explorer model and connect it to views."""
-
-        # Create isotherm list model
-        self.iso_model = IsoListModel()
-
-        # Create isotherm explorer view
-        self.ui.isoExplorer.setModel(self.iso_model)
-
-        self.ui.isoExplorer.selectionModel().currentChanged.connect(self.iso_model.select)
-        self.ui.isoExplorer.delete_current.connect(
-            self.iso_model.remove_iso_current)
-
-        self.ui.selectAllButton.clicked.connect(self.iso_model.check_all)
-        self.ui.deselectAllButton.clicked.connect(self.iso_model.uncheck_all)
-        self.ui.removeButton.clicked.connect(self.iso_model.remove_iso_current)
-
-        # Create isotherm info view
-        self.iso_model.layoutChanged.connect(self.iso_info)
-
-        # Create isotherm data view
-        self.ui.dataButton.clicked.connect(self.iso_data)
-
-        # Connect to graph
-        self.ui.isoGraph.setModel(self.iso_model)
-        self.iso_model.layoutChanged.connect(self.ui.isoGraph.plot)
-
-    ########################################################
-    # Display functionality
-    ########################################################
-
-    def iso_info(self):
-        isotherm = self.iso_model.get_iso_current()
-
-        # Reset if nothing to display
-        if not isotherm:
-            self.reset_iso_info()
-            return
-
-        # Essential properties
-        self.ui.materialNameLineEdit.setText(isotherm.material)
-        self.ui.adsorbateLineEdit.setText(str(isotherm.adsorbate))
-        self.ui.temperatureLineEdit.setText(str(isotherm.temperature))
-
-        # Units here
-        self.ui.pressureMode.addItems(list(pg_units._PRESSURE_MODE.keys()))
-        self.ui.pressureUnit.addItems(list(pg_units._PRESSURE_UNITS.keys()))
-        if isotherm.pressure_mode == "relative":
-            self.ui.pressureUnit.setEnabled(False)
-
-        self.ui.loadingBasis.addItems(list(pg_units._MATERIAL_MODE.keys()))
-        self.ui.adsorbentBasis.addItems(list(pg_units._MATERIAL_MODE.keys()))
-
-        self.ui.loadingUnit.addItems(
-            list(pg_units._MATERIAL_MODE[isotherm.loading_basis].keys()))
-        self.ui.adsorbentUnit.addItems(
-            list(pg_units._MATERIAL_MODE[isotherm.adsorbent_basis].keys()))
-
-        # Display other properties of the isotherm
-        self.ui.otherIsoInfoTable.setModel(IsoInfoTableModel(isotherm))
-        # self.ui.textInfo.setText(str(isotherm))
-
-    def reset_iso_info(self):
-        """Reset all the display."""
-
-        # Essential properties
-        self.ui.materialNameLineEdit.clear()
-        self.ui.adsorbateLineEdit.clear()
-        self.ui.temperatureLineEdit.clear()
-
-        # Units here
-        self.ui.pressureMode.clear()
-        self.ui.pressureUnit.clear()
-
-        self.ui.loadingBasis.clear()
-        self.ui.adsorbentBasis.clear()
-
-        self.ui.loadingUnit.clear()
-        self.ui.adsorbentUnit.clear()
-
-    def iso_data(self):
-        from src.dialogs.DataDialog import DataDialog
-        if self.iso_model.current_iso_index:
-            isotherm = self.iso_model.get_iso_current()
-            dialog = DataDialog()
-            dialog.tableView.setModel(IsoDataTableModel(isotherm.data()))
-            dialog.exec_()
 
     ########################################################
     # Menu functionality
@@ -154,18 +67,17 @@ class MainWindow(QMainWindow):
                 dirpath, filename = os.path.split(filepath)
                 filetitle, fileext = os.path.splitext(filename)
                 try:
-                    self.iso_model.load(filepath, filename, fileext)
+                    self.iso_controller.load(filepath, filename, fileext)
                 except Exception as e:
                     errorbox = ErrorMessageBox()
                     errorbox.setText(str(e))
                     errorbox.exec_()
-            first_iso = self.iso_model.index(0, 0)
-            self.ui.isoExplorer.setCurrentIndex(first_iso)
+            self.iso_controller.select_last()
 
     def save(self, filepath=None):
         """Save isotherm to file."""
-        if self.iso_model.current_iso_index is None:
-            return
+        # if self.iso_model.current_iso_index is None:
+        #     return
 
         if not filepath:
             filename = save_file_dialog(self, "Save an isotherm", '.',
@@ -177,7 +89,7 @@ class MainWindow(QMainWindow):
         if filename and filename != '':
             _, ext = os.path.splitext(filename)
             try:
-                self.iso_model.save(filename, ext)
+                self.iso_controller.save(filename, ext)
             except Exception as e:
                 errorbox = ErrorMessageBox()
                 errorbox.setText(str(e))
