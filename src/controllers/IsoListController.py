@@ -28,6 +28,7 @@ class IsoListController():
         self.widget.removeButton.clicked.connect(self.delete_current)
 
         # Create isotherm data view
+        self.widget.materialLabel.changed.connect
         self.widget.dataButton.clicked.connect(self.iso_data)
 
         # Connect signals for graph view
@@ -44,8 +45,8 @@ class IsoListController():
         isotherm = self.model.get_iso_index(index)
 
         # Reset if nothing to display
+        self.reset_iso_info()
         if not isotherm:
-            self.reset_iso_info()
             return
 
         # Essential properties

@@ -1,4 +1,4 @@
-from PySide2 import QtGui
+from PySide2 import QtGui, QtCore
 
 
 class IsoModel(QtGui.QStandardItem):
@@ -6,3 +6,4 @@ class IsoModel(QtGui.QStandardItem):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.setDropEnabled(False)

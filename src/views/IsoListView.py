@@ -16,6 +16,7 @@ class IsoListView(QtWidgets.QListView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setMovement(QtWidgets.QListView.Free)
         self.setAcceptDrops(True)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setDropIndicatorShown(True)
 
     def keyPressEvent(self, event):
