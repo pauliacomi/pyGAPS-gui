@@ -62,12 +62,12 @@ def main():
     print(parsed_args)
     if parsed_args.file:
         filepaths = [pathlib.Path(x) for x in parsed_args.file]
-        application.load_cont(filepaths)
+        application.load(filepaths)
 
     elif parsed_args.folder:
         folder = pathlib.Path(parsed_args.folder)
         filepaths = [x for x in folder.iterdir() if not x.is_dir()]
-        application.load_cont(filepaths)
+        application.load(filepaths)
 
     # Execute
     sys.exit(app.exec_())

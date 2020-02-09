@@ -67,20 +67,23 @@ class MainWindowUI(object):
         self.gridExplorer = QGridLayout(self.explorerGroup)
         self.gridExplorer.setObjectName("gridExplorer")
         self.isoExplorer = IsoListView(self.explorerGroup)
-        self.isoExplorer.setEditTriggers(
-            QAbstractItemView.NoEditTriggers)
-        self.isoExplorer.setSelectionMode(
-            QAbstractItemView.ExtendedSelection)
         self.isoExplorer.setObjectName("isoExplorer")
         self.gridExplorer.addWidget(self.isoExplorer, 0, 0, 1, 2)
 
+        self.explorerBottomButtons = QHBoxLayout()
+
         self.selectAllButton = QPushButton(self.explorerGroup)
         self.selectAllButton.setObjectName("selectAllButton")
-        self.gridExplorer.addWidget(self.selectAllButton, 1, 0, 1, 1)
+        self.explorerBottomButtons.addWidget(self.selectAllButton)
 
         self.deselectAllButton = QPushButton(self.explorerGroup)
         self.deselectAllButton.setObjectName("deselectAllButton")
-        self.gridExplorer.addWidget(self.deselectAllButton, 1, 1, 1, 1)
+        self.explorerBottomButtons.addWidget(self.deselectAllButton)
+
+        self.removeButton = QPushButton(self.explorerGroup)
+        self.removeButton.setObjectName("removeButton")
+        self.explorerBottomButtons.addWidget(self.removeButton)
+        self.gridExplorer.addLayout(self.explorerBottomButtons, 1, 0, 1, 2)
 
         self.mainLayout.addWidget(self.explorerGroup)
 
@@ -164,9 +167,6 @@ class MainWindowUI(object):
         self.dataButton.setObjectName("dataButton")
         self.detailsBottomButtons.addWidget(self.dataButton)
         self.detailsBottomButtons.addStretch(1)
-        self.removeButton = QPushButton(self.propertiesGroup)
-        self.removeButton.setObjectName("removeButton")
-        self.detailsBottomButtons.addWidget(self.removeButton)
         self.gridProperties.addLayout(self.detailsBottomButtons, 5, 0, 1, 2)
         self.mainLayout.addWidget(self.propertiesGroup)
 
@@ -217,6 +217,7 @@ class MainWindowUI(object):
             ":/res/icons/10_Search_48x48.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionOpen.setIcon(icon1)
         self.actionOpen.setObjectName("actionOpen")
+        self.actionOpen.setShortcut("Ctrl+O")
 
         self.actionSave = QAction(MainWindowUI)
         icon2 = QtGui.QIcon()
@@ -224,6 +225,7 @@ class MainWindowUI(object):
                         QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSave.setIcon(icon2)
         self.actionSave.setObjectName("actionSave")
+        self.actionSave.setShortcut("Ctrl+S")
 
         self.actionQuit = QAction(MainWindowUI)
         icon3 = QtGui.QIcon()
@@ -231,6 +233,7 @@ class MainWindowUI(object):
             ":/res/icons/14_Delete_48x48.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionQuit.setIcon(icon3)
         self.actionQuit.setObjectName("actionQuit")
+        self.actionQuit.setShortcut("Ctrl+Q")
 
         self.actionAbout = QAction(MainWindowUI)
         icon4 = QtGui.QIcon()

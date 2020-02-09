@@ -1,5 +1,3 @@
-import os
-
 from PySide2 import QtGui, QtCore
 
 import pygaps
@@ -8,36 +6,41 @@ from src.models.IsoModel import IsoModel
 
 
 class IsoListModel(QtGui.QStandardItemModel):
-    """Overloading an item model to store list of isotherms."""
+    """Overloading an item model to store a list of isotherms."""
 
     current_iso_index = None
     selected_iso_indices = []
-    iso_sel_change = QtCore.Signal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.itemChanged.connect(self.check_changed)
+        self.layoutChanged.connect(self.print_lc)
+
+    def print_lc(self):
+        print('layout changed emitted')
 
     def get_iso_current(self):
-        return self.itemFromIndex(self.current_iso_index).data()
+        if self.current_iso_index:
+            return self.itemFromIndex(self.current_iso_index).data()
+        return None
 
     def get_iso_index(self, index):
         return self.itemFromIndex(index).data()
 
-    def select(self, index):
+    def select(self, index, **kwargs):
         self.current_iso_index = index
-        self.iso_sel_change.emit()
+        self.layoutChanged.emit()
 
     def checked(self, index):
         self.current_iso_index = index
         if index not in self.selected_iso_indices:
             self.selected_iso_indices.append(index)
-        self.iso_sel_change.emit()
+        self.layoutChanged.emit()
 
     def unchecked(self, index):
         self.selected_iso_indices.remove(index)
-        self.iso_sel_change.emit()
+        self.layoutChanged.emit()
 
     def check_changed(self, item):
         if item.checkState() == QtCore.Qt.Checked:
@@ -56,7 +59,7 @@ class IsoListModel(QtGui.QStandardItemModel):
                 if index not in self.selected_iso_indices:
                     self.selected_iso_indices.append(index)
             self.blockSignals(False)
-            self.iso_sel_change.emit()
+            self.layoutChanged.emit()
 
     def uncheck_all(self):
         """Un-check all items and update selection."""
@@ -67,7 +70,7 @@ class IsoListModel(QtGui.QStandardItemModel):
                 item.setCheckState(QtCore.Qt.Unchecked)
             self.selected_iso_indices.clear()
             self.blockSignals(False)
-            self.iso_sel_change.emit()
+            self.layoutChanged.emit()
 
     def load(self, path, name, ext):
         """Load isotherm from disk."""
@@ -98,10 +101,17 @@ class IsoListModel(QtGui.QStandardItemModel):
         elif ext == '.xls' or ext == '.xlsx':
             pygaps.isotherm_to_xl(isotherm, path)
 
-    def remove_current(self):
+    def remove_iso_current(self):
         """Remove currently selected isotherm from list."""
-        index = self.current_iso_index.row()
-        self.removeRow(index)
-        if index == self.rowCount() and index != 0:
-            self.current_iso_index -= 1
-        self.iso_sel_change.emit()
+        self.remove_iso_index(self.current_iso_index)
+
+    def remove_iso_index(self, index):
+        """Remove isotherm from list."""
+        row = index.row()
+
+        if self.rowCount() == 1:
+            self.current_iso_index = None
+        elif row == self.rowCount() - 1:
+            self.current_iso_index = self.item(row).index()
+
+        self.removeRow(row)  # LayoutChanged called automatically

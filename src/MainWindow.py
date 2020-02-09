@@ -43,36 +43,40 @@ class MainWindow(QMainWindow):
         """Create the isotherm explorer model and connect it to views."""
 
         # Create isotherm list model
-        self.isotherms_model = IsoListModel()
+        self.iso_model = IsoListModel()
 
         # Create isotherm explorer view
-        self.ui.isoExplorer.setModel(self.isotherms_model)
-        self.ui.isoExplorer.clicked.connect(self.isotherms_model.select)
-        self.ui.selectAllButton.clicked.connect(
-            self.isotherms_model.check_all)
-        self.ui.deselectAllButton.clicked.connect(
-            self.isotherms_model.uncheck_all)
+        self.ui.isoExplorer.setModel(self.iso_model)
+
+        self.ui.isoExplorer.selectionModel().currentChanged.connect(self.iso_model.select)
+        self.ui.isoExplorer.delete_current.connect(
+            self.iso_model.remove_iso_current)
+
+        self.ui.selectAllButton.clicked.connect(self.iso_model.check_all)
+        self.ui.deselectAllButton.clicked.connect(self.iso_model.uncheck_all)
+        self.ui.removeButton.clicked.connect(self.iso_model.remove_iso_current)
 
         # Create isotherm info view
-        self.isotherms_model.iso_sel_change.connect(self.iso_info_display)
-
-        # Enable save/cancel buttons if user modifies something)
-        self.ui.removeButton.clicked.connect(
-            self.isotherms_model.remove_current)
+        self.iso_model.layoutChanged.connect(self.iso_info)
 
         # Create isotherm data view
-        self.ui.dataButton.clicked.connect(self.iso_data_display)
+        self.ui.dataButton.clicked.connect(self.iso_data)
 
         # Connect to graph
-        self.ui.isoGraph.setModel(self.isotherms_model)
-        self.isotherms_model.iso_sel_change.connect(self.ui.isoGraph.plot)
+        self.ui.isoGraph.setModel(self.iso_model)
+        self.iso_model.layoutChanged.connect(self.ui.isoGraph.plot)
 
     ########################################################
     # Display functionality
     ########################################################
 
-    def iso_info_display(self):
-        isotherm = self.isotherms_model.get_iso_current()
+    def iso_info(self):
+        isotherm = self.iso_model.get_iso_current()
+
+        # Reset if nothing to display
+        if not isotherm:
+            self.reset_iso_info()
+            return
 
         # Essential properties
         self.ui.materialNameLineEdit.setText(isotherm.material)
@@ -80,7 +84,6 @@ class MainWindow(QMainWindow):
         self.ui.temperatureLineEdit.setText(str(isotherm.temperature))
 
         # Units here
-
         self.ui.pressureMode.addItems(list(pg_units._PRESSURE_MODE.keys()))
         self.ui.pressureUnit.addItems(list(pg_units._PRESSURE_UNITS.keys()))
         if isotherm.pressure_mode == "relative":
@@ -94,15 +97,32 @@ class MainWindow(QMainWindow):
         self.ui.adsorbentUnit.addItems(
             list(pg_units._MATERIAL_MODE[isotherm.adsorbent_basis].keys()))
 
-        # Extra properties here
-
+        # Display other properties of the isotherm
         self.ui.otherIsoInfoTable.setModel(IsoInfoTableModel(isotherm))
         # self.ui.textInfo.setText(str(isotherm))
 
-    def iso_data_display(self):
+    def reset_iso_info(self):
+        """Reset all the display."""
+
+        # Essential properties
+        self.ui.materialNameLineEdit.clear()
+        self.ui.adsorbateLineEdit.clear()
+        self.ui.temperatureLineEdit.clear()
+
+        # Units here
+        self.ui.pressureMode.clear()
+        self.ui.pressureUnit.clear()
+
+        self.ui.loadingBasis.clear()
+        self.ui.adsorbentBasis.clear()
+
+        self.ui.loadingUnit.clear()
+        self.ui.adsorbentUnit.clear()
+
+    def iso_data(self):
         from src.dialogs.DataDialog import DataDialog
-        if self.isotherms_model.current_iso_index:
-            isotherm = self.isotherms_model.get_iso_current()
+        if self.iso_model.current_iso_index:
+            isotherm = self.iso_model.get_iso_current()
             dialog = DataDialog()
             dialog.tableView.setModel(IsoDataTableModel(isotherm.data()))
             dialog.exec_()
@@ -115,7 +135,7 @@ class MainWindow(QMainWindow):
         """Connect signals and slots of the menu."""
         self.ui.actionOpen.triggered.connect(self.load)
         self.ui.actionSave.triggered.connect(self.save)
-        self.ui.actionQuit.triggered.connect(self.quit_app)
+        self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionAbout.triggered.connect(self.about)
         # self.ui.actionConsole.triggered.connect(self.console)
 
@@ -123,45 +143,41 @@ class MainWindow(QMainWindow):
         self.ui.actionLangmuir_Surface_Area.triggered.connect(
             self.langmuirarea)
 
-    def quit_app(self):
-        """Close application."""
-        self.close()
-
-    def load(self):
+    def load(self, filepaths=None):
         """Open isotherm from file."""
-        filenames = open_files_dialog(self, "Load an isotherm", '.',
-                                      filter='pyGAPS isotherms (*.json *.csv *.xls)')
+        if not filepaths:
+            filepaths = open_files_dialog(self, "Load an isotherm", '.',
+                                          filter='pyGAPS isotherms (*.json *.csv *.xls)')
 
-        if filenames and filenames != '':
-            for filepath in filenames:
+        if filepaths and filepaths != '':
+            for filepath in filepaths:
                 dirpath, filename = os.path.split(filepath)
                 filetitle, fileext = os.path.splitext(filename)
                 try:
-                    self.isotherms_model.load(filepath, filename, fileext)
+                    self.iso_model.load(filepath, filename, fileext)
                 except Exception as e:
                     errorbox = ErrorMessageBox()
                     errorbox.setText(str(e))
                     errorbox.exec_()
-
-            first_iso = self.isotherms_model.index(0, 0)
+            first_iso = self.iso_model.index(0, 0)
             self.ui.isoExplorer.setCurrentIndex(first_iso)
-            self.isotherms_model.select(first_iso)
 
-    def save(self):
+    def save(self, filepath=None):
         """Save isotherm to file."""
-        if self.isotherms_model.current_iso_index is None:
+        if self.iso_model.current_iso_index is None:
             return
 
-        filename = save_file_dialog(self, "Save an isotherm", '.',
-                                    filter=";;".join(
-                                        ['pyGAPS JSON Isotherm (*.json)',
-                                         'pyGAPS CSV Isotherm (*.csv)',
-                                         'pyGAPS Excel Isotherm (*.xls)']))
+        if not filepath:
+            filename = save_file_dialog(self, "Save an isotherm", '.',
+                                        filter=";;".join(
+                                            ['pyGAPS JSON Isotherm (*.json)',
+                                             'pyGAPS CSV Isotherm (*.csv)',
+                                             'pyGAPS Excel Isotherm (*.xls)']))
 
-        if filename is not None and filename != '':
+        if filename and filename != '':
             _, ext = os.path.splitext(filename)
             try:
-                self.isotherms_model.save(filename, ext)
+                self.iso_model.save(filename, ext)
             except Exception as e:
                 errorbox = ErrorMessageBox()
                 errorbox.setText(str(e))
@@ -170,9 +186,9 @@ class MainWindow(QMainWindow):
     def BETarea(self):
         from src.dialogs.BETDialog import BETDialog
         from src.models.BETModel import BETModel
-        index = self.isotherms_model.current_iso_index
+        index = self.iso_model.current_iso_index
         if index:
-            isotherm = self.isotherms_model.itemFromIndex(index).data()
+            isotherm = self.iso_model.itemFromIndex(index).data()
             dialog = BETDialog()
             model = BETModel(isotherm)
             model.set_view(dialog)
@@ -181,9 +197,9 @@ class MainWindow(QMainWindow):
     def langmuirarea(self):
         from src.dialogs.LangmuirDialog import LangmuirDialog
         from src.models.LangmuirModel import LangmuirModel
-        index = self.isotherms_model.current_iso_index
+        index = self.iso_model.current_iso_index
         if index:
-            isotherm = self.isotherms_model.itemFromIndex(index).data()
+            isotherm = self.iso_model.itemFromIndex(index).data()
             dialog = LangmuirDialog()
             model = LangmuirModel(isotherm)
             model.set_view(dialog)

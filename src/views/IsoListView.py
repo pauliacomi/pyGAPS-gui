@@ -1,19 +1,25 @@
-
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtCore
 
 
 class IsoListView(QtWidgets.QListView):
     """List view that shows the opened list of isotherms."""
+
+    # Ask to delete current isotherm
+    delete_current = QtCore.Signal()
 
     def __init__(self, parent=None):
 
         # Initial init
         super().__init__(parent)
 
-    def remove_current(self):
-        """Remove currently selected isotherm from list."""
-        index = self.current_iso_index.row()
-        self.removeRow(index)
-        if index == self.rowCount() and index != 0:
-            self.current_iso_index -= 1
-        self.iso_sel_change.emit()
+        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.setMovement(QtWidgets.QListView.Free)
+        self.setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Delete:
+            self.delete_current.emit()
+            return
+        super().keyPressEvent(event)
