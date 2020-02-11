@@ -7,3 +7,5 @@ class IsoModel(QtGui.QStandardItem):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setDropEnabled(False)
+        self.oldCheckState = QtCore.Qt.Unchecked
+        self.userCheckState = QtCore.Qt.Unchecked

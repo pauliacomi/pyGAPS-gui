@@ -23,20 +23,21 @@ class IsoListController():
         self.list_view.selectionModel().currentChanged.connect(self.selection_changed)
         self.list_view.delete_current.connect(self.delete_current)
 
-        self.widget.selectAllButton.clicked.connect(self.model.check_all)
-        self.widget.deselectAllButton.clicked.connect(self.model.uncheck_all)
+        self.widget.selectAllButton.clicked.connect(self.model.tick_all)
+        self.widget.deselectAllButton.clicked.connect(self.model.untick_all)
         self.widget.removeButton.clicked.connect(self.delete_current)
 
         # Create isotherm data view
-        self.widget.materialLineEdit.editingFinished.connect(self.modify_iso)
-        self.widget.adsorbateLineEdit.editingFinished.connect(self.modify_iso)
-        self.widget.temperatureLineEdit.editingFinished.connect(
-            self.modify_iso)
+        self.widget.materialEdit.editingFinished.connect(self.modify_iso)
+        self.widget.adsorbateEdit.insertItems(
+            0, [ads.name for ads in pygaps.ADSORBATE_LIST])
+        self.widget.adsorbateEdit.lineEdit().editingFinished.connect(self.modify_iso)
+        self.widget.temperatureEdit.editingFinished.connect(self.modify_iso)
         self.widget.dataButton.clicked.connect(self.iso_data)
 
         # Connect signals for graph view
         self.graph_view.setModel(self.model)
-        self.list_view.selectionModel().currentChanged.connect(self.model.check)
+        self.list_view.selectionModel().currentChanged.connect(self.model.check_selected)
         self.model.checkedChanged.connect(self.graph_view.plot)
 
     ########################################################
@@ -53,9 +54,9 @@ class IsoListController():
             return
 
         # Essential properties
-        self.widget.materialLineEdit.setText(isotherm.material)
-        self.widget.adsorbateLineEdit.setText(str(isotherm.adsorbate))
-        self.widget.temperatureLineEdit.setText(str(isotherm.temperature))
+        self.widget.materialEdit.setText(isotherm.material)
+        self.widget.adsorbateEdit.setCurrentText(str(isotherm.adsorbate))
+        self.widget.temperatureEdit.setText(str(isotherm.temperature))
 
         # Units here
         self.widget.pressureMode.addItems(list(pg_units._PRESSURE_MODE.keys()))
@@ -79,11 +80,11 @@ class IsoListController():
 
     def reset_iso_info(self):
         """Reset all the display."""
-
+        # self.widget.blockSignals(True)
         # Essential properties
-        self.widget.materialLineEdit.clear()
-        self.widget.adsorbateLineEdit.clear()
-        self.widget.temperatureLineEdit.clear()
+        self.widget.materialEdit.clear()
+        self.widget.adsorbateEdit.lineEdit().clear()
+        self.widget.temperatureEdit.clear()
 
         # Units here
         self.widget.pressureMode.clear()
@@ -94,11 +95,13 @@ class IsoListController():
 
         self.widget.loadingUnit.clear()
         self.widget.adsorbentUnit.clear()
+        # self.widget.blockSignals(False)
 
     def iso_data(self):
         from src.widgets.DataDialog import DataDialog
-        if self.iso_model.current_iso_index:
-            isotherm = self.iso_model.get_iso_current()
+        index = self.list_view.selectionModel().currentIndex()
+        isotherm = self.model.get_iso_index(index)
+        if isotherm:
             dialog = DataDialog()
             dialog.tableView.setModel(IsoDataTableModel(isotherm.data()))
             dialog.exec_()
@@ -146,6 +149,7 @@ class IsoListController():
         row = index.row()
         if row < 0:
             return
+        self.model.old_check_state = None
         self.model.removeRow(row)  # LayoutChanged called automatically
 
     def delete_current(self):

@@ -27,12 +27,7 @@ class IsoGraphView(QtWidgets.QWidget):
         self.model = model
 
     def plot(self, sel_index=None, **kwargs):
-        selection = [
-            self.model.get_iso_index(index)
-            for index in self.model.selected_iso_indices
-        ]
-        if sel_index and sel_index not in self.model.selected_iso_indices:
-            selection.append(self.model.get_iso_index(sel_index))
+        selection = self.model.get_iso_checked()
         self._static_ax.clear()
         if any(selection):
             pygaps.plot_iso(
