@@ -69,9 +69,8 @@ class IsoListModel(QtGui.QStandardItemModel):
                 item = self.item(row)
                 item.setCheckState(QtCore.Qt.Checked)
                 item.oldCheckState = QtCore.Qt.Checked
-                if item.index() != self.oldCurrent:
-                    item.userCheckState = QtCore.Qt.Unchecked
-                else:
+                # make sure that the selected isotherm is marked
+                if item.index() == self.oldCurrent:
                     item.userCheckState = QtCore.Qt.Checked
             self.blockSignals(False)
             self.layoutChanged.emit()
@@ -83,6 +82,7 @@ class IsoListModel(QtGui.QStandardItemModel):
             self.blockSignals(True)
             for row in range(self.rowCount()):
                 item = self.item(row)
+                # only untick non-selected isotherms
                 if item.index() != self.oldCurrent:
                     item.setCheckState(QtCore.Qt.Unchecked)
                     item.oldCheckState = QtCore.Qt.Unchecked
