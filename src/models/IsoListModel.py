@@ -93,10 +93,16 @@ class IsoListModel(QtGui.QStandardItemModel):
 
     def delete(self, index):
         """Remove isotherm from model."""
+        # LayoutChanged called automatically BEFORE actual removal
+        # Therefore must ensure old isotherm is not ticked
+        self.blockSignals(True)
+        self.itemFromIndex(index).setCheckState(QtCore.Qt.Unchecked)
+        self.blockSignals(False)
+        # Remove reference to old isotherm
         self.oldCurrent = None
         for row in range(self.rowCount()):
             self.item(row).oldCheckState = QtCore.Qt.Unchecked
-        self.blockSignals(True)
-        self.removeRow(index.row())  # LayoutChanged called automatically
-        self.blockSignals(False)
-        self.layoutChanged.emit()
+        # Call method for removal
+        self.removeRow(index.row())
+        # Remove reference again
+        self.oldCurrent = None
