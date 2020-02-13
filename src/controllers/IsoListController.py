@@ -144,17 +144,9 @@ class IsoListController():
         elif ext == '.xls' or ext == '.xlsx':
             pygaps.isotherm_to_xl(isotherm, path)
 
-    def delete(self, index):
-        """Remove isotherm from model."""
-        row = index.row()
-        if row < 0:
-            return
-        self.model.old_check_state = None
-        self.model.removeRow(row)  # LayoutChanged called automatically
-
     def delete_current(self):
         """Remove current isotherm from model."""
-        self.delete(self.list_view.currentIndex())
+        self.model.delete(self.list_view.currentIndex())
 
     def modify_iso(self):
         print('modified')
