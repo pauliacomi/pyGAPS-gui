@@ -27,11 +27,11 @@ class IsoGraphView(QtWidgets.QWidget):
         self.model = model
 
     def plot(self, sel_index=None, **kwargs):
-        selection = self.model.get_iso_checked()
         self._static_ax.clear()
+        selection = self.model.get_iso_checked()
         if any(selection):
             pygaps.plot_iso(
                 selection,
                 ax=self._static_ax
             )
-            self._static_ax.figure.canvas.draw()
+        self._static_ax.figure.canvas.draw()

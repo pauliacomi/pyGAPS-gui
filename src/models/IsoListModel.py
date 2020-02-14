@@ -25,7 +25,6 @@ class IsoListModel(QtGui.QStandardItemModel):
 
     def check_ticked(self, item):
         """If an item changed, verify if it was a tick change."""
-        print(item.index())
         # Can never uncheck a selected item
         if item.index() == self.oldCurrent:
             self.blockSignals(True)
@@ -60,6 +59,8 @@ class IsoListModel(QtGui.QStandardItemModel):
             elif oldItem and oldItem.oldCheckState == QtCore.Qt.Unchecked:
                 self.checkedChanged.emit()
             self.oldCurrent = index
+        else:
+            self.checkedChanged.emit()
 
     def tick_all(self):
         """Tick all items and mark them for display."""
@@ -100,9 +101,10 @@ class IsoListModel(QtGui.QStandardItemModel):
         self.blockSignals(False)
         # Remove reference to old isotherm
         self.oldCurrent = None
-        for row in range(self.rowCount()):
-            self.item(row).oldCheckState = QtCore.Qt.Unchecked
         # Call method for removal
         self.removeRow(index.row())
         # Remove reference again
         self.oldCurrent = None
+
+    # TODO delete does not update selection when deleting checked isotherms
+    # TODO delete keeps one item ticked
