@@ -2,9 +2,9 @@ import src.widgets.resources_rc
 
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtWidgets import QApplication, QWidget
-from PySide2.QtWidgets import QHBoxLayout, QGridLayout, QGroupBox
+from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout, QGroupBox
 from PySide2.QtWidgets import QSizePolicy, QAbstractItemView
-from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QComboBox
+from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QComboBox, QFrame
 from PySide2.QtWidgets import QMenu, QMenuBar, QAction, QStatusBar
 
 from src.views.IsoGraphView import IsoGraphView
@@ -64,11 +64,11 @@ class MainWindowUI(object):
         sizePolicy.setHorizontalStretch(1)
         self.explorerGroup.setSizePolicy(sizePolicy)
 
-        self.gridExplorer = QGridLayout(self.explorerGroup)
-        self.gridExplorer.setObjectName("gridExplorer")
+        self.explorerLayout = QGridLayout(self.explorerGroup)
+        self.explorerLayout.setObjectName("explorerLayout")
         self.isoExplorer = IsoListView(self.explorerGroup)
         self.isoExplorer.setObjectName("isoExplorer")
-        self.gridExplorer.addWidget(self.isoExplorer, 0, 0, 1, 2)
+        self.explorerLayout.addWidget(self.isoExplorer, 0, 0, 1, 2)
 
         self.explorerBottomButtons = QHBoxLayout()
 
@@ -83,7 +83,7 @@ class MainWindowUI(object):
         self.removeButton = QPushButton(self.explorerGroup)
         self.removeButton.setObjectName("removeButton")
         self.explorerBottomButtons.addWidget(self.removeButton)
-        self.gridExplorer.addLayout(self.explorerBottomButtons, 1, 0, 1, 2)
+        self.explorerLayout.addLayout(self.explorerBottomButtons, 1, 0, 1, 2)
 
         self.mainLayout.addWidget(self.explorerGroup)
 
@@ -97,29 +97,29 @@ class MainWindowUI(object):
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(2)
         self.propertiesGroup.setSizePolicy(sizePolicy)
-        self.gridProperties = QGridLayout(self.propertiesGroup)
-        self.gridProperties.setObjectName("gridProperties")
+        self.propertiesLayout = QGridLayout(self.propertiesGroup)
+        self.propertiesLayout.setObjectName("propertiesLayout")
 
         self.materialLabel = QLabel(self.propertiesGroup)
         self.materialLabel.setObjectName("materialLabel")
-        self.gridProperties.addWidget(self.materialLabel, 0, 0, 1, 1)
+        self.propertiesLayout.addWidget(self.materialLabel, 0, 0, 1, 1)
         self.materialEdit = QLineEdit(self.propertiesGroup)
         self.materialEdit.setObjectName("materialEdit")
-        self.gridProperties.addWidget(self.materialEdit, 0, 1, 1, 1)
+        self.propertiesLayout.addWidget(self.materialEdit, 0, 1, 1, 1)
         self.adsorbateLabel = QLabel(self.propertiesGroup)
         self.adsorbateLabel.setObjectName("adsorbateLabel")
-        self.gridProperties.addWidget(self.adsorbateLabel, 1, 0, 1, 1)
+        self.propertiesLayout.addWidget(self.adsorbateLabel, 1, 0, 1, 1)
         self.adsorbateEdit = QComboBox(self.propertiesGroup)
         self.adsorbateEdit.setInsertPolicy(QComboBox.NoInsert)
         self.adsorbateEdit.setObjectName("adsorbateEdit")
         self.adsorbateEdit.setEditable(True)
-        self.gridProperties.addWidget(self.adsorbateEdit, 1, 1, 1, 1)
+        self.propertiesLayout.addWidget(self.adsorbateEdit, 1, 1, 1, 1)
         self.temperatureLabel = QLabel(self.propertiesGroup)
         self.temperatureLabel.setObjectName("temperatureLabel")
-        self.gridProperties.addWidget(self.temperatureLabel, 2, 0, 1, 1)
+        self.propertiesLayout.addWidget(self.temperatureLabel, 2, 0, 1, 1)
         self.temperatureEdit = QLineEdit(self.propertiesGroup)
         self.temperatureEdit.setObjectName("temperatureEdit")
-        self.gridProperties.addWidget(self.temperatureEdit, 2, 1, 1, 1)
+        self.propertiesLayout.addWidget(self.temperatureEdit, 2, 1, 1, 1)
 
         # Modes, bases and modes for isotherm physical quantities.
         self.unitGroup = QHBoxLayout()
@@ -141,18 +141,60 @@ class MainWindowUI(object):
         self.adsorbentUnit = QComboBox(self.propertiesGroup)
         self.adsorbentUnit.setObjectName("adsorbentUnit")
         self.unitGroup.addWidget(self.adsorbentUnit)
-        self.gridProperties.addLayout(self.unitGroup, 3, 0, 1, 2)
+        self.propertiesLayout.addLayout(self.unitGroup, 3, 0, 1, 2)
 
+        #
         # Other isotherm information
+        self.extraPropLayout = QVBoxLayout()
+        self.propertiesLayout.addLayout(self.extraPropLayout, 4, 0, 1, 2)
 
-        # Table View
-        self.otherIsoInfoTable = QtWidgets.QTableView(self.propertiesGroup)
-        self.otherIsoInfoTable.setObjectName("otherIsoInfoTable")
-        self.gridProperties.addWidget(self.otherIsoInfoTable, 4, 0, 1, 2)
+        # Top button layout
+        self.extraPropButtonWidget = QtWidgets.QWidget(self.propertiesGroup)
+        self.extraPropButtonLayout = QHBoxLayout(self.extraPropButtonWidget)
+
+        self.extraPropLabelAdd = QLabel(self.propertiesGroup)
+        self.extraPropLabelAdd.setObjectName("extraPropLabelAdd")
+        self.extraPropButtonLayout.addWidget(self.extraPropLabelAdd)
+
+        self.extraPropLineEditAdd = QLineEdit(self.propertiesGroup)
+        self.extraPropLineEditAdd.setObjectName("extraPropLineEditAdd")
+        self.extraPropButtonLayout.addWidget(self.extraPropLineEditAdd)
+
+        self.extraPropButtonAdd = QPushButton(self.propertiesGroup)
+        self.extraPropButtonAdd.setObjectName("extraPropButtonAdd")
+        self.extraPropButtonLayout.addWidget(self.extraPropButtonAdd)
+
+        extraPropDivideLine = QFrame(self.propertiesGroup)
+        extraPropDivideLine.setFrameShape(QFrame.VLine)
+        extraPropDivideLine.setFrameShadow(QFrame.Sunken)
+        self.extraPropButtonLayout.addWidget(extraPropDivideLine)
+
+        self.extraPropButtonEdit = QPushButton(self.propertiesGroup)
+        self.extraPropButtonEdit.setObjectName("extraPropButtonEdit")
+        self.extraPropButtonLayout.addWidget(self.extraPropButtonEdit)
+
+        extraPropDivideLine = QFrame(self.propertiesGroup)
+        extraPropDivideLine.setFrameShape(QFrame.VLine)
+        extraPropDivideLine.setFrameShadow(QFrame.Sunken)
+        self.extraPropButtonLayout.addWidget(extraPropDivideLine)
+
+        self.extraPropButtonDelete = QPushButton(self.propertiesGroup)
+        self.extraPropButtonDelete.setObjectName("extraPropButtonDelete")
+        self.extraPropButtonLayout.addWidget(self.extraPropButtonDelete)
+
+        self.extraPropLayout.addWidget(self.extraPropButtonWidget)
+
+        # Table View & properties
+        self.extraPropTableView = QtWidgets.QTableView(self.propertiesGroup)
+        self.extraPropTableView.setSelectionBehavior(
+            QtWidgets.QTableView.SelectRows)
+        self.extraPropTableView.verticalHeader().setVisible(False)
+        self.extraPropTableView.setObjectName("extraPropTableView")
+        self.extraPropLayout.addWidget(self.extraPropTableView)
 
         # TableView Headers
-        self.horizontalHTable = self.otherIsoInfoTable.horizontalHeader()
-        self.verticalHTable = self.otherIsoInfoTable.verticalHeader()
+        self.horizontalHTable = self.extraPropTableView.horizontalHeader()
+        self.verticalHTable = self.extraPropTableView.verticalHeader()
         self.horizontalHTable.setSectionResizeMode(
             QtWidgets.QHeaderView.ResizeToContents)
         self.verticalHTable.setSectionResizeMode(
@@ -161,7 +203,7 @@ class MainWindowUI(object):
 
         # self.textInfo = QTextBrowser(self.propertiesGroup)
         # self.textInfo.setObjectName("textInfo")
-        # self.gridProperties.addWidget(self.textInfo, 4, 0, 1, 2)
+        # self.propertiesLayout.addWidget(self.textInfo, 4, 0, 1, 2)
 
         # Bottom buttons
         self.detailsBottomButtons = QHBoxLayout()
@@ -169,7 +211,7 @@ class MainWindowUI(object):
         self.dataButton.setObjectName("dataButton")
         self.detailsBottomButtons.addWidget(self.dataButton)
         self.detailsBottomButtons.addStretch(1)
-        self.gridProperties.addLayout(self.detailsBottomButtons, 5, 0, 1, 2)
+        self.propertiesLayout.addLayout(self.detailsBottomButtons, 5, 0, 1, 2)
         self.mainLayout.addWidget(self.propertiesGroup)
 
     def setup_iso_graph(self):
@@ -302,6 +344,14 @@ class MainWindowUI(object):
             "MainWindowUI", "Select All", None, -1))
         self.deselectAllButton.setText(QApplication.translate(
             "MainWindowUI", "Deselect All", None, -1))
+        self.extraPropLabelAdd.setText(QApplication.translate(
+            "MainWindowUI", "Property", None, -1))
+        self.extraPropButtonAdd.setText(QApplication.translate(
+            "MainWindowUI", "+", None, -1))
+        self.extraPropButtonEdit.setText(QApplication.translate(
+            "MainWindowUI", "edt", None, -1))
+        self.extraPropButtonDelete.setText(QApplication.translate(
+            "MainWindowUI", "del", None, -1))
         self.dataButton.setText(QApplication.translate(
             "MainWindowUI", "Data", None, -1))
         self.removeButton.setText(QApplication.translate(
