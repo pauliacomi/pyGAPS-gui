@@ -98,9 +98,9 @@ class MainWindow(QMainWindow):
     def BETarea(self):
         from src.widgets.BETDialog import BETDialog
         from src.models.BETModel import BETModel
-        index = self.iso_model.current_iso_index
+        index = self.ui.isoExplorer.currentIndex()
         if index:
-            isotherm = self.iso_model.itemFromIndex(index).data()
+            isotherm = self.iso_model.get_iso_index(index)
             dialog = BETDialog()
             model = BETModel(isotherm)
             model.set_view(dialog)
@@ -109,9 +109,9 @@ class MainWindow(QMainWindow):
     def langmuirarea(self):
         from src.widgets.LangmuirDialog import LangmuirDialog
         from src.models.LangmuirModel import LangmuirModel
-        index = self.iso_model.current_iso_index
+        index = self.ui.isoExplorer.currentIndex()
         if index:
-            isotherm = self.iso_model.itemFromIndex(index).data()
+            isotherm = self.iso_model.get_iso_index(index)
             dialog = LangmuirDialog()
             model = LangmuirModel(isotherm)
             model.set_view(dialog)
