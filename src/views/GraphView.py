@@ -1,13 +1,13 @@
-from PySide2 import QtWidgets
+from qtpy import QtWidgets
 
 from matplotlib.backends.backend_qt5agg import (
-    FigureCanvasQTAgg as FigureCanvas,
-    NavigationToolbar2QT as NavigationToolbar)
+    FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as
+    NavigationToolbar
+)
 from matplotlib.figure import Figure
 
 
 class GraphView(QtWidgets.QWidget):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

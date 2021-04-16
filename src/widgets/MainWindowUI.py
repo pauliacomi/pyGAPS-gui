@@ -1,11 +1,12 @@
 import src.widgets.resources_rc
 
-from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtWidgets import QApplication, QWidget
-from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout, QGroupBox
-from PySide2.QtWidgets import QSizePolicy, QAbstractItemView
-from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton, QComboBox, QFrame
-from PySide2.QtWidgets import QMenu, QMenuBar, QAction, QStatusBar
+from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtWidgets import QApplication, QWidget
+from qtpy.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout, QGroupBox
+from qtpy.QtWidgets import QSizePolicy, QAbstractItemView
+from qtpy.QtWidgets import QLabel, QLineEdit, QPushButton, QComboBox, QFrame
+from qtpy.QtWidgets import QMenu, QMenuBar, QStatusBar
+from qtpy.QtWidgets import QAction
 
 from src.views.IsoGraphView import IsoGraphView
 from src.views.IsoListView import IsoListView
@@ -13,7 +14,6 @@ from src.views.IsoListView import IsoListView
 
 class MainWindowUI(object):
     """Main window user interface for pygaps."""
-
     def setupUi(self, MainWindowUI):
         """Create the window and all its components."""
 
@@ -23,8 +23,10 @@ class MainWindowUI(object):
 
         # Icon
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(
-            ":/res/designer/icons/01_Warning_48x48.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(":/res/designer/icons/01_Warning_48x48.png"),
+            QtGui.QIcon.Normal, QtGui.QIcon.Off
+        )
         MainWindowUI.setWindowIcon(icon)
 
         # Central widget
@@ -59,8 +61,7 @@ class MainWindowUI(object):
 
         self.explorerGroup = QGroupBox(self.centralwidget)
         self.explorerGroup.setObjectName("explorerGroup")
-        sizePolicy = QSizePolicy(
-            QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         self.explorerGroup.setSizePolicy(sizePolicy)
 
@@ -135,12 +136,12 @@ class MainWindowUI(object):
         self.loadingUnit = QComboBox(self.propertiesGroup)
         self.loadingUnit.setObjectName("loadingUnit")
         self.unitGroup.addWidget(self.loadingUnit)
-        self.adsorbentBasis = QComboBox(self.propertiesGroup)
-        self.adsorbentBasis.setObjectName("adsorbentBasis")
-        self.unitGroup.addWidget(self.adsorbentBasis)
-        self.adsorbentUnit = QComboBox(self.propertiesGroup)
-        self.adsorbentUnit.setObjectName("adsorbentUnit")
-        self.unitGroup.addWidget(self.adsorbentUnit)
+        self.materialBasis = QComboBox(self.propertiesGroup)
+        self.materialBasis.setObjectName("materialBasis")
+        self.unitGroup.addWidget(self.materialBasis)
+        self.materialUnit = QComboBox(self.propertiesGroup)
+        self.materialUnit.setObjectName("materialUnit")
+        self.unitGroup.addWidget(self.materialUnit)
         self.propertiesLayout.addLayout(self.unitGroup, 3, 0, 1, 2)
 
         #
@@ -187,7 +188,8 @@ class MainWindowUI(object):
         # Table View & properties
         self.extraPropTableView = QtWidgets.QTableView(self.propertiesGroup)
         self.extraPropTableView.setSelectionBehavior(
-            QtWidgets.QTableView.SelectRows)
+            QtWidgets.QTableView.SelectRows
+        )
         self.extraPropTableView.verticalHeader().setVisible(False)
         self.extraPropTableView.setObjectName("extraPropTableView")
         self.extraPropLayout.addWidget(self.extraPropTableView)
@@ -196,9 +198,11 @@ class MainWindowUI(object):
         self.horizontalHTable = self.extraPropTableView.horizontalHeader()
         self.verticalHTable = self.extraPropTableView.verticalHeader()
         self.horizontalHTable.setSectionResizeMode(
-            QtWidgets.QHeaderView.ResizeToContents)
+            QtWidgets.QHeaderView.ResizeToContents
+        )
         self.verticalHTable.setSectionResizeMode(
-            QtWidgets.QHeaderView.ResizeToContents)
+            QtWidgets.QHeaderView.ResizeToContents
+        )
         self.horizontalHTable.setStretchLastSection(True)
 
         # self.textInfo = QTextBrowser(self.propertiesGroup)
@@ -257,40 +261,47 @@ class MainWindowUI(object):
 
         self.actionOpen = QAction(MainWindowUI)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(
-            ":/res/icons/10_Search_48x48.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(
+            QtGui.QPixmap(":/res/icons/10_Search_48x48.png"),
+            QtGui.QIcon.Normal, QtGui.QIcon.Off
+        )
         self.actionOpen.setIcon(icon1)
         self.actionOpen.setObjectName("actionOpen")
         self.actionOpen.setShortcut("Ctrl+O")
 
         self.actionSave = QAction(MainWindowUI)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/res/icons/04_Save_48x48.png"),
-                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(
+            QtGui.QPixmap(":/res/icons/04_Save_48x48.png"), QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.actionSave.setIcon(icon2)
         self.actionSave.setObjectName("actionSave")
         self.actionSave.setShortcut("Ctrl+S")
 
         self.actionQuit = QAction(MainWindowUI)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(
-            ":/res/icons/14_Delete_48x48.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(
+            QtGui.QPixmap(":/res/icons/14_Delete_48x48.png"),
+            QtGui.QIcon.Normal, QtGui.QIcon.Off
+        )
         self.actionQuit.setIcon(icon3)
         self.actionQuit.setObjectName("actionQuit")
         self.actionQuit.setShortcut("Ctrl+Q")
 
         self.actionAbout = QAction(MainWindowUI)
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/res/icons/15_Tick_48x48.png"),
-                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(
+            QtGui.QPixmap(":/res/icons/15_Tick_48x48.png"), QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.actionAbout.setIcon(icon4)
         self.actionAbout.setObjectName("actionAbout")
 
-        self.actionBET_Surface_Area = QAction(MainWindowUI)
-        self.actionBET_Surface_Area.setObjectName("actionBET_Surface_Area")
-        self.actionLangmuir_Surface_Area = QAction(MainWindowUI)
-        self.actionLangmuir_Surface_Area.setObjectName(
-            "actionLangmuir_Surface_Area")
+        self.actionBET_SA = QAction(MainWindowUI)
+        self.actionBET_SA.setObjectName("actionBET_Surface_Area")
+        self.actionLangmuir_SA = QAction(MainWindowUI)
+        self.actionLangmuir_SA.setObjectName("actionLangmuir_Surface_Area")
         self.actiont_plot = QAction(MainWindowUI)
         self.actiont_plot.setObjectName("actiont_plot")
         self.actionalpha_s_plot = QAction(MainWindowUI)
@@ -310,8 +321,8 @@ class MainWindowUI(object):
         self.menuFile.addAction(self.actionSave)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
-        self.menuCharact.addAction(self.actionBET_Surface_Area)
-        self.menuCharact.addAction(self.actionLangmuir_Surface_Area)
+        self.menuCharact.addAction(self.actionBET_SA)
+        self.menuCharact.addAction(self.actionLangmuir_SA)
         self.menuCharact.addSeparator()
         self.menuCharact.addAction(self.actiont_plot)
         self.menuCharact.addAction(self.actionalpha_s_plot)
@@ -328,67 +339,115 @@ class MainWindowUI(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
     def retranslateUi(self, MainWindowUI):
-        MainWindowUI.setWindowTitle(QApplication.translate(
-            "MainWindowUI", "pyGAPS-gui", None, -1))
-        self.explorerGroup.setTitle(QApplication.translate(
-            "MainWindowUI", "Isotherm Explorer", None, -1))
-        self.propertiesGroup.setTitle(QApplication.translate(
-            "MainWindowUI", "Isotherm Properties", None, -1))
-        self.temperatureLabel.setText(QApplication.translate(
-            "MainWindowUI", "Temperature (K)", None, -1))
-        self.adsorbateLabel.setText(QApplication.translate(
-            "MainWindowUI", "Adsorbate", None, -1))
-        self.materialLabel.setText(QApplication.translate(
-            "MainWindowUI", "Material", None, -1))
-        self.selectAllButton.setText(QApplication.translate(
-            "MainWindowUI", "Select All", None, -1))
-        self.deselectAllButton.setText(QApplication.translate(
-            "MainWindowUI", "Deselect All", None, -1))
-        self.extraPropLabelAdd.setText(QApplication.translate(
-            "MainWindowUI", "Property", None, -1))
-        self.extraPropButtonAdd.setText(QApplication.translate(
-            "MainWindowUI", "+", None, -1))
-        self.extraPropButtonEdit.setText(QApplication.translate(
-            "MainWindowUI", "edt", None, -1))
-        self.extraPropButtonDelete.setText(QApplication.translate(
-            "MainWindowUI", "del", None, -1))
-        self.dataButton.setText(QApplication.translate(
-            "MainWindowUI", "Data", None, -1))
-        self.removeButton.setText(QApplication.translate(
-            "MainWindowUI", "Remove", None, -1))
-        self.graphGroup.setTitle(QApplication.translate(
-            "MainWindowUI", "Isotherm Overlay", None, -1))
-        self.menuFile.setTitle(QApplication.translate(
-            "MainWindowUI", "File", None, -1))
-        self.menuCharact.setTitle(QApplication.translate(
-            "MainWindowUI", "Characterization", None, -1))
-        self.menuHelp.setTitle(QApplication.translate(
-            "MainWindowUI", "Help", None, -1))
-        self.menuModel.setTitle(QApplication.translate(
-            "MainWindowUI", "Model", None, -1))
-        self.actionOpen.setText(QApplication.translate(
-            "MainWindowUI", "Open", None, -1))
-        self.actionSave.setText(QApplication.translate(
-            "MainWindowUI", "Save", None, -1))
-        self.actionQuit.setText(QApplication.translate(
-            "MainWindowUI", "Quit", None, -1))
-        self.actionAbout.setText(QApplication.translate(
-            "MainWindowUI", "About", None, -1))
-        self.actionBET_Surface_Area.setText(QApplication.translate(
-            "MainWindowUI", "BET Surface Area", None, -1))
-        self.actionLangmuir_Surface_Area.setText(QApplication.translate(
-            "MainWindowUI", "Langmuir Surface Area", None, -1))
-        self.actiont_plot.setText(QApplication.translate(
-            "MainWindowUI", "t-plot", None, -1))
-        self.actionalpha_s_plot.setText(QApplication.translate(
-            "MainWindowUI", "alpha-s plot", None, -1))
-        self.actionMicroporous_PSD.setText(QApplication.translate(
-            "MainWindowUI", "Microporous PSD", None, -1))
-        self.actionMesoporous_PSD.setText(QApplication.translate(
-            "MainWindowUI", "Mesoporous PSD", None, -1))
-        self.actionDFT_Kernel_PSD.setText(QApplication.translate(
-            "MainWindowUI", "DFT Kernel PSD", None, -1))
-        self.actionModel_By.setText(QApplication.translate(
-            "MainWindowUI", "Model Using", None, -1))
-        self.actionGuess_Model.setText(QApplication.translate(
-            "MainWindowUI", "Model Guess", None, -1))
+        MainWindowUI.setWindowTitle(
+            QApplication.translate("MainWindowUI", "pyGAPS-gui", None, -1)
+        )
+        self.explorerGroup.setTitle(
+            QApplication.translate(
+                "MainWindowUI", "Isotherm Explorer", None, -1
+            )
+        )
+        self.propertiesGroup.setTitle(
+            QApplication.translate(
+                "MainWindowUI", "Isotherm Properties", None, -1
+            )
+        )
+        self.temperatureLabel.setText(
+            QApplication.translate(
+                "MainWindowUI", "Temperature (K)", None, -1
+            )
+        )
+        self.adsorbateLabel.setText(
+            QApplication.translate("MainWindowUI", "Adsorbate", None, -1)
+        )
+        self.materialLabel.setText(
+            QApplication.translate("MainWindowUI", "Material", None, -1)
+        )
+        self.selectAllButton.setText(
+            QApplication.translate("MainWindowUI", "Select All", None, -1)
+        )
+        self.deselectAllButton.setText(
+            QApplication.translate("MainWindowUI", "Deselect All", None, -1)
+        )
+        self.extraPropLabelAdd.setText(
+            QApplication.translate("MainWindowUI", "Property", None, -1)
+        )
+        self.extraPropButtonAdd.setText(
+            QApplication.translate("MainWindowUI", "+", None, -1)
+        )
+        self.extraPropButtonEdit.setText(
+            QApplication.translate("MainWindowUI", "edt", None, -1)
+        )
+        self.extraPropButtonDelete.setText(
+            QApplication.translate("MainWindowUI", "del", None, -1)
+        )
+        self.dataButton.setText(
+            QApplication.translate("MainWindowUI", "Data", None, -1)
+        )
+        self.removeButton.setText(
+            QApplication.translate("MainWindowUI", "Remove", None, -1)
+        )
+        self.graphGroup.setTitle(
+            QApplication.translate(
+                "MainWindowUI", "Isotherm Overlay", None, -1
+            )
+        )
+        self.menuFile.setTitle(
+            QApplication.translate("MainWindowUI", "File", None, -1)
+        )
+        self.menuCharact.setTitle(
+            QApplication.translate(
+                "MainWindowUI", "Characterization", None, -1
+            )
+        )
+        self.menuHelp.setTitle(
+            QApplication.translate("MainWindowUI", "Help", None, -1)
+        )
+        self.menuModel.setTitle(
+            QApplication.translate("MainWindowUI", "Model", None, -1)
+        )
+        self.actionOpen.setText(
+            QApplication.translate("MainWindowUI", "Open", None, -1)
+        )
+        self.actionSave.setText(
+            QApplication.translate("MainWindowUI", "Save", None, -1)
+        )
+        self.actionQuit.setText(
+            QApplication.translate("MainWindowUI", "Quit", None, -1)
+        )
+        self.actionAbout.setText(
+            QApplication.translate("MainWindowUI", "About", None, -1)
+        )
+        self.actionBET_SA.setText(
+            QApplication.translate(
+                "MainWindowUI", "BET Surface Area", None, -1
+            )
+        )
+        self.actionLangmuir_SA.setText(
+            QApplication.translate(
+                "MainWindowUI", "Langmuir Surface Area", None, -1
+            )
+        )
+        self.actiont_plot.setText(
+            QApplication.translate("MainWindowUI", "t-plot", None, -1)
+        )
+        self.actionalpha_s_plot.setText(
+            QApplication.translate("MainWindowUI", "alpha-s plot", None, -1)
+        )
+        self.actionMicroporous_PSD.setText(
+            QApplication.translate(
+                "MainWindowUI", "Microporous PSD", None, -1
+            )
+        )
+        self.actionMesoporous_PSD.setText(
+            QApplication.translate("MainWindowUI", "Mesoporous PSD", None, -1)
+        )
+        self.actionDFT_Kernel_PSD.setText(
+            QApplication.translate("MainWindowUI", "DFT Kernel PSD", None, -1)
+        )
+        self.actionModel_By.setText(
+            QApplication.translate("MainWindowUI", "Model Using", None, -1)
+        )
+        self.actionGuess_Model.setText(
+            QApplication.translate("MainWindowUI", "Model Guess", None, -1)
+        )

@@ -1,4 +1,4 @@
-from PySide2 import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from src.views.GraphView import GraphView
 from src.views.IsoGraphView import IsoGraphView
@@ -43,14 +43,14 @@ class BETDialog(QtWidgets.QDialog):
         self.layout.addWidget(self.optionsBox, 1, 0, 1, 1)
 
         self.optionsLayout = QtWidgets.QGridLayout(self.optionsBox)
-        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=2,
-                                            slider_range=[0, 1, 0.01], values=[0, 1])
+        self.pSlider = QHSpinBoxRangeSlider(
+            parent=self, dec_pnts=2, slider_range=[0, 1, 0.01], values=[0, 1]
+        )
         self.pSlider.setMaximumHeight(50)
         self.pSlider.setEmitWhileMoving(False)
         self.optionsLayout.addWidget(self.pSlider, 0, 0, 1, 4)
 
-        self.optionsLayout.addWidget(
-            QtWidgets.QLabel("Fit (R):"), 1, 0, 1, 1)
+        self.optionsLayout.addWidget(QtWidgets.QLabel("Fit (R):"), 1, 0, 1, 1)
         self.result_r = LabelResult(self)
         self.optionsLayout.addWidget(self.result_r, 1, 1, 1, 1)
         self.auto_button = QtWidgets.QPushButton('Auto-determine', self)
@@ -58,19 +58,20 @@ class BETDialog(QtWidgets.QDialog):
 
         # description labels
         self.optionsLayout.addWidget(
-            QtWidgets.QLabel("Calculated results:"), 2, 0, 1, 2)
+            QtWidgets.QLabel("Calculated results:"), 2, 0, 1, 2
+        )
+        self.optionsLayout.addWidget(LabelAlignRight("BET area:"), 3, 0, 1, 1)
         self.optionsLayout.addWidget(
-            LabelAlignRight("BET area:"), 3, 0, 1, 1)
+            LabelAlignRight("C constant:"), 3, 2, 1, 1
+        )
         self.optionsLayout.addWidget(
-            LabelAlignRight("C constant:"), 3, 2, 1, 1)
+            LabelAlignRight("Monolayer uptake:"), 4, 0, 1, 1
+        )
         self.optionsLayout.addWidget(
-            LabelAlignRight("Monolayer uptake:"), 4, 0, 1, 1)
-        self.optionsLayout.addWidget(
-            LabelAlignRight("Monolayer pressure:"), 4, 2, 1, 1)
-        self.optionsLayout.addWidget(
-            LabelAlignRight("Slope:"), 5, 0, 1, 1)
-        self.optionsLayout.addWidget(
-            LabelAlignRight("Intercept:"), 5, 2, 1, 1)
+            LabelAlignRight("Monolayer pressure:"), 4, 2, 1, 1
+        )
+        self.optionsLayout.addWidget(LabelAlignRight("Slope:"), 5, 0, 1, 1)
+        self.optionsLayout.addWidget(LabelAlignRight("Intercept:"), 5, 2, 1, 1)
 
         # result labels
         self.result_bet = LabelResult(self)
@@ -87,7 +88,8 @@ class BETDialog(QtWidgets.QDialog):
         self.optionsLayout.addWidget(self.result_intercept, 5, 3, 1, 1)
 
         self.optionsLayout.addWidget(
-            QtWidgets.QLabel("Calculation output:"), 6, 0, 1, 2)
+            QtWidgets.QLabel("Calculation output:"), 6, 0, 1, 2
+        )
         self.output = LabelOutput(self)
         self.optionsLayout.addWidget(self.output, 7, 0, 2, 4)
 
@@ -95,17 +97,23 @@ class BETDialog(QtWidgets.QDialog):
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok
+        )
         self.buttonBox.setObjectName("buttonBox")
         self.layout.addWidget(self.buttonBox)
 
         self.retranslateUi(Dialog)
         QtCore.QObject.connect(
-            self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept)
+            self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept
+        )
         QtCore.QObject.connect(
-            self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject)
+            self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject
+        )
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtWidgets.QApplication.translate(
-            "BETDialog", "BET area calculation", None, -1))
+        Dialog.setWindowTitle(
+            QtWidgets.QApplication.translate(
+                "BETDialog", "BET area calculation", None, -1
+            )
+        )

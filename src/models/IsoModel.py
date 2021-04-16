@@ -1,9 +1,8 @@
-from PySide2 import QtGui, QtCore
+from qtpy import QtGui, QtCore
 
 
 class IsoModel(QtGui.QStandardItem):
     """Overloading a standard item to store an isotherm."""
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setDropEnabled(False)

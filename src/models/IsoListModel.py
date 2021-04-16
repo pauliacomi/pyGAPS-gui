@@ -1,4 +1,4 @@
-from PySide2 import QtGui, QtCore
+from qtpy import QtGui, QtCore
 
 
 class IsoListModel(QtGui.QStandardItemModel):
@@ -19,7 +19,8 @@ class IsoListModel(QtGui.QStandardItemModel):
     def get_iso_checked(self):
         """Return list of checked isotherms."""
         return [
-            self.item(row).data() for row in range(self.rowCount())
+            self.item(row).data()
+            for row in range(self.rowCount())
             if self.item(row).checkState() == QtCore.Qt.Checked
         ]
 

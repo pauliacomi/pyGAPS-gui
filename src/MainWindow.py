@@ -1,7 +1,6 @@
 import os
-import sys
-from PySide2.QtWidgets import QMainWindow, QMessageBox
-import PySide2.QtCore as QtCore
+from qtpy.QtWidgets import QMainWindow, QMessageBox
+import qtpy.QtCore as QtCore
 
 from src.widgets.MainWindowUI import MainWindowUI
 from src.widgets.UtilityWidgets import open_files_dialog, save_file_dialog, ErrorMessageBox
@@ -17,7 +16,6 @@ from src.controllers.IsoListController import IsoListController
 
 class MainWindow(QMainWindow):
     """Main Window for isotherm explorer and plotting."""
-
     def __init__(self, kernel, parent=None):
 
         # Initial init
@@ -52,15 +50,18 @@ class MainWindow(QMainWindow):
         self.ui.actionAbout.triggered.connect(self.about)
         # self.ui.actionConsole.triggered.connect(self.console)
 
-        self.ui.actionBET_Surface_Area.triggered.connect(self.BETarea)
-        self.ui.actionLangmuir_Surface_Area.triggered.connect(
-            self.langmuirarea)
+        self.ui.actionBET_SA.triggered.connect(self.BETarea)
+        self.ui.actionLangmuir_SA.triggered.connect(self.langmuirarea)
 
     def load(self, filepaths=None):
         """Open isotherm from file."""
         if not filepaths:
-            filepaths = open_files_dialog(self, "Load an isotherm", '.',
-                                          filter='pyGAPS isotherms (*.json *.csv *.xls)')
+            filepaths = open_files_dialog(
+                self,
+                "Load an isotherm",
+                '.',
+                filter='pyGAPS isotherms (*.json *.csv *.xls)'
+            )
 
         if filepaths and filepaths != '':
             for filepath in filepaths:
@@ -80,11 +81,16 @@ class MainWindow(QMainWindow):
         #     return
 
         if not filepath:
-            filename = save_file_dialog(self, "Save an isotherm", '.',
-                                        filter=";;".join(
-                                            ['pyGAPS JSON Isotherm (*.json)',
-                                             'pyGAPS CSV Isotherm (*.csv)',
-                                             'pyGAPS Excel Isotherm (*.xls)']))
+            filename = save_file_dialog(
+                self,
+                "Save an isotherm",
+                '.',
+                filter=";;".join([
+                    'pyGAPS JSON Isotherm (*.json)',
+                    'pyGAPS CSV Isotherm (*.csv)',
+                    'pyGAPS Excel Isotherm (*.xls)'
+                ])
+            )
 
         if filename and filename != '':
             _, ext = os.path.splitext(filename)

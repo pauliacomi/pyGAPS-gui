@@ -1,15 +1,15 @@
-from PySide2 import QtWidgets
+from qtpy import QtWidgets
 
 from matplotlib.backends.backend_qt5agg import (
-    FigureCanvasQTAgg as FigureCanvas,
-    NavigationToolbar2QT as NavigationToolbar)
+    FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as
+    NavigationToolbar
+)
 from matplotlib.figure import Figure
 
 import pygaps
 
 
 class IsoGraphView(QtWidgets.QWidget):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -30,8 +30,5 @@ class IsoGraphView(QtWidgets.QWidget):
         self._static_ax.clear()
         selection = self.model.get_iso_checked()
         if any(selection):
-            pygaps.plot_iso(
-                selection,
-                ax=self._static_ax
-            )
+            pygaps.plot_iso(selection, ax=self._static_ax)
         self._static_ax.figure.canvas.draw()

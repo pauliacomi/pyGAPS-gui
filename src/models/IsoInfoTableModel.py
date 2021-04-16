@@ -1,16 +1,15 @@
-from PySide2 import QtCore
+from qtpy import QtCore
 
 
 class IsoInfoTableModel(QtCore.QAbstractTableModel):
     """Table model to display various isotherm properties."""
-
     def __init__(self, isotherm, parent=None):
         super().__init__(parent)
         self.isotherm = isotherm
         self.params = []
 
         for prop in vars(isotherm):
-            if prop not in isotherm._required_params + list(isotherm._named_params) + \
+            if prop not in isotherm._required_params + \
                     list(isotherm._unit_params) + isotherm._reserved_params:
                 self.params.append([prop, str(getattr(isotherm, prop))])
 
@@ -65,11 +64,13 @@ class IsoInfoTableModel(QtCore.QAbstractTableModel):
         self.beginRemoveRows(index, position, position + rows - 1)
         for row in range(rows):
             delattr(self.isotherm, self.params[position + row][0])
-        del self.params[position:position+rows]
+        del self.params[position:position + rows]
         self.endRemoveRows()
         return True
 
-    def insertRows(self, position, rows=1, index=QtCore.QModelIndex(), val=None):
+    def insertRows(
+        self, position, rows=1, index=QtCore.QModelIndex(), val=None
+    ):
         """Insert a row into the model. Adds new attribute to isotherm."""
         if val:
             self.beginInsertRows(index, position, position + rows - 1)

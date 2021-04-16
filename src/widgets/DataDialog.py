@@ -1,8 +1,7 @@
-from PySide2 import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 
 class DataDialog(QtWidgets.QDialog):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
@@ -23,16 +22,19 @@ class DataDialog(QtWidgets.QDialog):
         self.horizontal_header = self.tableView.horizontalHeader()
         self.vertical_header = self.tableView.verticalHeader()
         self.horizontal_header.setSectionResizeMode(
-            QtWidgets.QHeaderView.ResizeToContents)
+            QtWidgets.QHeaderView.ResizeToContents
+        )
         self.vertical_header.setSectionResizeMode(
-            QtWidgets.QHeaderView.ResizeToContents)
+            QtWidgets.QHeaderView.ResizeToContents
+        )
         self.horizontal_header.setStretchLastSection(True)
 
         # Button box
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok
+        )
         self.buttonBox.setObjectName("buttonBox")
         self.layout.addWidget(self.buttonBox)
 
@@ -40,11 +42,16 @@ class DataDialog(QtWidgets.QDialog):
 
         # Button box connections
         QtCore.QObject.connect(
-            self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept)
+            self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept
+        )
         QtCore.QObject.connect(
-            self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject)
+            self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject
+        )
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtWidgets.QApplication.translate(
-            "DataDialog", "Isotherm Data", None, -1))
+        Dialog.setWindowTitle(
+            QtWidgets.QApplication.translate(
+                "DataDialog", "Isotherm Data", None, -1
+            )
+        )

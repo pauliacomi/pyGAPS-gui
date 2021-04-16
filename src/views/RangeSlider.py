@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2009 Zhuang Lab, Harvard University
 # Copyright (c) 2016 Sean Yeh
-#   (Porting to PySide2, Python3 compatibility, and some trivial modifications)
+#   (Porting to qtpy, Python3 compatibility, and some trivial modifications)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,10 @@
 # THE SOFTWARE.
 
 import decimal
-from PySide2 import QtCore, QtGui
+from qtpy import QtCore, QtGui
 import sys
 
-from PySide2.QtWidgets import (
+from qtpy.QtWidgets import (
     QDoubleSpinBox,
     QWidget,
     QDialog,
@@ -73,7 +73,8 @@ class QRangeSlider(QWidget):
 
     def emitRange(self):
         """Emits the rangeChanged signal, if the range has actually changed."""
-        if (self.old_min_val != self.min_val) or (self.old_max_val != self.max_val):
+        if (self.old_min_val !=
+            self.min_val) or (self.old_max_val != self.max_val):
             self.rangeChanged.emit(self.min_val, self.max_val)
             self.old_min_val = self.min_val
             self.old_max_val = self.max_val
@@ -160,7 +161,10 @@ class QRangeSlider(QWidget):
                     self.emitRange()
         elif self.moving == "bar":
             temp = self.start_display_min - diff
-            if (temp >= self.bar_width) and (temp < size - self.bar_width - (self.start_display_max - self.start_display_min)):
+            if (temp >= self.bar_width) and (
+                temp < size - self.bar_width -
+                (self.start_display_max - self.start_display_min)
+            ):
                 self.display_min = temp
                 self.display_max = self.start_display_max - diff
                 self.updateScaleValues()
@@ -175,9 +179,11 @@ class QRangeSlider(QWidget):
         @param event A PyQt event.
         """
         pos = self.getPos(event)
-        if abs(self.display_min - 0.5 * self.bar_width - pos) < (0.5 * self.bar_width):
+        if abs(self.display_min - 0.5 * self.bar_width -
+               pos) < (0.5 * self.bar_width):
             self.moving = "min"
-        elif abs(self.display_max + 0.5 * self.bar_width - pos) < (0.5 * self.bar_width):
+        elif abs(self.display_max + 0.5 * self.bar_width -
+                 pos) < (0.5 * self.bar_width):
             self.moving = "max"
         elif (pos > self.display_min) and (pos < self.display_max):
             self.moving = "bar"
@@ -250,9 +256,11 @@ class QRangeSlider(QWidget):
         """
         size = float(self.rangeSliderSize() - 2 * self.bar_width - 1)
         self.display_min = int(
-            size * (self.min_val - self.start)/self.scale) + self.bar_width
+            size * (self.min_val - self.start) / self.scale
+        ) + self.bar_width
         self.display_max = int(
-            size * (self.max_val - self.start)/self.scale) + self.bar_width
+            size * (self.max_val - self.start) / self.scale
+        ) + self.bar_width
 
     def updateScaleValues(self):
         """
@@ -264,12 +272,14 @@ class QRangeSlider(QWidget):
             self.min_val = self.start + \
                 (self.display_min - self.bar_width)/float(size) * self.scale
             self.min_val = float(
-                round(self.min_val/self.single_step))*self.single_step
+                round(self.min_val / self.single_step)
+            ) * self.single_step
         if (self.moving == "max") or (self.moving == "bar"):
             self.max_val = self.start + \
                 (self.display_max - self.bar_width)/float(size) * self.scale
             self.max_val = float(
-                round(self.max_val/self.single_step))*self.single_step
+                round(self.max_val / self.single_step)
+            ) * self.single_step
         self.updateDisplayValues()
         self.update()
 
@@ -285,7 +295,6 @@ class QHRangeSlider(QRangeSlider):
     @param values (Optional) [initial minimum setting, initial maximum setting].
     @param parent (Optional) The PyQt parent of this widget.
     """
-
     def __init__(self, slider_range=None, values=None, parent=None):
         QRangeSlider.__init__(self, slider_range, values, parent)
         if parent is not None:
@@ -312,23 +321,26 @@ class QHRangeSlider(QRangeSlider):
         # background
         painter.setPen(QtCore.Qt.gray)
         painter.setBrush(QtCore.Qt.lightGray)
-        painter.drawRect(2, 2, w-4, h-4)
+        painter.drawRect(2, 2, w - 4, h - 4)
 
         # range bar
         painter.setPen(QtCore.Qt.darkGray)
         painter.setBrush(QtCore.Qt.darkGray)
-        painter.drawRect(self.display_min-1, 5,
-                         self.display_max-self.display_min+2, h-10)
+        painter.drawRect(
+            self.display_min - 1, 5, self.display_max - self.display_min + 2,
+            h - 10
+        )
 
         # min & max tabs
         painter.setPen(QtCore.Qt.black)
         painter.setBrush(QtCore.Qt.gray)
-        painter.drawRect(self.display_min-self.bar_width,
-                         1, self.bar_width, h-2)
+        painter.drawRect(
+            self.display_min - self.bar_width, 1, self.bar_width, h - 2
+        )
 
         painter.setPen(QtCore.Qt.black)
         painter.setBrush(QtCore.Qt.gray)
-        painter.drawRect(self.display_max, 1, self.bar_width, h-2)
+        painter.drawRect(self.display_max, 1, self.bar_width, h - 2)
 
     def rangeSliderSize(self):
         """
@@ -345,7 +357,6 @@ class QVRangeSlider(QRangeSlider):
     @param values (Optional) [initial minimum setting, initial maximum setting].
     @param parent (Optional) The PyQt parent of this widget.
     """
-
     def __init__(self, slider_range=None, values=None, parent=None):
         QRangeSlider.__init__(self, slider_range, values, parent)
         if parent is not None:
@@ -372,23 +383,26 @@ class QVRangeSlider(QRangeSlider):
         # background
         painter.setPen(QtCore.Qt.gray)
         painter.setBrush(QtCore.Qt.lightGray)
-        painter.drawRect(2, 2, w-4, h-4)
+        painter.drawRect(2, 2, w - 4, h - 4)
 
         # range bar
         painter.setPen(QtCore.Qt.darkGray)
         painter.setBrush(QtCore.Qt.darkGray)
-        painter.drawRect(5, h-self.display_max-1, w-10,
-                         self.display_max-self.display_min+1)
+        painter.drawRect(
+            5, h - self.display_max - 1, w - 10,
+            self.display_max - self.display_min + 1
+        )
 
         # min & max tabs
         painter.setPen(QtCore.Qt.black)
         painter.setBrush(QtCore.Qt.gray)
-        painter.drawRect(1, h-self.display_max -
-                         self.bar_width-1, w-2, self.bar_width)
+        painter.drawRect(
+            1, h - self.display_max - self.bar_width - 1, w - 2, self.bar_width
+        )
 
         painter.setPen(QtCore.Qt.black)
         painter.setBrush(QtCore.Qt.gray)
-        painter.drawRect(1, h-self.display_min-1, w-2, self.bar_width)
+        painter.drawRect(1, h - self.display_min - 1, w - 2, self.bar_width)
 
     def rangeSliderSize(self):
         """
@@ -419,8 +433,9 @@ class QSpinBoxRangeSlider(QWidget):
             dec_pnts = kwargs['dec_pnts']
         else:
             # Attempt to calculate the appropriate number of decimal points.
-            dec_pnts = abs(decimal.Decimal(
-                slider_range[2]).as_tuple().exponent)
+            dec_pnts = abs(
+                decimal.Decimal(slider_range[2]).as_tuple().exponent
+            )
 
         self.min_spin_box = QDoubleSpinBox()
         self.min_spin_box.setDecimals(dec_pnts)
@@ -448,7 +463,8 @@ class QSpinBoxRangeSlider(QWidget):
 
         # Make range slider take as much of the space as possible.
         size_policy = QSizePolicy(
-            QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+            QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding
+        )
         self.range_slider.setSizePolicy(size_policy)
 
         # Connect signals/
@@ -489,8 +505,7 @@ class QSpinBoxRangeSlider(QWidget):
         """
         @return [current minimum, current maximum].
         """
-        return [self.min_spin_box.value(),
-                self.max_spin_box.value()]
+        return [self.min_spin_box.value(), self.max_spin_box.value()]
 
     def setValues(self, values, emit=True):
         """
@@ -562,10 +577,10 @@ class QHSpinBoxRangeSlider(QSpinBoxRangeSlider):
     @param values [initial minimum setting, initial maximum setting].
     @param parent (Optional) The PyQt parent of this widget.
     """
-
     def __init__(self, slider_range, values, parent=None, **kwargs):
         QSpinBoxRangeSlider.__init__(
-            self, slider_range, values, parent, **kwargs)
+            self, slider_range, values, parent, **kwargs
+        )
         self.addRangeSlider(QHRangeSlider(slider_range, values, self))
 
         if (not parent):
@@ -585,10 +600,10 @@ class QVSpinBoxRangeSlider(QSpinBoxRangeSlider):
     @param values [initial minimum setting, initial maximum setting].
     @param parent (Optional) The PyQt parent of this widget.
     """
-
     def __init__(self, slider_range, values, parent=None, **kwargs):
         QSpinBoxRangeSlider.__init__(
-            self, slider_range, values, parent, **kwargs)
+            self, slider_range, values, parent, **kwargs
+        )
         self.addRangeSlider(QVRangeSlider(slider_range, values, self))
 
         if (not parent):

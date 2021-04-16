@@ -2,9 +2,9 @@ import argparse
 import pathlib
 import sys
 
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QApplication
-from qtconsole.inprocess import QtInProcessKernelManager
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QApplication
+# from qtconsole.inprocess import QtInProcessKernelManager
 from .MainWindow import MainWindow
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -14,7 +14,7 @@ sys._excepthook = sys.excepthook
 
 
 def exception_hook(exctype, value, traceback):
-    """Catch PySide2 exceptions."""
+    """Catch qtpy exceptions."""
     # https://stackoverflow.com/questions/43039048/pyqt5-fails-with-cryptic-message
 
     # Print the error and traceback
@@ -26,14 +26,19 @@ def exception_hook(exctype, value, traceback):
 
 def process_cl_args():
     """Process the known arguments."""
-    parser = argparse.ArgumentParser(
-        description='Directly open isotherms.')
+    parser = argparse.ArgumentParser(description='Directly open isotherms.')
     parser.add_argument(
-        '--file', '-f', action='store', nargs='+',
-        help="Open one or more isotherms.")
+        '--file',
+        '-f',
+        action='store',
+        nargs='+',
+        help="Open one or more isotherms.",
+    )
     parser.add_argument(
-        '--folder', action='store',
-        help="Open a folder of isotherms.")
+        '--folder',
+        action='store',
+        help="Open a folder of isotherms.",
+    )
 
     parsed_args, unparsed_args = parser.parse_known_args()
     return parsed_args, unparsed_args
