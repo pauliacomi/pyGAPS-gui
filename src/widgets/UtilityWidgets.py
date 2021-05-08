@@ -1,8 +1,9 @@
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
 
 
 def open_file_dialog(parent_widget, caption, directory, filter=None):
-    filename = QtWidgets.QFileDialog.getOpenFileName(
+    filename = QW.QFileDialog.getOpenFileName(
         parent_widget, caption=caption, directory=directory, filter=filter
     )
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
@@ -11,7 +12,7 @@ def open_file_dialog(parent_widget, caption, directory, filter=None):
 
 
 def open_files_dialog(parent_widget, caption, directory, filter=None):
-    filenames = QtWidgets.QFileDialog.getOpenFileNames(
+    filenames = QW.QFileDialog.getOpenFileNames(
         parent_widget, caption=caption, directory=directory, filter=filter
     )
     if isinstance(filenames, tuple):  # PyQt5 returns a tuple...
@@ -20,7 +21,7 @@ def open_files_dialog(parent_widget, caption, directory, filter=None):
 
 
 def save_file_dialog(parent_widget, caption, directory, filter=None):
-    filename = QtWidgets.QFileDialog.getSaveFileName(
+    filename = QW.QFileDialog.getSaveFileName(
         parent_widget, caption=caption, directory=directory, filter=filter
     )
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
@@ -28,20 +29,20 @@ def save_file_dialog(parent_widget, caption, directory, filter=None):
     return str(filename)
 
 
-class ErrorMessageBox(QtWidgets.QDialog):
+class ErrorMessageBox(QW.QDialog):
     def __init__(self, *args, **kwargs):
         super(ErrorMessageBox, self).__init__(*args, **kwargs)
         self.setWindowTitle("An error occurred!")
 
-        self.text_lbl = QtWidgets.QLabel()
-        self.text_lbl.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self.scroll_area = QtWidgets.QScrollArea()
+        self.text_lbl = QW.QLabel()
+        self.text_lbl.setTextInteractionFlags(QC.Qt.TextSelectableByMouse)
+        self.scroll_area = QW.QScrollArea()
 
         self.scroll_area.setWidget(self.text_lbl)
         self.scroll_area.setWidgetResizable(True)
-        self.ok_btn = QtWidgets.QPushButton('OK')
+        self.ok_btn = QW.QPushButton('OK')
 
-        _layout = QtWidgets.QGridLayout()
+        _layout = QW.QGridLayout()
         _layout.addWidget(self.scroll_area, 0, 0, 1, 10)
         _layout.addWidget(self.ok_btn, 1, 9)
 
@@ -52,32 +53,32 @@ class ErrorMessageBox(QtWidgets.QDialog):
         self.text_lbl.setText(text_str)
 
 
-class LabelAlignRight(QtWidgets.QLabel):
+class LabelAlignRight(QW.QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        self.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignVCenter)
 
 
-class LabelResult(QtWidgets.QLabel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
-        self.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-
-
-class LabelOutput(QtWidgets.QLabel):
+class LabelResult(QW.QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
-        self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.setFrameStyle(QW.QFrame.Panel | QW.QFrame.Sunken)
+        self.setAlignment(QC.Qt.AlignHCenter | QC.Qt.AlignVCenter)
+
+
+class LabelOutput(QW.QLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setFrameStyle(QW.QFrame.Panel | QW.QFrame.Sunken)
+        self.setAlignment(QC.Qt.AlignLeft | QC.Qt.AlignTop)
         self.setWordWrap(True)
 
 
-class LabelOnChange(QtWidgets.QLabel):
+class LabelOnChange(QW.QLabel):
 
-    changed = QtCore.Signal()
+    changed = QC.Signal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

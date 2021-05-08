@@ -1,4 +1,5 @@
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
 
 from src.views.GraphView import GraphView
 from src.views.IsoGraphView import IsoGraphView
@@ -7,7 +8,7 @@ from src.views.RangeSlider import QHSpinBoxRangeSlider
 from src.widgets.UtilityWidgets import LabelAlignRight, LabelOutput, LabelResult
 
 
-class LangmuirDialog(QtWidgets.QDialog):
+class LangmuirDialog(QW.QDialog):
 
     isotherm = None
 
@@ -19,7 +20,7 @@ class LangmuirDialog(QtWidgets.QDialog):
         Dialog.setObjectName("langmuirDialog")
         Dialog.resize(1000, 800)
 
-        self.layout = QtWidgets.QGridLayout(Dialog)
+        self.layout = QW.QGridLayout(Dialog)
         self.layout.setObjectName("layout")
 
         # Isotherm display
@@ -34,10 +35,10 @@ class LangmuirDialog(QtWidgets.QDialog):
 
         # Options/results box
 
-        self.optionsBox = QtWidgets.QGroupBox('Options', Dialog)
+        self.optionsBox = QW.QGroupBox('Options', Dialog)
         self.layout.addWidget(self.optionsBox, 1, 0, 1, 1)
 
-        self.optionsLayout = QtWidgets.QGridLayout(self.optionsBox)
+        self.optionsLayout = QW.QGridLayout(self.optionsBox)
         self.pSlider = QHSpinBoxRangeSlider(
             parent=self, dec_pnts=2, slider_range=[0, 1, 0.01], values=[0, 1]
         )
@@ -45,15 +46,15 @@ class LangmuirDialog(QtWidgets.QDialog):
         self.pSlider.setEmitWhileMoving(False)
         self.optionsLayout.addWidget(self.pSlider, 0, 0, 1, 4)
 
-        self.optionsLayout.addWidget(QtWidgets.QLabel("Fit (R):"), 1, 0, 1, 1)
+        self.optionsLayout.addWidget(QW.QLabel("Fit (R):"), 1, 0, 1, 1)
         self.result_r = LabelResult(self)
         self.optionsLayout.addWidget(self.result_r, 1, 1, 1, 1)
-        self.auto_button = QtWidgets.QPushButton('Auto-determine', self)
+        self.auto_button = QW.QPushButton('Auto-determine', self)
         self.optionsLayout.addWidget(self.auto_button, 1, 3, 1, 1)
 
         # description labels
         self.optionsLayout.addWidget(
-            QtWidgets.QLabel("Calculated results:"), 2, 0, 1, 2
+            QW.QLabel("Calculated results:"), 2, 0, 1, 2
         )
         self.optionsLayout.addWidget(
             LabelAlignRight("Langmuir area:"), 3, 0, 1, 1
@@ -85,32 +86,32 @@ class LangmuirDialog(QtWidgets.QDialog):
         self.optionsLayout.addWidget(self.result_intercept, 5, 3, 1, 1)
 
         self.optionsLayout.addWidget(
-            QtWidgets.QLabel("Calculation output:"), 6, 0, 1, 2
+            QW.QLabel("Calculation output:"), 6, 0, 1, 2
         )
         self.output = LabelOutput(self)
         self.optionsLayout.addWidget(self.output, 7, 0, 2, 4)
 
         # Bottom buttons
-        self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox = QW.QDialogButtonBox(Dialog)
+        self.buttonBox.setOrientation(QC.Qt.Horizontal)
         self.buttonBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok
+            QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok
         )
         self.buttonBox.setObjectName("buttonBox")
         self.layout.addWidget(self.buttonBox)
 
         self.retranslateUi(Dialog)
-        QtCore.QObject.connect(
-            self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept
+        QC.QObject.connect(
+            self.buttonBox, QC.SIGNAL("accepted()"), Dialog.accept
         )
-        QtCore.QObject.connect(
-            self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject
+        QC.QObject.connect(
+            self.buttonBox, QC.SIGNAL("rejected()"), Dialog.reject
         )
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        QC.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(
-            QtWidgets.QApplication.translate(
+            QW.QApplication.translate(
                 "BETDialog", "BET area calculation", None, -1
             )
         )

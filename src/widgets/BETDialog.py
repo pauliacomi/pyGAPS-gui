@@ -1,4 +1,5 @@
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
 
 from src.views.GraphView import GraphView
 from src.views.IsoGraphView import IsoGraphView
@@ -7,42 +8,42 @@ from src.views.RangeSlider import QHSpinBoxRangeSlider
 from src.widgets.UtilityWidgets import LabelAlignRight, LabelOutput, LabelResult
 
 
-class BETDialog(QtWidgets.QDialog):
+class BETDialog(QW.QDialog):
 
     isotherm = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setupUi(self)
+        self.setupUi()
 
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("BETDialog")
-        Dialog.resize(1000, 800)
+    def setupUi(self):
+        self.setObjectName("BETDialog")
+        self.resize(1000, 800)
 
-        self.layout = QtWidgets.QGridLayout(Dialog)
+        self.layout = QW.QGridLayout(self)
         self.layout.setObjectName("layout")
 
         # Isotherm display
-        self.isoGraph = GraphView(Dialog)
+        self.isoGraph = GraphView(self)
         self.isoGraph.setObjectName("isoGraph")
         self.layout.addWidget(self.isoGraph, 0, 0, 1, 1)
 
         # BET plot
-        self.betGraph = GraphView(Dialog)
+        self.betGraph = GraphView(self)
         self.betGraph.setObjectName("betGraph")
         self.layout.addWidget(self.betGraph, 0, 1, 1, 1)
 
         # Rouquerol plot
-        self.rouqGraph = GraphView(Dialog)
+        self.rouqGraph = GraphView(self)
         self.rouqGraph.setObjectName("rouqGraph")
         self.layout.addWidget(self.rouqGraph, 1, 1, 1, 1)
 
         # Options/results box
 
-        self.optionsBox = QtWidgets.QGroupBox('Options', Dialog)
+        self.optionsBox = QW.QGroupBox('Options', self)
         self.layout.addWidget(self.optionsBox, 1, 0, 1, 1)
 
-        self.optionsLayout = QtWidgets.QGridLayout(self.optionsBox)
+        self.optionsLayout = QW.QGridLayout(self.optionsBox)
         self.pSlider = QHSpinBoxRangeSlider(
             parent=self, dec_pnts=2, slider_range=[0, 1, 0.01], values=[0, 1]
         )
@@ -50,15 +51,15 @@ class BETDialog(QtWidgets.QDialog):
         self.pSlider.setEmitWhileMoving(False)
         self.optionsLayout.addWidget(self.pSlider, 0, 0, 1, 4)
 
-        self.optionsLayout.addWidget(QtWidgets.QLabel("Fit (R):"), 1, 0, 1, 1)
+        self.optionsLayout.addWidget(QW.QLabel("Fit (R):"), 1, 0, 1, 1)
         self.result_r = LabelResult(self)
         self.optionsLayout.addWidget(self.result_r, 1, 1, 1, 1)
-        self.auto_button = QtWidgets.QPushButton('Auto-determine', self)
+        self.auto_button = QW.QPushButton('Auto-determine', self)
         self.optionsLayout.addWidget(self.auto_button, 1, 3, 1, 1)
 
         # description labels
         self.optionsLayout.addWidget(
-            QtWidgets.QLabel("Calculated results:"), 2, 0, 1, 2
+            QW.QLabel("Calculated results:"), 2, 0, 1, 2
         )
         self.optionsLayout.addWidget(LabelAlignRight("BET area:"), 3, 0, 1, 1)
         self.optionsLayout.addWidget(
@@ -88,32 +89,32 @@ class BETDialog(QtWidgets.QDialog):
         self.optionsLayout.addWidget(self.result_intercept, 5, 3, 1, 1)
 
         self.optionsLayout.addWidget(
-            QtWidgets.QLabel("Calculation output:"), 6, 0, 1, 2
+            QW.QLabel("Calculation output:"), 6, 0, 1, 2
         )
         self.output = LabelOutput(self)
         self.optionsLayout.addWidget(self.output, 7, 0, 2, 4)
 
         # Bottom buttons
-        self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox = QW.QDialogButtonBox(self)
+        self.buttonBox.setOrientation(QC.Qt.Horizontal)
         self.buttonBox.setStandardButtons(
-            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok
+            QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok
         )
         self.buttonBox.setObjectName("buttonBox")
         self.layout.addWidget(self.buttonBox)
 
-        self.retranslateUi(Dialog)
-        QtCore.QObject.connect(
-            self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept
+        self.retranslateUi()
+        QC.QObject.connect(
+            self.buttonBox, QC.SIGNAL("accepted()"), self.accept
         )
-        QtCore.QObject.connect(
-            self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject
+        QC.QObject.connect(
+            self.buttonBox, QC.SIGNAL("rejected()"), self.reject
         )
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        QC.QMetaObject.connectSlotsByName(self)
 
-    def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(
-            QtWidgets.QApplication.translate(
+    def retranslateUi(self):
+        self.setWindowTitle(
+            QW.QApplication.translate(
                 "BETDialog", "BET area calculation", None, -1
             )
         )
