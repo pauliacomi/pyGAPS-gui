@@ -1,10 +1,11 @@
-from qtpy import QtGui, QtCore
+from qtpy import QtCore as QC
+from qtpy import QtGui as QG
 
 
-class IsoModel(QtGui.QStandardItem):
+class IsoModel(QG.QStandardItem):
     """Overloading a standard item to store an isotherm."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setDropEnabled(False)
-        self.oldCheckState = QtCore.Qt.Unchecked
-        self.userCheckState = QtCore.Qt.Unchecked
+        self.oldCheckState = QC.Qt.Unchecked
+        self.userCheckState = QC.Qt.Unchecked

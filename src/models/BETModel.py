@@ -1,7 +1,5 @@
 import warnings
 
-from qtpy import QtCore
-
 import pygaps
 from pygaps.characterisation.area_bet import (
     area_BET_raw, bet_transform, roq_transform

@@ -1,3 +1,4 @@
+import re
 import pygaps
 from pygaps.utilities.converter_mode import _PRESSURE_MODE, _MATERIAL_MODE
 
@@ -133,6 +134,31 @@ class IsoListController():
             isotherm = pygaps.isotherm_from_json(path)
         elif ext == '.xls' or ext == '.xlsx':
             isotherm = pygaps.isotherm_from_xl(path)
+
+        # Create the model to store the isotherm
+        iso_model = IsoModel(name)
+        # store data
+        iso_model.setData(isotherm)
+        # make checkable (default unchecked)
+        iso_model.setCheckable(True)
+        # Add to the list model
+        self.iso_list_model.appendRow(iso_model)
+
+    def loadImport(self, path, name, iso_type):
+        isotherm = None
+        if iso_type == 0:  # bel raw
+            isotherm = pygaps.isotherm_from_bel(path)
+        elif iso_type == 1:  # bel report
+            isotherm = pygaps.isotherm_from_xl(path, fmt='bel')
+        elif iso_type == 2:  # mic report
+            isotherm = pygaps.isotherm_from_xl(path, fmt='mic')
+        elif iso_type == 3:  # qnt report
+            pass
+        else:
+            raise Exception("Could not determine import type.")
+
+        if not isotherm:
+            return
 
         # Create the model to store the isotherm
         iso_model = IsoModel(name)

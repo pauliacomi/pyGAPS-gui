@@ -36,4 +36,7 @@ setup(
         'qtpy',
         'pyGAPS',
     },
+    setup_requires=[
+        'pyinstaller > 4.0'
+    ]
 )

@@ -1,7 +1,5 @@
 import warnings
 
-from qtpy import QtCore
-
 import pygaps
 from pygaps.characterisation.area_langmuir import (
     area_langmuir_raw, langmuir_transform

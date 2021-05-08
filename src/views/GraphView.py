@@ -1,4 +1,4 @@
-from qtpy import QtWidgets
+from qtpy import QtWidgets as QW
 
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as
@@ -7,14 +7,14 @@ from matplotlib.backends.backend_qt5agg import (
 from matplotlib.figure import Figure
 
 
-class GraphView(QtWidgets.QWidget):
+class GraphView(QW.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.canvas = FigureCanvas(Figure(figsize=(5, 3)))
         self.navBar = NavigationToolbar(self.canvas, self)
 
-        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout = QW.QVBoxLayout(self)
         self.layout.addWidget(self.canvas)
         self.layout.addWidget(self.navBar)
         self.setLayout(self.layout)

@@ -1,7 +1,7 @@
-from qtpy import QtCore
+from qtpy import QtCore as QC
 
 
-class IsoDataTableModel(QtCore.QAbstractTableModel):
+class IsoDataTableModel(QC.QAbstractTableModel):
     """Overloading a table model to display isotherm adsorption data."""
     def __init__(self, data, parent=None):
         super().__init__(parent)
@@ -13,17 +13,17 @@ class IsoDataTableModel(QtCore.QAbstractTableModel):
     def columnCount(self, parent=None):
         return self._data.columns.size
 
-    def data(self, index, role=QtCore.Qt.DisplayRole):
+    def data(self, index, role=QC.Qt.DisplayRole):
         if index.isValid():
-            if role == QtCore.Qt.DisplayRole:
+            if role == QC.Qt.DisplayRole:
                 return str(self._data.values[index.row()][index.column()])
         return None
 
-    def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
-        if role != QtCore.Qt.DisplayRole:
+    def headerData(self, section, orientation, role=QC.Qt.DisplayRole):
+        if role != QC.Qt.DisplayRole:
             return None
 
-        if orientation == QtCore.Qt.Horizontal:
+        if orientation == QC.Qt.Horizontal:
             try:
                 label = self._data.columns.tolist()[section]
                 if label == section:
@@ -31,5 +31,5 @@ class IsoDataTableModel(QtCore.QAbstractTableModel):
                 return label
             except (IndexError, ):
                 return None
-        elif orientation == QtCore.Qt.Vertical:
+        elif orientation == QC.Qt.Vertical:
             return section

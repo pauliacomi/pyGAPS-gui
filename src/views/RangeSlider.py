@@ -4,6 +4,8 @@
 # Copyright (c) 2009 Zhuang Lab, Harvard University
 # Copyright (c) 2016 Sean Yeh
 #   (Porting to qtpy, Python3 compatibility, and some trivial modifications)
+# Copyright (c) 2020 Paul Iacomi
+#   (trivial modifications)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +26,12 @@
 # THE SOFTWARE.
 
 import decimal
-from qtpy import QtCore, QtGui
-import sys
-
-from qtpy.QtWidgets import (
-    QDoubleSpinBox,
-    QWidget,
-    QDialog,
-    QSizePolicy,
-    QHBoxLayout,
-    QGridLayout,
-    QDialogButtonBox,
-)
+from qtpy import QtCore as QC
+from qtpy import QtGui as QG
+from qtpy import QtWidgets as QW
 
 
-class QRangeSlider(QWidget):
+class QRangeSlider(QW.QWidget):
     """
     Range Slider super class.
 
@@ -46,11 +39,11 @@ class QRangeSlider(QWidget):
     @param values [initial minimum setting, initial maximum setting].
     @param parent (Optional) The PyQt parent of this widget.
     """
-    doubleClick = QtCore.Signal(bool)
-    rangeChanged = QtCore.Signal(float, float)
+    doubleClick = QC.Signal(bool)
+    rangeChanged = QC.Signal(float, float)
 
     def __init__(self, slider_range, values, parent=None):
-        QWidget.__init__(self, parent)
+        QW.QWidget.__init__(self, parent)
         self.bar_width = 10
         self.emit_while_moving = False
         self.moving = "none"
@@ -69,7 +62,7 @@ class QRangeSlider(QWidget):
         else:
             self.setValues([0.3, 0.6])
 
-        self.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.setFocusPolicy(QC.Qt.ClickFocus)
 
     def emitRange(self):
         """Emits the rangeChanged signal, if the range has actually changed."""
@@ -91,15 +84,15 @@ class QRangeSlider(QWidget):
 
         # move bars based on arrow keys
         moving_max = False
-        if key == QtCore.Qt.Key_Up:
+        if key == QC.Qt.Key_Up:
             self.max_val += self.single_step
             moving_max = True
-        elif key == QtCore.Qt.Key_Down:
+        elif key == QC.Qt.Key_Down:
             self.max_val -= self.single_step
             moving_max = True
-        elif key == QtCore.Qt.Key_Left:
+        elif key == QC.Qt.Key_Left:
             self.min_val -= self.single_step
-        elif key == QtCore.Qt.Key_Right:
+        elif key == QC.Qt.Key_Right:
             self.min_val += self.single_step
 
         # update (if necessary) based on allowed range
@@ -208,12 +201,12 @@ class QRangeSlider(QWidget):
 
         @param event A PyQt event.
         """
-        QWidget.resizeEvent(self, event)
+        QW.QWidget.resizeEvent(self, event)
         self.updateDisplayValues()
 
     def setEmitWhileMoving(self, flag):
         """
-       Set whether or not to emit rangeChanged signal while the slider is 
+       Set whether or not to emit rangeChanged signal while the slider is
        being moved with the mouse.
 
        @param flag True/False emit while moving.
@@ -251,7 +244,7 @@ class QRangeSlider(QWidget):
 
     def updateDisplayValues(self):
         """
-        This updates the display value, i.e. the real location in the widgets 
+        This updates the display value, i.e. the real location in the widgets
         where the bars are drawn.
         """
         size = float(self.rangeSliderSize() - 2 * self.bar_width - 1)
@@ -264,7 +257,7 @@ class QRangeSlider(QWidget):
 
     def updateScaleValues(self):
         """
-        This updates the internal / real values that correspond to the 
+        This updates the internal / real values that correspond to the
         current slider positions.
         """
         size = float(self.rangeSliderSize() - 2 * self.bar_width - 1)
@@ -314,32 +307,32 @@ class QHRangeSlider(QRangeSlider):
 
         @param event A PyQt event.
         """
-        painter = QtGui.QPainter(self)
+        painter = QG.QPainter(self)
         w = self.width()
         h = self.height()
 
         # background
-        painter.setPen(QtCore.Qt.gray)
-        painter.setBrush(QtCore.Qt.lightGray)
+        painter.setPen(QC.Qt.gray)
+        painter.setBrush(QC.Qt.lightGray)
         painter.drawRect(2, 2, w - 4, h - 4)
 
         # range bar
-        painter.setPen(QtCore.Qt.darkGray)
-        painter.setBrush(QtCore.Qt.darkGray)
+        painter.setPen(QC.Qt.darkGray)
+        painter.setBrush(QC.Qt.darkGray)
         painter.drawRect(
             self.display_min - 1, 5, self.display_max - self.display_min + 2,
             h - 10
         )
 
         # min & max tabs
-        painter.setPen(QtCore.Qt.black)
-        painter.setBrush(QtCore.Qt.gray)
+        painter.setPen(QC.Qt.black)
+        painter.setBrush(QC.Qt.gray)
         painter.drawRect(
             self.display_min - self.bar_width, 1, self.bar_width, h - 2
         )
 
-        painter.setPen(QtCore.Qt.black)
-        painter.setBrush(QtCore.Qt.gray)
+        painter.setPen(QC.Qt.black)
+        painter.setBrush(QC.Qt.gray)
         painter.drawRect(self.display_max, 1, self.bar_width, h - 2)
 
     def rangeSliderSize(self):
@@ -376,32 +369,32 @@ class QVRangeSlider(QRangeSlider):
 
         @param event A PyQt event.
         """
-        painter = QtGui.QPainter(self)
+        painter = QG.QPainter(self)
         w = self.width()
         h = self.height()
 
         # background
-        painter.setPen(QtCore.Qt.gray)
-        painter.setBrush(QtCore.Qt.lightGray)
+        painter.setPen(QC.Qt.gray)
+        painter.setBrush(QC.Qt.lightGray)
         painter.drawRect(2, 2, w - 4, h - 4)
 
         # range bar
-        painter.setPen(QtCore.Qt.darkGray)
-        painter.setBrush(QtCore.Qt.darkGray)
+        painter.setPen(QC.Qt.darkGray)
+        painter.setBrush(QC.Qt.darkGray)
         painter.drawRect(
             5, h - self.display_max - 1, w - 10,
             self.display_max - self.display_min + 1
         )
 
         # min & max tabs
-        painter.setPen(QtCore.Qt.black)
-        painter.setBrush(QtCore.Qt.gray)
+        painter.setPen(QC.Qt.black)
+        painter.setBrush(QC.Qt.gray)
         painter.drawRect(
             1, h - self.display_max - self.bar_width - 1, w - 2, self.bar_width
         )
 
-        painter.setPen(QtCore.Qt.black)
-        painter.setBrush(QtCore.Qt.gray)
+        painter.setPen(QC.Qt.black)
+        painter.setBrush(QC.Qt.gray)
         painter.drawRect(1, h - self.display_min - 1, w - 2, self.bar_width)
 
     def rangeSliderSize(self):
@@ -411,7 +404,7 @@ class QVRangeSlider(QRangeSlider):
         return self.height()
 
 
-class QSpinBoxRangeSlider(QWidget):
+class QSpinBoxRangeSlider(QW.QWidget):
     """
     Range slider with two double spin boxes super class.
 
@@ -420,11 +413,11 @@ class QSpinBoxRangeSlider(QWidget):
     @param parent (Optional) The PyQt parent of this widget.
     """
 
-    doubleClick = QtCore.Signal(bool)
-    rangeChanged = QtCore.Signal(float, float)
+    doubleClick = QC.Signal(bool)
+    rangeChanged = QC.Signal(float, float)
 
     def __init__(self, slider_range, values, parent=None, **kwargs):
-        QWidget.__init__(self, parent)
+        QW.QWidget.__init__(self, parent)
         self.max_val = values[1]
         self.min_val = values[0]
         self.range_slider = False
@@ -437,7 +430,7 @@ class QSpinBoxRangeSlider(QWidget):
                 decimal.Decimal(slider_range[2]).as_tuple().exponent
             )
 
-        self.min_spin_box = QDoubleSpinBox()
+        self.min_spin_box = QW.QDoubleSpinBox()
         self.min_spin_box.setDecimals(dec_pnts)
         self.min_spin_box.setMinimum(slider_range[0])
         self.min_spin_box.setMaximum(slider_range[1])
@@ -445,7 +438,7 @@ class QSpinBoxRangeSlider(QWidget):
         self.min_spin_box.setValue(values[0])
         self.min_spin_box.valueChanged.connect(self.handleMinSpinBox)
 
-        self.max_spin_box = QDoubleSpinBox()
+        self.max_spin_box = QW.QDoubleSpinBox()
         self.max_spin_box.setDecimals(dec_pnts)
         self.max_spin_box.setMinimum(slider_range[0])
         self.max_spin_box.setMaximum(slider_range[1])
@@ -462,8 +455,8 @@ class QSpinBoxRangeSlider(QWidget):
         self.range_slider = range_slider
 
         # Make range slider take as much of the space as possible.
-        size_policy = QSizePolicy(
-            QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding
+        size_policy = QW.QSizePolicy(
+            QW.QSizePolicy.MinimumExpanding, QW.QSizePolicy.MinimumExpanding
         )
         self.range_slider.setSizePolicy(size_policy)
 
@@ -586,7 +579,7 @@ class QHSpinBoxRangeSlider(QSpinBoxRangeSlider):
         if (not parent):
             self.setGeometry(200, 200, 300, 100)
 
-        self.layout = QHBoxLayout(self)
+        self.layout = QW.QHBoxLayout(self)
         self.layout.addWidget(self.min_spin_box)
         self.layout.addWidget(self.range_slider)
         self.layout.addWidget(self.max_spin_box)
@@ -609,7 +602,7 @@ class QVSpinBoxRangeSlider(QSpinBoxRangeSlider):
         if (not parent):
             self.setGeometry(200, 200, 100, 300)
 
-        self.layout = QtGui.QVBoxLayout(self)
+        self.layout = QW.QVBoxLayout(self)
         self.layout.addWidget(self.max_spin_box)
         self.layout.addWidget(self.range_slider)
         self.layout.addWidget(self.min_spin_box)
