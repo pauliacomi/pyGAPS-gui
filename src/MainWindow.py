@@ -1,6 +1,6 @@
 import os
-from qtpy.QtWidgets import QMainWindow, QMessageBox
-import qtpy.QtCore as QtCore
+
+from qtpy import QtWidgets as QW
 
 from src.widgets.MainWindowUI import MainWindowUI
 from src.widgets.UtilityWidgets import open_files_dialog, save_file_dialog, ErrorMessageBox
@@ -14,7 +14,7 @@ from src.views.ConsoleView import ConsoleView
 from src.controllers.IsoListController import IsoListController
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QW.QMainWindow):
     """Main Window for isotherm explorer and plotting."""
     def __init__(self, kernel, parent=None):
 
@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # Create isotherm list mvc
-        self.iso_model = IsoListModel()
+        self.iso_model = IsoListModel(parent=self)
         self.iso_controller = IsoListController(self.ui, self.iso_model)
 
         # Create and connect menu
@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
     def connect_menu(self):
         """Connect signals and slots of the menu."""
         self.ui.actionOpen.triggered.connect(self.load)
+        self.ui.actionImport.triggered.connect(self.importIso)
         self.ui.actionSave.triggered.connect(self.save)
         self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionAbout.triggered.connect(self.about)
@@ -60,7 +61,7 @@ class MainWindow(QMainWindow):
                 self,
                 "Load an isotherm",
                 '.',
-                filter='pyGAPS isotherms (*.json *.csv *.xls)'
+                filter='pyGAPS isotherms (*.json *.csv *.xls *.aif)'
             )
 
         if filepaths and filepaths != '':
@@ -69,6 +70,26 @@ class MainWindow(QMainWindow):
                 filetitle, fileext = os.path.splitext(filename)
                 try:
                     self.iso_controller.load(filepath, filename, fileext)
+                except Exception as e:
+                    errorbox = ErrorMessageBox()
+                    errorbox.setText(str(e))
+                    errorbox.exec_()
+            self.iso_controller.select_last()
+
+    def importIso(self, filepaths=None):
+        """Import isotherm from manufacturer files."""
+        from src.widgets.ImportDialog import ImportDialog
+
+        dialog = ImportDialog()
+        dialog.exec_()
+
+        if dialog.filepaths and dialog.filepaths != '':
+            for filepath in dialog.filepaths:
+                dirpath, filename = os.path.split(filepath)
+                try:
+                    self.iso_controller.loadImport(
+                        filepath, filename, dialog.ftype
+                    )
                 except Exception as e:
                     errorbox = ErrorMessageBox()
                     errorbox.setText(str(e))
@@ -125,7 +146,7 @@ class MainWindow(QMainWindow):
 
     def about(self):
         """Show Help/About message box."""
-        QMessageBox.about(self, 'application', 'iacomi.paul@gmail.com')
+        QW.QMessageBox.about(self, 'application', 'iacomi.paul@gmail.com')
 
     def console(self):
         """Display console."""

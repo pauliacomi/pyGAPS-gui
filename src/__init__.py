@@ -5,7 +5,6 @@ import sys
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication
 # from qtconsole.inprocess import QtInProcessKernelManager
-from .MainWindow import MainWindow
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
@@ -25,7 +24,7 @@ def exception_hook(exctype, value, traceback):
 
 
 def process_cl_args():
-    """Process the known arguments."""
+    """Process known arguments."""
     parser = argparse.ArgumentParser(description='Directly open isotherms.')
     parser.add_argument(
         '--file',
@@ -61,6 +60,7 @@ def main():
     # kernel.gui = 'qt'
 
     # Create main window and show
+    from .MainWindow import MainWindow
     application = MainWindow(None)  # (kernel_manager)
     application.show()
 
