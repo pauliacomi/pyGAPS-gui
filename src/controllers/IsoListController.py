@@ -49,7 +49,10 @@ class IsoListController():
         self.widget.removeButton.clicked.connect(self.delete_current_iso)
 
         # Create isotherm data view
-        self.widget.materialEdit.editingFinished.connect(
+        self.widget.materialEdit.insertItems(
+            0, [mat.name for mat in pygaps.MATERIAL_LIST]
+        )
+        self.widget.materialEdit.lineEdit().editingFinished.connect(
             self.modify_iso_baseprops
         )
         self.widget.adsorbateEdit.insertItems(
@@ -81,6 +84,12 @@ class IsoListController():
         self.iso_list_model.checkedChanged.connect(self.graph_view.plot)
         self.unit_widget.unitsChanged.connect(self.graph_view.plot)
 
+    def refresh_material_edit(self):
+        self.widget.materialEdit.clear()
+        self.widget.materialEdit.insertItems(
+            0, [mat.name for mat in pygaps.MATERIAL_LIST]
+        )
+
     ########################################################
     # Display functionality
     ########################################################
@@ -95,7 +104,7 @@ class IsoListController():
             return
 
         # Essential metadata
-        self.widget.materialEdit.setText(str(isotherm.material))
+        self.widget.materialEdit.setCurrentText(str(isotherm.material))
         self.widget.adsorbateEdit.setCurrentText(str(isotherm.adsorbate))
         self.widget.temperatureEdit.setText(str(isotherm.temperature))
 
@@ -111,7 +120,7 @@ class IsoListController():
         # self.widget.blockSignals(True)
 
         # Essential metadata
-        self.widget.materialEdit.clear()
+        self.widget.materialEdit.lineEdit().clear()
         self.widget.adsorbateEdit.lineEdit().clear()
         self.widget.temperatureEdit.clear()
 
@@ -175,6 +184,11 @@ class IsoListController():
 
     def add_isotherm(self, name, isotherm):
 
+        # Add adsorbates to the list
+        if isotherm.material not in pygaps.MATERIAL_LIST:
+            pygaps.MATERIAL_LIST.append(isotherm.material)
+            self.refresh_material_edit()
+
         # Create the model to store the isotherm
         iso_model = IsoModel(name)
         # store data
@@ -217,23 +231,31 @@ class IsoListController():
     def modify_iso_baseprops(self):
         index = self.list_view.selectionModel().currentIndex()
         isotherm = self.iso_list_model.get_iso_index(index)
-        if isotherm.material != self.widget.materialEdit.text():
-            isotherm.material = self.widget.materialEdit.text()
+        modified = False
+
+        if isotherm.material != self.widget.materialEdit.lineEdit().text():
+            isotherm.material = self.widget.materialEdit.lineEdit().text()
             self.widget.statusbar.showMessage(
                 'Material modified to ' + isotherm.material, 2000
             )
+            modified = True
 
         if isotherm.adsorbate != self.widget.adsorbateEdit.lineEdit().text():
             isotherm.adsorbate = self.widget.adsorbateEdit.lineEdit().text()
             self.widget.statusbar.showMessage(
                 'Adsorbate modified to ' + isotherm.adsorbate, 2000
             )
+            modified = True
 
         if isotherm.temperature != float(self.widget.temperatureEdit.text()):
             isotherm.temperature = float(self.widget.temperatureEdit.text())
             self.widget.statusbar.showMessage(
                 'Temperature modified to ' + str(isotherm.temperature), 2000
             )
+            modified = True
+
+        if modified:
+            self.graph_view.plot()
 
     def extraPropAdd(self):
         propName = self.widget.extraPropLineEditAdd.text()
