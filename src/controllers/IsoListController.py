@@ -1,6 +1,5 @@
-import re
 import pygaps
-from pygaps.utilities.converter_mode import _PRESSURE_MODE, _MATERIAL_MODE
+from pygaps.utilities.converter_mode import _PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE
 
 from src.models.IsoModel import IsoModel
 from src.models.IsoDataTableModel import IsoDataTableModel
@@ -8,22 +7,38 @@ from src.models.IsoInfoTableModel import IsoInfoTableModel
 
 
 class IsoListController():
+    """
+    Interface between the Isotherm List Model and main window Isotherm views.
+
+    The Isotherm List Model is the collection of isotherms that have been loaded
+    in memory, which are stored in a custom QT QStandardItemModel.
+
+    The main window has various views into this collection, such as:
+
+        - displaying a list of all isotherms (IsoExplorer)
+        - displaying metadata and unit for a selected isotherm (IsoDetails)
+        - plotting one or more selected isotherms (IsoGraph)
+
+    This is also the only place where the pygaps package is imported and used
+    for the main window.
+
+    """
     def __init__(self, widget, model):
         """Connect the MVC architecture."""
 
         self.widget = widget
+        self.unit_widget = widget.unitPropButtonWidget
         self.list_view = widget.isoExplorer
         self.graph_view = widget.isoGraph
 
         self.iso_list_model = model
-        self.iso_prop_model = None
 
         # Connect signals for list view
         self.list_view.setModel(self.iso_list_model)
         self.list_view.selectionModel().currentChanged.connect(
             self.selection_changed
         )
-        self.list_view.delete_current.connect(self.delete_current)
+        self.list_view.delete_current_iso.connect(self.delete_current_iso)
 
         self.widget.selectAllButton.clicked.connect(
             self.iso_list_model.tick_all
@@ -31,18 +46,32 @@ class IsoListController():
         self.widget.deselectAllButton.clicked.connect(
             self.iso_list_model.untick_all
         )
-        self.widget.removeButton.clicked.connect(self.delete_current)
+        self.widget.removeButton.clicked.connect(self.delete_current_iso)
 
         # Create isotherm data view
-        self.widget.materialEdit.editingFinished.connect(self.modify_iso)
+        self.widget.materialEdit.editingFinished.connect(
+            self.modify_iso_baseprops
+        )
         self.widget.adsorbateEdit.insertItems(
             0, [ads.name for ads in pygaps.ADSORBATE_LIST]
         )
         self.widget.adsorbateEdit.lineEdit().editingFinished.connect(
-            self.modify_iso
+            self.modify_iso_baseprops
         )
-        self.widget.temperatureEdit.editingFinished.connect(self.modify_iso)
-        self.widget.dataButton.clicked.connect(self.iso_data)
+        self.widget.temperatureEdit.editingFinished.connect(
+            self.modify_iso_baseprops
+        )
+        self.widget.dataButton.clicked.connect(self.display_iso_data)
+
+        # Setup unit view
+        self.unit_widget.init_boxes(
+            _PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE
+        )
+
+        # Setup property signals
+        self.widget.extraPropButtonAdd.clicked.connect(self.extraPropAdd)
+        self.widget.extraPropButtonEdit.clicked.connect(self.extraPropEdit)
+        self.widget.extraPropButtonDelete.clicked.connect(self.extraPropDelete)
 
         # Connect signals for graph view
         self.graph_view.setModel(self.iso_list_model)
@@ -50,70 +79,47 @@ class IsoListController():
             self.iso_list_model.check_selected
         )
         self.iso_list_model.checkedChanged.connect(self.graph_view.plot)
+        self.unit_widget.unitsChanged.connect(self.graph_view.plot)
 
     ########################################################
     # Display functionality
     ########################################################
 
     def selection_changed(self, index, **kwargs):
-        """What to do when the isotherm selected was changed."""
+        """What to do when the selected isotherm has changed."""
         isotherm = self.iso_list_model.get_iso_index(index)
 
         # Reset if nothing to display
-        self.reset_iso_info()
+        self.clear_iso_views()
         if not isotherm:
             return
 
-        # Essential properties
+        # Essential metadata
         self.widget.materialEdit.setText(str(isotherm.material))
         self.widget.adsorbateEdit.setCurrentText(str(isotherm.adsorbate))
         self.widget.temperatureEdit.setText(str(isotherm.temperature))
 
-        # Units here
-        self.widget.pressureMode.addItems(list(_PRESSURE_MODE.keys()))
-        self.widget.pressureUnit.addItems(
-            list(_PRESSURE_MODE['absolute'].keys())
-        )
-        if isotherm.pressure_mode == "relative":
-            self.widget.pressureUnit.setEnabled(False)
+        # Units setup
+        self.unit_widget.init_units(isotherm)
 
-        self.widget.loadingBasis.addItems(list(_MATERIAL_MODE.keys()))
-        self.widget.materialBasis.addItems(list(_MATERIAL_MODE.keys()))
-
-        self.widget.loadingUnit.addItems(
-            list(_MATERIAL_MODE[isotherm.loading_basis].keys())
-        )
-        self.widget.materialUnit.addItems(
-            list(_MATERIAL_MODE[isotherm.material_basis].keys())
-        )
-
-        # Display other properties of the isotherm
+        # Other isotherm metadata
         self.extraPropTableModel = IsoInfoTableModel(isotherm)
         self.widget.extraPropTableView.setModel(self.extraPropTableModel)
-        self.widget.extraPropButtonAdd.clicked.connect(self.extraPropAdd)
-        self.widget.extraPropButtonEdit.clicked.connect(self.extraPropEdit)
-        self.widget.extraPropButtonDelete.clicked.connect(self.extraPropDelete)
 
-    def reset_iso_info(self):
+    def clear_iso_views(self):
         """Reset all the display."""
         # self.widget.blockSignals(True)
-        # Essential properties
+
+        # Essential metadata
         self.widget.materialEdit.clear()
         self.widget.adsorbateEdit.lineEdit().clear()
         self.widget.temperatureEdit.clear()
 
-        # Units here
-        self.widget.pressureMode.clear()
-        self.widget.pressureUnit.clear()
-
-        self.widget.loadingBasis.clear()
-        self.widget.materialBasis.clear()
-
-        self.widget.loadingUnit.clear()
-        self.widget.materialUnit.clear()
+        # Units
+        self.unit_widget.clear()
         # self.widget.blockSignals(False)
 
-    def iso_data(self):
+    def display_iso_data(self):
         from src.widgets.DataDialog import DataDialog
         index = self.list_view.selectionModel().currentIndex()
         isotherm = self.iso_list_model.get_iso_index(index)
@@ -123,29 +129,33 @@ class IsoListController():
             dialog.exec_()
 
     ########################################################
-    # Model editing functionality
+    # Add and remove functionality
     ########################################################
 
     def load(self, path, name, ext):
         """Load isotherm from disk."""
+
+        isotherm = None
+
         if ext == '.csv':
             isotherm = pygaps.isotherm_from_csv(path)
         elif ext == '.json':
             isotherm = pygaps.isotherm_from_json(path)
         elif ext == '.xls' or ext == '.xlsx':
             isotherm = pygaps.isotherm_from_xl(path)
+        elif ext == '.aif':
+            isotherm = pygaps.isotherm_from_aif(path)
+        else:
+            raise Exception(f"Unknown isotherm type '{ext}'.")
 
-        # Create the model to store the isotherm
-        iso_model = IsoModel(name)
-        # store data
-        iso_model.setData(isotherm)
-        # make checkable (default unchecked)
-        iso_model.setCheckable(True)
-        # Add to the list model
-        self.iso_list_model.appendRow(iso_model)
+        if not isotherm:
+            return
+
+        self.add_isotherm(name, isotherm)
 
     def loadImport(self, path, name, iso_type):
         isotherm = None
+
         if iso_type == 0:  # bel raw
             isotherm = pygaps.isotherm_from_bel(path)
         elif iso_type == 1:  # bel report
@@ -153,28 +163,24 @@ class IsoListController():
         elif iso_type == 2:  # mic report
             isotherm = pygaps.isotherm_from_xl(path, fmt='mic')
         elif iso_type == 3:  # qnt report
+            # TODO implement
             pass
         else:
-            raise Exception("Could not determine import type.")
+            raise Exception(f"Could not determine import type '{iso_type}'.")
 
         if not isotherm:
             return
+
+        self.add_isotherm(name, isotherm)
+
+    def add_isotherm(self, name, isotherm):
 
         # Create the model to store the isotherm
         iso_model = IsoModel(name)
         # store data
         iso_model.setData(isotherm)
-        # make checkable (default unchecked)
-        iso_model.setCheckable(True)
         # Add to the list model
         self.iso_list_model.appendRow(iso_model)
-
-    def select_last(self):
-        """Select last isotherm"""
-        last_iso = self.iso_list_model.index(
-            self.iso_list_model.rowCount() - 1, 0
-        )
-        self.list_view.setCurrentIndex(last_iso)
 
     def save(self, path, ext):
         """Save isotherm to disk."""
@@ -188,12 +194,27 @@ class IsoListController():
             pygaps.isotherm_to_json(isotherm, path)
         elif ext == '.xls' or ext == '.xlsx':
             pygaps.isotherm_to_xl(isotherm, path)
+        elif ext == '.aif':
+            pygaps.isotherm_to_aif(isotherm, path)
+        else:
+            raise Exception("Unknown file save format.")
 
-    def delete_current(self):
+    ########################################################
+    # Selecting, modifying and deleting isotherms
+    ########################################################
+
+    def select_last_iso(self):
+        """Select last isotherm"""
+        last_iso = self.iso_list_model.index(
+            self.iso_list_model.rowCount() - 1, 0
+        )
+        self.list_view.setCurrentIndex(last_iso)
+
+    def delete_current_iso(self):
         """Remove current isotherm from model."""
         self.iso_list_model.delete(self.list_view.currentIndex())
 
-    def modify_iso(self):
+    def modify_iso_baseprops(self):
         index = self.list_view.selectionModel().currentIndex()
         isotherm = self.iso_list_model.get_iso_index(index)
         if isotherm.material != self.widget.materialEdit.text():

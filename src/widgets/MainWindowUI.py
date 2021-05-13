@@ -6,6 +6,7 @@ from qtpy import QtWidgets as QW
 
 from src.views.IsoGraphView import IsoGraphView
 from src.views.IsoListView import IsoListView
+from src.widgets.IsoUnitWidget import IsoUnitWidget
 
 
 class MainWindowUI():
@@ -133,28 +134,8 @@ class MainWindowUI():
         self.basePropLayout.addWidget(self.temperatureEdit, 2, 1, 1, 1)
 
         # then, units for isotherm physical quantities
-        self.unitPropButtonWidget = QW.QWidget(self.propertiesGroup)
+        self.unitPropButtonWidget = IsoUnitWidget(self.propertiesGroup)
         self.propertiesLayout.addWidget(self.unitPropButtonWidget, 1, 0, 1, 2)
-        self.unitPropLayout = QW.QHBoxLayout(self.unitPropButtonWidget)
-
-        self.pressureMode = QW.QComboBox(self.unitPropButtonWidget)
-        self.pressureMode.setObjectName("pressureMode")
-        self.unitPropLayout.addWidget(self.pressureMode)
-        self.pressureUnit = QW.QComboBox(self.unitPropButtonWidget)
-        self.pressureUnit.setObjectName("pressureUnit")
-        self.unitPropLayout.addWidget(self.pressureUnit)
-        self.loadingBasis = QW.QComboBox(self.unitPropButtonWidget)
-        self.loadingBasis.setObjectName("loadingBasis")
-        self.unitPropLayout.addWidget(self.loadingBasis)
-        self.loadingUnit = QW.QComboBox(self.unitPropButtonWidget)
-        self.loadingUnit.setObjectName("loadingUnit")
-        self.unitPropLayout.addWidget(self.loadingUnit)
-        self.materialBasis = QW.QComboBox(self.unitPropButtonWidget)
-        self.materialBasis.setObjectName("materialBasis")
-        self.unitPropLayout.addWidget(self.materialBasis)
-        self.materialUnit = QW.QComboBox(self.unitPropButtonWidget)
-        self.materialUnit.setObjectName("materialUnit")
-        self.unitPropLayout.addWidget(self.materialUnit)
 
         # then, isotherm metadata
         self.extraPropWidget = QW.QWidget(self.propertiesGroup)
