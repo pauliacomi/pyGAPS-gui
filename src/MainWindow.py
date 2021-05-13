@@ -74,7 +74,7 @@ class MainWindow(QW.QMainWindow):
                     errorbox = ErrorMessageBox()
                     errorbox.setText(str(e))
                     errorbox.exec_()
-            self.iso_controller.select_last()
+            self.iso_controller.select_last_iso()
 
     def importIso(self, filepaths=None):
         """Import isotherm from manufacturer files."""
@@ -94,12 +94,13 @@ class MainWindow(QW.QMainWindow):
                     errorbox = ErrorMessageBox()
                     errorbox.setText(str(e))
                     errorbox.exec_()
-            self.iso_controller.select_last()
+            self.iso_controller.select_last_iso()
 
     def save(self, filepath=None):
         """Save isotherm to file."""
-        # if self.iso_model.current_iso_index is None:
-        #     return
+        index = self.ui.isoExplorer.currentIndex()
+        if not index.isValid():
+            return
 
         if not filepath:
             filename = save_file_dialog(
@@ -126,7 +127,7 @@ class MainWindow(QW.QMainWindow):
         from src.widgets.BETDialog import BETDialog
         from src.models.BETModel import BETModel
         index = self.ui.isoExplorer.currentIndex()
-        if index:
+        if index.isValid():
             isotherm = self.iso_model.get_iso_index(index)
             dialog = BETDialog()
             model = BETModel(isotherm)
@@ -137,7 +138,7 @@ class MainWindow(QW.QMainWindow):
         from src.widgets.LangmuirDialog import LangmuirDialog
         from src.models.LangmuirModel import LangmuirModel
         index = self.ui.isoExplorer.currentIndex()
-        if index:
+        if index.isValid():
             isotherm = self.iso_model.get_iso_index(index)
             dialog = LangmuirDialog()
             model = LangmuirModel(isotherm)

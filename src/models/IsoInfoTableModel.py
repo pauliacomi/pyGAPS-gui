@@ -35,7 +35,7 @@ class IsoInfoTableModel(QC.QAbstractTableModel):
 
         if orientation == QC.Qt.Horizontal:
             if section == 0:
-                return "Parameter"
+                return "Metadata"
             elif section == 1:
                 return "Value"
             else:

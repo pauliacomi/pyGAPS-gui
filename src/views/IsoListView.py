@@ -6,7 +6,7 @@ class IsoListView(QW.QListView):
     """List view that shows the opened list of isotherms."""
 
     # Ask to delete current isotherm
-    delete_current = QC.Signal()
+    delete_current_iso = QC.Signal()
 
     def __init__(self, parent=None):
 
@@ -22,6 +22,6 @@ class IsoListView(QW.QListView):
 
     def keyPressEvent(self, event):
         if event.key() == QC.Qt.Key_Delete:
-            self.delete_current.emit()
+            self.delete_current_iso.emit()
             return
         super().keyPressEvent(event)
