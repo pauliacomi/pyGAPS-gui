@@ -20,10 +20,7 @@ class MainWindowUI():
 
         # Icon
         icon = QG.QIcon()
-        icon.addPixmap(
-            QG.QPixmap(":/res/designer/icons/01_Warning_48x48.png"),
-            QG.QIcon.Normal, QG.QIcon.Off
-        )
+        icon.addPixmap(QG.QPixmap(":/res/designer/icons/01_Warning_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         MainWindowUI.setWindowIcon(icon)
 
         # Central widget
@@ -57,9 +54,7 @@ class MainWindowUI():
         # create a groupbox to contain the iso explorer
         self.explorerGroup = QW.QGroupBox(self.centralwidget)
         self.explorerGroup.setObjectName("explorerGroup")
-        sizePolicy = QW.QSizePolicy(
-            QW.QSizePolicy.Expanding, QW.QSizePolicy.Expanding
-        )
+        sizePolicy = QW.QSizePolicy(QW.QSizePolicy.Expanding, QW.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)  # relative 1 col
         self.explorerGroup.setSizePolicy(sizePolicy)
 
@@ -97,9 +92,7 @@ class MainWindowUI():
         # create a groupbox for details of one isotherm
         self.propertiesGroup = QW.QGroupBox(self.centralwidget)
         self.propertiesGroup.setObjectName("propertiesGroup")
-        sizePolicy = QW.QSizePolicy(
-            QW.QSizePolicy.Expanding, QW.QSizePolicy.Expanding
-        )
+        sizePolicy = QW.QSizePolicy(QW.QSizePolicy.Expanding, QW.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(2)  # relative 2 col
         self.propertiesGroup.setSizePolicy(sizePolicy)
 
@@ -120,6 +113,10 @@ class MainWindowUI():
         self.materialEdit.setObjectName("materialEdit")
         self.materialEdit.setEditable(True)
         self.basePropLayout.addWidget(self.materialEdit, 0, 1, 1, 1)
+        self.materialDetails = QW.QPushButton(self.basePropButtonWidget)
+        self.materialDetails.setObjectName("materialDetails")
+        self.basePropLayout.addWidget(self.materialDetails, 0, 2, 1, 1)
+
         self.adsorbateLabel = QW.QLabel(self.basePropButtonWidget)
         self.adsorbateLabel.setObjectName("adsorbateLabel")
         self.basePropLayout.addWidget(self.adsorbateLabel, 1, 0, 1, 1)
@@ -128,6 +125,10 @@ class MainWindowUI():
         self.adsorbateEdit.setObjectName("adsorbateEdit")
         self.adsorbateEdit.setEditable(True)
         self.basePropLayout.addWidget(self.adsorbateEdit, 1, 1, 1, 1)
+        self.adsorbateDetails = QW.QPushButton(self.basePropButtonWidget)
+        self.adsorbateDetails.setObjectName("adsorbateDetails")
+        self.basePropLayout.addWidget(self.adsorbateDetails, 1, 2, 1, 1)
+
         self.temperatureLabel = QW.QLabel(self.basePropButtonWidget)
         self.temperatureLabel.setObjectName("temperatureLabel")
         self.basePropLayout.addWidget(self.temperatureLabel, 2, 0, 1, 1)
@@ -188,12 +189,8 @@ class MainWindowUI():
 
         self.horizontalHTable = self.extraPropTableView.horizontalHeader()
         self.verticalHTable = self.extraPropTableView.verticalHeader()
-        self.horizontalHTable.setSectionResizeMode(
-            QW.QHeaderView.ResizeToContents
-        )
-        self.verticalHTable.setSectionResizeMode(
-            QW.QHeaderView.ResizeToContents
-        )
+        self.horizontalHTable.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
+        self.verticalHTable.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
         self.horizontalHTable.setStretchLastSection(True)
 
         # bottom buttons
@@ -213,9 +210,7 @@ class MainWindowUI():
         # create a groupbox for the isotherm plot
         self.graphGroup = QW.QGroupBox(self.centralwidget)
         self.graphGroup.setObjectName("graphGroup")
-        sizePolicy = QW.QSizePolicy(
-            QW.QSizePolicy.Preferred, QW.QSizePolicy.Expanding
-        )
+        sizePolicy = QW.QSizePolicy(QW.QSizePolicy.Preferred, QW.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(3)  # relative 3 columns
         self.graphGroup.setSizePolicy(sizePolicy)
 
@@ -259,10 +254,7 @@ class MainWindowUI():
         # open
         self.actionOpen = QW.QAction(MainWindowUI)
         icon1 = QG.QIcon()
-        icon1.addPixmap(
-            QG.QPixmap(":/res/icons/10_Search_48x48.png"), QG.QIcon.Normal,
-            QG.QIcon.Off
-        )
+        icon1.addPixmap(QG.QPixmap(":/res/icons/10_Search_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.actionOpen.setIcon(icon1)
         self.actionOpen.setObjectName("actionOpen")
         self.actionOpen.setShortcut("Ctrl+O")
@@ -271,20 +263,14 @@ class MainWindowUI():
         self.actionImport = QW.QAction(MainWindowUI)
         self.actionImport.setObjectName("actionImport")
         icon1 = QG.QIcon()
-        icon1.addPixmap(
-            QG.QPixmap(":/res/icons/16_Copy_48x48.png"), QG.QIcon.Normal,
-            QG.QIcon.Off
-        )
+        icon1.addPixmap(QG.QPixmap(":/res/icons/16_Copy_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.actionImport.setIcon(icon1)
         self.actionImport.setShortcut("Ctrl+I")
 
         # save
         self.actionSave = QW.QAction(MainWindowUI)
         icon2 = QG.QIcon()
-        icon2.addPixmap(
-            QG.QPixmap(":/res/icons/04_Save_48x48.png"), QG.QIcon.Normal,
-            QG.QIcon.Off
-        )
+        icon2.addPixmap(QG.QPixmap(":/res/icons/04_Save_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.actionSave.setIcon(icon2)
         self.actionSave.setObjectName("actionSave")
         self.actionSave.setShortcut("Ctrl+S")
@@ -292,10 +278,7 @@ class MainWindowUI():
         # quit
         self.actionQuit = QW.QAction(MainWindowUI)
         icon3 = QG.QIcon()
-        icon3.addPixmap(
-            QG.QPixmap(":/res/icons/14_Delete_48x48.png"), QG.QIcon.Normal,
-            QG.QIcon.Off
-        )
+        icon3.addPixmap(QG.QPixmap(":/res/icons/14_Delete_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.actionQuit.setIcon(icon3)
         self.actionQuit.setObjectName("actionQuit")
         self.actionQuit.setShortcut("Ctrl+Q")
@@ -303,10 +286,7 @@ class MainWindowUI():
         # about
         self.actionAbout = QW.QAction(MainWindowUI)
         icon4 = QG.QIcon()
-        icon4.addPixmap(
-            QG.QPixmap(":/res/icons/15_Tick_48x48.png"), QG.QIcon.Normal,
-            QG.QIcon.Off
-        )
+        icon4.addPixmap(QG.QPixmap(":/res/icons/15_Tick_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.actionAbout.setIcon(icon4)
         self.actionAbout.setObjectName("actionAbout")
 
@@ -361,128 +341,38 @@ class MainWindowUI():
 
     def retranslateUi(self, MainWindowUI):
         """Set UI text."""
-        MainWindowUI.setWindowTitle(
-            QW.QApplication.translate("MainWindowUI", "pyGAPS-gui", None, -1)
-        )
-        self.explorerGroup.setTitle(
-            QW.QApplication.translate(
-                "MainWindowUI", "Isotherm Explorer", None, -1
-            )
-        )
-        self.propertiesGroup.setTitle(
-            QW.QApplication.translate(
-                "MainWindowUI", "Isotherm Properties", None, -1
-            )
-        )
-        self.temperatureLabel.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "Temperature (K)", None, -1
-            )
-        )
-        self.adsorbateLabel.setText(
-            QW.QApplication.translate("MainWindowUI", "Adsorbate", None, -1)
-        )
-        self.materialLabel.setText(
-            QW.QApplication.translate("MainWindowUI", "Material", None, -1)
-        )
-        self.selectAllButton.setText(
-            QW.QApplication.translate("MainWindowUI", "Select All", None, -1)
-        )
-        self.deselectAllButton.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "Deselect All", None, -1
-            )
-        )
-        self.extraPropLabelAdd.setText(
-            QW.QApplication.translate("MainWindowUI", "Metadata", None, -1)
-        )
-        self.extraPropButtonAdd.setText(
-            QW.QApplication.translate("MainWindowUI", "add", None, -1)
-        )
-        self.extraPropButtonEdit.setText(
-            QW.QApplication.translate("MainWindowUI", "edit", None, -1)
-        )
-        self.extraPropButtonDelete.setText(
-            QW.QApplication.translate("MainWindowUI", "del", None, -1)
-        )
-        self.dataButton.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "Isotherm data", None, -1
-            )
-        )
-        self.removeButton.setText(
-            QW.QApplication.translate("MainWindowUI", "Remove", None, -1)
-        )
-        self.graphGroup.setTitle(
-            QW.QApplication.translate(
-                "MainWindowUI", "Isotherm Display", None, -1
-            )
-        )
-        self.menuFile.setTitle(
-            QW.QApplication.translate("MainWindowUI", "File", None, -1)
-        )
-        self.menuCharact.setTitle(
-            QW.QApplication.translate(
-                "MainWindowUI", "Characterization", None, -1
-            )
-        )
-        self.menuHelp.setTitle(
-            QW.QApplication.translate("MainWindowUI", "Help", None, -1)
-        )
-        self.menuModel.setTitle(
-            QW.QApplication.translate("MainWindowUI", "Model", None, -1)
-        )
-        self.actionOpen.setText(
-            QW.QApplication.translate("MainWindowUI", "Open", None, -1)
-        )
-        self.actionImport.setText(
-            QW.QApplication.translate("MainWindowUI", "Import", None, -1)
-        )
-        self.actionSave.setText(
-            QW.QApplication.translate("MainWindowUI", "Save", None, -1)
-        )
-        self.actionQuit.setText(
-            QW.QApplication.translate("MainWindowUI", "Quit", None, -1)
-        )
-        self.actionAbout.setText(
-            QW.QApplication.translate("MainWindowUI", "About", None, -1)
-        )
-        self.actionBET_SA.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "BET Surface Area", None, -1
-            )
-        )
-        self.actionLangmuir_SA.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "Langmuir Surface Area", None, -1
-            )
-        )
-        self.actiont_plot.setText(
-            QW.QApplication.translate("MainWindowUI", "t-plot", None, -1)
-        )
-        self.actionalpha_s_plot.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "alpha-s plot", None, -1
-            )
-        )
-        self.actionMicroporous_PSD.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "Microporous PSD", None, -1
-            )
-        )
-        self.actionMesoporous_PSD.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "Mesoporous PSD", None, -1
-            )
-        )
-        self.actionDFT_Kernel_PSD.setText(
-            QW.QApplication.translate(
-                "MainWindowUI", "DFT Kernel PSD", None, -1
-            )
-        )
-        self.actionModel_By.setText(
-            QW.QApplication.translate("MainWindowUI", "Model Using", None, -1)
-        )
-        self.actionGuess_Model.setText(
-            QW.QApplication.translate("MainWindowUI", "Model Guess", None, -1)
-        )
+        MainWindowUI.setWindowTitle(QW.QApplication.translate("MainWindowUI", "pyGAPS-gui", None, -1))
+        self.explorerGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Explorer", None, -1))
+        self.propertiesGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Properties", None, -1))
+        self.materialLabel.setText(QW.QApplication.translate("MainWindowUI", "Material", None, -1))
+        self.materialDetails.setText(QW.QApplication.translate("MainWindowUI", "+Props", None, -1))
+        self.adsorbateLabel.setText(QW.QApplication.translate("MainWindowUI", "Adsorbate", None, -1))
+        self.adsorbateDetails.setText(QW.QApplication.translate("MainWindowUI", "+Props", None, -1))
+        self.temperatureLabel.setText(QW.QApplication.translate("MainWindowUI", "Temperature (K)", None, -1))
+        self.selectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Select All", None, -1))
+        self.deselectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Deselect All", None, -1))
+        self.extraPropLabelAdd.setText(QW.QApplication.translate("MainWindowUI", "Metadata", None, -1))
+        self.extraPropButtonAdd.setText(QW.QApplication.translate("MainWindowUI", "add", None, -1))
+        self.extraPropButtonEdit.setText(QW.QApplication.translate("MainWindowUI", "edit", None, -1))
+        self.extraPropButtonDelete.setText(QW.QApplication.translate("MainWindowUI", "del", None, -1))
+        self.dataButton.setText(QW.QApplication.translate("MainWindowUI", "Isotherm data", None, -1))
+        self.removeButton.setText(QW.QApplication.translate("MainWindowUI", "Remove", None, -1))
+        self.graphGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Display", None, -1))
+        self.menuFile.setTitle(QW.QApplication.translate("MainWindowUI", "File", None, -1))
+        self.menuCharact.setTitle(QW.QApplication.translate("MainWindowUI", "Characterization", None, -1))
+        self.menuHelp.setTitle(QW.QApplication.translate("MainWindowUI", "Help", None, -1))
+        self.menuModel.setTitle(QW.QApplication.translate("MainWindowUI", "Model", None, -1))
+        self.actionOpen.setText(QW.QApplication.translate("MainWindowUI", "Open", None, -1))
+        self.actionImport.setText(QW.QApplication.translate("MainWindowUI", "Import", None, -1))
+        self.actionSave.setText(QW.QApplication.translate("MainWindowUI", "Save", None, -1))
+        self.actionQuit.setText(QW.QApplication.translate("MainWindowUI", "Quit", None, -1))
+        self.actionAbout.setText(QW.QApplication.translate("MainWindowUI", "About", None, -1))
+        self.actionBET_SA.setText(QW.QApplication.translate("MainWindowUI", "BET Surface Area", None, -1))
+        self.actionLangmuir_SA.setText(QW.QApplication.translate("MainWindowUI", "Langmuir Surface Area", None, -1))
+        self.actiont_plot.setText(QW.QApplication.translate("MainWindowUI", "t-plot", None, -1))
+        self.actionalpha_s_plot.setText(QW.QApplication.translate("MainWindowUI", "alpha-s plot", None, -1))
+        self.actionMicroporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Microporous PSD", None, -1))
+        self.actionMesoporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Mesoporous PSD", None, -1))
+        self.actionDFT_Kernel_PSD.setText(QW.QApplication.translate("MainWindowUI", "DFT Kernel PSD", None, -1))
+        self.actionModel_By.setText(QW.QApplication.translate("MainWindowUI", "Model Using", None, -1))
+        self.actionGuess_Model.setText(QW.QApplication.translate("MainWindowUI", "Model Guess", None, -1))
