@@ -19,11 +19,7 @@ class IsoListModel(QG.QStandardItemModel):
 
     def get_iso_checked(self):
         """Return list of checked isotherms."""
-        return [
-            self.item(row).data()
-            for row in range(self.rowCount())
-            if self.item(row).checkState() == QC.Qt.Checked
-        ]
+        return [self.item(row).data() for row in range(self.rowCount()) if self.item(row).checkState() == QC.Qt.Checked]
 
     def check_ticked(self, item):
         """If an item changed, verify if it was a tick change."""

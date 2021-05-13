@@ -1,9 +1,7 @@
 import warnings
 
 import pygaps
-from pygaps.characterisation.area_langmuir import (
-    area_langmuir_raw, langmuir_transform
-)
+from pygaps.characterisation.area_langmuir import (area_langmuir_raw, langmuir_transform)
 from pygaps.graphing.calc_graphs import langmuir_plot
 
 
@@ -17,12 +15,8 @@ class LangmuirModel():
         self.cross_section = adsorbate.get_prop("cross_sectional_area")
 
         # Loading and pressure
-        self.loading = self._isotherm.loading(
-            branch='ads', loading_unit='mol', loading_basis='molar'
-        )
-        self.pressure = self._isotherm.pressure(
-            branch='ads', pressure_mode='relative'
-        )
+        self.loading = self._isotherm.loading(branch='ads', loading_unit='mol', loading_basis='molar')
+        self.pressure = self._isotherm.pressure(branch='ads', pressure_mode='relative')
 
         self.minimum = None
         self.maximum = None
@@ -68,14 +62,9 @@ class LangmuirModel():
 
             try:
                 (
-                    self.lang_area, self.k_const, self.n_monolayer, self.slope,
-                    self.intercept, self.minimum, self.maximum, self.corr_coef
-                ) = area_langmuir_raw(
-                    self.pressure,
-                    self.loading,
-                    self.cross_section,
-                    limits=self.limits
-                )
+                    self.lang_area, self.k_const, self.n_monolayer, self.slope, self.intercept, self.minimum,
+                    self.maximum, self.corr_coef
+                ) = area_langmuir_raw(self.pressure, self.loading, self.cross_section, limits=self.limits)
 
             # We catch any errors or warnings and display them to the user
             except Exception as e:
@@ -83,10 +72,7 @@ class LangmuirModel():
                 return
 
             if warning:
-                self.output = '<br>'.join([
-                    f'<font color="red">Warning: {a.message}</font>'
-                    for a in warning
-                ])
+                self.output = '<br>'.join([f'<font color="red">Warning: {a.message}</font>' for a in warning])
             else:
                 self.output = None
 
@@ -101,10 +87,7 @@ class LangmuirModel():
         self.view.output.setText(self.output)
 
     def resetSlider(self):
-        self.view.pSlider.setValues([
-            self.pressure[self.minimum], self.pressure[self.maximum]
-        ],
-                                    emit=False)
+        self.view.pSlider.setValues([self.pressure[self.minimum], self.pressure[self.maximum]], emit=False)
 
     def plot_iso(self):
         # Generate plot of the isotherm
