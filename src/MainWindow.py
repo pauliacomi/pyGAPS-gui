@@ -107,24 +107,24 @@ class MainWindow(QW.QMainWindow):
                 errorbox.exec_()
 
     def BETarea(self):
-        from src.models.BETModel import BETModel
-        from src.views.BETDialog import BETDialog
+        from src.models.AreaBETModel import AreaBETModel
+        from src.views.AreaBETDialog import AreaBETDialog
         index = self.ui.isoExplorer.currentIndex()
         if index.isValid():
             isotherm = self.iso_model.get_iso_index(index)
-            dialog = BETDialog()
-            model = BETModel(isotherm)
+            dialog = AreaBETDialog()
+            model = AreaBETModel(isotherm)
             model.set_view(dialog)
             dialog.exec_()
 
     def langmuirarea(self):
-        from src.models.LangmuirModel import LangmuirModel
-        from src.views.LangmuirDialog import LangmuirDialog
+        from src.models.AreaLangModel import AreaLangModel
+        from src.views.AreaLangDialog import AreaLangDialog
         index = self.ui.isoExplorer.currentIndex()
         if index.isValid():
             isotherm = self.iso_model.get_iso_index(index)
-            dialog = LangmuirDialog()
-            model = LangmuirModel(isotherm)
+            dialog = AreaLangDialog()
+            model = AreaLangModel(isotherm)
             model.set_view(dialog)
             dialog.exec_()
 

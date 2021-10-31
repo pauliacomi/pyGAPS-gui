@@ -1,12 +1,12 @@
 import warnings
 
 import pygaps
-from pygaps.characterisation.area_langmuir import (area_langmuir_raw, langmuir_transform)
-from pygaps.graphing.calc_graphs import langmuir_plot
+from pygaps.characterisation.area_bet import (area_BET_raw, bet_transform, roq_transform)
+from pygaps.graphing.calc_graphs import bet_plot, roq_plot
 
 
-class LangmuirModel():
-    def __init__(self, isotherm, parent=None):
+class AreaBETModel():
+    def __init__(self, isotherm):
 
         self._isotherm = isotherm
 
@@ -21,9 +21,10 @@ class LangmuirModel():
         self.minimum = None
         self.maximum = None
 
-        self.lang_area = None
-        self.k_const = None
+        self.bet_area = None
+        self.c_const = None
         self.n_monolayer = None
+        self.p_monolayer = None
         self.slope = None
         self.intercept = None
         self.corr_coef = None
@@ -35,7 +36,7 @@ class LangmuirModel():
         self.view = view
         self.view.auto_button.clicked.connect(self.calc_auto)
         self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
-        self.plot_iso()
+        self.plotiso()
         self.calc_auto()
 
     def calc_auto(self):
@@ -43,7 +44,7 @@ class LangmuirModel():
         self.limits = None
         self.calculate()
         self.output_results()
-        self.plot_calc()
+        self.plotBET()
         self.resetSlider()
 
     def calc_with_limits(self, left, right):
@@ -51,7 +52,7 @@ class LangmuirModel():
         self.limits = [left, right]
         self.calculate()
         self.output_results()
-        self.plot_calc()
+        self.plotBET()
 
     def calculate(self):
 
@@ -62,9 +63,9 @@ class LangmuirModel():
 
             try:
                 (
-                    self.lang_area, self.k_const, self.n_monolayer, self.slope, self.intercept, self.minimum,
-                    self.maximum, self.corr_coef
-                ) = area_langmuir_raw(self.pressure, self.loading, self.cross_section, limits=self.limits)
+                    self.bet_area, self.c_const, self.n_monolayer, self.p_monolayer, self.slope, self.intercept,
+                    self.minimum, self.maximum, self.corr_coef
+                ) = area_BET_raw(self.pressure, self.loading, self.cross_section, limits=self.limits)
 
             # We catch any errors or warnings and display them to the user
             except Exception as e:
@@ -77,9 +78,10 @@ class LangmuirModel():
                 self.output = None
 
     def output_results(self):
-        self.view.result_lang.setText(f'{self.lang_area:.4}')
-        self.view.result_k.setText(f'{self.k_const:.4}')
+        self.view.result_bet.setText(f'{self.bet_area:.4}')
+        self.view.result_c.setText(f'{self.c_const:.4}')
         self.view.result_mono_n.setText(f'{self.n_monolayer:.4}')
+        self.view.result_mono_p.setText(f'{self.p_monolayer:.4}')
         self.view.result_slope.setText(f'{self.slope:.4}')
         self.view.result_intercept.setText(f'{self.intercept:.4}')
         self.view.result_r.setText(f'{self.corr_coef:.4}')
@@ -89,27 +91,42 @@ class LangmuirModel():
     def resetSlider(self):
         self.view.pSlider.setValues([self.pressure[self.minimum], self.pressure[self.maximum]], emit=False)
 
-    def plot_iso(self):
+    def plotiso(self):
         # Generate plot of the isotherm
         pygaps.plot_iso(self._isotherm, ax=self.view.isoGraph.ax)
         # Draw figure
         self.view.isoGraph.ax.figure.canvas.draw()
 
-    def plot_calc(self):
+    def plotBET(self):
 
         # Clear plots
-        self.view.langGraph.ax.clear()
+        self.view.betGraph.ax.clear()
+        self.view.rouqGraph.ax.clear()
 
         # Generate plot of the BET points chosen
-        langmuir_plot(
+        bet_plot(
             self.pressure,
-            langmuir_transform(self.pressure, self.loading),
+            bet_transform(self.pressure, self.loading),
             self.minimum,
             self.maximum,
             self.slope,
             self.intercept,
-            ax=self.view.langGraph.ax
+            self.p_monolayer,
+            bet_transform(self.p_monolayer, self.n_monolayer),
+            ax=self.view.betGraph.ax
+        )
+
+        # Generate plot of the Rouquerol points chosen
+        roq_plot(
+            self.pressure,
+            roq_transform(self.pressure, self.loading),
+            self.minimum,
+            self.maximum,
+            self.p_monolayer,
+            roq_transform(self.p_monolayer, self.n_monolayer),
+            ax=self.view.rouqGraph.ax
         )
 
         # Draw figures
-        self.view.langGraph.ax.figure.canvas.draw()
+        self.view.betGraph.ax.figure.canvas.draw()
+        self.view.rouqGraph.ax.figure.canvas.draw()
