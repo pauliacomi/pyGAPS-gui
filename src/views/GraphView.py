@@ -1,8 +1,9 @@
+# check deprecations with respect to iso graph view
+
 from qtpy import QtWidgets as QW
 
 from matplotlib.backends.backend_qt5agg import (
-    FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as
-    NavigationToolbar
+    FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
 )
 from matplotlib.figure import Figure
 
@@ -14,10 +15,9 @@ class GraphView(QW.QWidget):
         self.canvas = FigureCanvas(Figure(figsize=(5, 3)))
         self.navBar = NavigationToolbar(self.canvas, self)
 
-        self.layout = QW.QVBoxLayout(self)
-        self.layout.addWidget(self.canvas)
-        self.layout.addWidget(self.navBar)
-        self.setLayout(self.layout)
+        layout = QW.QVBoxLayout(self)
+        layout.addWidget(self.canvas)
+        layout.addWidget(self.navBar)
 
         self._static_ax = self.canvas.figure.subplots()
 
