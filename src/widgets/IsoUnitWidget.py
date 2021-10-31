@@ -11,30 +11,47 @@ class IsoUnitWidget(QW.QWidget):
 
         self.isotherm = None
         self.setupUI()
+        self.retranslateUi()
         self.connectSignals()
 
     def setupUI(self):
 
         self.unitPropLayout = QW.QHBoxLayout(self)
+        self.pressureGrid = QW.QGroupBox(self)
+        self.loadingGrid = QW.QGroupBox(self)
+        self.materialGrid = QW.QGroupBox(self)
+
+        self.unitPropLayout.addWidget(self.pressureGrid)
+        self.unitPropLayout.addWidget(self.loadingGrid)
+        self.unitPropLayout.addWidget(self.materialGrid)
+
+        self.pressurePropLayout = QW.QVBoxLayout(self.pressureGrid)
+        self.loadingPropLayout = QW.QVBoxLayout(self.loadingGrid)
+        self.materialPropLayout = QW.QVBoxLayout(self.materialGrid)
 
         self.pressureMode = QW.QComboBox()
         self.pressureMode.setObjectName("pressureMode")
-        self.unitPropLayout.addWidget(self.pressureMode)
+        self.pressurePropLayout.addWidget(self.pressureMode)
+
         self.pressureUnit = QW.QComboBox()
         self.pressureUnit.setObjectName("pressureUnit")
-        self.unitPropLayout.addWidget(self.pressureUnit)
+        self.pressurePropLayout.addWidget(self.pressureUnit)
+
         self.loadingBasis = QW.QComboBox()
         self.loadingBasis.setObjectName("loadingBasis")
-        self.unitPropLayout.addWidget(self.loadingBasis)
+        self.loadingPropLayout.addWidget(self.loadingBasis)
+
         self.loadingUnit = QW.QComboBox()
         self.loadingUnit.setObjectName("loadingUnit")
-        self.unitPropLayout.addWidget(self.loadingUnit)
+        self.loadingPropLayout.addWidget(self.loadingUnit)
+
         self.materialBasis = QW.QComboBox()
         self.materialBasis.setObjectName("materialBasis")
-        self.unitPropLayout.addWidget(self.materialBasis)
+        self.materialPropLayout.addWidget(self.materialBasis)
+
         self.materialUnit = QW.QComboBox()
         self.materialUnit.setObjectName("materialUnit")
-        self.unitPropLayout.addWidget(self.materialUnit)
+        self.materialPropLayout.addWidget(self.materialUnit)
 
     def connectSignals(self):
 
@@ -52,10 +69,12 @@ class IsoUnitWidget(QW.QWidget):
         self.loadingUnit.blockSignals(state)
         self.materialBasis.blockSignals(state)
         self.materialUnit.blockSignals(state)
+        self.materialUnit.blockSignals(state)
 
     def init_boxes(self, p_dict, l_dict, m_dict):
 
         self.blockComboSignals(True)
+
         self.pressure_dict = p_dict
         self.pressureMode.addItems(list(p_dict.keys()))
         self.pressureMode.setEnabled(False)
@@ -70,6 +89,7 @@ class IsoUnitWidget(QW.QWidget):
         self.materialBasis.addItems(list(m_dict.keys()))
         self.materialBasis.setEnabled(False)
         self.materialUnit.setEnabled(False)
+
         self.blockComboSignals(False)
 
     def init_units(self, isotherm):
@@ -138,7 +158,6 @@ class IsoUnitWidget(QW.QWidget):
         self.materialBasis.setEnabled(False)
         self.materialUnit.setEnabled(False)
 
-    # TODO errors for bad conversions
     def convert_pressure(self):
         if not self.isotherm:
             return
@@ -146,10 +165,7 @@ class IsoUnitWidget(QW.QWidget):
         mode_to = self.pressureMode.currentText()
         unit_to = self.pressureUnit.currentText()
 
-        if (
-            self.isotherm.pressure_mode != mode_to
-            or self.isotherm.pressure_unit != unit_to
-        ):
+        if (self.isotherm.pressure_mode != mode_to or self.isotherm.pressure_unit != unit_to):
 
             if self.isotherm.pressure_mode != mode_to:
                 units = self.pressure_dict[mode_to]
@@ -159,9 +175,7 @@ class IsoUnitWidget(QW.QWidget):
             self.isotherm.convert_pressure(mode_to=mode_to, unit_to=unit_to)
 
             self.blockComboSignals(True)
-            self.init_pressure(
-                self.isotherm.pressure_mode, self.isotherm.pressure_unit
-            )
+            self.init_pressure(self.isotherm.pressure_mode, self.isotherm.pressure_unit)
             self.blockComboSignals(False)
 
             self.unitsChanged.emit()
@@ -173,10 +187,7 @@ class IsoUnitWidget(QW.QWidget):
         basis_to = self.loadingBasis.currentText()
         unit_to = self.loadingUnit.currentText()
 
-        if (
-            self.isotherm.loading_basis != basis_to
-            or self.isotherm.loading_unit != unit_to
-        ):
+        if (self.isotherm.loading_basis != basis_to or self.isotherm.loading_unit != unit_to):
 
             if self.isotherm.loading_basis != basis_to:
                 units = self.loading_dict[basis_to]
@@ -186,9 +197,7 @@ class IsoUnitWidget(QW.QWidget):
             self.isotherm.convert_loading(basis_to=basis_to, unit_to=unit_to)
 
             self.blockComboSignals(True)
-            self.init_loading(
-                self.isotherm.loading_basis, self.isotherm.loading_unit
-            )
+            self.init_loading(self.isotherm.loading_basis, self.isotherm.loading_unit)
             self.blockComboSignals(False)
 
             self.unitsChanged.emit()
@@ -200,22 +209,40 @@ class IsoUnitWidget(QW.QWidget):
         basis_to = self.materialBasis.currentText()
         unit_to = self.materialUnit.currentText()
 
-        if (
-            self.isotherm.material_basis != basis_to
-            or self.isotherm.material_unit != unit_to
-        ):
+        if (self.isotherm.material_basis != basis_to or self.isotherm.material_unit != unit_to):
 
             if self.isotherm.material_basis != basis_to:
                 units = self.material_dict[basis_to]
                 if units:
                     unit_to = list(units.keys())[0]
 
-            self.isotherm.convert_material(basis_to=basis_to, unit_to=unit_to)
+            try:
+                self.isotherm.convert_material(basis_to=basis_to, unit_to=unit_to)
+            except Exception as ex:
+                from src.widgets.UtilityWidgets import ErrorMessageBox
+
+                errorbox = ErrorMessageBox()
+                if basis_to == "volume":
+                    errorbox.setText("Could not convert material to a volume basis. Does it have a density set?")
+                elif basis_to == "molar":
+                    errorbox.setText("Could not convert material to a molar basis. Does it have a molar_mass set?")
+                else:
+                    raise Exception from ex
+                errorbox.exec_()
 
             self.blockComboSignals(True)
-            self.init_material(
-                self.isotherm.material_basis, self.isotherm.material_unit
-            )
+            self.init_material(self.isotherm.material_basis, self.isotherm.material_unit)
             self.blockComboSignals(False)
 
             self.unitsChanged.emit()
+
+    def convert_temperature(self):
+        if not self.isotherm:
+            return
+
+        basis_to = self.temperatureUnit.currentText()
+
+    def retranslateUi(self):
+        self.pressureGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure", None, -1))
+        self.loadingGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "loading", None, -1))
+        self.materialGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "material", None, -1))
