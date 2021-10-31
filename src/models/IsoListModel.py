@@ -103,6 +103,3 @@ class IsoListModel(QG.QStandardItemModel):
         self.removeRow(index.row())
         # Remove reference again
         self.oldCurrent = None
-
-    # TODO delete does not update selection when deleting checked isotherms
-    # TODO delete keeps one item ticked
