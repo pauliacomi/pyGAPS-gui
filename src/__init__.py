@@ -4,8 +4,8 @@ import sys
 
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QApplication
-# from qtconsole.inprocess import QtInProcessKernelManager
 
+# Scaling for high dpi screens
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
 # Back up the reference to the exceptionhook
@@ -16,11 +16,21 @@ def exception_hook(exctype, value, traceback):
     """Catch qtpy exceptions."""
     # https://stackoverflow.com/questions/43039048/pyqt5-fails-with-cryptic-message
 
-    # Print the error and traceback
-    print(exctype, value, traceback)
+    from src.widgets.UtilityWidgets import ErrorMessageBox
+
+    errorbox = ErrorMessageBox()
+    errorbox.setText(str(value))
+    errorbox.exec_()
+
     # Call the normal Exception hook after
     sys._excepthook(exctype, value, traceback)
     sys.exit(1)
+
+
+# Resources
+def get_resource(file):
+    """Convenience function to locate resources"""
+    return pathlib.Path(__file__).parent / 'resources' / file
 
 
 def process_cl_args():
@@ -45,25 +55,23 @@ def process_cl_args():
 
 def main():
     """Main app entrypoint."""
+
     # Set the exception hook to our wrapping function
     sys.excepthook = exception_hook
 
-    # Create application
+    # Process cli arguments
     parsed_args, unparsed_args = process_cl_args()
     qt_args = sys.argv[:1] + unparsed_args
-    app = QApplication(qt_args)
 
-    # Create kernel
-    # kernel_manager = QtInProcessKernelManager()
-    # kernel_manager.start_kernel(show_banner=True)
-    # kernel = kernel_manager.kernel
-    # kernel.gui = 'qt'
+    # Create application
+    app = QApplication(qt_args)
 
     # Create main window and show
     from .MainWindow import MainWindow
-    application = MainWindow(None)  # (kernel_manager)
+    application = MainWindow(None)
     application.show()
 
+    # Load files from cli if needed
     if parsed_args.file:
         filepaths = [pathlib.Path(x) for x in parsed_args.file]
         application.load(filepaths)

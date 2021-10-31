@@ -2,27 +2,18 @@ import os
 
 from qtpy import QtWidgets as QW
 
-from src.widgets.MainWindowUI import MainWindowUI
-from src.widgets.UtilityWidgets import open_files_dialog, save_file_dialog, ErrorMessageBox
-
+from src.controllers.IsoController import IsoController
 from src.models.IsoListModel import IsoListModel
-from src.models.IsoDataTableModel import IsoDataTableModel
-from src.models.IsoInfoTableModel import IsoInfoTableModel
-
-from src.views.ConsoleView import ConsoleView
-
-from src.controllers.IsoListController import IsoListController
+from src.widgets.MainWindowUI import MainWindowUI
+from src.widgets.UtilityWidgets import (ErrorMessageBox, open_files_dialog, save_file_dialog)
 
 
 class MainWindow(QW.QMainWindow):
     """Main Window for isotherm explorer and plotting."""
-    def __init__(self, kernel, parent=None):
+    def __init__(self, parent=None):
 
         # Initial init
         super().__init__(parent)
-
-        # save kernel
-        self.kernel = kernel
 
         # Create and attach UI
         self.ui = MainWindowUI()
@@ -30,7 +21,7 @@ class MainWindow(QW.QMainWindow):
 
         # Create isotherm list mvc
         self.iso_model = IsoListModel(parent=self)
-        self.iso_controller = IsoListController(self.ui, self.iso_model)
+        self.iso_controller = IsoController(self.ui, self.iso_model)
 
         # Create and connect menu
         self.connect_menu()
@@ -49,7 +40,6 @@ class MainWindow(QW.QMainWindow):
         self.ui.actionSave.triggered.connect(self.save)
         self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionAbout.triggered.connect(self.about)
-        # self.ui.actionConsole.triggered.connect(self.console)
 
         self.ui.actionBET_SA.triggered.connect(self.BETarea)
         self.ui.actionLangmuir_SA.triggered.connect(self.langmuirarea)
@@ -58,10 +48,7 @@ class MainWindow(QW.QMainWindow):
         """Open isotherm from file."""
         if not filepaths:
             filepaths = open_files_dialog(
-                self,
-                "Load an isotherm",
-                '.',
-                filter='pyGAPS isotherms (*.json *.csv *.xls *.aif)'
+                self, "Load an isotherm", '.', filter='pyGAPS isotherms (*.aif *.json *.csv *.xls)'
             )
 
         if filepaths and filepaths != '':
@@ -78,7 +65,7 @@ class MainWindow(QW.QMainWindow):
 
     def importIso(self, filepaths=None):
         """Import isotherm from manufacturer files."""
-        from src.widgets.ImportDialog import ImportDialog
+        from src.views.ImportDialog import ImportDialog
 
         dialog = ImportDialog()
         dialog.exec_()
@@ -87,9 +74,7 @@ class MainWindow(QW.QMainWindow):
             for filepath in dialog.filepaths:
                 dirpath, filename = os.path.split(filepath)
                 try:
-                    self.iso_controller.loadImport(
-                        filepath, filename, dialog.ftype
-                    )
+                    self.iso_controller.loadImport(filepath, filename, dialog.ftype)
                 except Exception as e:
                     errorbox = ErrorMessageBox()
                     errorbox.setText(str(e))
@@ -108,9 +93,7 @@ class MainWindow(QW.QMainWindow):
                 "Save an isotherm",
                 '.',
                 filter=";;".join([
-                    'pyGAPS JSON Isotherm (*.json)',
-                    'pyGAPS CSV Isotherm (*.csv)',
-                    'pyGAPS Excel Isotherm (*.xls)'
+                    'pyGAPS JSON Isotherm (*.json)', 'pyGAPS CSV Isotherm (*.csv)', 'pyGAPS Excel Isotherm (*.xls)'
                 ])
             )
 
@@ -124,8 +107,8 @@ class MainWindow(QW.QMainWindow):
                 errorbox.exec_()
 
     def BETarea(self):
-        from src.widgets.BETDialog import BETDialog
         from src.models.BETModel import BETModel
+        from src.views.BETDialog import BETDialog
         index = self.ui.isoExplorer.currentIndex()
         if index.isValid():
             isotherm = self.iso_model.get_iso_index(index)
@@ -135,8 +118,8 @@ class MainWindow(QW.QMainWindow):
             dialog.exec_()
 
     def langmuirarea(self):
-        from src.widgets.LangmuirDialog import LangmuirDialog
         from src.models.LangmuirModel import LangmuirModel
+        from src.views.LangmuirDialog import LangmuirDialog
         index = self.ui.isoExplorer.currentIndex()
         if index.isValid():
             isotherm = self.iso_model.get_iso_index(index)
@@ -148,13 +131,3 @@ class MainWindow(QW.QMainWindow):
     def about(self):
         """Show Help/About message box."""
         QW.QMessageBox.about(self, 'application', 'iacomi.paul@gmail.com')
-
-    def console(self):
-        """Display console."""
-
-        kernel_client = self.kernel.client()
-        kernel_client.start_channels()
-
-        global ipython_widget  # Prevent from being garbage collected
-        ipython_widget = ConsoleView(self.kernel, kernel_client)
-        ipython_widget.show()

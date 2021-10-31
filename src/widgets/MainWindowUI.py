@@ -7,6 +7,7 @@ from qtpy import QtWidgets as QW
 from src.views.IsoGraphView import IsoGraphView
 from src.views.IsoListView import IsoListView
 from src.widgets.IsoUnitWidget import IsoUnitWidget
+from src.widgets.MetadataEditWidget import MetadataEditWidget
 
 
 class MainWindowUI():
@@ -135,6 +136,9 @@ class MainWindowUI():
         self.temperatureEdit = QW.QLineEdit(self.basePropButtonWidget)
         self.temperatureEdit.setObjectName("temperatureEdit")
         self.basePropLayout.addWidget(self.temperatureEdit, 2, 1, 1, 1)
+        self.temperatureUnit = QW.QComboBox(self.basePropButtonWidget)
+        self.temperatureUnit.setObjectName("temperatureUnit")
+        self.basePropLayout.addWidget(self.temperatureUnit, 2, 2, 1, 1)
 
         # then, units for isotherm physical quantities
         self.unitPropButtonWidget = IsoUnitWidget(self.propertiesGroup)
@@ -145,40 +149,9 @@ class MainWindowUI():
         self.propertiesLayout.addWidget(self.extraPropWidget, 2, 0, 1, 2)
         self.extraPropLayout = QW.QVBoxLayout(self.extraPropWidget)
 
-        # metadata buttons
-        self.extraPropButtonWidget = QW.QWidget(self.extraPropWidget)
+        # metadata edit widget
+        self.extraPropButtonWidget = MetadataEditWidget(self.extraPropWidget)
         self.extraPropLayout.addWidget(self.extraPropButtonWidget)
-        self.extraPropButtonLayout = QW.QHBoxLayout(self.extraPropButtonWidget)
-
-        self.extraPropLabelAdd = QW.QLabel(self.propertiesGroup)
-        self.extraPropLabelAdd.setObjectName("extraPropLabelAdd")
-        self.extraPropButtonLayout.addWidget(self.extraPropLabelAdd)
-
-        self.extraPropLineEditAdd = QW.QLineEdit(self.propertiesGroup)
-        self.extraPropLineEditAdd.setObjectName("extraPropLineEditAdd")
-        self.extraPropButtonLayout.addWidget(self.extraPropLineEditAdd)
-
-        self.extraPropButtonAdd = QW.QPushButton(self.propertiesGroup)
-        self.extraPropButtonAdd.setObjectName("extraPropButtonAdd")
-        self.extraPropButtonLayout.addWidget(self.extraPropButtonAdd)
-
-        extraPropDivideLine = QW.QFrame(self.propertiesGroup)
-        extraPropDivideLine.setFrameShape(QW.QFrame.VLine)
-        extraPropDivideLine.setFrameShadow(QW.QFrame.Sunken)
-        self.extraPropButtonLayout.addWidget(extraPropDivideLine)
-
-        self.extraPropButtonEdit = QW.QPushButton(self.propertiesGroup)
-        self.extraPropButtonEdit.setObjectName("extraPropButtonEdit")
-        self.extraPropButtonLayout.addWidget(self.extraPropButtonEdit)
-
-        extraPropDivideLine = QW.QFrame(self.propertiesGroup)
-        extraPropDivideLine.setFrameShape(QW.QFrame.VLine)
-        extraPropDivideLine.setFrameShadow(QW.QFrame.Sunken)
-        self.extraPropButtonLayout.addWidget(extraPropDivideLine)
-
-        self.extraPropButtonDelete = QW.QPushButton(self.propertiesGroup)
-        self.extraPropButtonDelete.setObjectName("extraPropButtonDelete")
-        self.extraPropButtonLayout.addWidget(self.extraPropButtonDelete)
 
         # metadata table & properties
         self.extraPropTableView = QW.QTableView(self.propertiesGroup)
@@ -345,16 +318,12 @@ class MainWindowUI():
         self.explorerGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Explorer", None, -1))
         self.propertiesGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Properties", None, -1))
         self.materialLabel.setText(QW.QApplication.translate("MainWindowUI", "Material", None, -1))
-        self.materialDetails.setText(QW.QApplication.translate("MainWindowUI", "+Props", None, -1))
+        self.materialDetails.setText(QW.QApplication.translate("MainWindowUI", "Details", None, -1))
         self.adsorbateLabel.setText(QW.QApplication.translate("MainWindowUI", "Adsorbate", None, -1))
-        self.adsorbateDetails.setText(QW.QApplication.translate("MainWindowUI", "+Props", None, -1))
-        self.temperatureLabel.setText(QW.QApplication.translate("MainWindowUI", "Temperature (K)", None, -1))
+        self.adsorbateDetails.setText(QW.QApplication.translate("MainWindowUI", "Details", None, -1))
+        self.temperatureLabel.setText(QW.QApplication.translate("MainWindowUI", "Temperature", None, -1))
         self.selectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Select All", None, -1))
         self.deselectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Deselect All", None, -1))
-        self.extraPropLabelAdd.setText(QW.QApplication.translate("MainWindowUI", "Metadata", None, -1))
-        self.extraPropButtonAdd.setText(QW.QApplication.translate("MainWindowUI", "add", None, -1))
-        self.extraPropButtonEdit.setText(QW.QApplication.translate("MainWindowUI", "edit", None, -1))
-        self.extraPropButtonDelete.setText(QW.QApplication.translate("MainWindowUI", "del", None, -1))
         self.dataButton.setText(QW.QApplication.translate("MainWindowUI", "Isotherm data", None, -1))
         self.removeButton.setText(QW.QApplication.translate("MainWindowUI", "Remove", None, -1))
         self.graphGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Display", None, -1))
