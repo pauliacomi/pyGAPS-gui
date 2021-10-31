@@ -1,7 +1,7 @@
 from qtpy import QtCore as QC
 
 
-class IsoInfoTableModel(QC.QAbstractTableModel):
+class IsoPropTableModel(QC.QAbstractTableModel):
     """Table model to display various isotherm properties."""
     def __init__(self, isotherm, parent=None):
         super().__init__(parent)

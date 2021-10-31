@@ -3,27 +3,21 @@ from qtpy import QtWidgets as QW
 
 
 def open_file_dialog(parent_widget, caption, directory, filter=None):
-    filename = QW.QFileDialog.getOpenFileName(
-        parent_widget, caption=caption, directory=directory, filter=filter
-    )
+    filename = QW.QFileDialog.getOpenFileName(parent_widget, caption=caption, directory=directory, filter=filter)
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
         return str(filename[0])
     return str(filename)
 
 
 def open_files_dialog(parent_widget, caption, directory, filter=None):
-    filenames = QW.QFileDialog.getOpenFileNames(
-        parent_widget, caption=caption, directory=directory, filter=filter
-    )
+    filenames = QW.QFileDialog.getOpenFileNames(parent_widget, caption=caption, directory=directory, filter=filter)
     if isinstance(filenames, tuple):  # PyQt5 returns a tuple...
         filenames = filenames[0]
     return filenames
 
 
 def save_file_dialog(parent_widget, caption, directory, filter=None):
-    filename = QW.QFileDialog.getSaveFileName(
-        parent_widget, caption=caption, directory=directory, filter=filter
-    )
+    filename = QW.QFileDialog.getSaveFileName(parent_widget, caption=caption, directory=directory, filter=filter)
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
         return str(filename[0])
     return str(filename)
