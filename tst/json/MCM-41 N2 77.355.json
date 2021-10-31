@@ -1,9 +1,21 @@
 {
     "file_version": "2.0",
     "adsorbate": "nitrogen",
+    "temperature": 77.355,
+    "temperature_unit": "K",
+    "material": "MCM-41",
+    "material_batch": "Test",
+    "pressure_mode": "relative",
+    "pressure_unit": null,
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
     "material_basis": "mass",
     "material_unit": "g",
     "iso_type": "Isotherme",
+    "lab": "MADIREL",
+    "machine": "Triflex",
+    "t_act": 150.0,
+    "user": "PI",
     "isotherm_data": [
         {
             "loading": 0.389345,
@@ -299,16 +311,5 @@
             "loading": 4.52049,
             "pressure": 0.204613991
         }
-    ],
-    "lab": "MADIREL",
-    "loading_basis": "molar",
-    "loading_unit": "mmol",
-    "machine": "Triflex",
-    "material": "MCM-41",
-    "material_batch": "Test",
-    "pressure_mode": "relative",
-    "pressure_unit": null,
-    "t_act": 150.0,
-    "temperature": 77.355,
-    "user": "PI"
+    ]
 }

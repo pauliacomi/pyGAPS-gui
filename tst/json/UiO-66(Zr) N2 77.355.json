@@ -1,9 +1,21 @@
 {
     "file_version": "2.0",
     "adsorbate": "nitrogen",
+    "temperature": 77.355,
+    "temperature_unit": "K",
+    "material": "UiO-66(Zr)",
+    "material_batch": "Test",
+    "pressure_mode": "absolute",
+    "pressure_unit": "bar",
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
     "material_basis": "mass",
     "material_unit": "g",
     "iso_type": "Isotherme",
+    "lab": "MADIREL",
+    "machine": "Triflex",
+    "t_act": 200.0,
+    "user": "PI",
     "isotherm_data": [
         {
             "loading": 0.257311,
@@ -480,16 +492,5 @@
             "loading": 13.6752,
             "pressure": 0.0980159566134
         }
-    ],
-    "lab": "MADIREL",
-    "loading_basis": "molar",
-    "loading_unit": "mmol",
-    "machine": "Triflex",
-    "material": "UiO-66(Zr)",
-    "material_batch": "Test",
-    "pressure_mode": "absolute",
-    "pressure_unit": "bar",
-    "t_act": 200.0,
-    "temperature": 77.355,
-    "user": "PI"
+    ]
 }
