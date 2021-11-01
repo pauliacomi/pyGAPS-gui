@@ -3,6 +3,8 @@ from qtpy import QtWidgets as QW
 
 from src.models.MatPropTableModel import MatPropTableModel
 from src.widgets.MetadataEditWidget import MetadataEditWidget
+from src.widgets.MetadataTableWidget import MetadataTableWidget
+from src.widgets.UtilityWidgets import ErrorMessageBox
 
 
 class MaterialView(QW.QDialog):
@@ -40,21 +42,16 @@ class MaterialView(QW.QDialog):
 
         layout.addWidget(self.propertiesWidget)
 
+        # metadata
+        self.metaLabel = QW.QLabel(self)
+        layout.addWidget(self.metaLabel)
+
         # metadata edit widget
         self.metaButtonWidget = MetadataEditWidget(self)
         layout.addWidget(self.metaButtonWidget)
 
         # Table view
-        self.tableView = QW.QTableView(self)
-        self.tableView.setSelectionBehavior(QW.QTableView.SelectRows)
-        self.tableView.verticalHeader().setVisible(False)
-
-        horizontalHTable = self.tableView.horizontalHeader()
-        horizontalHTable.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
-        horizontalHTable.setStretchLastSection(True)
-        verticalHTable = self.tableView.verticalHeader()
-        verticalHTable.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
-
+        self.tableView = MetadataTableWidget(self)
         layout.addWidget(self.tableView)
 
         # Button box
@@ -79,18 +76,9 @@ class MaterialView(QW.QDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-        self.metaButtonWidget.propButtonAdd.clicked.connect(self.extra_prop_add)
-        self.metaButtonWidget.propButtonEdit.clicked.connect(self.extra_prop_edit)
+        self.tableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
+        self.metaButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
         self.metaButtonWidget.propButtonDelete.clicked.connect(self.extra_prop_delete)
-
-    def extra_prop_add(self):
-        propName = self.metaButtonWidget.propLineEditAdd.text()
-        self.metaButtonWidget.propLineEditAdd.clear()
-        if not propName:
-            return
-        self.tableModel.insertRows(self.tableModel.rowCount(), val=propName)
-        self.tableView.scrollToBottom()
-        self.tableView.selectRow(self.tableModel.rowCount() - 1)
 
     def accept(self) -> None:
 
@@ -103,13 +91,36 @@ class MaterialView(QW.QDialog):
         if self.matMMValue.text() != self.material.molar_mass:
             self.material.molar_mass = self.matMMValue.text()
 
-        # TODO make sure to update isotherm display in parent
         return super().accept()
 
-    def extra_prop_edit(self):
+    def extra_prop_select(self):
         index = self.tableView.selectionModel().currentIndex()
         if index:
-            self.tableView.edit(index)
+            data = self.tableModel.rowData(index)
+            if data:
+                self.metaButtonWidget.display(*data)
+            else:
+                self.metaButtonWidget.clear()
+
+    def extra_prop_save(self):
+
+        propName = self.metaButtonWidget.nameEdit.text()
+        propValue = self.metaButtonWidget.valueEdit.text()
+        propType = self.metaButtonWidget.typeEdit.currentText()
+        if not propName:
+            return
+
+        if propType == "number":
+            try:
+                propValue = float(propValue)
+            except ValueError:
+                errorbox = ErrorMessageBox()
+                errorbox.setText("Could not convert metadata value to number.")
+                errorbox.exec_()
+                return
+
+        self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
+        self.tableView.resizeColumns()
 
     def extra_prop_delete(self):
         index = self.tableView.selectionModel().currentIndex()
@@ -120,3 +131,4 @@ class MaterialView(QW.QDialog):
         self.matNameLabel.setText(QW.QApplication.translate("MaterialView", "Material Name", None, -1))
         self.matDensityLabel.setText(QW.QApplication.translate("MaterialView", "Material Density", None, -1))
         self.matMMLabel.setText(QW.QApplication.translate("MaterialView", "Material Molar Mass", None, -1))
+        self.metaLabel.setText(QW.QApplication.translate("MaterialView", "Other Metadata", None, -1))

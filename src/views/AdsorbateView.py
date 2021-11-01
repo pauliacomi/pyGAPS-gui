@@ -4,7 +4,9 @@ from qtpy import QtSvg as QS
 from src.models.AdsPropTableModel import AdsPropTableModel
 
 from src.widgets.MetadataEditWidget import MetadataEditWidget
+from src.widgets.MetadataTableWidget import MetadataTableWidget
 from src.utilities.tex2svg import tex2svg
+from src.widgets.UtilityWidgets import ErrorMessageBox
 
 
 class AdsorbateView(QW.QDialog):
@@ -18,7 +20,7 @@ class AdsorbateView(QW.QDialog):
 
     def setupUi(self):
         self.setObjectName("AdsorbateView")
-        self.resize(400, 500)
+        self.resize(500, 500)
 
         # Create/set layout
         layout = QW.QVBoxLayout(self)
@@ -45,19 +47,17 @@ class AdsorbateView(QW.QDialog):
 
         layout.addWidget(self.propertiesWidget)
 
+        # metadata
+        self.metaLabel = QW.QLabel(self)
+        layout.addWidget(self.metaLabel)
+
         # metadata edit widget
         self.metaButtonWidget = MetadataEditWidget(self)
         layout.addWidget(self.metaButtonWidget)
 
         # Table view
-        self.tableWidget = QW.QTableWidget(self)
-        self.tableWidget.setColumnCount(3)
-        self.tableWidget.setHorizontalHeaderLabels(["Metadata", "Value", "Type"])
-        header = self.tableWidget.horizontalHeader()
-        header.setSectionResizeMode(0, QW.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QW.QHeaderView.Stretch)
-        header.setSectionResizeMode(2, QW.QHeaderView.ResizeToContents)
-        layout.addWidget(self.tableWidget)
+        self.tableView = MetadataTableWidget(self)
+        layout.addWidget(self.tableView)
 
         # Button box
         self.buttonBox = QW.QDialogButtonBox(self)
@@ -80,66 +80,50 @@ class AdsorbateView(QW.QDialog):
             backend = "No"
         self.adsBackendValue.setText(backend)
 
-        props = [(prop, self.adsorbate.properties[prop])
-                 for prop in self.adsorbate.properties
-                 if prop not in self.adsorbate._reserved_params]
-        self.tableWidget.setRowCount(len(props))
-        for row, prop in enumerate(props):
-            metaItem = QW.QTableWidgetItem()
-            metaItem.setText(str(prop[0]))
-            self.tableWidget.setItem(row, 0, metaItem)
-            nameItem = QW.QTableWidgetItem()
-            nameItem.setText(str(prop[1]))
-            self.tableWidget.setItem(row, 1, nameItem)
-            typeBox = QW.QComboBox()
-            typeBox.addItems(["text", "number"])
-            if type(prop[1]) == str:
-                typeBox.setCurrentIndex(0)
-            else:
-                typeBox.setCurrentIndex(1)
-            self.tableWidget.setCellWidget(row, 2, typeBox)
-        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableModel = AdsPropTableModel(self.adsorbate)
+        self.tableView.setModel(self.tableModel)
 
     def connectSignals(self):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-        self.metaButtonWidget.propButtonAdd.clicked.connect(self.extra_prop_add)
-        self.metaButtonWidget.propButtonEdit.clicked.connect(self.extra_prop_edit)
+        self.tableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
+        self.metaButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
         self.metaButtonWidget.propButtonDelete.clicked.connect(self.extra_prop_delete)
 
-    def extra_prop_add(self):
-        propName = self.metaButtonWidget.propLineEditAdd.text()
-        self.metaButtonWidget.propLineEditAdd.clear()
+    def extra_prop_select(self):
+        index = self.tableView.selectionModel().currentIndex()
+        if index:
+            data = self.tableModel.rowData(index)
+            if data:
+                self.metaButtonWidget.display(*data)
+            else:
+                self.metaButtonWidget.clear()
+
+    def extra_prop_save(self):
+
+        propName = self.metaButtonWidget.nameEdit.text()
+        propValue = self.metaButtonWidget.valueEdit.text()
+        propType = self.metaButtonWidget.typeEdit.currentText()
         if not propName:
             return
-        nrows = self.tableWidget.rowCount()
-        self.tableWidget.insertRow(nrows)
-        self.tableWidget.setItem(nrows, 0, QW.QTableWidgetItem(str(propName)))
-        self.tableWidget.scrollToBottom()
-        typeBox = QW.QComboBox()
-        typeBox.addItems(["text", "number"])
-        self.tableWidget.setCellWidget(nrows, 2, typeBox)
-        self.tableWidget.selectRow(nrows)
 
-        # self.tableModel.insertRows(self.tableModel.rowCount(), val=propName)
-        # self.tableView.scrollToBottom()
-        # self.tableView.selectRow(self.tableModel.rowCount() - 1)
+        if propType == "number":
+            try:
+                propValue = float(propValue)
+            except ValueError:
+                errorbox = ErrorMessageBox()
+                errorbox.setText("Could not convert metadata value to number.")
+                errorbox.exec_()
+                return
 
-    def extra_prop_edit(self):
-        index = self.tableWidget.selectionModel().currentIndex()
-        if index:
-            self.tableWidget.edit(index)
-
-        # index = self.tableView.selectionModel().currentIndex()
-        # if index:
-        #     self.tableView.edit(index)
+        self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
+        self.tableView.resizeColumns()
 
     def extra_prop_delete(self):
-        index = self.tableWidget.selectionModel().currentIndex()
-        self.tableWidget.removeRow(index)
-        # index = self.tableView.selectionModel().currentIndex()
-        # self.tableModel.removeRow(index.row())
+
+        index = self.tableView.selectionModel().currentIndex()
+        self.tableModel.removeRow(index.row())
 
     def retranslateUi(self):
         self.setWindowTitle(QW.QApplication.translate("AdsorbateView", "Adsorbate details", None, -1))
@@ -147,3 +131,4 @@ class AdsorbateView(QW.QDialog):
         self.adsAliasLabel.setText(QW.QApplication.translate("AdsorbateView", "Adsorbate Aliases", None, -1))
         self.adsFormulaLabel.setText(QW.QApplication.translate("AdsorbateView", "Adsorbate Formula", None, -1))
         self.adsBackendLabel.setText(QW.QApplication.translate("AdsorbateView", "Thermodynamic backend", None, -1))
+        self.metaLabel.setText(QW.QApplication.translate("MaterialView", "Other Metadata", None, -1))

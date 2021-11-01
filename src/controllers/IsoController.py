@@ -2,8 +2,11 @@ import pygaps
 from pygaps.utilities.converter_mode import _PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE
 from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
 
+from qtpy import QtWidgets as QW
+
 from src.models.IsoModel import IsoModel
 from src.models.IsoPropTableModel import IsoPropTableModel
+from src.widgets.UtilityWidgets import ErrorMessageBox
 
 
 class IsoController():
@@ -32,14 +35,16 @@ class IsoController():
         self.graph_view = mainWindowWidget.isoGraph
 
         self.iso_list_model = listModel
+        self.current_isotherm = None  # nothing here
 
         self.list_view.setModel(self.iso_list_model)
         self.graph_view.setModel(self.iso_list_model)
 
-        # populate
+        # populate adsorbates and materials
         self.mw_widget.materialEdit.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
         self.mw_widget.adsorbateEdit.insertItems(0, [ads.name for ads in pygaps.ADSORBATE_LIST])
-        # populate unit view
+
+        # populate units view
         self.unit_widget.temperatureUnit = self.mw_widget.temperatureUnit
         self.unit_widget.init_boxes(_PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE)
 
@@ -64,8 +69,7 @@ class IsoController():
         self.mw_widget.dataButton.clicked.connect(self.display_iso_data)
 
         # Setup property signals
-        self.mw_widget.extraPropButtonWidget.propButtonAdd.clicked.connect(self.extra_prop_add)
-        self.mw_widget.extraPropButtonWidget.propButtonEdit.clicked.connect(self.extra_prop_edit)
+        self.mw_widget.extraPropButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
         self.mw_widget.extraPropButtonWidget.propButtonDelete.clicked.connect(self.extra_prop_delete)
         self.mw_widget.materialDetails.clicked.connect(self.material_detail)
         self.mw_widget.adsorbateDetails.clicked.connect(self.adsorbate_detail)
@@ -82,31 +86,36 @@ class IsoController():
 
     def selection_changed(self, index, **kwargs):
         """What to do when the selected isotherm has changed."""
-        isotherm = self.iso_list_model.get_iso_index(index)
+        self.current_isotherm = self.iso_list_model.get_iso_index(index)
 
         # Just reset if nothing to display
-        self.clear_iso_views()
-        if not isotherm:
+        self.clear_isotherm()
+        if not self.current_isotherm:
             return
 
         # Otherwise detail all the isotherm
-        self.display_isotherm(isotherm)
+        self.display_isotherm()
 
-    def display_isotherm(self, isotherm):
+    def display_isotherm(self):
 
         # Essential metadata
-        self.mw_widget.materialEdit.setCurrentText(str(isotherm.material))
-        self.mw_widget.adsorbateEdit.setCurrentText(str(isotherm.adsorbate))
-        self.mw_widget.temperatureEdit.setText(str(isotherm.temperature))
+        self.mw_widget.materialEdit.setCurrentText(str(self.current_isotherm.material))
+        self.mw_widget.adsorbateEdit.setCurrentText(str(self.current_isotherm.adsorbate))
+        self.mw_widget.temperatureEdit.setText(str(self.current_isotherm.temperature))
 
         # Units setup
-        self.unit_widget.init_units(isotherm)
+        self.unit_widget.init_units(self.current_isotherm)
 
         # Other isotherm metadata
-        self.extraPropTableModel = IsoPropTableModel(isotherm)
+        self.extraPropTableModel = IsoPropTableModel(self.current_isotherm)
         self.mw_widget.extraPropTableView.setModel(self.extraPropTableModel)
+        self.mw_widget.extraPropTableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
 
-    def clear_iso_views(self):
+    def update_isotherm(self):
+        self.display_isotherm()
+        self.graph_view.plot()
+
+    def clear_isotherm(self):
         """Reset all the display."""
 
         # Essential metadata
@@ -117,9 +126,11 @@ class IsoController():
         # Units
         self.unit_widget.clear()
 
+        # Other metadata
+        self.mw_widget.extraPropButtonWidget.clear()
+
     def modify_iso_baseprops(self):
-        index = self.list_view.selectionModel().currentIndex()
-        isotherm = self.iso_list_model.get_iso_index(index)
+        isotherm = self.current_isotherm
         modified = False
 
         if isotherm.material != self.mw_widget.materialEdit.lineEdit().text():
@@ -139,40 +150,56 @@ class IsoController():
             modified = True
 
         if modified:
-            self.display_isotherm(isotherm)
-            self.graph_view.plot()
+            self.update_isotherm()
 
     def material_detail(self):
         from src.views.MaterialView import MaterialView
 
-        index = self.list_view.selectionModel().currentIndex()
-        isotherm = self.iso_list_model.get_iso_index(index)
-        if isotherm:
-            dialog = MaterialView(isotherm.material)
-            dialog.exec_()
+        if self.current_isotherm:
+            dialog = MaterialView(self.current_isotherm.material)
+            ret = dialog.exec_()
+            if ret == QW.QDialog.Accepted:
+                self.update_isotherm()
 
     def adsorbate_detail(self):
         from src.views.AdsorbateView import AdsorbateView
 
-        index = self.list_view.selectionModel().currentIndex()
-        isotherm = self.iso_list_model.get_iso_index(index)
-        if isotherm:
-            view = AdsorbateView(isotherm.adsorbate)
-            view.exec_()
+        if self.current_isotherm:
+            dialog = AdsorbateView(self.current_isotherm.adsorbate)
+            ret = dialog.exec_()
+            if ret == QW.QDialog.Accepted:
+                self.update_isotherm()
 
-    def extra_prop_add(self):
-        propName = self.mw_widget.extraPropButtonWidget.propLineEditAdd.text()
+    def extra_prop_select(self):
+        index = self.mw_widget.extraPropTableView.selectionModel().currentIndex()
+        if index:
+            data = self.extraPropTableModel.rowData(index)
+            if data:
+                self.mw_widget.extraPropButtonWidget.display(*data)
+            else:
+                self.mw_widget.extraPropButtonWidget.clear()
+
+    def extra_prop_save(self):
+
+        propName = self.mw_widget.extraPropButtonWidget.nameEdit.text()
+        propValue = self.mw_widget.extraPropButtonWidget.valueEdit.text()
+        propType = self.mw_widget.extraPropButtonWidget.typeEdit.currentText()
         if not propName:
             self.mw_widget.statusbar.showMessage("Fill property name!", 2000)
             return
-        self.extraPropTableModel.insertRows(self.extraPropTableModel.rowCount(), val=propName)
-        self.mw_widget.statusbar.showMessage(f"Added property named {propName}")
-        self.mw_widget.extraPropButtonWidget.propLineEditAdd.clear()
 
-    def extra_prop_edit(self):
-        index = self.mw_widget.extraPropTableView.selectionModel().currentIndex()
-        if index:
-            self.mw_widget.extraPropTableView.edit(index)
+        if propType == "number":
+            try:
+                propValue = float(propValue)
+            except ValueError:
+                errorbox = ErrorMessageBox()
+                errorbox.setText("Could not convert metadata value to number.")
+                errorbox.exec_()
+                return
+
+        self.extraPropTableModel.setOrInsertRow(data=[propName, propValue, propType])
+        self.mw_widget.statusbar.showMessage(f"Added property named {propName}")
+        self.mw_widget.extraPropTableView.resizeColumns()
 
     def extra_prop_delete(self):
         index = self.mw_widget.extraPropTableView.selectionModel().currentIndex()
@@ -183,12 +210,12 @@ class IsoController():
         from src.views.IsoDataDialog import IsoDataDialog
         from src.models.IsoDataTableModel import IsoDataTableModel
 
-        index = self.list_view.selectionModel().currentIndex()
-        isotherm = self.iso_list_model.get_iso_index(index)
-        if isotherm:
+        if self.current_isotherm:
             dialog = IsoDataDialog()
-            dialog.tableView.setModel(IsoDataTableModel(isotherm.data()))
-            dialog.exec_()
+            dialog.tableView.setModel(IsoDataTableModel(self.current_isotherm.data()))
+            ret = dialog.exec_()
+            if ret == QW.QDialog.Accepted:
+                self.update_isotherm()
 
     def refresh_material_edit(self):
         self.mw_widget.materialEdit.clear()

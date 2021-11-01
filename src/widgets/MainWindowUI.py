@@ -8,6 +8,7 @@ from src.views.IsoGraphView import IsoGraphView
 from src.views.IsoListView import IsoListView
 from src.widgets.IsoUnitWidget import IsoUnitWidget
 from src.widgets.MetadataEditWidget import MetadataEditWidget
+from src.widgets.MetadataTableWidget import MetadataTableWidget
 
 
 class MainWindowUI():
@@ -145,7 +146,7 @@ class MainWindowUI():
         self.propertiesLayout.addWidget(self.unitPropButtonWidget, 1, 0, 1, 2)
 
         # then, isotherm metadata
-        self.extraPropWidget = QW.QWidget(self.propertiesGroup)
+        self.extraPropWidget = QW.QGroupBox(self.propertiesGroup)
         self.propertiesLayout.addWidget(self.extraPropWidget, 2, 0, 1, 2)
         self.extraPropLayout = QW.QVBoxLayout(self.extraPropWidget)
 
@@ -153,26 +154,17 @@ class MainWindowUI():
         self.extraPropButtonWidget = MetadataEditWidget(self.extraPropWidget)
         self.extraPropLayout.addWidget(self.extraPropButtonWidget)
 
-        # metadata table & properties
-        self.extraPropTableView = QW.QTableView(self.propertiesGroup)
-        self.extraPropTableView.setSelectionBehavior(QW.QTableView.SelectRows)
-        self.extraPropTableView.verticalHeader().setVisible(False)
+        # metadata table
+        self.extraPropTableView = MetadataTableWidget(self.propertiesGroup)
         self.extraPropTableView.setObjectName("extraPropTableView")
         self.extraPropLayout.addWidget(self.extraPropTableView)
-
-        self.horizontalHTable = self.extraPropTableView.horizontalHeader()
-        self.verticalHTable = self.extraPropTableView.verticalHeader()
-        self.horizontalHTable.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
-        self.verticalHTable.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
-        self.horizontalHTable.setStretchLastSection(True)
 
         # bottom buttons
         self.detailsBottomButtons = QW.QHBoxLayout()
         self.dataButton = QW.QPushButton(self.propertiesGroup)
         self.dataButton.setObjectName("dataButton")
         self.detailsBottomButtons.addWidget(self.dataButton)
-        self.detailsBottomButtons.addStretch(1)
-        self.propertiesLayout.addLayout(self.detailsBottomButtons, 3, 0, 1, 2)
+        self.propertiesLayout.addLayout(self.detailsBottomButtons, 3, 0, 1, 3)
 
         # all done
         self.mainLayout.addWidget(self.propertiesGroup)
@@ -315,18 +307,23 @@ class MainWindowUI():
     def retranslateUi(self, MainWindowUI):
         """Set UI text."""
         MainWindowUI.setWindowTitle(QW.QApplication.translate("MainWindowUI", "pyGAPS-gui", None, -1))
+        #
         self.explorerGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Explorer", None, -1))
+        self.selectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Select All", None, -1))
+        self.deselectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Deselect All", None, -1))
+        self.removeButton.setText(QW.QApplication.translate("MainWindowUI", "Remove", None, -1))
+        #
         self.propertiesGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Properties", None, -1))
         self.materialLabel.setText(QW.QApplication.translate("MainWindowUI", "Material", None, -1))
         self.materialDetails.setText(QW.QApplication.translate("MainWindowUI", "Details", None, -1))
         self.adsorbateLabel.setText(QW.QApplication.translate("MainWindowUI", "Adsorbate", None, -1))
         self.adsorbateDetails.setText(QW.QApplication.translate("MainWindowUI", "Details", None, -1))
         self.temperatureLabel.setText(QW.QApplication.translate("MainWindowUI", "Temperature", None, -1))
-        self.selectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Select All", None, -1))
-        self.deselectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Deselect All", None, -1))
-        self.dataButton.setText(QW.QApplication.translate("MainWindowUI", "Isotherm data", None, -1))
-        self.removeButton.setText(QW.QApplication.translate("MainWindowUI", "Remove", None, -1))
+        self.extraPropWidget.setTitle(QW.QApplication.translate("MainWindowUI", "Metadata", None, -1))
+        self.dataButton.setText(QW.QApplication.translate("MainWindowUI", "Isotherm Points", None, -1))
+        #
         self.graphGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Display", None, -1))
+        #
         self.menuFile.setTitle(QW.QApplication.translate("MainWindowUI", "File", None, -1))
         self.menuCharact.setTitle(QW.QApplication.translate("MainWindowUI", "Characterization", None, -1))
         self.menuHelp.setTitle(QW.QApplication.translate("MainWindowUI", "Help", None, -1))

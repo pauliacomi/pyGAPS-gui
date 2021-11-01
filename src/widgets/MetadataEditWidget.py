@@ -6,46 +6,58 @@ from qtpy import QtCore as QC
 class MetadataEditWidget(QW.QWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent=parent)
+        self.meta_types = ["text", "number"]
         self.setupUi()
         self.retranslateUi()
 
     def setupUi(self):
 
         # metadata buttons
-        layout = QW.QHBoxLayout(self)
+        layout = QW.QGridLayout(self)
 
-        self.propLabelAdd = QW.QLabel(self)
-        self.propLabelAdd.setObjectName("propLabelAdd")
-        layout.addWidget(self.propLabelAdd)
+        self.nameLabel = QW.QLabel(self)
+        self.nameLabel.setObjectName("nameLabel")
+        layout.addWidget(self.nameLabel, 0, 0, 1, 1)
 
-        self.propLineEditAdd = QW.QLineEdit(self)
-        self.propLineEditAdd.setObjectName("propLineEditAdd")
-        layout.addWidget(self.propLineEditAdd)
+        self.valueLabel = QW.QLabel(self)
+        self.valueLabel.setObjectName("valueLabel")
+        layout.addWidget(self.valueLabel, 1, 0, 1, 1)
 
-        self.propButtonAdd = QW.QPushButton(self)
-        self.propButtonAdd.setObjectName("propButtonAdd")
-        layout.addWidget(self.propButtonAdd)
+        self.nameEdit = QW.QLineEdit(self)
+        self.nameEdit.setObjectName("nameEdit")
+        layout.addWidget(self.nameEdit, 0, 1, 1, 2)
 
-        propDivideLine = QW.QFrame(self)
-        propDivideLine.setFrameShape(QW.QFrame.VLine)
-        propDivideLine.setFrameShadow(QW.QFrame.Sunken)
-        layout.addWidget(propDivideLine)
+        self.typeEdit = QW.QComboBox(self)
+        self.typeEdit.setObjectName("typeEdit")
+        self.typeEdit.addItems(self.meta_types)
+        layout.addWidget(self.typeEdit, 0, 3, 1, 1)
 
-        self.propButtonEdit = QW.QPushButton(self)
-        self.propButtonEdit.setObjectName("propButtonEdit")
-        layout.addWidget(self.propButtonEdit)
+        self.valueEdit = QW.QLineEdit(self)
+        self.valueEdit.setObjectName("valueEdit")
+        layout.addWidget(self.valueEdit, 1, 1, 1, 3)
 
-        propDivideLine = QW.QFrame(self)
-        propDivideLine.setFrameShape(QW.QFrame.VLine)
-        propDivideLine.setFrameShadow(QW.QFrame.Sunken)
-        layout.addWidget(propDivideLine)
+        self.propButtonSave = QW.QPushButton(self)
+        self.propButtonSave.setObjectName("propButtonSave")
+        layout.addWidget(self.propButtonSave, 2, 0, 1, 2)
 
         self.propButtonDelete = QW.QPushButton(self)
         self.propButtonDelete.setObjectName("propButtonDelete")
-        layout.addWidget(self.propButtonDelete)
+        layout.addWidget(self.propButtonDelete, 2, 2, 1, 2)
 
     def retranslateUi(self):
-        self.propLabelAdd.setText(QW.QApplication.translate("MainWindowUI", "Metadata", None, -1))
-        self.propButtonAdd.setText(QW.QApplication.translate("MainWindowUI", "add", None, -1))
-        self.propButtonEdit.setText(QW.QApplication.translate("MainWindowUI", "edit", None, -1))
-        self.propButtonDelete.setText(QW.QApplication.translate("MainWindowUI", "del", None, -1))
+        self.nameLabel.setText(QW.QApplication.translate("MetaEditWidget", "Name", None, -1))
+        self.valueLabel.setText(QW.QApplication.translate("MetaEditWidget", "Value", None, -1))
+        self.propButtonSave.setText(QW.QApplication.translate("MetaEditWidget", "save", None, -1))
+        self.propButtonDelete.setText(QW.QApplication.translate("MetaEditWidget", "delete", None, -1))
+
+    def display(self, name, value, mtype):
+
+        self.nameEdit.setText(str(name))
+        self.valueEdit.setText(str(value))
+        self.typeEdit.setCurrentIndex(self.meta_types.index(str(mtype)))
+
+    def clear(self):
+
+        self.nameEdit.clear()
+        self.valueEdit.clear()
+        self.typeEdit.setCurrentIndex(0)
