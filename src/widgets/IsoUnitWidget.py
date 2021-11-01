@@ -6,10 +6,11 @@ class IsoUnitWidget(QW.QWidget):
 
     unitsChanged = QC.Signal()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, temp_qcombo_ref, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.isotherm = None
+        self.temperatureUnit = temp_qcombo_ref
         self.setupUI()
         self.retranslateUi()
         self.connectSignals()
@@ -61,6 +62,7 @@ class IsoUnitWidget(QW.QWidget):
         self.loadingUnit.currentIndexChanged.connect(self.convert_loading)
         self.materialBasis.currentIndexChanged.connect(self.convert_material)
         self.materialUnit.currentIndexChanged.connect(self.convert_material)
+        self.temperatureUnit.currentIndexChanged.connect(self.convert_temperature)
 
     def blockComboSignals(self, state):
         self.pressureMode.blockSignals(state)
@@ -70,8 +72,9 @@ class IsoUnitWidget(QW.QWidget):
         self.materialBasis.blockSignals(state)
         self.materialUnit.blockSignals(state)
         self.materialUnit.blockSignals(state)
+        self.temperatureUnit.blockSignals(state)
 
-    def init_boxes(self, p_dict, l_dict, m_dict):
+    def init_boxes(self, p_dict, l_dict, m_dict, t_dict):
 
         self.blockComboSignals(True)
 
@@ -90,6 +93,10 @@ class IsoUnitWidget(QW.QWidget):
         self.materialBasis.setEnabled(False)
         self.materialUnit.setEnabled(False)
 
+        self.t_dict = t_dict
+        self.temperatureUnit.addItems(list(t_dict.keys()))
+        self.temperatureUnit.setEnabled(False)
+
         self.blockComboSignals(False)
 
     def init_units(self, isotherm):
@@ -99,6 +106,7 @@ class IsoUnitWidget(QW.QWidget):
         self.init_pressure(isotherm.pressure_mode, isotherm.pressure_unit)
         self.init_loading(isotherm.loading_basis, isotherm.loading_unit)
         self.init_material(isotherm.material_basis, isotherm.material_unit)
+        self.init_temperature(isotherm.temperature_unit)
         self.blockComboSignals(False)
 
     def init_pressure(self, pressure_mode, pressure_unit):
@@ -149,6 +157,13 @@ class IsoUnitWidget(QW.QWidget):
             self.materialUnit.addItems(material_units)
             self.materialUnit.setCurrentIndex(self.mu_index)
 
+    def init_temperature(self, temperature_unit):
+
+        self.temperatureUnit.setEnabled(True)
+        temperature_units = list(self.t_dict.keys())
+        self.tm_index = temperature_units.index(temperature_unit)
+        self.loadingBasis.setCurrentIndex(self.lm_index)
+
     def clear(self):
         self.isotherm = None
         self.pressureMode.setEnabled(False)
@@ -157,6 +172,7 @@ class IsoUnitWidget(QW.QWidget):
         self.loadingUnit.setEnabled(False)
         self.materialBasis.setEnabled(False)
         self.materialUnit.setEnabled(False)
+        self.temperatureUnit.setEnabled(False)
 
     def convert_pressure(self):
         if not self.isotherm:
@@ -173,10 +189,6 @@ class IsoUnitWidget(QW.QWidget):
                     unit_to = list(units.keys())[0]
 
             self.isotherm.convert_pressure(mode_to=mode_to, unit_to=unit_to)
-
-            self.blockComboSignals(True)
-            self.init_pressure(self.isotherm.pressure_mode, self.isotherm.pressure_unit)
-            self.blockComboSignals(False)
 
             self.unitsChanged.emit()
 
@@ -195,10 +207,6 @@ class IsoUnitWidget(QW.QWidget):
                     unit_to = list(units.keys())[0]
 
             self.isotherm.convert_loading(basis_to=basis_to, unit_to=unit_to)
-
-            self.blockComboSignals(True)
-            self.init_loading(self.isotherm.loading_basis, self.isotherm.loading_unit)
-            self.blockComboSignals(False)
 
             self.unitsChanged.emit()
 
@@ -230,17 +238,16 @@ class IsoUnitWidget(QW.QWidget):
                     raise Exception from ex
                 errorbox.exec_()
 
-            self.blockComboSignals(True)
-            self.init_material(self.isotherm.material_basis, self.isotherm.material_unit)
-            self.blockComboSignals(False)
-
             self.unitsChanged.emit()
 
     def convert_temperature(self):
         if not self.isotherm:
             return
 
-        basis_to = self.temperatureUnit.currentText()
+        unit_to = self.temperatureUnit.currentText()
+        self.isotherm.convert_temperature(unit_to=unit_to)
+
+        self.unitsChanged.emit()
 
     def retranslateUi(self):
         self.pressureGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure", None, -1))

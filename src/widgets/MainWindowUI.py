@@ -137,12 +137,13 @@ class MainWindowUI():
         self.temperatureEdit = QW.QLineEdit(self.basePropButtonWidget)
         self.temperatureEdit.setObjectName("temperatureEdit")
         self.basePropLayout.addWidget(self.temperatureEdit, 2, 1, 1, 1)
+
+        # then, units for isotherm physical quantities
+        # the temperature combo is "given" to the unitWidget
         self.temperatureUnit = QW.QComboBox(self.basePropButtonWidget)
         self.temperatureUnit.setObjectName("temperatureUnit")
         self.basePropLayout.addWidget(self.temperatureUnit, 2, 2, 1, 1)
-
-        # then, units for isotherm physical quantities
-        self.unitPropButtonWidget = IsoUnitWidget(self.propertiesGroup)
+        self.unitPropButtonWidget = IsoUnitWidget(self.temperatureUnit, parent=self.propertiesGroup)
         self.propertiesLayout.addWidget(self.unitPropButtonWidget, 1, 0, 1, 2)
 
         # then, isotherm metadata

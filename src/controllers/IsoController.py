@@ -45,8 +45,7 @@ class IsoController():
         self.mw_widget.adsorbateEdit.insertItems(0, [ads.name for ads in pygaps.ADSORBATE_LIST])
 
         # populate units view
-        self.unit_widget.temperatureUnit = self.mw_widget.temperatureUnit
-        self.unit_widget.init_boxes(_PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE)
+        self.unit_widget.init_boxes(_PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE, _TEMPERATURE_UNITS)
 
         # signals between all model/views
         self.connectSignals()
@@ -65,7 +64,6 @@ class IsoController():
         self.mw_widget.materialEdit.lineEdit().editingFinished.connect(self.modify_iso_baseprops)
         self.mw_widget.adsorbateEdit.lineEdit().editingFinished.connect(self.modify_iso_baseprops)
         self.mw_widget.temperatureEdit.editingFinished.connect(self.modify_iso_baseprops)
-        self.mw_widget.temperatureUnit.currentIndexChanged.connect(self.modify_iso_baseprops)
         self.mw_widget.dataButton.clicked.connect(self.display_iso_data)
 
         # Setup property signals
@@ -75,10 +73,10 @@ class IsoController():
         self.mw_widget.adsorbateDetails.clicked.connect(self.adsorbate_detail)
 
         # Connect signals for graph view
-        # TODO: would it be better to centralize everything when an isotherm needs plotting/modifying?
         self.list_view.selectionModel().currentChanged.connect(self.iso_list_model.check_selected)
         self.iso_list_model.checkedChanged.connect(self.graph_view.plot)
-        self.unit_widget.unitsChanged.connect(self.graph_view.plot)
+        # TODO: update or self.graph_view.plot?
+        self.unit_widget.unitsChanged.connect(self.update_isotherm)
 
     ########################################################
     # Display functionality
@@ -101,7 +99,7 @@ class IsoController():
         # Essential metadata
         self.mw_widget.materialEdit.setCurrentText(str(self.current_isotherm.material))
         self.mw_widget.adsorbateEdit.setCurrentText(str(self.current_isotherm.adsorbate))
-        self.mw_widget.temperatureEdit.setText(str(self.current_isotherm.temperature))
+        self.mw_widget.temperatureEdit.setText(str(self.current_isotherm._temperature))
 
         # Units setup
         self.unit_widget.init_units(self.current_isotherm)
