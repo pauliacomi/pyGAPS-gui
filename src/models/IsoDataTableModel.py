@@ -16,7 +16,7 @@ class IsoDataTableModel(QC.QAbstractTableModel):
     def data(self, index, role=QC.Qt.DisplayRole):
         if index.isValid():
             if role == QC.Qt.DisplayRole:
-                if index.column() == 2:
+                if self._data.columns[index.column()] == "branch":
                     if self._data.values[index.row()][index.column()] == False:
                         return "adsorption"
                     return "desorption"
