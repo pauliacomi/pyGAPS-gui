@@ -74,8 +74,7 @@ class IsoController():
 
         # Connect signals for graph view
         self.list_view.selectionModel().currentChanged.connect(self.iso_list_model.check_selected)
-        self.iso_list_model.checkedChanged.connect(self.graph_view.plot)
-        # TODO: update or self.graph_view.plot?
+        self.iso_list_model.checkedChanged.connect(self.graph_view.update)
         self.unit_widget.unitsChanged.connect(self.update_isotherm)
 
     ########################################################
@@ -111,7 +110,7 @@ class IsoController():
 
     def update_isotherm(self):
         self.display_isotherm()
-        self.graph_view.plot()
+        self.graph_view.update()
 
     def clear_isotherm(self):
         """Reset all the display."""

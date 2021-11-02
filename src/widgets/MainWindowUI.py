@@ -4,7 +4,7 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
-from src.views.IsoGraphView import IsoGraphView
+from src.views.IsoListGraphView import IsoListGraphView
 from src.views.IsoListView import IsoListView
 from src.widgets.IsoUnitWidget import IsoUnitWidget
 from src.widgets.MetadataEditWidget import MetadataEditWidget
@@ -185,7 +185,7 @@ class MainWindowUI():
         self.graphGrid.setObjectName("graphGrid")
 
         # create the iso plot widget
-        self.isoGraph = IsoGraphView(self.graphGroup)
+        self.isoGraph = IsoListGraphView(self.graphGroup)
         self.isoGraph.setObjectName("isoGraph")
         self.graphGrid.addWidget(self.isoGraph, 0, 0, 1, 1)
 

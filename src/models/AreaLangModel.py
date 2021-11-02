@@ -35,7 +35,8 @@ class AreaLangModel():
         self.view = view
         self.view.auto_button.clicked.connect(self.calc_auto)
         self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
-        self.plot_iso()
+        self.view.isoGraph.setIsotherms(self._isotherm)
+        self.view.isoGraph.plot()
         self.calc_auto()
 
     def calc_auto(self):
@@ -88,12 +89,6 @@ class AreaLangModel():
 
     def resetSlider(self):
         self.view.pSlider.setValues([self.pressure[self.minimum], self.pressure[self.maximum]], emit=False)
-
-    def plot_iso(self):
-        # Generate plot of the isotherm
-        pygaps.plot_iso(self._isotherm, ax=self.view.isoGraph.ax)
-        # Draw figure
-        self.view.isoGraph.ax.figure.canvas.draw()
 
     def plot_calc(self):
 

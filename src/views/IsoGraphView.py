@@ -12,6 +12,7 @@ class IsoGraphView(QW.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi()
+        self.isotherms = None
 
     def setupUi(self):
         self.canvas = FigureCanvas(Figure(figsize=(5, 3)))
@@ -23,12 +24,11 @@ class IsoGraphView(QW.QWidget):
 
         self._static_ax = self.canvas.figure.subplots()
 
-    def setModel(self, model):
-        self.model = model
+    def setIsotherms(self, isotherms):
+        self.isotherms = isotherms
 
-    def plot(self, sel_index=None, **kwargs):
+    def plot(self):
         self._static_ax.clear()
-        selection = self.model.get_iso_checked()
-        if any(selection):
-            pygaps.plot_iso(selection, ax=self._static_ax)
+        if self.isotherms:
+            pygaps.plot_iso(self.isotherms, ax=self._static_ax)
         self._static_ax.figure.canvas.draw()
