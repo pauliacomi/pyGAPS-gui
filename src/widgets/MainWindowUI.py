@@ -261,16 +261,22 @@ class MainWindowUI():
         self.actionBET_SA.setObjectName("actionBET_Surface_Area")
         self.actionLangmuir_SA = QW.QAction(MainWindowUI)
         self.actionLangmuir_SA.setObjectName("actionLangmuir_Surface_Area")
-        self.actiont_plot = QW.QAction(MainWindowUI)
-        self.actiont_plot.setObjectName("actiont_plot")
-        self.actionalpha_s_plot = QW.QAction(MainWindowUI)
-        self.actionalpha_s_plot.setObjectName("actionalpha_s_plot")
+        self.action_da_plot = QW.QAction(MainWindowUI)
+        self.action_da_plot.setObjectName("action_da_plot")
+        self.action_dr_plot = QW.QAction(MainWindowUI)
+        self.action_dr_plot.setObjectName("action_dr_plot")
+        self.action_t_plot = QW.QAction(MainWindowUI)
+        self.action_t_plot.setObjectName("action_t_plot")
+        self.action_alpha_s_plot = QW.QAction(MainWindowUI)
+        self.action_alpha_s_plot.setObjectName("action_alpha_s_plot")
         self.actionMicroporous_PSD = QW.QAction(MainWindowUI)
         self.actionMicroporous_PSD.setObjectName("actionMicroporous_PSD")
         self.actionMesoporous_PSD = QW.QAction(MainWindowUI)
         self.actionMesoporous_PSD.setObjectName("actionMesoporous_PSD")
         self.actionDFT_Kernel_PSD = QW.QAction(MainWindowUI)
         self.actionDFT_Kernel_PSD.setObjectName("actionDFT_Kernel_PSD")
+        self.action_isosteric = QW.QAction(MainWindowUI)
+        self.action_isosteric.setObjectName("action_isosteric")
         self.actionModel_By = QW.QAction(MainWindowUI)
         self.actionModel_By.setObjectName("actionModel_By")
         self.actionGuess_Model = QW.QAction(MainWindowUI)
@@ -284,17 +290,27 @@ class MainWindowUI():
         ])
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
-        self.menuCharact.addAction(self.actionBET_SA)
-        self.menuCharact.addAction(self.actionLangmuir_SA)
+        #
+        self.menuCharact.addActions([
+            self.actionBET_SA,
+            self.actionLangmuir_SA,
+        ])
         self.menuCharact.addSeparator()
-        self.menuCharact.addAction(self.actiont_plot)
-        self.menuCharact.addAction(self.actionalpha_s_plot)
+        self.menuCharact.addActions([
+            self.action_t_plot,
+            self.action_alpha_s_plot,
+            self.action_dr_plot,
+            self.action_da_plot,
+        ])
         self.menuCharact.addSeparator()
         self.menuCharact.addActions([
             self.actionMicroporous_PSD,
             self.actionMesoporous_PSD,
             self.actionDFT_Kernel_PSD,
         ])
+        self.menuCharact.addSeparator()
+        self.menuCharact.addAction(self.action_isosteric)
+        #
         self.menuModel.addActions((
             self.actionModel_By,
             self.actionGuess_Model,
@@ -328,18 +344,21 @@ class MainWindowUI():
         self.menuFile.setTitle(QW.QApplication.translate("MainWindowUI", "File", None, -1))
         self.menuCharact.setTitle(QW.QApplication.translate("MainWindowUI", "Characterization", None, -1))
         self.menuHelp.setTitle(QW.QApplication.translate("MainWindowUI", "Help", None, -1))
-        self.menuModel.setTitle(QW.QApplication.translate("MainWindowUI", "Model", None, -1))
+        self.menuModel.setTitle(QW.QApplication.translate("MainWindowUI", "Model Fitting", None, -1))
         self.actionOpen.setText(QW.QApplication.translate("MainWindowUI", "Open", None, -1))
         self.actionImport.setText(QW.QApplication.translate("MainWindowUI", "Import", None, -1))
         self.actionSave.setText(QW.QApplication.translate("MainWindowUI", "Save", None, -1))
         self.actionQuit.setText(QW.QApplication.translate("MainWindowUI", "Quit", None, -1))
         self.actionAbout.setText(QW.QApplication.translate("MainWindowUI", "About", None, -1))
-        self.actionBET_SA.setText(QW.QApplication.translate("MainWindowUI", "BET Surface Area", None, -1))
-        self.actionLangmuir_SA.setText(QW.QApplication.translate("MainWindowUI", "Langmuir Surface Area", None, -1))
-        self.actiont_plot.setText(QW.QApplication.translate("MainWindowUI", "t-plot", None, -1))
-        self.actionalpha_s_plot.setText(QW.QApplication.translate("MainWindowUI", "alpha-s plot", None, -1))
+        self.actionBET_SA.setText(QW.QApplication.translate("MainWindowUI", "BET surface area", None, -1))
+        self.actionLangmuir_SA.setText(QW.QApplication.translate("MainWindowUI", "Langmuir surface area", None, -1))
+        self.action_t_plot.setText(QW.QApplication.translate("MainWindowUI", "T-plot", None, -1))
+        self.action_alpha_s_plot.setText(QW.QApplication.translate("MainWindowUI", "Alpha-s plot", None, -1))
+        self.action_da_plot.setText(QW.QApplication.translate("MainWindowUI", "Dubinin-Astakov plot", None, -1))
+        self.action_dr_plot.setText(QW.QApplication.translate("MainWindowUI", "Dubinin-Radushkevich plot", None, -1))
         self.actionMicroporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Microporous PSD", None, -1))
         self.actionMesoporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Mesoporous PSD", None, -1))
         self.actionDFT_Kernel_PSD.setText(QW.QApplication.translate("MainWindowUI", "DFT Kernel PSD", None, -1))
-        self.actionModel_By.setText(QW.QApplication.translate("MainWindowUI", "Model Using", None, -1))
-        self.actionGuess_Model.setText(QW.QApplication.translate("MainWindowUI", "Model Guess", None, -1))
+        self.action_isosteric.setText(QW.QApplication.translate("MainWindowUI", "Isosteric enthalpy", None, -1))
+        self.actionModel_By.setText(QW.QApplication.translate("MainWindowUI", "Model using...", None, -1))
+        self.actionGuess_Model.setText(QW.QApplication.translate("MainWindowUI", "Guess best model", None, -1))

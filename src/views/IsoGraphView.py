@@ -1,3 +1,4 @@
+from matplotlib.pyplot import figure, tight_layout
 from qtpy import QtWidgets as QW
 
 from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas)
@@ -15,7 +16,8 @@ class IsoGraphView(QW.QWidget):
         self.isotherms = None
 
     def setupUi(self):
-        self.canvas = FigureCanvas(Figure(figsize=(5, 3)))
+        self.figure = Figure(figsize=(5, 3), tight_layout=True)
+        self.canvas = FigureCanvas(self.figure)
         self.navBar = IsoGraphToolbar(self.canvas, self)
 
         layout = QW.QVBoxLayout(self)

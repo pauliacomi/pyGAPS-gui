@@ -9,9 +9,6 @@ from src.widgets.UtilityWidgets import LabelAlignRight, LabelOutput, LabelResult
 
 
 class AreaBETDialog(QW.QDialog):
-
-    isotherm = None
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi()
@@ -41,12 +38,11 @@ class AreaBETDialog(QW.QDialog):
         layout.addWidget(self.rouqGraph, 1, 1, 1, 1)
 
         # Options/results box
-
-        self.optionsBox = QW.QGroupBox('Options', self)
+        self.optionsBox = QW.QGroupBox(self)
         layout.addWidget(self.optionsBox, 1, 0, 1, 1)
 
         self.optionsLayout = QW.QGridLayout(self.optionsBox)
-        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=2, slider_range=[0, 1, 0.01], values=[0, 1])
+        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=3, slider_range=[0, 1, 0.01], values=[0, 1])
         self.pSlider.setMaximumHeight(50)
         self.pSlider.setEmitWhileMoving(False)
         self.optionsLayout.addWidget(self.pSlider, 0, 0, 1, 4)
@@ -54,7 +50,7 @@ class AreaBETDialog(QW.QDialog):
         self.optionsLayout.addWidget(QW.QLabel("Fit (R):"), 1, 0, 1, 1)
         self.result_r = LabelResult(self)
         self.optionsLayout.addWidget(self.result_r, 1, 1, 1, 1)
-        self.auto_button = QW.QPushButton('Auto-determine', self)
+        self.auto_button = QW.QPushButton(self)
         self.optionsLayout.addWidget(self.auto_button, 1, 3, 1, 1)
 
         # description labels
@@ -80,16 +76,16 @@ class AreaBETDialog(QW.QDialog):
         self.result_intercept = LabelResult(self)
         self.optionsLayout.addWidget(self.result_intercept, 5, 3, 1, 1)
 
-        self.optionsLayout.addWidget(QW.QLabel("Calculation output:"), 6, 0, 1, 2)
+        self.optionsLayout.addWidget(QW.QLabel("Calculation log:"), 6, 0, 1, 2)
         self.output = LabelOutput(self)
         self.optionsLayout.addWidget(self.output, 7, 0, 2, 4)
 
         # Bottom buttons
         self.buttonBox = QW.QDialogButtonBox(self)
         self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Close)
         self.buttonBox.setObjectName("buttonBox")
-        layout.addWidget(self.buttonBox)
+        layout.addWidget(self.buttonBox, 8, 0, 1, 2)
 
     def connectSignals(self):
         self.buttonBox.accepted.connect(self.accept)
@@ -97,3 +93,5 @@ class AreaBETDialog(QW.QDialog):
 
     def retranslateUi(self):
         self.setWindowTitle(QW.QApplication.translate("AreaBETDialog", "Calculate BET area", None, -1))
+        self.optionsBox.setTitle(QW.QApplication.translate("AreaBETDialog", "Options", None, -1))
+        self.auto_button.setText(QW.QApplication.translate("AreaBETDialog", "Auto-determine", None, -1))

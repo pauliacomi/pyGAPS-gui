@@ -6,18 +6,18 @@ from pygaps.graphing.calc_graphs import langmuir_plot
 
 
 class AreaLangModel():
-    def __init__(self, isotherm, parent=None):
+    def __init__(self, isotherm):
 
-        self._isotherm = isotherm
+        self.isotherm = isotherm
 
         # Properties
-        adsorbate = pygaps.Adsorbate.find(self._isotherm.adsorbate)
-        self.cross_section = adsorbate.get_prop("cross_sectional_area")
+        self.cross_section = self.isotherm.adsorbate.get_prop("cross_sectional_area")
 
         # Loading and pressure
-        self.loading = self._isotherm.loading(branch='ads', loading_unit='mol', loading_basis='molar')
-        self.pressure = self._isotherm.pressure(branch='ads', pressure_mode='relative')
+        self.loading = self.isotherm.loading(branch='ads', loading_unit='mol', loading_basis='molar')
+        self.pressure = self.isotherm.pressure(branch='ads', pressure_mode='relative')
 
+        self.limits = None
         self.minimum = None
         self.maximum = None
 
@@ -33,9 +33,13 @@ class AreaLangModel():
     def set_view(self, view):
         """Initial actions on view connect."""
         self.view = view
+
+        # connect signals
         self.view.auto_button.clicked.connect(self.calc_auto)
         self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
-        self.view.isoGraph.setIsotherms(self._isotherm)
+
+        # run
+        self.view.isoGraph.setIsotherms(self.isotherm)
         self.view.isoGraph.plot()
         self.calc_auto()
 
@@ -55,17 +59,26 @@ class AreaLangModel():
         self.plot_calc()
 
     def calculate(self):
-
-        # use the function
         with warnings.catch_warnings(record=True) as warning:
 
             warnings.simplefilter("always")
 
             try:
                 (
-                    self.lang_area, self.k_const, self.n_monolayer, self.slope, self.intercept, self.minimum,
-                    self.maximum, self.corr_coef
-                ) = area_langmuir_raw(self.pressure, self.loading, self.cross_section, limits=self.limits)
+                    self.lang_area,
+                    self.k_const,
+                    self.n_monolayer,
+                    self.slope,
+                    self.intercept,
+                    self.minimum,
+                    self.maximum,
+                    self.corr_coef,
+                ) = area_langmuir_raw(
+                    self.pressure,
+                    self.loading,
+                    self.cross_section,
+                    limits=self.limits,
+                )
 
             # We catch any errors or warnings and display them to the user
             except Exception as e:
@@ -93,7 +106,7 @@ class AreaLangModel():
     def plot_calc(self):
 
         # Clear plots
-        self.view.langGraph.ax.clear()
+        self.view.langGraph.clear()
 
         # Generate plot of the BET points chosen
         langmuir_plot(
@@ -107,4 +120,4 @@ class AreaLangModel():
         )
 
         # Draw figures
-        self.view.langGraph.ax.figure.canvas.draw()
+        self.view.langGraph.canvas.draw()

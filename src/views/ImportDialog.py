@@ -25,6 +25,11 @@ IMPORT_FILES = [
         "name": "Quantachrome report",
         "ext": ("txt", )
     },
+    {
+        "ind": "3p_rep",
+        "name": "3P report",
+        "ext": ("xls", "xlxs")
+    },
 ]
 
 
@@ -71,12 +76,10 @@ class ImportDialog(QW.QDialog):
             parent_widget=self,
             caption="Import an isotherm from a manufacturer file",
             directory='.',
-            filter=f"{sel['name']} (*.{', *.'.join(sel['ext'])})"
+            filter=f"{sel['name']} (*.{' *.'.join(sel['ext'])})"
         )
         if self.filepaths:
             self.close()
 
     def retranslateUi(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("BEImportDialogTDialog", "Import from manufacturer file", None, -1)
-        )
+        self.setWindowTitle(QW.QApplication.translate("ImportDialog", "Import from manufacturer file", None, -1))

@@ -1,6 +1,5 @@
 import warnings
 
-import pygaps
 from pygaps.characterisation.area_bet import (area_BET_raw, bet_transform, roq_transform)
 from pygaps.graphing.calc_graphs import bet_plot, roq_plot
 
@@ -8,16 +7,16 @@ from pygaps.graphing.calc_graphs import bet_plot, roq_plot
 class AreaBETModel():
     def __init__(self, isotherm):
 
-        self._isotherm = isotherm
+        self.isotherm = isotherm
 
         # Properties
-        adsorbate = pygaps.Adsorbate.find(self._isotherm.adsorbate)
-        self.cross_section = adsorbate.get_prop("cross_sectional_area")
+        self.cross_section = self.isotherm.adsorbate.get_prop("cross_sectional_area")
 
         # Loading and pressure
-        self.loading = self._isotherm.loading(branch='ads', loading_unit='mol', loading_basis='molar')
-        self.pressure = self._isotherm.pressure(branch='ads', pressure_mode='relative')
+        self.loading = self.isotherm.loading(branch='ads', loading_unit='mol', loading_basis='molar')
+        self.pressure = self.isotherm.pressure(branch='ads', pressure_mode='relative')
 
+        self.limits = None
         self.minimum = None
         self.maximum = None
 
@@ -34,52 +33,70 @@ class AreaBETModel():
     def set_view(self, view):
         """Initial actions on view connect."""
         self.view = view
+
+        # plot isotherm
+        self.view.isoGraph.setIsotherms(self.isotherm)
+        self.view.isoGraph.plot()
+
+        # connect signals
         self.view.auto_button.clicked.connect(self.calc_auto)
         self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
-        self.view.isoGraph.setIsotherms(self._isotherm)
-        self.view.isoGraph.plot()
+
+        # run
         self.calc_auto()
 
     def calc_auto(self):
         """Automatic calculation."""
         self.limits = None
-        self.calculate()
-        self.output_results()
-        self.plotBET()
-        self.resetSlider()
+        if self.calculate():
+            self.output_results()
+            self.plotBET()
+            self.resetSlider()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        self.calculate()
-        self.output_results()
-        self.plotBET()
+        if self.calculate():
+            self.calculate()
+            self.output_results()
+            self.plotBET()
 
     def calculate(self):
-
-        # use the function
         with warnings.catch_warnings(record=True) as warning:
 
             warnings.simplefilter("always")
 
             try:
                 (
-                    self.bet_area, self.c_const, self.n_monolayer, self.p_monolayer, self.slope, self.intercept,
-                    self.minimum, self.maximum, self.corr_coef
-                ) = area_BET_raw(self.pressure, self.loading, self.cross_section, limits=self.limits)
+                    self.bet_area,
+                    self.c_const,
+                    self.n_monolayer,
+                    self.p_monolayer,
+                    self.slope,
+                    self.intercept,
+                    self.minimum,
+                    self.maximum,
+                    self.corr_coef,
+                ) = area_BET_raw(
+                    self.pressure,
+                    self.loading,
+                    self.cross_section,
+                    limits=self.limits,
+                )
 
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output = f'<font color="red">Calculation failed! <br> {e}</font>'
-                return
+                return False
 
             if warning:
                 self.output = '<br>'.join([f'<font color="red">Warning: {a.message}</font>' for a in warning])
             else:
                 self.output = None
+            return True
 
     def output_results(self):
-        self.view.result_bet.setText(f'{self.bet_area:.4}')
+        self.view.result_bet.setText(f'{self.bet_area:g}')
         self.view.result_c.setText(f'{self.c_const:.4}')
         self.view.result_mono_n.setText(f'{self.n_monolayer:.4}')
         self.view.result_mono_p.setText(f'{self.p_monolayer:.4}')
@@ -95,8 +112,8 @@ class AreaBETModel():
     def plotBET(self):
 
         # Clear plots
-        self.view.betGraph.ax.clear()
-        self.view.rouqGraph.ax.clear()
+        self.view.betGraph.clear()
+        self.view.rouqGraph.clear()
 
         # Generate plot of the BET points chosen
         bet_plot(
@@ -123,5 +140,5 @@ class AreaBETModel():
         )
 
         # Draw figures
-        self.view.betGraph.ax.figure.canvas.draw()
-        self.view.rouqGraph.ax.figure.canvas.draw()
+        self.view.betGraph.canvas.draw()
+        self.view.rouqGraph.canvas.draw()

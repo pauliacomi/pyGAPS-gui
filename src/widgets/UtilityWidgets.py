@@ -23,6 +23,12 @@ def save_file_dialog(parent_widget, caption, directory, filter=None):
     return str(filename)
 
 
+def error_dialog(error: str):
+    errorbox = ErrorMessageBox()
+    errorbox.setText(error)
+    errorbox.exec_()
+
+
 class ErrorMessageBox(QW.QDialog):
     def __init__(self, *args, **kwargs):
         super(ErrorMessageBox, self).__init__(*args, **kwargs)
@@ -68,11 +74,3 @@ class LabelOutput(QW.QLabel):
         self.setFrameStyle(QW.QFrame.Panel | QW.QFrame.Sunken)
         self.setAlignment(QC.Qt.AlignLeft | QC.Qt.AlignTop)
         self.setWordWrap(True)
-
-
-class LabelOnChange(QW.QLabel):
-
-    changed = QC.Signal()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)

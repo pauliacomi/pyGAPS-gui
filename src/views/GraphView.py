@@ -12,15 +12,18 @@ class GraphView(QW.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.canvas = FigureCanvas(Figure(figsize=(5, 3)))
+        self.figure = Figure(figsize=(5, 3), tight_layout=True)
+        self.canvas = FigureCanvas(self.figure)
         self.navBar = NavigationToolbar(self.canvas, self)
+        self.ax = self.figure.subplots()
 
         layout = QW.QVBoxLayout(self)
         layout.addWidget(self.canvas)
         layout.addWidget(self.navBar)
 
-        self._static_ax = self.canvas.figure.subplots()
-
-    @property
-    def ax(self):
-        return self._static_ax
+    def clear(self):
+        for ax in self.figure.axes:
+            if ax == self.ax:
+                ax.clear()
+            else:
+                self.figure.delaxes(ax)
