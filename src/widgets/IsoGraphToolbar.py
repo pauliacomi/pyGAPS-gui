@@ -8,6 +8,9 @@ from .. import get_resource
 
 class IsoGraphToolbar(NavigationToolbar):
 
+    logx = QC.Signal(bool)
+    logy = QC.Signal(bool)
+
     toolitems = [*NavigationToolbar.toolitems]
     toolitems.insert([name for name, *_ in toolitems].index("Subplots") + 2,
                      ("Log(x)", "Log the X axis", "pg_btn_logx", "log_x"))
@@ -63,8 +66,10 @@ class IsoGraphToolbar(NavigationToolbar):
         # Change to log
         if axes.get_xscale() != 'log':
             axes.set_xscale('log')
+            self.logx.emit(True)
         elif axes.get_xscale() != 'linear':
             axes.set_xscale('linear')
+            self.logx.emit(False)
 
         axes.set_xlim(xmin, xmax)
 
@@ -81,8 +86,10 @@ class IsoGraphToolbar(NavigationToolbar):
         # Change to log
         if axes.get_yscale() != 'log':
             axes.set_yscale('log')
+            self.logy.emit(True)
         elif axes.get_yscale() != 'linear':
             axes.set_yscale('linear')
+            self.logy.emit(False)
 
         axes.set_ylim(ymin, ymax)
 

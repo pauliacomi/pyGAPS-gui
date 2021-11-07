@@ -1,36 +1,37 @@
-from matplotlib.pyplot import figure, tight_layout
-from qtpy import QtWidgets as QW
-
-from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas)
-from matplotlib.figure import Figure
-
-from ..widgets.IsoGraphToolbar import IsoGraphToolbar
-
 import pygaps
 
+from src.views.GraphView import GraphView
+from src.widgets.IsoGraphToolbar import IsoGraphToolbar
 
-class IsoGraphView(QW.QWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setupUi()
-        self.isotherms = None
 
-    def setupUi(self):
-        self.figure = Figure(figsize=(5, 3), tight_layout=True)
-        self.canvas = FigureCanvas(self.figure)
-        self.navBar = IsoGraphToolbar(self.canvas, self)
+class IsoGraphView(GraphView):
 
-        layout = QW.QVBoxLayout(self)
-        layout.addWidget(self.canvas)
-        layout.addWidget(self.navBar)
+    isotherms = None
+    logx = False
+    logy = False
 
-        self._static_ax = self.canvas.figure.subplots()
+    def setupNav(self):
+        self.navbar = IsoGraphToolbar(self.canvas, self)
+        self.navbar.logx.connect(self.handle_logx)
+        self.navbar.logy.connect(self.handle_logy)
 
     def setIsotherms(self, isotherms):
         self.isotherms = isotherms
 
-    def plot(self):
-        self._static_ax.clear()
+    def plot(self, branch="all"):
+        self.ax.clear()
         if self.isotherms:
-            pygaps.plot_iso(self.isotherms, ax=self._static_ax)
-        self._static_ax.figure.canvas.draw()
+            pygaps.plot_iso(
+                self.isotherms,
+                ax=self.ax,
+                branch=branch,
+                logx=self.logx,
+                logy=self.logy,
+            )
+        self.canvas.draw()
+
+    def handle_logx(self, is_set: bool):
+        self.logx = is_set
+
+    def handle_logy(self, is_set: bool):
+        self.logy = is_set

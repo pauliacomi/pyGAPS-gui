@@ -52,6 +52,8 @@ class MainWindow(QW.QMainWindow):
         self.ui.actionDFT_Kernel_PSD.triggered.connect(self.psd_kernel)
         self.ui.action_isosteric.triggered.connect(self.isosteric)
 
+        self.ui.actionModel_By.triggered.connect(self.model_by)
+
     def load(self, filepaths=None):
         """Open isotherm from file."""
         if not filepaths:
@@ -238,6 +240,19 @@ class MainWindow(QW.QMainWindow):
         from src.views.IsostericDialog import IsostericDialog
         dialog = IsostericDialog()
         model = IsostericModel(isotherms)
+        model.set_view(dialog)
+        dialog.exec_()
+
+    def model_by(self):
+        index = self.ui.isoExplorer.currentIndex()
+        if not index.isValid():
+            return
+        isotherm = self.iso_model.get_iso_index(index)
+
+        from src.models.IsoModelByModel import IsoModelByModel
+        from src.views.IsoModelByDialog import IsoModelByDialog
+        dialog = IsoModelByDialog()
+        model = IsoModelByModel(isotherm)
         model.set_view(dialog)
         dialog.exec_()
 
