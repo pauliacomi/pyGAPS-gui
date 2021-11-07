@@ -53,6 +53,12 @@ class ErrorMessageBox(QW.QDialog):
         self.text_lbl.setText(text_str)
 
 
+class EditAlignRight(QW.QLineEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignVCenter)
+
+
 class LabelAlignRight(QW.QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -74,3 +80,4 @@ class LabelOutput(QW.QLabel):
         self.setFrameStyle(QW.QFrame.Panel | QW.QFrame.Sunken)
         self.setAlignment(QC.Qt.AlignLeft | QC.Qt.AlignTop)
         self.setWordWrap(True)
+        self.setMinimumSize(50, 100)
