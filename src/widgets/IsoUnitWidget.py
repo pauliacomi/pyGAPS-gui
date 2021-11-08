@@ -1,3 +1,4 @@
+from pygaps.core.pointisotherm import PointIsotherm
 from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
 
@@ -102,6 +103,7 @@ class IsoUnitWidget(QW.QWidget):
     def init_units(self, isotherm):
 
         self.isotherm = isotherm
+        self.units_active = isinstance(isotherm, PointIsotherm)
         self.blockComboSignals(True)
         self.init_pressure(isotherm.pressure_mode, isotherm.pressure_unit)
         self.init_loading(isotherm.loading_basis, isotherm.loading_unit)
@@ -111,7 +113,8 @@ class IsoUnitWidget(QW.QWidget):
 
     def init_pressure(self, pressure_mode, pressure_unit):
 
-        self.pressureMode.setEnabled(True)
+        if self.units_active:
+            self.pressureMode.setEnabled(True)
         pressure_modes = list(self.pressure_dict.keys())
         self.pm_index = pressure_modes.index(pressure_mode)
         self.pressureMode.setCurrentIndex(self.pm_index)
@@ -119,7 +122,8 @@ class IsoUnitWidget(QW.QWidget):
         self.pressureUnit.clear()
         pressure_units = self.pressure_dict.get(pressure_mode, None)
         if pressure_units:
-            self.pressureUnit.setEnabled(True)
+            if self.units_active:
+                self.pressureUnit.setEnabled(True)
             pressure_units = list(pressure_units.keys())
             self.pu_index = pressure_units.index(pressure_unit)
             self.pressureUnit.addItems(pressure_units)
@@ -127,7 +131,8 @@ class IsoUnitWidget(QW.QWidget):
 
     def init_loading(self, loading_basis, loading_unit):
 
-        self.loadingBasis.setEnabled(True)
+        if self.units_active:
+            self.loadingBasis.setEnabled(True)
         loading_bases = list(self.loading_dict.keys())
         self.lm_index = loading_bases.index(loading_basis)
         self.loadingBasis.setCurrentIndex(self.lm_index)
@@ -135,7 +140,8 @@ class IsoUnitWidget(QW.QWidget):
         self.loadingUnit.clear()
         loading_units = self.loading_dict.get(loading_basis, None)
         if loading_units:
-            self.loadingUnit.setEnabled(True)
+            if self.units_active:
+                self.loadingUnit.setEnabled(True)
             loading_units = list(loading_units.keys())
             self.lu_index = loading_units.index(loading_unit)
             self.loadingUnit.addItems(loading_units)
@@ -143,7 +149,8 @@ class IsoUnitWidget(QW.QWidget):
 
     def init_material(self, material_basis, material_unit):
 
-        self.materialBasis.setEnabled(True)
+        if self.units_active:
+            self.materialBasis.setEnabled(True)
         material_bases = list(self.material_dict.keys())
         self.mm_index = material_bases.index(material_basis)
         self.materialBasis.setCurrentIndex(self.mm_index)
@@ -151,7 +158,8 @@ class IsoUnitWidget(QW.QWidget):
         self.materialUnit.clear()
         material_units = self.material_dict.get(material_basis, None)
         if material_units:
-            self.materialUnit.setEnabled(True)
+            if self.units_active:
+                self.materialUnit.setEnabled(True)
             material_units = list(material_units.keys())
             self.mu_index = material_units.index(material_unit)
             self.materialUnit.addItems(material_units)
@@ -236,7 +244,7 @@ class IsoUnitWidget(QW.QWidget):
                     errorbox.setText("Could not convert material to a molar basis. Does it have a molar_mass set?")
                 else:
                     raise Exception from ex
-                errorbox.exec_()
+                errorbox.exec()
 
             self.unitsChanged.emit()
 

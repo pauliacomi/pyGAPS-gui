@@ -150,20 +150,20 @@ class IsoController():
             self.update_isotherm()
 
     def material_detail(self):
-        from src.views.MaterialView import MaterialView
+        from src.views.MaterialView import MaterialDialog
 
         if self.current_isotherm:
-            dialog = MaterialView(self.current_isotherm.material)
-            ret = dialog.exec_()
+            dialog = MaterialDialog(self.current_isotherm.material)
+            ret = dialog.exec()
             if ret == QW.QDialog.Accepted:
                 self.update_isotherm()
 
     def adsorbate_detail(self):
-        from src.views.AdsorbateView import AdsorbateView
+        from src.views.AdsorbateView import AdsorbateDialog
 
         if self.current_isotherm:
-            dialog = AdsorbateView(self.current_isotherm.adsorbate)
-            ret = dialog.exec_()
+            dialog = AdsorbateDialog(self.current_isotherm.adsorbate)
+            ret = dialog.exec()
             if ret == QW.QDialog.Accepted:
                 self.update_isotherm()
 
@@ -191,7 +191,7 @@ class IsoController():
             except ValueError:
                 errorbox = ErrorMessageBox()
                 errorbox.setText("Could not convert metadata value to number.")
-                errorbox.exec_()
+                errorbox.exec()
                 return
 
         self.extraPropTableModel.setOrInsertRow(data=[propName, propValue, propType])
@@ -210,7 +210,7 @@ class IsoController():
         if self.current_isotherm:
             dialog = IsoDataDialog()
             dialog.tableView.setModel(IsoDataTableModel(self.current_isotherm.data()))
-            ret = dialog.exec_()
+            ret = dialog.exec()
             if ret == QW.QDialog.Accepted:
                 self.update_isotherm()
 
@@ -253,9 +253,11 @@ class IsoController():
         elif iso_type == 2:  # mic report
             isotherm = pygaps.isotherm_from_xl(path, fmt='mic')
         elif iso_type == 3:  # qnt report
-            pygaps.isotherm_from_xl()
+            isotherm = pygaps.isotherm_from_xl(fmt='qnt')
             # TODO implement Quantachrome report
-            pass
+        elif iso_type == 4:  # 3P report:
+            isotherm = pygaps.isotherm_from_xl(fmt='3p')
+            # TODO implement 3p report
         else:
             raise Exception(f"Could not determine import type '{iso_type}'.")
 

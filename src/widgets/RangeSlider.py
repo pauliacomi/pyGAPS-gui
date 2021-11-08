@@ -42,8 +42,8 @@ class QRangeSlider(QW.QWidget):
     doubleClick = QC.Signal(bool)
     rangeChanged = QC.Signal(float, float)
 
-    def __init__(self, slider_range, values, parent=None, flags=None):
-        super().__init__(parent, flags)
+    def __init__(self, slider_range, values, parent=None):
+        super().__init__(parent)
         self.bar_width = 10
         self.emit_while_moving = False
         self.moving = "none"
@@ -394,8 +394,8 @@ class QSpinBoxRangeSlider(QW.QWidget):
     doubleClick = QC.Signal(bool)
     rangeChanged = QC.Signal(float, float)
 
-    def __init__(self, slider_range, values, parent=None, flags=None, **kwargs):
-        super().__init__(parent, flags)
+    def __init__(self, slider_range, values, parent=None, **kwargs):
+        super().__init__(parent)
 
         self.max_val = values[1]
         self.min_val = values[0]

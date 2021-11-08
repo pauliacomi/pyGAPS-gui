@@ -35,14 +35,14 @@ class MainWindow(QW.QMainWindow):
 
     def connect_menu(self):
         """Connect signals and slots of the menu."""
-        self.ui.actionOpen.triggered.connect(self.load)
-        self.ui.actionImport.triggered.connect(self.importIso)
-        self.ui.actionSave.triggered.connect(self.save)
+        self.ui.actionOpen.triggered.connect(self.load_iso)
+        self.ui.actionImport.triggered.connect(self.import_iso)
+        self.ui.actionSave.triggered.connect(self.save_iso)
         self.ui.actionQuit.triggered.connect(self.close)
         self.ui.actionAbout.triggered.connect(self.about)
 
-        self.ui.actionBET_SA.triggered.connect(self.BETarea)
-        self.ui.actionLangmuir_SA.triggered.connect(self.langmuirarea)
+        self.ui.actionBET_SA.triggered.connect(self.area_BET)
+        self.ui.actionLangmuir_SA.triggered.connect(self.area_langmuir)
         self.ui.action_t_plot.triggered.connect(self.t_plot)
         self.ui.action_alpha_s_plot.triggered.connect(self.alphas_plot)
         self.ui.action_dr_plot.triggered.connect(self.dr_plot)
@@ -50,11 +50,17 @@ class MainWindow(QW.QMainWindow):
         self.ui.actionMicroporous_PSD.triggered.connect(self.psd_micro)
         self.ui.actionMesoporous_PSD.triggered.connect(self.psd_meso)
         self.ui.actionDFT_Kernel_PSD.triggered.connect(self.psd_kernel)
-        self.ui.action_isosteric.triggered.connect(self.isosteric)
+        self.ui.actionIsosteric.triggered.connect(self.isosteric)
 
-        self.ui.actionModel_By.triggered.connect(self.model_by)
+        self.ui.actionModelBy.triggered.connect(self.model_by)
+        self.ui.actionModelGuess.triggered.connect(self.model_guess)
 
-    def load(self, filepaths=None):
+        self.ui.actionIAST.triggered.connect(self.iast)
+
+        self.ui.actionAdsorbates.triggered.connect(self.adsorbate_explorer)
+        self.ui.actionMaterials.triggered.connect(self.material_explorer)
+
+    def load_iso(self, filepaths=None):
         """Open isotherm from file."""
         if not filepaths:
             filepaths = open_files_dialog(
@@ -71,12 +77,12 @@ class MainWindow(QW.QMainWindow):
                     error_dialog(str(e))
             self.iso_controller.select_last_iso()
 
-    def importIso(self, filepaths=None):
+    def import_iso(self, filepaths=None):
         """Import isotherm from manufacturer files."""
         from src.views.ImportDialog import ImportDialog
 
         dialog = ImportDialog()
-        dialog.exec_()
+        dialog.exec()
 
         if dialog.filepaths and dialog.filepaths != '':
             for filepath in dialog.filepaths:
@@ -87,7 +93,7 @@ class MainWindow(QW.QMainWindow):
                     error_dialog(str(e))
             self.iso_controller.select_last_iso()
 
-    def save(self, filepath=None):
+    def save_iso(self, filepath=None):
         """Save isotherm to file."""
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
@@ -110,7 +116,7 @@ class MainWindow(QW.QMainWindow):
             except Exception as e:
                 error_dialog(str(e))
 
-    def BETarea(self):
+    def area_BET(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
@@ -121,9 +127,9 @@ class MainWindow(QW.QMainWindow):
         dialog = AreaBETDialog()
         model = AreaBETModel(isotherm)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
-    def langmuirarea(self):
+    def area_langmuir(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
@@ -134,7 +140,7 @@ class MainWindow(QW.QMainWindow):
         dialog = AreaLangDialog()
         model = AreaLangModel(isotherm)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def t_plot(self):
         index = self.ui.isoExplorer.currentIndex()
@@ -147,7 +153,7 @@ class MainWindow(QW.QMainWindow):
         dialog = PlotTDialog()
         model = PlotTModel(isotherm)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def alphas_plot(self):
         index = self.ui.isoExplorer.currentIndex()
@@ -170,7 +176,7 @@ class MainWindow(QW.QMainWindow):
         dialog = PlotAlphaSDialog()
         model = PlotAlphaSModel(isotherm, ref_isotherm)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def dr_plot(self):
         self.dadr_plot(ptype="DR")
@@ -189,7 +195,7 @@ class MainWindow(QW.QMainWindow):
         dialog = DADRDialog(ptype=ptype)
         model = DADRModel(isotherm, ptype=ptype)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def psd_micro(self):
         index = self.ui.isoExplorer.currentIndex()
@@ -202,7 +208,7 @@ class MainWindow(QW.QMainWindow):
         dialog = PSDMicroDialog()
         model = PSDMicroModel(isotherm)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def psd_meso(self):
         index = self.ui.isoExplorer.currentIndex()
@@ -215,7 +221,7 @@ class MainWindow(QW.QMainWindow):
         dialog = PSDMesoDialog()
         model = PSDMesoModel(isotherm)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def psd_kernel(self):
         index = self.ui.isoExplorer.currentIndex()
@@ -228,7 +234,7 @@ class MainWindow(QW.QMainWindow):
         dialog = PSDKernelDialog()
         model = PSDKernelModel(isotherm)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def isosteric(self):
         isotherms = self.iso_model.get_iso_checked()
@@ -241,7 +247,7 @@ class MainWindow(QW.QMainWindow):
         dialog = IsostericDialog()
         model = IsostericModel(isotherms)
         model.set_view(dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def model_by(self):
         index = self.ui.isoExplorer.currentIndex()
@@ -254,8 +260,61 @@ class MainWindow(QW.QMainWindow):
         dialog = IsoModelByDialog()
         model = IsoModelByModel(isotherm)
         model.set_view(dialog)
-        dialog.exec_()
+        ret = dialog.exec()
+
+        if ret == QW.QDialog.Accepted and model.model_isotherm:
+            name = self.iso_model.itemFromIndex(index).text() + " model"
+            self.iso_controller.add_isotherm(name, model.model_isotherm)
+            self.iso_controller.select_last_iso()
+
+    def model_guess(self):
+        index = self.ui.isoExplorer.currentIndex()
+        if not index.isValid():
+            return
+        isotherm = self.iso_model.get_iso_index(index)
+
+        from src.models.IsoModelGuessModel import IsoModelGuessModel
+        from src.views.IsoModelGuessDialog import IsoModelGuessDialog
+        dialog = IsoModelGuessDialog()
+        model = IsoModelGuessModel(isotherm)
+        model.set_view(dialog)
+        ret = dialog.exec()
+
+        if ret == QW.QDialog.Accepted and model.model_isotherm:
+            name = self.iso_model.itemFromIndex(index).text() + " model"
+            self.iso_controller.add_isotherm(name, model.model_isotherm)
+            self.iso_controller.select_last_iso()
+
+    def iast(self):
+        """Start IAST procedures."""
+        isotherms = self.iso_model.get_iso_checked()
+        if len(isotherms) < 2:
+            error_dialog("Select two or more isotherms")
+            return
+
+        # from src.models.IASTModel import IASTModel
+        # from src.views.IASTDialog import IASTDialog
+        # dialog = IASTDialog()
+        # model = IASTModel(isotherms)
+        # model.set_view(dialog)
+        # dialog.exec()
+
+    def adsorbate_explorer(self):
+        """Explore/modify pyGAPS adsorbates."""
+        from src.views.AdsorbatesView import AdsorbatesView
+        dialog = AdsorbatesView()
+        dialog.exec()
+
+    def material_explorer(self):
+        """Explore/modify pyGAPS materials."""
+        from src.views.MaterialsView import MaterialsView
+        dialog = MaterialsView()
+        dialog.exec()
 
     def about(self):
         """Show Help/About message box."""
-        QW.QMessageBox.about(self, 'application', 'iacomi.paul@gmail.com')
+        QW.QMessageBox.about(
+            self, "About pyGAPS-GUI", "Main author Paul Iacomi\n"
+            "iacomi.paul@gmail.com\n"
+            "Under MIT License\n"
+        )
