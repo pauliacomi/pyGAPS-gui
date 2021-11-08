@@ -9,13 +9,17 @@ from src.utilities.tex2svg import tex2svg
 from src.widgets.UtilityWidgets import ErrorMessageBox
 
 
-class AdsorbateView(QW.QDialog):
-    def __init__(self, adsorbate, *args, **kwargs):
+class AdsorbateView(QW.QWidget):
+
+    adsorbate = None
+
+    def __init__(self, adsorbate=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.adsorbate = adsorbate
         self.setupUi()
-        self.setupModel()
-        self.connectSignals()
+        if adsorbate:
+            self.adsorbate = adsorbate
+            self.setupModel()
+            self.connectSignals()
         self.retranslateUi()
 
     def setupUi(self):
@@ -38,6 +42,8 @@ class AdsorbateView(QW.QDialog):
         self.adsAliasValues = QW.QListWidget(self.propertiesWidget)
         self.adsFormulaLabel = QW.QLabel(self.propertiesWidget)
         self.adsFormulaValue = QS.QSvgWidget(self.propertiesWidget)
+        self.adsFormulaValue.setMinimumSize(10, 50)
+        self.adsFormulaValue.setMaximumSize(30, 100)
         self.adsBackendLabel = QW.QLabel(self.propertiesWidget)
         self.adsBackendValue = QW.QLabel(self.propertiesWidget)
         self.propertiesLayout.addRow(self.adsNameLabel, self.adsNameValue)
@@ -59,11 +65,13 @@ class AdsorbateView(QW.QDialog):
         self.tableView = MetadataTableWidget(self)
         layout.addWidget(self.tableView)
 
-        # Button box
-        self.buttonBox = QW.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
-        layout.addWidget(self.buttonBox)
+    def setAdsorbate(self, adsorbate):
+        if not adsorbate:
+            return
+
+        self.adsorbate = adsorbate
+        self.setupModel()
+        self.connectSignals()
 
     def setupModel(self):
         self.adsNameValue.setText(self.adsorbate.name)
@@ -84,8 +92,6 @@ class AdsorbateView(QW.QDialog):
         self.tableView.setModel(self.tableModel)
 
     def connectSignals(self):
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
 
         self.tableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
         self.metaButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
@@ -114,7 +120,7 @@ class AdsorbateView(QW.QDialog):
             except ValueError:
                 errorbox = ErrorMessageBox()
                 errorbox.setText("Could not convert metadata value to number.")
-                errorbox.exec_()
+                errorbox.exec()
                 return
 
         self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
@@ -126,9 +132,39 @@ class AdsorbateView(QW.QDialog):
         self.tableModel.removeRow(index.row())
 
     def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("AdsorbateView", "Adsorbate details", None, -1))
         self.adsNameLabel.setText(QW.QApplication.translate("AdsorbateView", "Adsorbate Name", None, -1))
         self.adsAliasLabel.setText(QW.QApplication.translate("AdsorbateView", "Adsorbate Aliases", None, -1))
         self.adsFormulaLabel.setText(QW.QApplication.translate("AdsorbateView", "Adsorbate Formula", None, -1))
         self.adsBackendLabel.setText(QW.QApplication.translate("AdsorbateView", "Thermodynamic backend", None, -1))
-        self.metaLabel.setText(QW.QApplication.translate("MaterialView", "Other Metadata", None, -1))
+        self.metaLabel.setText(QW.QApplication.translate("AdsorbateView", "Other Metadata", None, -1))
+
+
+class AdsorbateDialog(QW.QDialog):
+    def __init__(self, adsorbate, parent=None, **kwargs) -> None:
+        super().__init__(parent=parent, **kwargs)
+
+        self.setupUi()
+        self.retranslateUi()
+        self.connectSignals()
+        self.view.setAdsorbate(adsorbate)
+
+    def setupUi(self):
+
+        layout = QW.QVBoxLayout(self)
+
+        # View
+        self.view = AdsorbateView(parent=self)
+        layout.addWidget(self.view)
+
+        # Button box
+        self.buttonBox = QW.QDialogButtonBox(self)
+        self.buttonBox.setOrientation(QC.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
+        layout.addWidget(self.buttonBox)
+
+    def connectSignals(self):
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+    def retranslateUi(self):
+        self.setWindowTitle(QW.QApplication.translate("AdsorbateDialog", "Adsorbate details", None, -1))

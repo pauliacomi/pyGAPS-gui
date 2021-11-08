@@ -7,14 +7,18 @@ from src.widgets.MetadataTableWidget import MetadataTableWidget
 from src.widgets.UtilityWidgets import ErrorMessageBox
 
 
-class MaterialView(QW.QDialog):
-    def __init__(self, material, *args, **kwargs):
+class MaterialView(QW.QWidget):
+
+    material = None
+
+    def __init__(self, material=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.material = material
         self.setupUi()
-        self.setupModel()
-        self.connectSignals()
         self.retranslateUi()
+        if material:
+            self.material = material
+            self.setupModel()
+            self.connectSignals()
 
     def setupUi(self):
         self.setObjectName("MaterialView")
@@ -54,11 +58,13 @@ class MaterialView(QW.QDialog):
         self.tableView = MetadataTableWidget(self)
         layout.addWidget(self.tableView)
 
-        # Button box
-        self.buttonBox = QW.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
-        layout.addWidget(self.buttonBox)
+    def setMaterial(self, material):
+        if not material:
+            return
+
+        self.material = material
+        self.setupModel()
+        self.connectSignals()
 
     def setupModel(self):
         self.matNameValue.setText(self.material.name)
@@ -73,9 +79,6 @@ class MaterialView(QW.QDialog):
         self.tableView.setModel(self.tableModel)
 
     def connectSignals(self):
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
-
         self.tableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
         self.metaButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
         self.metaButtonWidget.propButtonDelete.clicked.connect(self.extra_prop_delete)
@@ -90,8 +93,6 @@ class MaterialView(QW.QDialog):
 
         if self.matMMValue.text() != self.material.molar_mass:
             self.material.molar_mass = self.matMMValue.text()
-
-        return super().accept()
 
     def extra_prop_select(self):
         index = self.tableView.selectionModel().currentIndex()
@@ -116,7 +117,7 @@ class MaterialView(QW.QDialog):
             except ValueError:
                 errorbox = ErrorMessageBox()
                 errorbox.setText("Could not convert metadata value to number.")
-                errorbox.exec_()
+                errorbox.exec()
                 return
 
         self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
@@ -127,8 +128,42 @@ class MaterialView(QW.QDialog):
         self.tableModel.removeRow(index.row())
 
     def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("MaterialView", "Material details", None, -1))
         self.matNameLabel.setText(QW.QApplication.translate("MaterialView", "Material Name", None, -1))
         self.matDensityLabel.setText(QW.QApplication.translate("MaterialView", "Material Density", None, -1))
         self.matMMLabel.setText(QW.QApplication.translate("MaterialView", "Material Molar Mass", None, -1))
         self.metaLabel.setText(QW.QApplication.translate("MaterialView", "Other Metadata", None, -1))
+
+
+class MaterialDialog(QW.QDialog):
+    def __init__(self, material, parent=None, **kwargs) -> None:
+        super().__init__(parent=parent, **kwargs)
+
+        self.setupUi()
+        self.retranslateUi()
+        self.connectSignals()
+        self.view.setMaterial(material)
+
+    def setupUi(self):
+
+        layout = QW.QVBoxLayout(self)
+
+        # View
+        self.view = MaterialView(parent=self)
+        layout.addWidget(self.view)
+
+        # Button box
+        self.buttonBox = QW.QDialogButtonBox(self)
+        self.buttonBox.setOrientation(QC.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
+        layout.addWidget(self.buttonBox)
+
+    def connectSignals(self):
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+    def accept(self) -> None:
+        self.view.accept()
+        return super().accept()
+
+    def retranslateUi(self):
+        self.setWindowTitle(QW.QApplication.translate("MaterialView", "Material details", None, -1))

@@ -20,11 +20,6 @@ class MainWindowUI():
         MainWindowUI.setObjectName("MainWindowUI")
         MainWindowUI.resize(1200, 700)
 
-        # Icon
-        icon = QG.QIcon()
-        icon.addPixmap(QG.QPixmap(":/res/designer/icons/01_Warning_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
-        MainWindowUI.setWindowIcon(icon)
-
         # Central widget
         self.centralwidget = QW.QWidget(MainWindowUI)
         self.centralwidget.setObjectName("centralwidget")
@@ -199,62 +194,60 @@ class MainWindowUI():
         self.menubar = QW.QMenuBar(MainWindowUI)
         self.menubar.setGeometry(QC.QRect(0, 0, 900, 30))
         self.menubar.setObjectName("menubar")
-        self.menuFile = QW.QMenu(self.menubar)
-        self.menuFile.setObjectName("menuFile")
-        self.menuFileImport = QW.QMenu(self.menubar)
-        self.menuFileImport.setObjectName("menuFileImport")
-        self.menuCharact = QW.QMenu(self.menubar)
-        self.menuCharact.setObjectName("menuCharact")
-        self.menuHelp = QW.QMenu(self.menubar)
-        self.menuHelp.setObjectName("menuHelp")
-        self.menuModel = QW.QMenu(self.menubar)
-        self.menuModel.setObjectName("menuModel")
         MainWindowUI.setMenuBar(self.menubar)
 
-        # Create status bar
-        self.statusbar = QW.QStatusBar(MainWindowUI)
-        self.statusbar.setObjectName("statusbar")
-        MainWindowUI.setStatusBar(self.statusbar)
+        # Create menu components
+        self.menuFile = QW.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
+        self.menubar.addAction(self.menuFile.menuAction())
+        self.menuCharact = QW.QMenu(self.menubar)
+        self.menuCharact.setObjectName("menuCharact")
+        self.menubar.addAction(self.menuCharact.menuAction())
+        self.menuModel = QW.QMenu(self.menubar)
+        self.menuModel.setObjectName("menuModel")
+        self.menubar.addAction(self.menuModel.menuAction())
+        self.menuPredict = QW.QMenu(self.menubar)
+        self.menuPredict.setObjectName("menuPredict")
+        self.menubar.addAction(self.menuPredict.menuAction())
+        self.menuOptions = QW.QMenu(self.menubar)
+        self.menuOptions.setObjectName("menuOptions")
+        self.menubar.addAction(self.menuOptions.menuAction())
+        self.menuHelp = QW.QMenu(self.menubar)
+        self.menuHelp.setObjectName("menuHelp")
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         # Defining menu actions
         # open
         self.actionOpen = QW.QAction(MainWindowUI)
-        icon1 = QG.QIcon()
-        icon1.addPixmap(QG.QPixmap(":/res/icons/10_Search_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
-        self.actionOpen.setIcon(icon1)
+        icon = QG.QIcon()
+        icon.addPixmap(QG.QPixmap(":/res/icons/10_Search_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        self.actionOpen.setIcon(icon)
         self.actionOpen.setObjectName("actionOpen")
         self.actionOpen.setShortcut("Ctrl+O")
 
         # import
         self.actionImport = QW.QAction(MainWindowUI)
         self.actionImport.setObjectName("actionImport")
-        icon1 = QG.QIcon()
-        icon1.addPixmap(QG.QPixmap(":/res/icons/16_Copy_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
-        self.actionImport.setIcon(icon1)
+        icon = QG.QIcon()
+        icon.addPixmap(QG.QPixmap(":/res/icons/16_Copy_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        self.actionImport.setIcon(icon)
         self.actionImport.setShortcut("Ctrl+I")
 
         # save
         self.actionSave = QW.QAction(MainWindowUI)
-        icon2 = QG.QIcon()
-        icon2.addPixmap(QG.QPixmap(":/res/icons/04_Save_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
-        self.actionSave.setIcon(icon2)
+        icon = QG.QIcon()
+        icon.addPixmap(QG.QPixmap(":/res/icons/04_Save_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        self.actionSave.setIcon(icon)
         self.actionSave.setObjectName("actionSave")
         self.actionSave.setShortcut("Ctrl+S")
 
         # quit
         self.actionQuit = QW.QAction(MainWindowUI)
-        icon3 = QG.QIcon()
-        icon3.addPixmap(QG.QPixmap(":/res/icons/14_Delete_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
-        self.actionQuit.setIcon(icon3)
+        icon = QG.QIcon()
+        icon.addPixmap(QG.QPixmap(":/res/icons/14_Delete_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        self.actionQuit.setIcon(icon)
         self.actionQuit.setObjectName("actionQuit")
         self.actionQuit.setShortcut("Ctrl+Q")
-
-        # about
-        self.actionAbout = QW.QAction(MainWindowUI)
-        icon4 = QG.QIcon()
-        icon4.addPixmap(QG.QPixmap(":/res/icons/15_Tick_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
-        self.actionAbout.setIcon(icon4)
-        self.actionAbout.setObjectName("actionAbout")
 
         # characterisation
         self.actionBET_SA = QW.QAction(MainWindowUI)
@@ -275,12 +268,31 @@ class MainWindowUI():
         self.actionMesoporous_PSD.setObjectName("actionMesoporous_PSD")
         self.actionDFT_Kernel_PSD = QW.QAction(MainWindowUI)
         self.actionDFT_Kernel_PSD.setObjectName("actionDFT_Kernel_PSD")
-        self.action_isosteric = QW.QAction(MainWindowUI)
-        self.action_isosteric.setObjectName("action_isosteric")
-        self.actionModel_By = QW.QAction(MainWindowUI)
-        self.actionModel_By.setObjectName("actionModel_By")
-        self.actionGuess_Model = QW.QAction(MainWindowUI)
-        self.actionGuess_Model.setObjectName("actionGuess_Model")
+        self.actionIsosteric = QW.QAction(MainWindowUI)
+        self.actionIsosteric.setObjectName("actionIsosteric")
+
+        # modelling
+        self.actionModelBy = QW.QAction(MainWindowUI)
+        self.actionModelBy.setObjectName("actionModelBy")
+        self.actionModelGuess = QW.QAction(MainWindowUI)
+        self.actionModelGuess.setObjectName("actionModelGuess")
+
+        # prediction
+        self.actionIAST = QW.QAction(MainWindowUI)
+        self.actionIAST.setObjectName("actionIAST")
+
+        # options
+        self.actionAdsorbates = QW.QAction(MainWindowUI)
+        self.actionAdsorbates.setObjectName("actionAdsorbates")
+        self.actionMaterials = QW.QAction(MainWindowUI)
+        self.actionMaterials.setObjectName("actionMaterials")
+
+        # about
+        self.actionAbout = QW.QAction(MainWindowUI)
+        icon = QG.QIcon()
+        icon.addPixmap(QG.QPixmap(":/res/icons/15_Tick_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        self.actionAbout.setIcon(icon)
+        self.actionAbout.setObjectName("actionAbout")
 
         # add all actions to menus
         self.menuFile.addActions([
@@ -309,17 +321,24 @@ class MainWindowUI():
             self.actionDFT_Kernel_PSD,
         ])
         self.menuCharact.addSeparator()
-        self.menuCharact.addAction(self.action_isosteric)
+        self.menuCharact.addActions([self.actionIsosteric])
         #
         self.menuModel.addActions((
-            self.actionModel_By,
-            self.actionGuess_Model,
+            self.actionModelBy,
+            self.actionModelGuess,
         ))
+        #
+        self.menuPredict.addActions([self.actionIAST])
+        self.menuOptions.addActions([
+            self.actionAdsorbates,
+            self.actionMaterials,
+        ])
         self.menuHelp.addAction(self.actionAbout)
-        self.menubar.addAction(self.menuFile.menuAction())
-        self.menubar.addAction(self.menuCharact.menuAction())
-        self.menubar.addAction(self.menuModel.menuAction())
-        self.menubar.addAction(self.menuHelp.menuAction())
+
+        # Create status bar
+        self.statusbar = QW.QStatusBar(MainWindowUI)
+        self.statusbar.setObjectName("statusbar")
+        MainWindowUI.setStatusBar(self.statusbar)
 
     def retranslateUi(self, MainWindowUI):
         """Set UI text."""
@@ -345,6 +364,8 @@ class MainWindowUI():
         self.menuCharact.setTitle(QW.QApplication.translate("MainWindowUI", "Characterization", None, -1))
         self.menuHelp.setTitle(QW.QApplication.translate("MainWindowUI", "Help", None, -1))
         self.menuModel.setTitle(QW.QApplication.translate("MainWindowUI", "Model Fitting", None, -1))
+        self.menuPredict.setTitle(QW.QApplication.translate("MainWindowUI", "Predict", None, -1))
+        self.menuOptions.setTitle(QW.QApplication.translate("MainWindowUI", "Options", None, -1))
         self.actionOpen.setText(QW.QApplication.translate("MainWindowUI", "Open", None, -1))
         self.actionImport.setText(QW.QApplication.translate("MainWindowUI", "Import", None, -1))
         self.actionSave.setText(QW.QApplication.translate("MainWindowUI", "Save", None, -1))
@@ -359,6 +380,9 @@ class MainWindowUI():
         self.actionMicroporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Microporous PSD", None, -1))
         self.actionMesoporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Mesoporous PSD", None, -1))
         self.actionDFT_Kernel_PSD.setText(QW.QApplication.translate("MainWindowUI", "DFT Kernel PSD", None, -1))
-        self.action_isosteric.setText(QW.QApplication.translate("MainWindowUI", "Isosteric enthalpy", None, -1))
-        self.actionModel_By.setText(QW.QApplication.translate("MainWindowUI", "Model using...", None, -1))
-        self.actionGuess_Model.setText(QW.QApplication.translate("MainWindowUI", "Guess best model", None, -1))
+        self.actionIsosteric.setText(QW.QApplication.translate("MainWindowUI", "Isosteric enthalpy", None, -1))
+        self.actionModelBy.setText(QW.QApplication.translate("MainWindowUI", "Model using...", None, -1))
+        self.actionModelGuess.setText(QW.QApplication.translate("MainWindowUI", "Guess best model", None, -1))
+        self.actionIAST.setText(QW.QApplication.translate("MainWindowUI", "IAST", None, -1))
+        self.actionAdsorbates.setText(QW.QApplication.translate("MainWindowUI", "pyGAPS Adsorbates", None, -1))
+        self.actionMaterials.setText(QW.QApplication.translate("MainWindowUI", "pyGAPS Materials", None, -1))
