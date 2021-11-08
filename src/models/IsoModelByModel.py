@@ -2,7 +2,7 @@ import warnings
 
 from pygaps.modelling import _MODELS
 from pygaps.modelling import get_isotherm_model
-from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps import ModelIsotherm
 
 from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC

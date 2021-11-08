@@ -1,4 +1,4 @@
-import pygaps
+import pygaps.graphing as pgg
 
 from src.views.IsoGraphView import IsoGraphView
 
@@ -15,7 +15,7 @@ class IsoModelGraphView(IsoGraphView):
     def plot(self, branch="all"):
         self.ax.clear()
         if self.isotherms:
-            pygaps.plot_iso(
+            pgg.plot_iso(
                 self.isotherms,
                 ax=self.ax,
                 branch=branch,
@@ -24,7 +24,7 @@ class IsoModelGraphView(IsoGraphView):
                 lgd_pos=None,
             )
             if self.model_isotherm:
-                pygaps.plot_iso(
+                pgg.plot_iso(
                     self.model_isotherm,
                     ax=self.ax,
                     branch=branch,

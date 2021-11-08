@@ -227,14 +227,15 @@ class IsoController():
 
         isotherm = None
 
+        import pygaps.parsing as pgp
         if ext == '.csv':
-            isotherm = pygaps.isotherm_from_csv(path)
+            isotherm = pgp.isotherm_from_csv(path)
         elif ext == '.json':
-            isotherm = pygaps.isotherm_from_json(path)
+            isotherm = pgp.isotherm_from_json(path)
         elif ext in ['.xls', '.xlsx']:
-            isotherm = pygaps.isotherm_from_xl(path)
+            isotherm = pgp.isotherm_from_xl(path)
         elif ext == '.aif':
-            isotherm = pygaps.isotherm_from_aif(path)
+            isotherm = pgp.isotherm_from_aif(path)
         else:
             raise Exception(f"Unknown isotherm type '{ext}'.")
 

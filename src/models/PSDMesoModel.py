@@ -1,8 +1,8 @@
 import warnings
 
-from pygaps.characterisation.psd_mesoporous import psd_mesoporous
-from pygaps.characterisation.psd_mesoporous import _MESO_PSD_MODELS
-from pygaps.characterisation.psd_mesoporous import _PORE_GEOMETRIES
+from pygaps.characterisation.psd_meso import psd_mesoporous
+from pygaps.characterisation.psd_meso import _MESO_PSD_MODELS
+from pygaps.characterisation.psd_meso import _PORE_GEOMETRIES
 from pygaps.characterisation.models_thickness import _THICKNESS_MODELS
 from pygaps.characterisation.models_kelvin import _KELVIN_MODELS
 from pygaps.graphing.calc_graphs import psd_plot

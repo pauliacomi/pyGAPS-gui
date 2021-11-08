@@ -1,8 +1,8 @@
 import warnings
 
-from pygaps.characterisation.psd_microporous import psd_microporous
-from pygaps.characterisation.psd_microporous import _MICRO_PSD_MODELS
-from pygaps.characterisation.psd_microporous import _PORE_GEOMETRIES
+from pygaps.characterisation.psd_micro import psd_microporous
+from pygaps.characterisation.psd_micro import _MICRO_PSD_MODELS
+from pygaps.characterisation.psd_micro import _PORE_GEOMETRIES
 from pygaps.characterisation.models_hk import _ADSORBENT_MODELS
 from pygaps.graphing.calc_graphs import psd_plot
 

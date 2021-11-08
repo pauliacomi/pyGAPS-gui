@@ -1,6 +1,6 @@
 import warnings
 
-from pygaps.characterisation.isosteric_enthalpy import isosteric_enthalpy, isosteric_enthalpy_raw
+from pygaps.characterisation.isosteric_enth import isosteric_enthalpy, isosteric_enthalpy_raw
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 
 

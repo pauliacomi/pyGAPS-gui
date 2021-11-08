@@ -1,7 +1,7 @@
 import warnings
 
-from pygaps.characterisation.psd_dft import psd_dft
-from pygaps.characterisation.psd_dft import _KERNELS
+from pygaps.characterisation.psd_kernel import psd_dft
+from pygaps.characterisation.psd_kernel import _KERNELS
 from pygaps.graphing.calc_graphs import psd_plot
 
 from qtpy import QtWidgets as QW

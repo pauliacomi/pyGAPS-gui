@@ -1,7 +1,6 @@
 import warnings
 
-import pygaps
-from pygaps.characterisation.area_langmuir import (area_langmuir_raw, langmuir_transform)
+from pygaps.characterisation.area_lang import (area_langmuir_raw, langmuir_transform)
 from pygaps.graphing.calc_graphs import langmuir_plot
 
 
