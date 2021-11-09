@@ -247,17 +247,18 @@ class IsoController():
     def loadImport(self, path, name, iso_type):
         isotherm = None
 
+        import pygaps.parsing as pgp
         if iso_type == 0:  # bel raw
-            isotherm = pygaps.isotherm_from_bel(path)
+            isotherm = pgp.isotherm_from_bel(path)
         elif iso_type == 1:  # bel report
-            isotherm = pygaps.isotherm_from_xl(path, fmt='bel')
+            isotherm = pgp.isotherm_from_xl(path, fmt='bel')
         elif iso_type == 2:  # mic report
-            isotherm = pygaps.isotherm_from_xl(path, fmt='mic')
+            isotherm = pgp.isotherm_from_xl(path, fmt='mic')
         elif iso_type == 3:  # qnt report
-            isotherm = pygaps.isotherm_from_xl(fmt='qnt')
+            isotherm = pgp.isotherm_from_xl(fmt='qnt')
             # TODO implement Quantachrome report
         elif iso_type == 4:  # 3P report:
-            isotherm = pygaps.isotherm_from_xl(fmt='3p')
+            isotherm = pgp.isotherm_from_xl(fmt='3p')
             # TODO implement 3p report
         else:
             raise Exception(f"Could not determine import type '{iso_type}'.")
@@ -285,14 +286,15 @@ class IsoController():
         """Save isotherm to disk."""
         isotherm = self.iso_list_model.get_iso_index(self.list_view.currentIndex())
 
+        import pygaps.parsing as pgp
         if ext == '.csv':
-            pygaps.isotherm_to_csv(isotherm, path)
+            pgp.isotherm_to_csv(isotherm, path)
         elif ext == '.json':
-            pygaps.isotherm_to_json(isotherm, path)
+            pgp.isotherm_to_json(isotherm, path)
         elif ext == '.xls' or ext == '.xlsx':
-            pygaps.isotherm_to_xl(isotherm, path)
+            pgp.isotherm_to_xl(isotherm, path)
         elif ext == '.aif':
-            pygaps.isotherm_to_aif(isotherm, path)
+            pgp.isotherm_to_aif(isotherm, path)
         else:
             raise Exception("Unknown file save format.")
 

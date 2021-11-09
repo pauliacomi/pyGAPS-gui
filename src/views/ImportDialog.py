@@ -13,12 +13,12 @@ IMPORT_FILES = [
     {
         "ind": "bel_xl",
         "name": "BELSORP MAX report",
-        "ext": ("xls", "xlxs")
+        "ext": ("xls", "xlsx")
     },
     {
         "ind": "mic_rep",
         "name": "Micromeritics report",
-        "ext": ("xls", "xlxs")
+        "ext": ("xls", "xlsx")
     },
     {
         "ind": "qnt_rep",
@@ -28,7 +28,7 @@ IMPORT_FILES = [
     {
         "ind": "3p_rep",
         "name": "3P report",
-        "ext": ("xls", "xlxs")
+        "ext": ("xls", "xlsx")
     },
 ]
 

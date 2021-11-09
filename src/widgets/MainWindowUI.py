@@ -18,7 +18,7 @@ class MainWindowUI():
 
         # First setup
         MainWindowUI.setObjectName("MainWindowUI")
-        MainWindowUI.resize(1200, 700)
+        MainWindowUI.resize(1400, 700)
 
         # Central widget
         self.centralwidget = QW.QWidget(MainWindowUI)

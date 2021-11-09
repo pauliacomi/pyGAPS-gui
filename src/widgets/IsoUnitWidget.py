@@ -2,6 +2,8 @@ from pygaps.core.pointisotherm import PointIsotherm
 from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
 
+from src.widgets.UtilityWidgets import error_dialog
+
 
 class IsoUnitWidget(QW.QWidget):
 
@@ -196,7 +198,10 @@ class IsoUnitWidget(QW.QWidget):
                 if units:
                     unit_to = list(units.keys())[0]
 
-            self.isotherm.convert_pressure(mode_to=mode_to, unit_to=unit_to)
+            try:
+                self.isotherm.convert_pressure(mode_to=mode_to, unit_to=unit_to)
+            except Exception as ex:
+                error_dialog("Could not convert pressure, is your isotherm supercritical?")
 
             self.unitsChanged.emit()
 
@@ -214,7 +219,10 @@ class IsoUnitWidget(QW.QWidget):
                 if units:
                     unit_to = list(units.keys())[0]
 
-            self.isotherm.convert_loading(basis_to=basis_to, unit_to=unit_to)
+            try:
+                self.isotherm.convert_loading(basis_to=basis_to, unit_to=unit_to)
+            except Exception as ex:
+                error_dialog("Could not convert loading, is your isotherm supercritical?")
 
             self.unitsChanged.emit()
 

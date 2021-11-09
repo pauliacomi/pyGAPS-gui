@@ -314,7 +314,9 @@ class MainWindow(QW.QMainWindow):
     def about(self):
         """Show Help/About message box."""
         QW.QMessageBox.about(
-            self, "About pyGAPS-GUI", "Main author Paul Iacomi\n"
-            "iacomi.paul@gmail.com\n"
-            "Under MIT License\n"
+            self, "About pyGAPS-GUI", "Main author <i>Paul Iacomi</i><br>"
+            "<a href='mailto:iacomi.paul@gmail.com'>iacomi.paul@gmail.com</a><br>"
+            "Open source at<br>"
+            "<a href='https://github.com/pauliacomi/pyGAPS-gui'>github.com/pauliacomi/pyGAPS-gui</a><br>"
+            "Under MIT License<br>"
         )
