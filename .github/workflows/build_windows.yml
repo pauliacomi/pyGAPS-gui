@@ -24,17 +24,17 @@ jobs:
 
     - name: Create venv
       run: |
-          python -m venv ./.venv
-          ./.venv/Scripts/activate
-          pip install -r requirements.txt
+        python -m venv ./.venv
+        ./.venv/Scripts/activate
+        pip install -r requirements.txt
       if: steps.cache-venv.outputs.cache-hit != 'true'
 
     - name: Run PyInstaller
-      run:
+      run: |
         ./.venv/Scripts/activate
         pyinstaller pyGAPS-gui.spec
 
     - name: Run Executable
       run: |
-        cd dist/pyGAPS-gui
-        pyGAPS-gui.exe
+         cd ./dist/pyGAPS-gui
+         pyGAPS-gui.exe
