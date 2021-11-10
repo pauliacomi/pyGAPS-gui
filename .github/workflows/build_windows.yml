@@ -30,7 +30,9 @@ jobs:
       if: steps.cache-venv.outputs.cache-hit != 'true'
 
     - name: Run PyInstaller
-      run: pyinstaller pyGAPS-gui.spec
+      run:
+        ./.venv/Scripts/activate
+        pyinstaller pyGAPS-gui.spec
 
     - name: Run Executable
       run: |
