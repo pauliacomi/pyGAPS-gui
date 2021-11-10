@@ -36,5 +36,5 @@ jobs:
 
     - name: Run Executable
       run: |
-        cd dist\pyGAPS-gui*
-        pyGAPS-gui.exe test
+        cd dist/pyGAPS-gui
+        pyGAPS-gui.exe
