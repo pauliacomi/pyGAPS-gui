@@ -1,0 +1,38 @@
+name: CD-WINDOWS
+
+on: [push]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Use Cache
+      id: cache-venv
+      uses: actions/cache@v2
+      with:
+        path: ./.venv/
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-venv-
+
+    - name: Create venv
+      run: |
+          python -m venv ./.venv
+          ./.venv/bin/activate
+          pip install -r requirements.txt
+      if: steps.cache-venv.outputs.cache-hit != 'true'
+
+    - name: Run PyInstaller
+      run: pyinstaller pyGAPS-gui.spec
+
+    - name: Run Executable
+      run: |
+        cd dist\pyGAPS-gui*
+        pyGAPS-gui.exe test
