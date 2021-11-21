@@ -6,7 +6,7 @@ _exptl_adsorptive C3H8
 _exptl_temperature 303.00
 _exptl_sample_mass 0.0740
 _sample_id 'Sample_E'
-_sample_material_id 'asd'
+_sample_material_id 'Sample_E'
 _units_temperature K
 _units_pressure kPa
 _units_mass g
