@@ -329,8 +329,8 @@ class MainWindowUI():
             self.actionModelBy,
             self.actionModelGuess,
         ))
-        self.menuCharact.addSeparator()
-        self.menuCharact.addActions([self.actionModelCreate])
+        self.menuModel.addSeparator()
+        self.menuModel.addActions([self.actionModelCreate])
         #
         self.menuPredict.addActions([self.actionIAST])
         self.menuOptions.addActions([
