@@ -34,7 +34,7 @@ class PSDMicroModel():
         self.view.amodelDropdown.addItems(_ADSORBENT_MODELS),
 
         # plot isotherm
-        self.view.isoGraph.setIsotherms(self.isotherm)
+        self.view.isoGraph.setIsotherms([self.isotherm])
         self.view.isoGraph.plot()
 
         # connect signals

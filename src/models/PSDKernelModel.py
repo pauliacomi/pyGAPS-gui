@@ -31,7 +31,7 @@ class PSDKernelModel():
         self.view.smoothEdit.setValue(2)
 
         # plot isotherm
-        self.view.isoGraph.setIsotherms(self.isotherm)
+        self.view.isoGraph.setIsotherms([self.isotherm])
         self.view.isoGraph.plot()
 
         # connect signals

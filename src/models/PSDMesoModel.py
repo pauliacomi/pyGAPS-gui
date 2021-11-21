@@ -36,7 +36,7 @@ class PSDMesoModel():
         self.view.kmodelDropdown.addItems(_KELVIN_MODELS),
 
         # plot isotherm
-        self.view.isoGraph.setIsotherms(self.isotherm)
+        self.view.isoGraph.setIsotherms([self.isotherm])
         self.view.isoGraph.plot()
 
         # connect signals

@@ -38,7 +38,7 @@ class AreaLangModel():
         self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
 
         # run
-        self.view.isoGraph.setIsotherms(self.isotherm)
+        self.view.isoGraph.setIsotherms([self.isotherm])
         self.view.isoGraph.plot()
         self.calc_auto()
 

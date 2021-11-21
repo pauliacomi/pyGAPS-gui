@@ -31,7 +31,7 @@ class IsoModelByModel():
         self.view.branchDropdown.addItems(["ads", "des"])
 
         # plot isotherm
-        self.view.isoGraph.setIsotherms(self.isotherm)
+        self.view.isoGraph.setIsotherms([self.isotherm])
         self.view.isoGraph.plot(branch=self.branch)
 
         # connect signals
@@ -124,5 +124,5 @@ class IsoModelByModel():
         self.current_model.loading_range = [min(loading), max(loading)]
 
     def plot(self):
-        self.view.isoGraph.setIsotherms(self.isotherm, self.model_isotherm)
+        self.view.isoGraph.setIsotherms([self.isotherm, self.model_isotherm])
         self.view.isoGraph.plot(branch=self.branch)

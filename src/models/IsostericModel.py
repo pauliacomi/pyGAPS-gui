@@ -24,7 +24,7 @@ class IsostericModel():
         self.view.branchDropdown.addItems(["ads", "des"]),
 
         # plot isotherm
-        self.view.isoGraph.setIsotherms(self.isotherms)
+        self.view.isoGraph.setIsotherms([self.isotherm])
         self.view.isoGraph.plot()
 
         # connect signals

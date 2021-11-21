@@ -35,7 +35,7 @@ class AreaBETModel():
         self.view = view
 
         # plot isotherm
-        self.view.isoGraph.setIsotherms(self.isotherm)
+        self.view.isoGraph.setIsotherms([self.isotherm])
         self.view.isoGraph.plot()
 
         # connect signals
