@@ -15,10 +15,8 @@ class IsoListView(QW.QListView):
 
         self.setEditTriggers(QW.QAbstractItemView.NoEditTriggers)
         self.setSelectionMode(QW.QAbstractItemView.SingleSelection)
-        self.setMovement(QW.QListView.Free)
-        self.setAcceptDrops(True)
+        self.setMovement(QW.QListView.Snap)
         self.setDragDropMode(QW.QAbstractItemView.InternalMove)
-        self.setDropIndicatorShown(True)
 
     def keyPressEvent(self, event):
         if event.key() == QC.Qt.Key_Delete:

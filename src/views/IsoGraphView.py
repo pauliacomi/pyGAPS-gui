@@ -26,10 +26,11 @@ class IsoGraphView(GraphView):
 
     def setIsotherms(self, isotherms):
         self.isotherms = isotherms
-        keys = list(getattr(iso, "other_keys", None) for iso in isotherms)
+        keys = list(getattr(iso, "other_keys", []) for iso in isotherms)
         self.data_types = ["pressure", "loading"]
         self.y2_data = None
         if any(keys):
+            print(keys)
             self.data_types = self.data_types + list(
                 set(itertools.chain.from_iterable(keys))
             )

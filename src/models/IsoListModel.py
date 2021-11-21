@@ -1,16 +1,32 @@
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 
+from src.models.IsoModel import IsoModel
+
 
 class IsoListModel(QG.QStandardItemModel):
-    """Overloading an item model to store a list of isotherms."""
+    """
+    Overload an item model to store a list of isotherms.
 
-    checkedChanged = QC.Signal()
-    oldCurrent = None
+    There are two main isotherm states:
+        "selected" - isotherm details will be displayed
+        "checked" - isotherm will be plotted (for comparisons)
+
+        The "selected" isotherm will automatically be "checked".
+
+    Changing states:
+        selected isotherm is changed by clicking the item/arrow keys
+        checked items are changed by clicking the checkmark
+
+    """
+
+    checkedChanged = QC.Signal()  # emits when any checked are changed
+    indexCurrent = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.itemChanged.connect(self.check_ticked)
+        self.itemChanged.connect(self.handle_item_change)
+        self.setItemPrototype(IsoModel())
 
     def get_iso_index(self, index):
         """Return an isotherm given an index."""
@@ -19,76 +35,88 @@ class IsoListModel(QG.QStandardItemModel):
 
     def get_iso_checked(self):
         """Return list of checked isotherms."""
-        return [self.item(row).data() for row in range(self.rowCount()) if self.item(row).checkState() == QC.Qt.Checked]
+        # There is no standard method for this
+        return [
+            self.item(row).data()
+            for row in range(self.rowCount())
+            if self.item(row).checkState() == QC.Qt.Checked
+        ]
 
-    def check_ticked(self, item):
-        """If an item changed, verify if it was a tick change."""
+    def handle_item_change(self, item):
+        """If an item changed, we need to check why."""
         # Can never uncheck a selected item
-        if item.index() == self.oldCurrent:
+        # if it is selected then we re-mark it as checked
+        if item.index() == self.indexCurrent:
             self.blockSignals(True)
             item.setCheckState(QC.Qt.Checked)
             self.blockSignals(False)
             return
-        # Mirror state in backup, then emit change
-        if item.checkState() != item.oldCheckState:
-            item.oldCheckState = item.checkState()
-            self.checkedChanged.emit()
+        # Otherwise emit change
+        self.checkedChanged.emit()
 
-    def check_selected(self, index):
+    def handle_item_select(self, index):
         """When isotherm is selected, ensure it is marked checked."""
-        # Restore user check state to previous item
+
+        # Restore previous item check state to user state
         oldItem = None
-        if self.oldCurrent:
-            oldItem = self.itemFromIndex(self.oldCurrent)
+        if self.indexCurrent:
+            oldItem = self.itemFromIndex(self.indexCurrent)
             if oldItem:
                 self.blockSignals(True)
                 oldItem.setCheckState(oldItem.userCheckState)
-                oldItem.oldCheckState = oldItem.userCheckState
+                oldItem.userCheckState = QC.Qt.Unchecked
                 self.blockSignals(False)
+
         # Save user check state and mark selected item as checked
         newItem = self.itemFromIndex(index)
         if newItem:
+            # Before any changes, store old state
             newItem.userCheckState = newItem.checkState()
-            # Depending on the previous state
-            # we either change to checked or just refresh
-            if newItem.userCheckState == QC.Qt.Unchecked:
-                newItem.setCheckState(QC.Qt.Checked)
-            # refresh is done when we change the isotherms
-            elif oldItem and oldItem.oldCheckState == QC.Qt.Unchecked:
-                self.checkedChanged.emit()
-            self.oldCurrent = index
-        else:
-            self.checkedChanged.emit()
+
+            self.blockSignals(True)
+            newItem.setCheckState(QC.Qt.Checked)
+            self.blockSignals(False)
+
+            # store index
+            self.indexCurrent = index
+
+            # improve performance by emitting check change if something changed
+            if oldItem:
+                if (
+                    oldItem.checkState() == QC.Qt.Checked
+                    and newItem.userCheckState == QC.Qt.Checked
+                ):
+                    return
+
+        self.checkedChanged.emit()
 
     def tick_all(self):
         """Tick all items and mark them for display."""
-        if self.rowCount() > 0:
+        nrows = self.rowCount()
+        if nrows > 0:
             self.blockSignals(True)
-            for row in range(self.rowCount()):
+            for row in range(nrows):
                 item = self.item(row)
                 item.setCheckState(QC.Qt.Checked)
-                item.oldCheckState = QC.Qt.Checked
-                # make sure that the selected isotherm is marked
-                if item.index() == self.oldCurrent:
-                    item.userCheckState = QC.Qt.Checked
             self.blockSignals(False)
-            self.layoutChanged.emit()
-            self.checkedChanged.emit()
+
+            self.layoutChanged.emit()  # let models know something changed
+            self.checkedChanged.emit()  # and that checked state changed
 
     def untick_all(self):
         """Un-tick all items and update selection."""
-        if self.rowCount() > 0:
+        nrows = self.rowCount()
+        if nrows > 0:
             self.blockSignals(True)
-            for row in range(self.rowCount()):
+            for row in range(nrows):
                 item = self.item(row)
                 # only untick non-selected isotherms
-                if item.index() != self.oldCurrent:
+                if item.index() != self.indexCurrent:
                     item.setCheckState(QC.Qt.Unchecked)
-                    item.oldCheckState = QC.Qt.Unchecked
-                item.userCheckState = QC.Qt.Unchecked
             self.blockSignals(False)
-            self.layoutChanged.emit()
-            self.checkedChanged.emit()
+
+            self.layoutChanged.emit()  # let models know something changed
+            self.checkedChanged.emit()  # and that checked state changed
 
     def delete(self, index):
         """Remove isotherm from model."""
@@ -97,9 +125,8 @@ class IsoListModel(QG.QStandardItemModel):
         self.blockSignals(True)
         self.itemFromIndex(index).setCheckState(QC.Qt.Unchecked)
         self.blockSignals(False)
+
         # Remove reference to old isotherm
-        self.oldCurrent = None
+        self.indexCurrent = None
         # Call method for removal
         self.removeRow(index.row())
-        # Remove reference again
-        self.oldCurrent = None

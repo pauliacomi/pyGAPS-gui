@@ -73,7 +73,7 @@ class IsoController():
         self.mw_widget.adsorbateDetails.clicked.connect(self.adsorbate_detail)
 
         # Connect signals for graph view
-        self.list_view.selectionModel().currentChanged.connect(self.iso_list_model.check_selected)
+        self.list_view.selectionModel().currentChanged.connect(self.iso_list_model.handle_item_select)
         self.iso_list_model.checkedChanged.connect(self.graph_view.update)
         self.unit_widget.unitsChanged.connect(self.update_isotherm)
 
