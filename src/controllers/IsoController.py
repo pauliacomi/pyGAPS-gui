@@ -98,7 +98,7 @@ class IsoController():
         # Essential metadata
         self.mw_widget.materialEdit.setCurrentText(str(self.current_isotherm.material))
         self.mw_widget.adsorbateEdit.setCurrentText(str(self.current_isotherm.adsorbate))
-        self.mw_widget.temperatureEdit.setText(str(self.current_isotherm._temperature))
+        self.mw_widget.temperatureEdit.setText(f"{self.current_isotherm._temperature:g}")
 
         # Units setup
         self.unit_widget.init_units(self.current_isotherm)
