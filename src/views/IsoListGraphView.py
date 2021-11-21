@@ -9,5 +9,5 @@ class IsoListGraphView(IsoGraphView):
         self.model = model
 
     def update(self):
-        self.isotherms = self.model.get_iso_checked()
+        self.setIsotherms(self.model.get_iso_checked())
         self.plot()

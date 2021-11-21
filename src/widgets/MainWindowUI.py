@@ -276,6 +276,8 @@ class MainWindowUI():
         self.actionModelBy.setObjectName("actionModelBy")
         self.actionModelGuess = QW.QAction(MainWindowUI)
         self.actionModelGuess.setObjectName("actionModelGuess")
+        self.actionModelCreate = QW.QAction(MainWindowUI)
+        self.actionModelCreate.setObjectName("actionModelCreate")
 
         # prediction
         self.actionIAST = QW.QAction(MainWindowUI)
@@ -327,6 +329,8 @@ class MainWindowUI():
             self.actionModelBy,
             self.actionModelGuess,
         ))
+        self.menuCharact.addSeparator()
+        self.menuCharact.addActions([self.actionModelCreate])
         #
         self.menuPredict.addActions([self.actionIAST])
         self.menuOptions.addActions([
@@ -381,8 +385,9 @@ class MainWindowUI():
         self.actionMesoporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Mesoporous PSD", None, -1))
         self.actionDFT_Kernel_PSD.setText(QW.QApplication.translate("MainWindowUI", "DFT Kernel PSD", None, -1))
         self.actionIsosteric.setText(QW.QApplication.translate("MainWindowUI", "Isosteric enthalpy", None, -1))
-        self.actionModelBy.setText(QW.QApplication.translate("MainWindowUI", "Model using...", None, -1))
+        self.actionModelBy.setText(QW.QApplication.translate("MainWindowUI", "Fit a model", None, -1))
         self.actionModelGuess.setText(QW.QApplication.translate("MainWindowUI", "Guess best model", None, -1))
+        self.actionModelCreate.setText(QW.QApplication.translate("MainWindowUI", "Manually create a model", None, -1))
         self.actionIAST.setText(QW.QApplication.translate("MainWindowUI", "IAST", None, -1))
         self.actionAdsorbates.setText(QW.QApplication.translate("MainWindowUI", "pyGAPS Adsorbates", None, -1))
         self.actionMaterials.setText(QW.QApplication.translate("MainWindowUI", "pyGAPS Materials", None, -1))

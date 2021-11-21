@@ -17,10 +17,16 @@ class IsoGraphToolbar(NavigationToolbar):
     toolitems.insert([name for name, *_ in toolitems].index("Subplots") + 3,
                      ("Log(y)", "Log the Y axis", "pg_btn_logy", "log_y"))
 
+    def __init__(self, canvas, parent, coordinates=True):
+        super().__init__(canvas, parent, coordinates=coordinates)
+        self._actions['log_x'].setCheckable(True)
+        self._actions['log_y'].setCheckable(True)
+
     def _icon(self, name):
         """
-        Construct a `.QIcon` from an image file *name*, including the extension
-        and relative to Matplotlib's "images" data directory.
+        We override a matplotlib NavigationToolbar2QT function.
+        If the name of an icon starts with pg, we go find it locally,
+        Otherwas pass it to the main function.
         """
         if name.startswith("pg"):
             pm = QG.QPixmap(str(get_resource(name[3:])))
@@ -33,6 +39,15 @@ class IsoGraphToolbar(NavigationToolbar):
             return QG.QIcon(pm)
         else:
             return super()._icon(name)
+
+    def get_main_ax(self):
+        axes = self.canvas.figure.get_axes()
+        if not axes:
+            QW.QMessageBox.warning(self.canvas.parent(), "Error", "There are no axes to edit.")
+            return
+        else:
+            ax = axes[0]
+        return ax
 
     def get_ax(self):
         axes = self.canvas.figure.get_axes()
@@ -55,44 +70,50 @@ class IsoGraphToolbar(NavigationToolbar):
             if not ok:
                 return
             ax = axes[titles.index(item)]
-        return ax
+        return ax, len(axes)
 
     def log_x(self):
         # Get axis
-        axes = self.get_ax()
+        axes = self.get_main_ax()
 
         xmin, xmax = map(float, axes.get_xlim())
 
         # Change to log
         if axes.get_xscale() != 'log':
+            logx = True
             axes.set_xscale('log')
-            self.logx.emit(True)
         elif axes.get_xscale() != 'linear':
             axes.set_xscale('linear')
-            self.logx.emit(False)
+            logx = False
 
         axes.set_xlim(xmin, xmax)
 
-        # Redraw
-        figure = axes.get_figure()
-        figure.canvas.draw()
+        # set checkable
+        self._actions['log_x'].setChecked(logx)
+
+        # Emit for redraw
+        self.logx.emit(logx)
 
     def log_y(self):
         # Get axis
-        axes = self.get_ax()
+        axes, naxes = self.get_ax()
 
         ymin, ymax = map(float, axes.get_ylim())
 
         # Change to log
         if axes.get_yscale() != 'log':
             axes.set_yscale('log')
-            self.logy.emit(True)
+            logy = True
         elif axes.get_yscale() != 'linear':
             axes.set_yscale('linear')
-            self.logy.emit(False)
+            logy = False
 
         axes.set_ylim(ymin, ymax)
 
-        # Redraw
-        figure = axes.get_figure()
-        figure.canvas.draw()
+        if naxes == 1:
+            self._actions['log_y'].setChecked(logy)
+        else:
+            self._actions['log_y'].setChecked(False)
+
+        # Emit for redraw
+        self.logy.emit(logy)
