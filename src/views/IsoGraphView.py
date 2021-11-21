@@ -1,9 +1,11 @@
 import itertools
 
 import pygaps.graphing as pgg
+import pygaps.utilities.exceptions as pge
 
 from src.views.GraphView import GraphView
 from src.widgets.IsoGraphToolbar import IsoGraphToolbar
+from src.widgets.UtilityWidgets import error_dialog
 
 
 class IsoGraphView(GraphView):
@@ -11,7 +13,7 @@ class IsoGraphView(GraphView):
     isotherms = None
     logx = False
     logy = False
-    data_types = None
+    data_types = ["pressure", "loading"]
     x_data = "pressure"
     y1_data = "loading"
     y2_data = None
@@ -20,29 +22,41 @@ class IsoGraphView(GraphView):
         self.navbar = IsoGraphToolbar(self.canvas, self)
         self.navbar.logx.connect(self.handle_logx)
         self.navbar.logy.connect(self.handle_logy)
+        self.navbar.axis_data_sel.connect(self.handle_data_sel)
 
     def setIsotherms(self, isotherms):
         self.isotherms = isotherms
         keys = list(getattr(iso, "other_keys", None) for iso in isotherms)
-        self.data_types = None
+        self.data_types = ["pressure", "loading"]
         self.y2_data = None
         if any(keys):
-            self.data_types = list(set(itertools.chain.from_iterable(keys)))
-            self.y2_data = self.data_types[0]
+            self.data_types = self.data_types + list(
+                set(itertools.chain.from_iterable(keys))
+            )
+            self.y2_data = self.data_types[-1]
+        if self.y1_data not in self.data_types:
+            self.y1_data = "loading"
+        if self.x_data not in self.data_types:
+            self.x_data = "pressure"
 
     def plot(self, branch="all"):
         self.clear()
         if self.isotherms:
-            pgg.plot_iso(
-                self.isotherms,
-                ax=self.ax,
-                branch=branch,
-                logx=self.logx,
-                logy1=self.logy,
-                x_data=self.x_data,
-                y1_data=self.y1_data,
-                y2_data=self.y2_data,
-            )
+            try:
+                pgg.plot_iso(
+                    self.isotherms,
+                    ax=self.ax,
+                    branch=branch,
+                    logx=self.logx,
+                    logy1=self.logy,
+                    x_data=self.x_data,
+                    y1_data=self.y1_data,
+                    y2_data=self.y2_data,
+                )
+            except pge.GraphingError as ex:
+                error_dialog(
+                    "X-axis and Y1-axis must display data that is shared by all isotherms (i.e. pressure or loading)."
+                )
         self.canvas.draw()
 
     def handle_logx(self, is_set: bool):
@@ -52,3 +66,19 @@ class IsoGraphView(GraphView):
     def handle_logy(self, is_set: bool):
         self.logy = is_set
         self.canvas.draw()
+
+    def handle_data_sel(self):
+        from src.widgets.IsoGraphDataSel import IsoGraphDataSel
+        dialog = IsoGraphDataSel(
+            self.data_types,
+            self.x_data,
+            self.y1_data,
+            self.y2_data,
+            parent=self
+        )
+        if dialog.exec_():
+            if dialog.changed:
+                self.x_data = dialog.x_data
+                self.y1_data = dialog.y1_data
+                self.y2_data = dialog.y2_data
+                self.plot()

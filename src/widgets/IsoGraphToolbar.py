@@ -10,12 +10,22 @@ class IsoGraphToolbar(NavigationToolbar):
 
     logx = QC.Signal(bool)
     logy = QC.Signal(bool)
+    axis_data_sel = QC.Signal()
 
     toolitems = [*NavigationToolbar.toolitems]
-    toolitems.insert([name for name, *_ in toolitems].index("Subplots") + 2,
-                     ("Log(x)", "Log the X axis", "pg_btn_logx", "log_x"))
-    toolitems.insert([name for name, *_ in toolitems].index("Subplots") + 3,
-                     ("Log(y)", "Log the Y axis", "pg_btn_logy", "log_y"))
+
+    pos = [name for name, *_ in toolitems].index("Subplots") + 2
+
+    toolitems.insert(
+        pos,
+        ("Data X", "Data to plot on X/Y1/Y2 axis", "pg_btn_data", "axis_data")
+    )
+    toolitems.insert(
+        pos + 1, ("Log(x)", "Log the X axis", "pg_btn_logx", "log_x")
+    )
+    toolitems.insert(
+        pos + 2, ("Log(y)", "Log the Y axis", "pg_btn_logy", "log_y")
+    )
 
     def __init__(self, canvas, parent, coordinates=True):
         super().__init__(canvas, parent, coordinates=coordinates)
@@ -33,7 +43,9 @@ class IsoGraphToolbar(NavigationToolbar):
             _setDevicePixelRatio(pm, _devicePixelRatioF(self))
             if self.palette().color(self.backgroundRole()).value() < 128:
                 icon_color = self.palette().color(self.foregroundRole())
-                mask = pm.createMaskFromColor(QG.QColor('black'), QC.Qt.MaskOutColor)
+                mask = pm.createMaskFromColor(
+                    QG.QColor('black'), QC.Qt.MaskOutColor
+                )
                 pm.fill(icon_color)
                 pm.setMask(mask)
             return QG.QIcon(pm)
@@ -43,7 +55,9 @@ class IsoGraphToolbar(NavigationToolbar):
     def get_main_ax(self):
         axes = self.canvas.figure.get_axes()
         if not axes:
-            QW.QMessageBox.warning(self.canvas.parent(), "Error", "There are no axes to edit.")
+            QW.QMessageBox.warning(
+                self.canvas.parent(), "Error", "There are no axes to edit."
+            )
             return
         else:
             ax = axes[0]
@@ -52,25 +66,36 @@ class IsoGraphToolbar(NavigationToolbar):
     def get_ax(self):
         axes = self.canvas.figure.get_axes()
         if not axes:
-            QW.QMessageBox.warning(self.canvas.parent(), "Error", "There are no axes to edit.")
+            QW.QMessageBox.warning(
+                self.canvas.parent(), "Error", "There are no axes to edit."
+            )
             return
         elif len(axes) == 1:
             ax, = axes
         else:
             titles = [
-                ax.get_label() or ax.get_title()
-                or " - ".join(filter(None, [ax.get_xlabel(), ax.get_ylabel()])) or f"<anonymous {type(ax).__name__}>"
-                for ax in axes
+                ax.get_label() or ax.get_title() or
+                " - ".join(filter(None, [ax.get_xlabel(),
+                                         ax.get_ylabel()]))
+                or f"<anonymous {type(ax).__name__}>" for ax in axes
             ]
-            duplicate_titles = [title for title in titles if titles.count(title) > 1]
+            duplicate_titles = [
+                title for title in titles if titles.count(title) > 1
+            ]
             for i, ax in enumerate(axes):
                 if titles[i] in duplicate_titles:
                     titles[i] += f" (id: {id(ax):#x})"  # Deduplicate titles.
-            item, ok = QW.QInputDialog.getItem(self.canvas.parent(), 'Customize', 'Select axes:', titles, 0, False)
+            item, ok = QW.QInputDialog.getItem(
+                self.canvas.parent(), 'Customize', 'Select axes:', titles, 0,
+                False
+            )
             if not ok:
                 return
             ax = axes[titles.index(item)]
         return ax, len(axes)
+
+    def axis_data(self):
+        self.axis_data_sel.emit()
 
     def log_x(self):
         # Get axis

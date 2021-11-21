@@ -26,7 +26,7 @@ def exception_hook(exctype, value, traceback):
 
     # Call the normal Exception hook after
     sys._excepthook(exctype, value, traceback)
-    sys.exit(1)
+    # sys.exit(1)
 
 
 # Resources
