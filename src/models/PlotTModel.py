@@ -17,7 +17,9 @@ class PlotTModel():
         self.liquid_density = self.isotherm.adsorbate.liquid_density(isotherm.temperature)
 
         # Loading and pressure
-        self.loading = self.isotherm.loading(branch='ads', loading_unit='mol', loading_basis='molar')
+        self.loading = self.isotherm.loading(
+            branch='ads', loading_unit='mol', loading_basis='molar'
+        )
         self.pressure = self.isotherm.pressure(branch='ads', pressure_mode='relative')
 
         self.limits = None
@@ -56,7 +58,7 @@ class PlotTModel():
         self.calculate()
         self.output_results()
         self.plot()
-        self.resetSlider()
+        self.slider_reset()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -86,7 +88,9 @@ class PlotTModel():
                 return
 
             if warning:
-                self.output = '<br>'.join([f'<font color="red">Warning: {a.message}</font>' for a in warning])
+                self.output = '<br>'.join([
+                    f'<font color="red">Warning: {a.message}</font>' for a in warning
+                ])
             else:
                 self.output = None
 
@@ -94,11 +98,19 @@ class PlotTModel():
         self.view.resultsTable.setRowCount(0)
         self.view.resultsTable.setRowCount(len(self.results))
         for index, result in enumerate(self.results):
-            self.view.resultsTable.setItem(index, 0, QW.QTableWidgetItem(f"{result.get('adsorbed_volume'):g}"))
+            self.view.resultsTable.setItem(
+                index, 0, QW.QTableWidgetItem(f"{result.get('adsorbed_volume'):g}")
+            )
             self.view.resultsTable.setItem(index, 1, QW.QTableWidgetItem(f"{result.get('area'):g}"))
-            self.view.resultsTable.setItem(index, 2, QW.QTableWidgetItem(f"{result.get('corr_coef'):g}"))
-            self.view.resultsTable.setItem(index, 3, QW.QTableWidgetItem(f"{result.get('slope'):g}"))
-            self.view.resultsTable.setItem(index, 4, QW.QTableWidgetItem(f"{result.get('intercept'):g}"))
+            self.view.resultsTable.setItem(
+                index, 2, QW.QTableWidgetItem(f"{result.get('corr_coef'):g}")
+            )
+            self.view.resultsTable.setItem(
+                index, 3, QW.QTableWidgetItem(f"{result.get('slope'):g}")
+            )
+            self.view.resultsTable.setItem(
+                index, 4, QW.QTableWidgetItem(f"{result.get('intercept'):g}")
+            )
 
     def plot(self):
 
@@ -116,5 +128,5 @@ class PlotTModel():
         # Draw figures
         self.view.tGraph.canvas.draw()
 
-    def resetSlider(self):
+    def slider_reset(self):
         self.view.pSlider.setValues((self.t_curve[0], self.t_curve[-1]), emit=False)

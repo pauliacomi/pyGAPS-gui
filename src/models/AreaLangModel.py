@@ -13,7 +13,9 @@ class AreaLangModel():
         self.cross_section = self.isotherm.adsorbate.get_prop("cross_sectional_area")
 
         # Loading and pressure
-        self.loading = self.isotherm.loading(branch='ads', loading_unit='mol', loading_basis='molar')
+        self.loading = self.isotherm.loading(
+            branch='ads', loading_unit='mol', loading_basis='molar'
+        )
         self.pressure = self.isotherm.pressure(branch='ads', pressure_mode='relative')
 
         self.limits = None
@@ -38,8 +40,8 @@ class AreaLangModel():
         self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
 
         # run
-        self.view.isoGraph.setIsotherms([self.isotherm])
-        self.view.isoGraph.plot()
+        self.view.isoGraph.set_isotherms([self.isotherm])
+        self.view.isoGraph.draw_isotherms()
         self.calc_auto()
 
     def calc_auto(self):
@@ -48,7 +50,7 @@ class AreaLangModel():
         self.calculate()
         self.output_results()
         self.plot_calc()
-        self.resetSlider()
+        self.slider_reset()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -85,7 +87,9 @@ class AreaLangModel():
                 return
 
             if warning:
-                self.output = '<br>'.join([f'<font color="red">Warning: {a.message}</font>' for a in warning])
+                self.output = '<br>'.join([
+                    f'<font color="red">Warning: {a.message}</font>' for a in warning
+                ])
             else:
                 self.output = None
 
@@ -99,8 +103,9 @@ class AreaLangModel():
 
         self.view.output.setText(self.output)
 
-    def resetSlider(self):
-        self.view.pSlider.setValues([self.pressure[self.minimum], self.pressure[self.maximum]], emit=False)
+    def slider_reset(self):
+        self.view.pSlider.setValues([self.pressure[self.minimum], self.pressure[self.maximum]],
+                                    emit=False)
 
     def plot_calc(self):
 

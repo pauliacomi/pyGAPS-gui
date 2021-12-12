@@ -31,7 +31,9 @@ class DADRModel():
                 pressure_mode='relative',
             )
         except Exception:
-            error_dialog("The isotherm cannot be converted to a relative basis. Is your isotherm supercritical?")
+            error_dialog(
+                "The isotherm cannot be converted to a relative basis. Is your isotherm supercritical?"
+            )
 
         self.limits = None
         self.minimum = None
@@ -70,7 +72,7 @@ class DADRModel():
         self.calculate()
         self.output_results()
         self.plot()
-        self.resetSlider()
+        self.slider_reset()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -116,7 +118,9 @@ class DADRModel():
                 return
 
             if warning:
-                self.output = '<br>'.join([f'<font color="red">Warning: {a.message}</font>' for a in warning])
+                self.output = '<br>'.join([
+                    f'<font color="red">Warning: {a.message}</font>' for a in warning
+                ])
             else:
                 self.output = None
 
@@ -148,5 +152,6 @@ class DADRModel():
         # Draw figures
         self.view.graph.canvas.draw()
 
-    def resetSlider(self):
-        self.view.pSlider.setValues([self.pressure[self.minimum], self.pressure[self.maximum - 1]], emit=False)
+    def slider_reset(self):
+        self.view.pSlider.setValues([self.pressure[self.minimum], self.pressure[self.maximum - 1]],
+                                    emit=False)

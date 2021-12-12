@@ -4,7 +4,7 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
-from src.views.IsoListGraphView import IsoListGraphView
+from src.views.IsoGraphView import IsoListGraphView
 from src.views.IsoListView import IsoListView
 from src.widgets.IsoUnitWidget import IsoUnitWidget
 from src.widgets.MetadataEditWidget import MetadataEditWidget

@@ -34,8 +34,8 @@ class PSDMicroModel():
         self.view.amodelDropdown.addItems(_ADSORBENT_MODELS),
 
         # plot isotherm
-        self.view.isoGraph.setIsotherms([self.isotherm])
-        self.view.isoGraph.plot()
+        self.view.isoGraph.set_isotherms([self.isotherm])
+        self.view.isoGraph.draw_isotherms()
 
         # connect signals
         self.view.autoButton.clicked.connect(self.calc_auto)
@@ -50,7 +50,7 @@ class PSDMicroModel():
         self.calculate()
         self.output_results()
         self.plot()
-        self.resetSlider()
+        self.slider_reset()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -78,7 +78,9 @@ class PSDMicroModel():
                 return
 
             if warning:
-                error_dialog('<br>'.join([f'<font color="red">Warning: {a.message}</font>' for a in warning]))
+                error_dialog(
+                    '<br>'.join([f'<font color="red">Warning: {a.message}</font>' for a in warning])
+                )
                 self.output = None
 
     def output_results(self):
@@ -103,5 +105,5 @@ class PSDMicroModel():
         # Draw figures
         self.view.resGraph.canvas.draw()
 
-    def resetSlider(self):
+    def slider_reset(self):
         self.view.pSlider.setValues([0, 1], emit=False)

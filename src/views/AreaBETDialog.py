@@ -23,17 +23,18 @@ class AreaBETDialog(QW.QDialog):
         layout.setObjectName("layout")
 
         # Isotherm display
-        self.isoGraph = IsoGraphView(self)
+        self.isoGraph = IsoGraphView(selector=True, parent=self)
         self.isoGraph.setObjectName("isoGraph")
+        self.pSlider = self.isoGraph.selector.slider
         layout.addWidget(self.isoGraph, 0, 0, 1, 1)
 
         # BET plot
-        self.betGraph = GraphView(self)
+        self.betGraph = GraphView(parent=self)
         self.betGraph.setObjectName("betGraph")
         layout.addWidget(self.betGraph, 0, 1, 1, 1)
 
         # Rouquerol plot
-        self.rouqGraph = GraphView(self)
+        self.rouqGraph = GraphView(parent=self)
         self.rouqGraph.setObjectName("rouqGraph")
         layout.addWidget(self.rouqGraph, 1, 1, 1, 1)
 
@@ -42,10 +43,12 @@ class AreaBETDialog(QW.QDialog):
         layout.addWidget(self.optionsBox, 1, 0, 1, 1)
 
         self.optionsLayout = QW.QGridLayout(self.optionsBox)
-        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=3, slider_range=[0, 1, 0.01], values=[0, 1])
-        self.pSlider.setMaximumHeight(50)
-        self.pSlider.setEmitWhileMoving(False)
-        self.optionsLayout.addWidget(self.pSlider, 0, 0, 1, 4)
+
+        self.branchLabel = LabelAlignRight("Branch used:")
+        self.optionsLayout.addWidget(self.branchLabel, 0, 0, 1, 1)
+        self.branchDropdown = QW.QComboBox(self)
+        self.branchDropdown.addItems(["ads", "des"]),
+        self.optionsLayout.addWidget(self.branchDropdown, 0, 1, 1, 1)
 
         self.optionsLayout.addWidget(QW.QLabel("Fit (R):"), 1, 0, 1, 1)
         self.result_r = LabelResult(self)
@@ -64,17 +67,17 @@ class AreaBETDialog(QW.QDialog):
 
         # result labels
         self.result_bet = LabelResult(self)
-        self.optionsLayout.addWidget(self.result_bet, 3, 1, 1, 1)
+        self.optionsLayout.addWidget(self.result_bet, 2, 1, 1, 1)
         self.result_c = LabelResult(self)
-        self.optionsLayout.addWidget(self.result_c, 3, 3, 1, 1)
+        self.optionsLayout.addWidget(self.result_c, 2, 3, 1, 1)
         self.result_mono_n = LabelResult(self)
-        self.optionsLayout.addWidget(self.result_mono_n, 4, 1, 1, 1)
+        self.optionsLayout.addWidget(self.result_mono_n, 3, 1, 1, 1)
         self.result_mono_p = LabelResult(self)
-        self.optionsLayout.addWidget(self.result_mono_p, 4, 3, 1, 1)
+        self.optionsLayout.addWidget(self.result_mono_p, 3, 3, 1, 1)
         self.result_slope = LabelResult(self)
-        self.optionsLayout.addWidget(self.result_slope, 5, 1, 1, 1)
+        self.optionsLayout.addWidget(self.result_slope, 4, 1, 1, 1)
         self.result_intercept = LabelResult(self)
-        self.optionsLayout.addWidget(self.result_intercept, 5, 3, 1, 1)
+        self.optionsLayout.addWidget(self.result_intercept, 4, 3, 1, 1)
 
         self.optionsLayout.addWidget(QW.QLabel("Calculation log:"), 6, 0, 1, 2)
         self.output = LabelOutput(self)
@@ -92,6 +95,10 @@ class AreaBETDialog(QW.QDialog):
         self.buttonBox.rejected.connect(self.reject)
 
     def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("AreaBETDialog", "Calculate BET area", None, -1))
+        self.setWindowTitle(
+            QW.QApplication.translate("AreaBETDialog", "Calculate BET area", None, -1)
+        )
         self.optionsBox.setTitle(QW.QApplication.translate("AreaBETDialog", "Options", None, -1))
-        self.auto_button.setText(QW.QApplication.translate("AreaBETDialog", "Auto-determine", None, -1))
+        self.auto_button.setText(
+            QW.QApplication.translate("AreaBETDialog", "Auto-determine", None, -1)
+        )

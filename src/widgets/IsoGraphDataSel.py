@@ -1,5 +1,3 @@
-from itertools import chain
-
 from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
 
@@ -48,9 +46,7 @@ class IsoGraphDataSel(QW.QDialog):
         # Bottom buttons
         self.buttonBox = QW.QDialogButtonBox(self)
         self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(
-            QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close
-        )
+        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
         self.buttonBox.setObjectName("buttonBox")
         self.dataLayout.addWidget(self.buttonBox)
 

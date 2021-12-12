@@ -11,6 +11,7 @@ from src.widgets.UtilityWidgets import error_dialog
 class IsoGraphView(GraphView):
 
     isotherms = None
+    branch = "all"
     logx = False
     logy = False
     data_types = ["pressure", "loading"]
@@ -24,23 +25,20 @@ class IsoGraphView(GraphView):
         self.navbar.logy.connect(self.handle_logy)
         self.navbar.axis_data_sel.connect(self.handle_data_sel)
 
-    def setIsotherms(self, isotherms):
+    def set_isotherms(self, isotherms):
         self.isotherms = isotherms
         keys = list(getattr(iso, "other_keys", []) for iso in isotherms)
         self.data_types = ["pressure", "loading"]
         self.y2_data = None
         if any(keys):
-            print(keys)
-            self.data_types = self.data_types + list(
-                set(itertools.chain.from_iterable(keys))
-            )
+            self.data_types = self.data_types + list(set(itertools.chain.from_iterable(keys)))
             self.y2_data = self.data_types[-1]
         if self.y1_data not in self.data_types:
             self.y1_data = "loading"
         if self.x_data not in self.data_types:
             self.x_data = "pressure"
 
-    def plot(self, branch="all"):
+    def draw_isotherms(self, branch="all"):
         self.clear()
         if self.isotherms:
             try:
@@ -58,28 +56,37 @@ class IsoGraphView(GraphView):
                 error_dialog(
                     "X-axis and Y1-axis must display data that is shared by all isotherms (i.e. pressure or loading)."
                 )
-        self.canvas.draw()
+        self.canvas.draw_idle()
 
     def handle_logx(self, is_set: bool):
         self.logx = is_set
-        self.canvas.draw()
+        if self.selector:
+            self.selector.setRange(self.ax.get_xlim())
+            self.selector.setLogScale(is_set)
 
     def handle_logy(self, is_set: bool):
         self.logy = is_set
-        self.canvas.draw()
 
     def handle_data_sel(self):
         from src.widgets.IsoGraphDataSel import IsoGraphDataSel
         dialog = IsoGraphDataSel(
-            self.data_types,
-            self.x_data,
-            self.y1_data,
-            self.y2_data,
-            parent=self
+            self.data_types, self.x_data, self.y1_data, self.y2_data, parent=self
         )
         if dialog.exec_():
             if dialog.changed:
                 self.x_data = dialog.x_data
                 self.y1_data = dialog.y1_data
                 self.y2_data = dialog.y2_data
-                self.plot()
+                self.draw_isotherms()
+
+
+class IsoListGraphView(IsoGraphView):
+    """IsoGraphView sublass which adds the ability to connect to a IsoListModel"""
+    model = None
+
+    def setModel(self, model):
+        self.model = model
+
+    def update(self):
+        self.set_isotherms(self.model.get_iso_checked())
+        self.draw_isotherms()

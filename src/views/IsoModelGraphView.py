@@ -7,7 +7,7 @@ class IsoModelGraphView(IsoGraphView):
 
     model_isotherm = None
 
-    def setIsotherms(self, isotherm, model_isotherm=None):
+    def set_isotherms(self, isotherm, model_isotherm=None):
         self.isotherms = isotherm
         if model_isotherm:
             self.model_isotherm = model_isotherm

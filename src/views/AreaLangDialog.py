@@ -23,12 +23,12 @@ class AreaLangDialog(QW.QDialog):
         layout.setObjectName("layout")
 
         # Isotherm display
-        self.isoGraph = IsoGraphView(self)
+        self.isoGraph = IsoGraphView(selector=True, parent=self)
         self.isoGraph.setObjectName("isoGraph")
         layout.addWidget(self.isoGraph, 0, 0, 1, 1)
 
         # Langmuir plot
-        self.langGraph = GraphView(self)
+        self.langGraph = GraphView(parent=self)
         self.langGraph.setObjectName("langGraph")
         layout.addWidget(self.langGraph, 0, 1, 1, 1)
 
@@ -37,7 +37,9 @@ class AreaLangDialog(QW.QDialog):
         layout.addWidget(self.optionsBox, 1, 0, 1, 1)
 
         self.optionsLayout = QW.QGridLayout(self.optionsBox)
-        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=3, slider_range=[0, 1, 0.01], values=[0, 1])
+        self.pSlider = QHSpinBoxRangeSlider(
+            parent=self, dec_pnts=3, slider_range=[0, 1, 0.01], values=[0, 1]
+        )
         self.pSlider.setMaximumHeight(50)
         self.pSlider.setEmitWhileMoving(False)
         self.optionsLayout.addWidget(self.pSlider, 0, 0, 1, 4)
@@ -87,6 +89,10 @@ class AreaLangDialog(QW.QDialog):
         self.buttonBox.rejected.connect(self.reject)
 
     def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("AreaLangDialog", "Calculate Langmuir area", None, -1))
+        self.setWindowTitle(
+            QW.QApplication.translate("AreaLangDialog", "Calculate Langmuir area", None, -1)
+        )
         self.optionsBox.setTitle(QW.QApplication.translate("AreaLangDialog", "Options", None, -1))
-        self.auto_button.setText(QW.QApplication.translate("AreaLangDialog", "Auto-determine", None, -1))
+        self.auto_button.setText(
+            QW.QApplication.translate("AreaLangDialog", "Auto-determine", None, -1)
+        )

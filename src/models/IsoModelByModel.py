@@ -31,8 +31,8 @@ class IsoModelByModel():
         self.view.branchDropdown.addItems(["ads", "des"])
 
         # plot isotherm
-        self.view.isoGraph.setIsotherms([self.isotherm])
-        self.view.isoGraph.plot(branch=self.branch)
+        self.view.isoGraph.set_isotherms([self.isotherm])
+        self.view.isoGraph.draw_isotherms(branch=self.branch)
 
         # connect signals
         self.view.modelDropdown.currentIndexChanged.connect(self.change_model)
@@ -59,7 +59,7 @@ class IsoModelByModel():
 
     def select_branch(self):
         self.branch = self.view.branchDropdown.currentText()
-        self.view.isoGraph.plot(branch=self.branch)
+        self.view.isoGraph.draw_isotherms(branch=self.branch)
 
     def model_auto(self):
         """Automatic calculation."""
@@ -99,7 +99,11 @@ class IsoModelByModel():
                 return False
 
             if warning:
-                error_dialog('<br>'.join([f'<font color="red">Fitting warning: {a.message}</font>' for a in warning]))
+                error_dialog(
+                    '<br>'.join([
+                        f'<font color="red">Fitting warning: {a.message}</font>' for a in warning
+                    ])
+                )
                 self.output = None
 
             return True
@@ -124,5 +128,5 @@ class IsoModelByModel():
         self.current_model.loading_range = [min(loading), max(loading)]
 
     def plot(self):
-        self.view.isoGraph.setIsotherms([self.isotherm, self.model_isotherm])
-        self.view.isoGraph.plot(branch=self.branch)
+        self.view.isoGraph.set_isotherms([self.isotherm, self.model_isotherm])
+        self.view.isoGraph.draw_isotherms(branch=self.branch)
