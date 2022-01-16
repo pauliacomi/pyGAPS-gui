@@ -248,12 +248,15 @@ class QRangeSlider(QW.QWidget):
             if (abs(steps - round(steps)) > 0.01 * self.single_step):
                 raise Exception("Slider range is not a multiple of the step size!")
         else:
-            self.single_step = self.scale / 500
+            self.single_step = self.scale / 100
 
     def setValues(self, values, emit=True):
         """
         @param values [position of minimum slider, position of maximum slider].
         """
+        self.setValuesRaw(values=list(map(self.scale_fun, values)), emit=emit)
+
+    def setValuesRaw(self, values, emit=True):
         self.min_val = values[0]
         self.max_val = values[1]
         if emit:
@@ -448,6 +451,8 @@ class QSpinBoxRangeSlider(QW.QWidget):
     @param values [initial minimum setting, initial maximum setting].
     @param parent (Optional) The PyQt parent of this widget.
     """
+    doubleClick = QC.Signal(bool)
+
     def __init__(self, slider_range, values, parent=None, **kwargs):
         super().__init__(parent)
 
@@ -488,7 +493,7 @@ class QSpinBoxRangeSlider(QW.QWidget):
         # min/max/scale/step spinboxes
         self.setupSpinboxes()
 
-        # Connect signals/
+        # Connect signals
         self.range_slider.doubleClick.connect(self.handleDoubleClick)
         self.range_slider.rangeChanged.connect(self.handleRangeChange)
         self.rangeChanged = self.range_slider.rangeChanged
@@ -532,23 +537,25 @@ class QSpinBoxRangeSlider(QW.QWidget):
             self.max_val = self.max_spin_box.value()
             should_emit = True
         if should_emit:
-            self.range_slider.setValues([self.min_val, self.max_val])
+            self.range_slider.setValuesRaw([self.min_val, self.max_val])
 
     def getValues(self):
         """
         @return [current minimum, current maximum].
         """
-        return [self.min_spin_box.value(), self.max_spin_box.value()]
+        return self.range_slider.getValues()
 
     def setValues(self, values, emit=True):
         """
         @param values [position of minimum slider, position of maximum slider].
         """
         self.range_slider.setValues(values, emit)
+        if not emit:
+            self.setupSpinboxes()
 
     def setRange(self, values):
         """
-        @param values [position of minimum slider, position of maximum slider].
+        @param values [min position of minimum slider, max position of maximum slider].
         """
         self.range_slider.setRange(values)
 

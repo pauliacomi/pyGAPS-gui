@@ -4,7 +4,10 @@ from qtpy import QtWidgets as QW
 from src.models.MatPropTableModel import MatPropTableModel
 from src.widgets.MetadataEditWidget import MetadataEditWidget
 from src.widgets.MetadataTableWidget import MetadataTableWidget
-from src.widgets.UtilityWidgets import ErrorMessageBox
+from src.widgets.UtilityWidgets import error_dialog
+
+from pygaps import MATERIAL_LIST
+from pygaps import Material
 
 
 class MaterialView(QW.QWidget):
@@ -13,14 +16,14 @@ class MaterialView(QW.QWidget):
 
     def __init__(self, material=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setupUi()
-        self.retranslateUi()
+        self.setup_UI()
+        self.translate_UI()
         if material:
             self.material = material
             self.setupModel()
-            self.connectSignals()
+            self.connect_signals()
 
-    def setupUi(self):
+    def setup_UI(self):
         self.setObjectName("MaterialView")
         self.resize(400, 500)
 
@@ -64,7 +67,7 @@ class MaterialView(QW.QWidget):
 
         self.material = material
         self.setupModel()
-        self.connectSignals()
+        self.connect_signals()
 
     def setupModel(self):
         self.matNameValue.setText(self.material.name)
@@ -78,7 +81,7 @@ class MaterialView(QW.QWidget):
         self.tableModel = MatPropTableModel(self.material)
         self.tableView.setModel(self.tableModel)
 
-    def connectSignals(self):
+    def connect_signals(self):
         self.tableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
         self.metaButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
         self.metaButtonWidget.propButtonDelete.clicked.connect(self.extra_prop_delete)
@@ -115,9 +118,7 @@ class MaterialView(QW.QWidget):
             try:
                 propValue = float(propValue)
             except ValueError:
-                errorbox = ErrorMessageBox()
-                errorbox.setText("Could not convert metadata value to number.")
-                errorbox.exec()
+                error_dialog("Could not convert metadata value to number.")
                 return
 
         self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
@@ -127,23 +128,31 @@ class MaterialView(QW.QWidget):
         index = self.tableView.selectionModel().currentIndex()
         self.tableModel.removeRow(index.row())
 
-    def retranslateUi(self):
-        self.matNameLabel.setText(QW.QApplication.translate("MaterialView", "Material Name", None, -1))
-        self.matDensityLabel.setText(QW.QApplication.translate("MaterialView", "Material Density", None, -1))
-        self.matMMLabel.setText(QW.QApplication.translate("MaterialView", "Material Molar Mass", None, -1))
-        self.metaLabel.setText(QW.QApplication.translate("MaterialView", "Other Metadata", None, -1))
+    def translate_UI(self):
+        self.matNameLabel.setText(
+            QW.QApplication.translate("MaterialView", "Material Name", None, -1)
+        )
+        self.matDensityLabel.setText(
+            QW.QApplication.translate("MaterialView", "Material Density", None, -1)
+        )
+        self.matMMLabel.setText(
+            QW.QApplication.translate("MaterialView", "Material Molar Mass", None, -1)
+        )
+        self.metaLabel.setText(
+            QW.QApplication.translate("MaterialView", "Other Metadata", None, -1)
+        )
 
 
 class MaterialDialog(QW.QDialog):
     def __init__(self, material, parent=None, **kwargs) -> None:
         super().__init__(parent=parent, **kwargs)
 
-        self.setupUi()
-        self.retranslateUi()
-        self.connectSignals()
+        self.setup_UI()
+        self.translate_UI()
+        self.connect_signals()
         self.view.setMaterial(material)
 
-    def setupUi(self):
+    def setup_UI(self):
 
         layout = QW.QVBoxLayout(self)
 
@@ -152,18 +161,50 @@ class MaterialDialog(QW.QDialog):
         layout.addWidget(self.view)
 
         # Button box
-        self.buttonBox = QW.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
-        layout.addWidget(self.buttonBox)
+        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
+        layout.addWidget(self.button_box)
 
-    def connectSignals(self):
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+    def connect_signals(self):
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
 
     def accept(self) -> None:
         self.view.accept()
         return super().accept()
 
-    def retranslateUi(self):
+    def translate_UI(self):
         self.setWindowTitle(QW.QApplication.translate("MaterialView", "Material details", None, -1))
+
+
+class MaterialListView(QW.QDialog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setup_UI()
+        self.translate_UI()
+        self.setupModel()
+
+    def setup_UI(self):
+
+        layout = QW.QHBoxLayout(self)
+
+        # list
+        self.materialList = QW.QListWidget(parent=self)
+        layout.addWidget(self.materialList)
+
+        # details
+        self.materialDetails = MaterialView(parent=self)
+        layout.addWidget(self.materialDetails)
+
+    def setupModel(self):
+        self.materialList.addItems([mat.name for mat in MATERIAL_LIST])
+        self.materialList.currentItemChanged.connect(self.selectMaterial)
+
+    def selectMaterial(self, item):
+        self.materialDetails.setMaterial(Material.find(item.text()))
+
+    def translate_UI(self):
+        self.setWindowTitle(
+            QW.QApplication.translate("MaterialListView", "pyGAPS Material explorer", None, -1)
+        )

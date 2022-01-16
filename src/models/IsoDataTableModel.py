@@ -1,39 +1,31 @@
 from qtpy import QtCore as QC
 
+from src.models.dfTableModel import dfTableModel
+from src.widgets.UtilityWidgets import error_dialog
 
-class IsoDataTableModel(QC.QAbstractTableModel):
-    """Overloading a table model to display isotherm adsorption data."""
-    def __init__(self, data, parent=None):
-        super().__init__(parent)
-        self._data = data
 
-    def rowCount(self, parent=None):
-        return len(self._data.values)
+class IsoDataTableModel(dfTableModel):
+    """Overload a dataframe table model to display isotherm adsorption data."""
+    def data(self, index=QC.QModelIndex(), role=QC.Qt.DisplayRole):
 
-    def columnCount(self, parent=None):
-        return self._data.columns.size
+        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+            val = self._data.values[index.row()][index.column()]
+            if self._data.columns[index.column()] == "branch":
+                return "des" if val else "ads"
 
-    def data(self, index, role=QC.Qt.DisplayRole):
-        if index.isValid():
-            if role == QC.Qt.DisplayRole:
-                if self._data.columns[index.column()] == "branch":
-                    if self._data.values[index.row()][index.column()] == False:
-                        return "adsorption"
-                    return "desorption"
-                return str(self._data.values[index.row()][index.column()])
-        return None
+        return super().data(index, role)
 
-    def headerData(self, section, orientation, role=QC.Qt.DisplayRole):
-        if role != QC.Qt.DisplayRole:
-            return None
+    def setData(self, index, value, role: int = QC.Qt.EditRole) -> bool:
 
-        if orientation == QC.Qt.Horizontal:
-            try:
-                label = self._data.columns.tolist()[section]
-                if label == section:
-                    label = section
-                return label
-            except (IndexError, ):
-                return None
-        elif orientation == QC.Qt.Vertical:
-            return section
+        if role == QC.Qt.EditRole:
+            if self._data.columns[index.column()] == "branch":
+                if value in ["ads", "des"]:
+                    choice = {"ads": False, "des": True}
+                    self._data.iloc[index.row(), index.column()] = choice[value]
+                    self.dataChanged.emit(index, index)
+                    return True
+                else:
+                    error_dialog("Branch can only be 'ads' or 'des'.")
+                    return False
+
+        return super().setData(index, value, role)

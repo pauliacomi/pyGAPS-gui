@@ -18,11 +18,8 @@ def exception_hook(exctype, value, traceback):
     """Catch qtpy exceptions."""
     # https://stackoverflow.com/questions/43039048/pyqt5-fails-with-cryptic-message
 
-    from src.widgets.UtilityWidgets import ErrorMessageBox
-
-    errorbox = ErrorMessageBox()
-    errorbox.setText(str(value))
-    errorbox.exec()
+    from src.widgets.UtilityWidgets import error_dialog
+    error_dialog(str(value))
 
     # Call the normal Exception hook after
     sys._excepthook(exctype, value, traceback)
@@ -73,6 +70,10 @@ def main():
     icon.addFile('./src/resources/main_icon.png', QC.QSize(48, 48))
     icon.addFile('./src/resources/main_icon.png', QC.QSize(100, 100))
     app.setWindowIcon(icon)
+
+    # Init pygaps
+    from src.init_pygaps import init_pygaps
+    init_pygaps()
 
     # Create main window and show
     from .MainWindow import MainWindow

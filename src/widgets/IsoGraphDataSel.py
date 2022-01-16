@@ -19,11 +19,11 @@ class IsoGraphDataSel(QW.QDialog):
         self.y1_data = y1_data
         self.y2_data = y2_data
 
-        self.setupUI()
+        self.setup_UI()
         self.setupData()
-        self.connectSignals()
+        self.connect_signals()
 
-    def setupUI(self):
+    def setup_UI(self):
         self.dataLayout = QW.QFormLayout(self)
 
         self.xCombo = QW.QComboBox(self)
@@ -44,11 +44,10 @@ class IsoGraphDataSel(QW.QDialog):
         )
 
         # Bottom buttons
-        self.buttonBox = QW.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
-        self.buttonBox.setObjectName("buttonBox")
-        self.dataLayout.addWidget(self.buttonBox)
+        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
+        self.dataLayout.addWidget(self.button_box)
 
     def setupData(self):
         self.xCombo.addItems(self.datas)
@@ -62,9 +61,9 @@ class IsoGraphDataSel(QW.QDialog):
         else:
             self.y2Combo.setDisabled(True)
 
-    def connectSignals(self):
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+    def connect_signals(self):
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
         self.xCombo.currentIndexChanged.connect(self.handleChanged)
         self.y1Combo.currentIndexChanged.connect(self.handleChanged)
         self.y2Combo.currentIndexChanged.connect(self.handleChanged)

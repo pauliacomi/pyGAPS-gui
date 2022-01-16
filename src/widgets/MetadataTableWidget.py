@@ -18,5 +18,6 @@ class MetadataTableWidget(QW.QTableView):
         return ret
 
     def resizeColumns(self) -> None:
+        # TODO may be a better way to do this
         self.horizontalHeader().setSectionResizeMode(QW.QHeaderView.ResizeToContents)
         self.horizontalHeader().setSectionResizeMode(1, QW.QHeaderView.Stretch)

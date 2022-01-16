@@ -8,10 +8,11 @@ else:
     from qtpy import QtSvg as QS
 
 from src.views.IsoGraphView import IsoModelGraphView
+from src.widgets.SpinBoxSlider import QHSpinBoxSlider
 from src.widgets.UtilityWidgets import (EditAlignRight, LabelAlignRight, LabelOutput, LabelResult)
 
 
-class IsoModelByDialog(QW.QDialog):
+class IsoModelGuessDialog(QW.QDialog):
 
     paramWidgets = {}
 
@@ -31,35 +32,21 @@ class IsoModelByDialog(QW.QDialog):
         self.options_layout = QW.QVBoxLayout()
         layout.addLayout(self.options_layout, 0, 0)
 
+        # list
+        self.options_layout.addWidget(QW.QLabel("Available models:"))
+        self.modelList = QW.QListWidget(parent=self)
+        self.options_layout.addWidget(self.modelList)
+
         modelLayout = QW.QFormLayout()
         self.options_layout.addLayout(modelLayout)
-
-        # Model selection
-        self.modelLabel = LabelAlignRight("Model:", parent=self)
-        self.modelDropdown = QW.QComboBox(self)
-        modelLayout.addRow(self.modelLabel, self.modelDropdown)
 
         # Branch selection
         self.branchLabel = LabelAlignRight("Branch:", parent=self)
         self.branchDropdown = QW.QComboBox(self)
         modelLayout.addRow(self.branchLabel, self.branchDropdown)
 
-        btnLayout = QW.QHBoxLayout()
         self.autoButton = QW.QPushButton(self)
-        btnLayout.addWidget(self.autoButton)
-        self.manualButton = QW.QPushButton(self)
-        btnLayout.addWidget(self.manualButton)
-        self.options_layout.addLayout(btnLayout)
-
-        # Parameter box
-        self.paramBox = QW.QGroupBox(self)
-        self.options_layout.addWidget(self.paramBox)
-        self.paramLayout = QW.QVBoxLayout(self.paramBox)
-        self.modelFormulaValue = QS.QSvgWidget(self.paramBox)
-        self.modelFormulaValue.setMinimumSize(10, 50)
-        self.paramLayout.addWidget(self.modelFormulaValue)
-
-        self.options_layout.addStretch()
+        self.options_layout.addWidget(self.autoButton)
 
         # Output log
         self.output_label = QW.QLabel("Output log:")
@@ -87,12 +74,8 @@ class IsoModelByDialog(QW.QDialog):
 
     def translate_UI(self):
         self.setWindowTitle(
-            QW.QApplication.translate("IsoModelByDialog", "Isotherm model fitting", None, -1)
+            QW.QApplication.translate("IsoModelGuessDialog", "Isotherm model fitting", None, -1)
         )
-        self.paramBox.setTitle(
-            QW.QApplication.translate("IsoModelByDialog", "Parameters", None, -1)
-        )
-        self.autoButton.setText(QW.QApplication.translate("IsoModelByDialog", "Autofit", None, -1))
-        self.manualButton.setText(
-            QW.QApplication.translate("IsoModelByDialog", "Use selected parameters", None, -1)
+        self.autoButton.setText(
+            QW.QApplication.translate("IsoModelGuessDialog", "Fit selected models", None, -1)
         )

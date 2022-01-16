@@ -7,10 +7,10 @@ class MetadataEditWidget(QW.QWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent=parent)
         self.meta_types = ["text", "number"]
-        self.setupUi()
-        self.retranslateUi()
+        self.setup_UI()
+        self.translate_UI()
 
-    def setupUi(self):
+    def setup_UI(self):
 
         # metadata buttons
         layout = QW.QGridLayout(self)
@@ -44,11 +44,13 @@ class MetadataEditWidget(QW.QWidget):
         self.propButtonDelete.setObjectName("propButtonDelete")
         layout.addWidget(self.propButtonDelete, 2, 2, 1, 2)
 
-    def retranslateUi(self):
+    def translate_UI(self):
         self.nameLabel.setText(QW.QApplication.translate("MetaEditWidget", "Name", None, -1))
         self.valueLabel.setText(QW.QApplication.translate("MetaEditWidget", "Value", None, -1))
         self.propButtonSave.setText(QW.QApplication.translate("MetaEditWidget", "save", None, -1))
-        self.propButtonDelete.setText(QW.QApplication.translate("MetaEditWidget", "delete", None, -1))
+        self.propButtonDelete.setText(
+            QW.QApplication.translate("MetaEditWidget", "delete", None, -1)
+        )
 
     def display(self, name, value, mtype):
 

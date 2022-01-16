@@ -3,52 +3,68 @@ import warnings
 from pygaps.characterisation.isosteric_enth import isosteric_enthalpy, isosteric_enthalpy_raw
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 
+from src.widgets.UtilityWidgets import error_dialog
+
+import numpy
+
 
 class IsostericModel():
-    def __init__(self, isotherms):
+    # Refs
+    isotherms = None
+    view = None
 
+    # Settings
+    branch = "ads"
+    limits = None
+    loading_points = None
+    loading_point_no = 50
+
+    # Results
+    results = None
+    output = ""
+    success = True
+
+    def __init__(self, isotherms, view):
+        """First init"""
+        # Save refs
         self.isotherms = isotherms
-
-        self.limits = None
-        self.minimum = None
-        self.maximum = None
-
-        self.results = None
-        self.output = None
-
-    def set_view(self, view):
-        """Initial actions on view connect."""
         self.view = view
 
         # view setup
-        self.view.branchDropdown.addItems(["ads", "des"]),
+        self.view.branchDropdown.addItems(["ads", "des"])
+        self.view.branchDropdown.setCurrentText(self.branch)
 
         # plot isotherm
-        self.view.isoGraph.set_isotherms([self.isotherm])
-        self.view.isoGraph.draw_isotherms()
+        self.view.isoGraph.branch = self.branch
+        self.view.isoGraph.set_isotherms(self.isotherms)
 
         # connect signals
+        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
         self.view.autoButton.clicked.connect(self.calc_auto)
-        self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
+        # self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
+        self.view.button_box.accepted.connect(self.export_results)
+        self.view.button_box.rejected.connect(self.view.reject)
 
-        # run
+        # Calculation
+        # run calculation
         self.calc_auto()
 
     def calc_auto(self):
         """Automatic calculation."""
         self.limits = None
-        if self.calculate():
-            self.output_results()
-            self.plot()
-            self.slider_reset()
+        self.loading_points = None
+        self.calculate()
+        self.slider_reset()
+        self.output_results()
+        self.plot_results()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        if self.calculate():
-            self.calculate()
-            self.output_results()
-            self.plot()
+        self.loading_points = numpy.linspace(left, right, self.loading_point_no)
+        self.calculate()
+        self.output_results()
+        self.plot_results()
 
     def calculate(self):
         with warnings.catch_warnings(record=True) as warning:
@@ -58,41 +74,50 @@ class IsostericModel():
             try:
                 self.results = isosteric_enthalpy(
                     self.isotherms,
-                    branch=self.view.branchDropdown.currentText(),
-                    # loading_points=,
+                    branch=self.branch,
+                    loading_points=self.loading_points,
                 )
 
             # We catch any errors or warnings and display them to the user
             except Exception as e:
-                self.output = f'<font color="red">Calculation failed! <br> {e}</font>'
-                return False
+                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+                self.limits = [0, 0]
 
             if warning:
-                self.output = '<br>'.join([
-                    f'<font color="red">Warning: {a.message}</font>' for a in warning
+                self.output += '<br>'.join([
+                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
                 ])
-            else:
-                self.output = None
-            return True
 
     def output_results(self):
-        pass
+        if self.output:
+            error_dialog(self.output)
+            self.output = ""
 
-    def slider_reset(self):
-        self.view.pSlider.setValues([0, 1], emit=False)
+    def plot_results(self):
 
-    def plot(self):
+        # Isotherm plot update
+        self.view.isoGraph.draw_isotherms(branch=self.branch)
 
-        # Clear plots
-        self.view.resGraph.clear()
-
-        # Generate plot of the BET points chosen
+        # Generate plot of the points chosen
+        self.view.res_graph.clear()
         isosteric_enthalpy_plot(
             self.results["loading"],
             self.results["isosteric_enthalpy"],
             self.results["std_errs"],
-            ax=self.view.resGraph.ax,
+            ax=self.view.res_graph.ax,
         )
+        self.view.res_graph.canvas.draw()
 
-        # Draw figures
-        self.view.resGraph.canvas.draw()
+    def slider_reset(self):
+        if self.limits:
+            self.view.x_select.setValues(self.limits, emit=False)
+            self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
+
+    def select_branch(self):
+        self.branch = self.view.branchDropdown.currentText()
+        self.calc_auto()
+
+    def export_results(self):
+        if not self.results:
+            error_dialog("No results to export.")
+            return

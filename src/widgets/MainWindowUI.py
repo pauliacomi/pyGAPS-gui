@@ -13,12 +13,17 @@ from src.widgets.MetadataTableWidget import MetadataTableWidget
 
 class MainWindowUI():
     """Main window user interface for pygaps."""
-    def setupUi(self, MainWindowUI):
+    def setup_UI(self, MainWindowUI):
         """Create the window and all its components."""
 
         # First setup
-        MainWindowUI.setObjectName("MainWindowUI")
-        MainWindowUI.resize(1400, 700)
+        MainWindowUI.setObjectName("MainWindow")
+
+        # TODO This code is borked for pyside6
+        # # remove after finalizing
+        # monitor = QW.QDesktopWidget().screenGeometry(0)
+        # MainWindowUI.move(monitor.left(), monitor.top())
+        # MainWindowUI.resize(monitor.width() * 0.9, monitor.height() * 0.8)
 
         # Central widget
         self.centralwidget = QW.QWidget(MainWindowUI)
@@ -42,7 +47,7 @@ class MainWindowUI():
         self.setup_menu_status(MainWindowUI)
 
         # Finally
-        self.retranslateUi(MainWindowUI)
+        self.translate_UI(MainWindowUI)
         QC.QMetaObject.connectSlotsByName(MainWindowUI)
 
     def setup_iso_explorer(self):
@@ -114,9 +119,9 @@ class MainWindowUI():
         self.materialDetails.setObjectName("materialDetails")
         self.basePropLayout.addWidget(self.materialDetails, 0, 2, 1, 1)
 
-        self.adsorbateLabel = QW.QLabel(self.basePropButtonWidget)
-        self.adsorbateLabel.setObjectName("adsorbateLabel")
-        self.basePropLayout.addWidget(self.adsorbateLabel, 1, 0, 1, 1)
+        self.adsorbate_label = QW.QLabel(self.basePropButtonWidget)
+        self.adsorbate_label.setObjectName("adsorbate_label")
+        self.basePropLayout.addWidget(self.adsorbate_label, 1, 0, 1, 1)
         self.adsorbateEdit = QW.QComboBox(self.basePropButtonWidget)
         self.adsorbateEdit.setInsertPolicy(QW.QComboBox.NoInsert)
         self.adsorbateEdit.setObjectName("adsorbateEdit")
@@ -209,6 +214,10 @@ class MainWindowUI():
         self.menuPredict = QW.QMenu(self.menubar)
         self.menuPredict.setObjectName("menuPredict")
         self.menubar.addAction(self.menuPredict.menuAction())
+        # Submenu
+        self.menuIAST = QW.QMenu(self.menubar)
+        self.menuIAST.setObjectName("menuPredict")
+        self.menuPredict.addAction(self.menuIAST.menuAction())
         self.menuOptions = QW.QMenu(self.menubar)
         self.menuOptions.setObjectName("menuOptions")
         self.menubar.addAction(self.menuOptions.menuAction())
@@ -217,6 +226,14 @@ class MainWindowUI():
         self.menubar.addAction(self.menuHelp.menuAction())
 
         # Defining menu actions
+        # new
+        self.actionNew = QW.QAction(MainWindowUI)
+        icon = QG.QIcon()
+        icon.addPixmap(QG.QPixmap(":/res/icons/05_Edit_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        self.actionNew.setIcon(icon)
+        self.actionNew.setObjectName("actionNew")
+        self.actionNew.setShortcut("Ctrl+O")
+
         # open
         self.actionOpen = QW.QAction(MainWindowUI)
         icon = QG.QIcon()
@@ -280,8 +297,12 @@ class MainWindowUI():
         self.actionModelCreate.setObjectName("actionModelCreate")
 
         # prediction
-        self.actionIAST = QW.QAction(MainWindowUI)
-        self.actionIAST.setObjectName("actionIAST")
+        self.actionIASTvle = QW.QAction(MainWindowUI)
+        self.actionIASTvle.setObjectName("actionIASTvle")
+        self.actionIASTsvp = QW.QAction(MainWindowUI)
+        self.actionIASTsvp.setObjectName("actionIASTsvp")
+        self.actionIASTgeneral = QW.QAction(MainWindowUI)
+        self.actionIASTgeneral.setObjectName("actionIASTgeneral")
 
         # options
         self.actionAdsorbates = QW.QAction(MainWindowUI)
@@ -298,6 +319,7 @@ class MainWindowUI():
 
         # add all actions to menus
         self.menuFile.addActions([
+            self.actionNew,
             self.actionOpen,
             self.actionImport,
             self.actionSave,
@@ -332,7 +354,11 @@ class MainWindowUI():
         self.menuModel.addSeparator()
         self.menuModel.addActions([self.actionModelCreate])
         #
-        self.menuPredict.addActions([self.actionIAST])
+        self.menuIAST.addActions([
+            self.actionIASTvle,
+            self.actionIASTsvp,
+            self.actionIASTgeneral,
+        ])
         self.menuOptions.addActions([
             self.actionAdsorbates,
             self.actionMaterials,
@@ -344,50 +370,116 @@ class MainWindowUI():
         self.statusbar.setObjectName("statusbar")
         MainWindowUI.setStatusBar(self.statusbar)
 
-    def retranslateUi(self, MainWindowUI):
+    def translate_UI(self, MainWindowUI):
         """Set UI text."""
-        MainWindowUI.setWindowTitle(QW.QApplication.translate("MainWindowUI", "pyGAPS-gui", None, -1))
+        MainWindowUI.setWindowTitle(
+            QW.QApplication.translate("MainWindowUI", "pyGAPS-gui", None, -1)
+        )
         #
-        self.explorerGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Explorer", None, -1))
-        self.selectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Select All", None, -1))
-        self.deselectAllButton.setText(QW.QApplication.translate("MainWindowUI", "Deselect All", None, -1))
+        self.explorerGroup.setTitle(
+            QW.QApplication.translate("MainWindowUI", "Isotherm Explorer", None, -1)
+        )
+        self.selectAllButton.setText(
+            QW.QApplication.translate("MainWindowUI", "Select All", None, -1)
+        )
+        self.deselectAllButton.setText(
+            QW.QApplication.translate("MainWindowUI", "Deselect All", None, -1)
+        )
         self.removeButton.setText(QW.QApplication.translate("MainWindowUI", "Remove", None, -1))
         #
-        self.propertiesGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Properties", None, -1))
+        self.propertiesGroup.setTitle(
+            QW.QApplication.translate("MainWindowUI", "Isotherm Properties", None, -1)
+        )
         self.materialLabel.setText(QW.QApplication.translate("MainWindowUI", "Material", None, -1))
         self.materialDetails.setText(QW.QApplication.translate("MainWindowUI", "Details", None, -1))
-        self.adsorbateLabel.setText(QW.QApplication.translate("MainWindowUI", "Adsorbate", None, -1))
-        self.adsorbateDetails.setText(QW.QApplication.translate("MainWindowUI", "Details", None, -1))
-        self.temperatureLabel.setText(QW.QApplication.translate("MainWindowUI", "Temperature", None, -1))
-        self.extraPropWidget.setTitle(QW.QApplication.translate("MainWindowUI", "Metadata", None, -1))
-        self.dataButton.setText(QW.QApplication.translate("MainWindowUI", "Isotherm Points", None, -1))
+        self.adsorbate_label.setText(
+            QW.QApplication.translate("MainWindowUI", "Adsorbate", None, -1)
+        )
+        self.adsorbateDetails.setText(
+            QW.QApplication.translate("MainWindowUI", "Details", None, -1)
+        )
+        self.temperatureLabel.setText(
+            QW.QApplication.translate("MainWindowUI", "Temperature", None, -1)
+        )
+        self.extraPropWidget.setTitle(
+            QW.QApplication.translate("MainWindowUI", "Metadata", None, -1)
+        )
+        self.dataButton.setText(
+            QW.QApplication.translate("MainWindowUI", "Isotherm Points", None, -1)
+        )
         #
-        self.graphGroup.setTitle(QW.QApplication.translate("MainWindowUI", "Isotherm Display", None, -1))
+        self.graphGroup.setTitle(
+            QW.QApplication.translate("MainWindowUI", "Isotherm Display", None, -1)
+        )
         #
         self.menuFile.setTitle(QW.QApplication.translate("MainWindowUI", "File", None, -1))
-        self.menuCharact.setTitle(QW.QApplication.translate("MainWindowUI", "Characterization", None, -1))
+        self.menuCharact.setTitle(
+            QW.QApplication.translate("MainWindowUI", "Characterization", None, -1)
+        )
         self.menuHelp.setTitle(QW.QApplication.translate("MainWindowUI", "Help", None, -1))
-        self.menuModel.setTitle(QW.QApplication.translate("MainWindowUI", "Model Fitting", None, -1))
+        self.menuModel.setTitle(
+            QW.QApplication.translate("MainWindowUI", "Model Fitting", None, -1)
+        )
         self.menuPredict.setTitle(QW.QApplication.translate("MainWindowUI", "Predict", None, -1))
         self.menuOptions.setTitle(QW.QApplication.translate("MainWindowUI", "Options", None, -1))
+        self.actionNew.setText(QW.QApplication.translate("MainWindowUI", "New", None, -1))
         self.actionOpen.setText(QW.QApplication.translate("MainWindowUI", "Open", None, -1))
         self.actionImport.setText(QW.QApplication.translate("MainWindowUI", "Import", None, -1))
         self.actionSave.setText(QW.QApplication.translate("MainWindowUI", "Save", None, -1))
         self.actionQuit.setText(QW.QApplication.translate("MainWindowUI", "Quit", None, -1))
         self.actionAbout.setText(QW.QApplication.translate("MainWindowUI", "About", None, -1))
-        self.actionBET_SA.setText(QW.QApplication.translate("MainWindowUI", "BET surface area", None, -1))
-        self.actionLangmuir_SA.setText(QW.QApplication.translate("MainWindowUI", "Langmuir surface area", None, -1))
+        self.actionBET_SA.setText(
+            QW.QApplication.translate("MainWindowUI", "BET surface area", None, -1)
+        )
+        self.actionLangmuir_SA.setText(
+            QW.QApplication.translate("MainWindowUI", "Langmuir surface area", None, -1)
+        )
         self.action_t_plot.setText(QW.QApplication.translate("MainWindowUI", "T-plot", None, -1))
-        self.action_alpha_s_plot.setText(QW.QApplication.translate("MainWindowUI", "Alpha-s plot", None, -1))
-        self.action_da_plot.setText(QW.QApplication.translate("MainWindowUI", "Dubinin-Astakov plot", None, -1))
-        self.action_dr_plot.setText(QW.QApplication.translate("MainWindowUI", "Dubinin-Radushkevich plot", None, -1))
-        self.actionMicroporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Microporous PSD", None, -1))
-        self.actionMesoporous_PSD.setText(QW.QApplication.translate("MainWindowUI", "Mesoporous PSD", None, -1))
-        self.actionDFT_Kernel_PSD.setText(QW.QApplication.translate("MainWindowUI", "DFT Kernel PSD", None, -1))
-        self.actionIsosteric.setText(QW.QApplication.translate("MainWindowUI", "Isosteric enthalpy", None, -1))
-        self.actionModelBy.setText(QW.QApplication.translate("MainWindowUI", "Fit a model", None, -1))
-        self.actionModelGuess.setText(QW.QApplication.translate("MainWindowUI", "Guess best model", None, -1))
-        self.actionModelCreate.setText(QW.QApplication.translate("MainWindowUI", "Manually create a model", None, -1))
-        self.actionIAST.setText(QW.QApplication.translate("MainWindowUI", "IAST", None, -1))
-        self.actionAdsorbates.setText(QW.QApplication.translate("MainWindowUI", "pyGAPS Adsorbates", None, -1))
-        self.actionMaterials.setText(QW.QApplication.translate("MainWindowUI", "pyGAPS Materials", None, -1))
+        self.action_alpha_s_plot.setText(
+            QW.QApplication.translate("MainWindowUI", "Alpha-s plot", None, -1)
+        )
+        self.action_da_plot.setText(
+            QW.QApplication.translate("MainWindowUI", "Dubinin-Astakov plot", None, -1)
+        )
+        self.action_dr_plot.setText(
+            QW.QApplication.translate("MainWindowUI", "Dubinin-Radushkevich plot", None, -1)
+        )
+        self.actionMicroporous_PSD.setText(
+            QW.QApplication.translate("MainWindowUI", "Microporous PSD", None, -1)
+        )
+        self.actionMesoporous_PSD.setText(
+            QW.QApplication.translate("MainWindowUI", "Mesoporous PSD", None, -1)
+        )
+        self.actionDFT_Kernel_PSD.setText(
+            QW.QApplication.translate("MainWindowUI", "DFT Kernel PSD", None, -1)
+        )
+        self.actionIsosteric.setText(
+            QW.QApplication.translate("MainWindowUI", "Isosteric enthalpy", None, -1)
+        )
+        self.actionModelBy.setText(
+            QW.QApplication.translate("MainWindowUI", "Fit a model", None, -1)
+        )
+        self.actionModelGuess.setText(
+            QW.QApplication.translate("MainWindowUI", "Guess best model", None, -1)
+        )
+        self.actionModelCreate.setText(
+            QW.QApplication.translate("MainWindowUI", "Manually create a model", None, -1)
+        )
+        self.menuIAST.setTitle(QW.QApplication.translate("MainWindowUI", "IAST", None, -1))
+        self.actionIASTvle.setText(
+            QW.QApplication.translate("MainWindowUI", "Binary phase equilibrium", None, -1)
+        )
+        self.actionIASTsvp.setText(
+            QW.QApplication.translate("MainWindowUI", "Binary selectivity v. pressure", None, -1)
+        )
+        self.actionIASTgeneral.setText(
+            QW.QApplication.translate(
+                "MainWindowUI", "Multicomponent uptake v. pressure", None, -1
+            )
+        )
+        self.actionAdsorbates.setText(
+            QW.QApplication.translate("MainWindowUI", "pyGAPS Adsorbates", None, -1)
+        )
+        self.actionMaterials.setText(
+            QW.QApplication.translate("MainWindowUI", "pyGAPS Materials", None, -1)
+        )

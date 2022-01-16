@@ -1,6 +1,7 @@
 import os
 
 from qtpy import QtWidgets as QW
+from qtpy import QtCore as QC
 
 from src.controllers.IsoController import IsoController
 from src.models.IsoListModel import IsoListModel
@@ -17,7 +18,7 @@ class MainWindow(QW.QMainWindow):
 
         # Create and attach UI
         self.ui = MainWindowUI()
-        self.ui.setupUi(self)
+        self.ui.setup_UI(self)
 
         # Create isotherm list mvc
         self.iso_model = IsoListModel(parent=self)
@@ -29,12 +30,16 @@ class MainWindow(QW.QMainWindow):
         # Display state
         self.ui.statusbar.showMessage('Ready', 5000)
 
+    def sizeHint(self) -> QC.QSize:
+        return QC.QSize(1400, 700)
+
     ########################################################
     # Menu functionality
     ########################################################
 
     def connect_menu(self):
         """Connect signals and slots of the menu."""
+        self.ui.actionNew.triggered.connect(self.new_iso)
         self.ui.actionOpen.triggered.connect(self.load_iso)
         self.ui.actionImport.triggered.connect(self.import_iso)
         self.ui.actionSave.triggered.connect(self.save_iso)
@@ -54,11 +59,27 @@ class MainWindow(QW.QMainWindow):
 
         self.ui.actionModelBy.triggered.connect(self.model_by)
         self.ui.actionModelGuess.triggered.connect(self.model_guess)
+        self.ui.actionModelCreate.triggered.connect(self.model_manual)
 
-        self.ui.actionIAST.triggered.connect(self.iast)
+        self.ui.actionIASTvle.triggered.connect(self.iast_vle)
+        self.ui.actionIASTsvp.triggered.connect(self.iast_svp)
+        self.ui.actionIASTgeneral.triggered.connect(self.iast_general)
 
         self.ui.actionAdsorbates.triggered.connect(self.adsorbate_explorer)
         self.ui.actionMaterials.triggered.connect(self.material_explorer)
+
+    def new_iso(self):
+        # TODO dialog for new isotherm
+        from pygaps import PointIsotherm
+        isotherm = PointIsotherm(
+            pressure=[0, 1],
+            loading=[0, 1],
+            m="New material",
+            a="N2",
+            t=77,
+        )
+        self.iso_controller.add_isotherm("new isotherm", isotherm)
+        self.iso_controller.select_last_iso()
 
     def load_iso(self, filepaths=None):
         """Open isotherm from file."""
@@ -105,7 +126,9 @@ class MainWindow(QW.QMainWindow):
                 "Save an isotherm",
                 '.',
                 filter=";;".join([
-                    'pyGAPS JSON Isotherm (*.json)', 'pyGAPS CSV Isotherm (*.csv)', 'pyGAPS Excel Isotherm (*.xls)'
+                    'pyGAPS JSON Isotherm (*.json)',
+                    'pyGAPS CSV Isotherm (*.csv)',
+                    'pyGAPS Excel Isotherm (*.xls)',
                 ])
             )
 
@@ -120,48 +143,48 @@ class MainWindow(QW.QMainWindow):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.AreaBETModel import AreaBETModel
         from src.views.AreaBETDialog import AreaBETDialog
         dialog = AreaBETDialog()
-        model = AreaBETModel(isotherm)
-        model.set_view(dialog)
-        dialog.exec()
+        model = AreaBETModel(isotherm, dialog)
+        if model.success:
+            dialog.exec()
 
     def area_langmuir(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.AreaLangModel import AreaLangModel
         from src.views.AreaLangDialog import AreaLangDialog
         dialog = AreaLangDialog()
-        model = AreaLangModel(isotherm)
-        model.set_view(dialog)
-        dialog.exec()
+        model = AreaLangModel(isotherm, dialog)
+        if model.success:
+            dialog.exec()
 
     def t_plot(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.PlotTModel import PlotTModel
         from src.views.PlotTDialog import PlotTDialog
         dialog = PlotTDialog()
-        model = PlotTModel(isotherm)
-        model.set_view(dialog)
-        dialog.exec()
+        model = PlotTModel(isotherm, dialog)
+        if model.success:
+            dialog.exec()
 
     def alphas_plot(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
-        isotherms = self.iso_model.get_iso_checked()
+        isotherms = self.iso_model.get_item_checked()
         if len(isotherms) != 2:
             error_dialog("Select two isotherms")
             return
@@ -174,9 +197,9 @@ class MainWindow(QW.QMainWindow):
         from src.models.PlotAlphaSModel import PlotAlphaSModel
         from src.views.PlotAlphaSDialog import PlotAlphaSDialog
         dialog = PlotAlphaSDialog()
-        model = PlotAlphaSModel(isotherm, ref_isotherm)
-        model.set_view(dialog)
-        dialog.exec()
+        model = PlotAlphaSModel(isotherm, ref_isotherm, dialog)
+        if model.success:
+            dialog.exec()
 
     def dr_plot(self):
         self.dadr_plot(ptype="DR")
@@ -188,56 +211,56 @@ class MainWindow(QW.QMainWindow):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.DADRModel import DADRModel
         from src.views.DADRDialog import DADRDialog
         dialog = DADRDialog(ptype=ptype)
-        model = DADRModel(isotherm, ptype=ptype)
-        model.set_view(dialog)
-        dialog.exec()
+        model = DADRModel(isotherm, dialog, ptype=ptype)
+        if model.success:
+            dialog.exec()
 
     def psd_micro(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.PSDMicroModel import PSDMicroModel
         from src.views.PSDMicroDialog import PSDMicroDialog
         dialog = PSDMicroDialog()
-        model = PSDMicroModel(isotherm)
-        model.set_view(dialog)
-        dialog.exec()
+        model = PSDMicroModel(isotherm, dialog)
+        if model.success:
+            dialog.exec()
 
     def psd_meso(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.PSDMesoModel import PSDMesoModel
         from src.views.PSDMesoDialog import PSDMesoDialog
         dialog = PSDMesoDialog()
-        model = PSDMesoModel(isotherm)
-        model.set_view(dialog)
-        dialog.exec()
+        model = PSDMesoModel(isotherm, dialog)
+        if model.success:
+            dialog.exec()
 
     def psd_kernel(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.PSDKernelModel import PSDKernelModel
         from src.views.PSDKernelDialog import PSDKernelDialog
         dialog = PSDKernelDialog()
-        model = PSDKernelModel(isotherm)
-        model.set_view(dialog)
-        dialog.exec()
+        model = PSDKernelModel(isotherm, dialog)
+        if model.success:
+            dialog.exec()
 
     def isosteric(self):
-        isotherms = self.iso_model.get_iso_checked()
+        isotherms = self.iso_model.get_item_checked()
         if len(isotherms) < 2:
             error_dialog("Select two or more isotherms")
             return
@@ -245,21 +268,22 @@ class MainWindow(QW.QMainWindow):
         from src.models.IsostericModel import IsostericModel
         from src.views.IsostericDialog import IsostericDialog
         dialog = IsostericDialog()
-        model = IsostericModel(isotherms)
-        model.set_view(dialog)
-        dialog.exec()
+        model = IsostericModel(isotherms, dialog)
+        if model.success:
+            dialog.exec()
 
     def model_by(self):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.IsoModelByModel import IsoModelByModel
         from src.views.IsoModelByDialog import IsoModelByDialog
         dialog = IsoModelByDialog()
-        model = IsoModelByModel(isotherm)
-        model.set_view(dialog)
+        model = IsoModelByModel(isotherm, dialog)
+        if not model.success:
+            return
         ret = dialog.exec()
 
         if ret == QW.QDialog.Accepted and model.model_isotherm:
@@ -271,13 +295,14 @@ class MainWindow(QW.QMainWindow):
         index = self.ui.isoExplorer.currentIndex()
         if not index.isValid():
             return
-        isotherm = self.iso_model.get_iso_index(index)
+        isotherm = self.iso_model.get_item_index(index)
 
         from src.models.IsoModelGuessModel import IsoModelGuessModel
         from src.views.IsoModelGuessDialog import IsoModelGuessDialog
         dialog = IsoModelGuessDialog()
-        model = IsoModelGuessModel(isotherm)
-        model.set_view(dialog)
+        model = IsoModelGuessModel(isotherm, dialog)
+        if not model.success:
+            return
         ret = dialog.exec()
 
         if ret == QW.QDialog.Accepted and model.model_isotherm:
@@ -285,30 +310,75 @@ class MainWindow(QW.QMainWindow):
             self.iso_controller.add_isotherm(name, model.model_isotherm)
             self.iso_controller.select_last_iso()
 
-    def iast(self):
+    def model_manual(self):
+        from src.models.IsoModelManualModel import IsoModelManualModel
+        from src.views.IsoModelManualDialog import IsoModelManualDialog
+        dialog = IsoModelManualDialog()
+        model = IsoModelManualModel(dialog)
+        if not model.success:
+            return
+        ret = dialog.exec()
+
+        if ret == QW.QDialog.Accepted and model.model_isotherm:
+            name = model.model_isotherm.model.name + " custom model"
+            self.iso_controller.add_isotherm(name, model.model_isotherm)
+            self.iso_controller.select_last_iso()
+
+    def iast_vle(self):
         """Start IAST procedures."""
-        isotherms = self.iso_model.get_iso_checked()
-        if len(isotherms) < 2:
-            error_dialog("Select two or more isotherms")
+        isotherms = self.iso_model.get_item_checked()
+        if len(isotherms) != 2:
+            error_dialog("Select two isotherms.")
             return
 
-        # from src.models.IASTModel import IASTModel
-        # from src.views.IASTDialog import IASTDialog
-        # dialog = IASTDialog()
-        # model = IASTModel(isotherms)
-        # model.set_view(dialog)
-        # dialog.exec()
+        from src.models.IASTVLEModel import IASTVLEModel
+        from src.views.IASTVLEDialog import IASTVLEDialog
+        dialog = IASTVLEDialog()
+        model = IASTVLEModel(isotherms, dialog)
+        if not model.success:
+            return
+        dialog.exec()
+
+    def iast_svp(self):
+        """Start IAST procedures."""
+        isotherms = self.iso_model.get_item_checked()
+        if len(isotherms) != 2:
+            error_dialog("Select two isotherms.")
+            return
+
+        from src.models.IASTSVPModel import IASTSVPModel
+        from src.views.IASTSVPDialog import IASTSVPDialog
+        dialog = IASTSVPDialog()
+        model = IASTSVPModel(isotherms, dialog)
+        if not model.success:
+            return
+        dialog.exec()
+
+    def iast_general(self):
+        """Start IAST procedures."""
+        isotherms = self.iso_model.get_item_checked()
+        if len(isotherms) < 2:
+            error_dialog("Select at least two isotherms.")
+            return
+
+        from src.models.IASTModel import IASTModel
+        from src.views.IASTDialog import IASTDialog
+        dialog = IASTDialog()
+        model = IASTModel(isotherms, dialog)
+        if not model.success:
+            return
+        dialog.exec()
 
     def adsorbate_explorer(self):
         """Explore/modify pyGAPS adsorbates."""
-        from src.views.AdsorbatesView import AdsorbatesView
-        dialog = AdsorbatesView()
+        from src.views.AdsorbateView import AdsorbateListView
+        dialog = AdsorbateListView()
         dialog.exec()
 
     def material_explorer(self):
         """Explore/modify pyGAPS materials."""
-        from src.views.MaterialsView import MaterialsView
-        dialog = MaterialsView()
+        from src.views.MaterialView import MaterialListView
+        dialog = MaterialListView()
         dialog.exec()
 
     def about(self):
@@ -318,5 +388,5 @@ class MainWindow(QW.QMainWindow):
             "<a href='mailto:iacomi.paul@gmail.com'>iacomi.paul@gmail.com</a><br>"
             "Open source at<br>"
             "<a href='https://github.com/pauliacomi/pyGAPS-gui'>github.com/pauliacomi/pyGAPS-gui</a><br>"
-            "Under MIT License<br>"
+            "Under AGPL License<br>"
         )

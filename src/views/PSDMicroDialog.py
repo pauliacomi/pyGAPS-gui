@@ -4,88 +4,93 @@ from qtpy import QtWidgets as QW
 from src.views.GraphView import GraphView
 from src.views.IsoGraphView import IsoGraphView
 
-from src.widgets.RangeSlider import QHSpinBoxRangeSlider
 from src.widgets.UtilityWidgets import LabelAlignRight, LabelOutput, LabelResult
 
 
 class PSDMicroDialog(QW.QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setupUi()
-        self.retranslateUi()
-        self.connectSignals()
+        self.setup_UI()
+        self.translate_UI()
+        self.connect_signals()
 
-    def setupUi(self):
+    def setup_UI(self):
         self.setObjectName("PSDMicroDialog")
-        self.resize(800, 800)
 
         layout = QW.QGridLayout(self)
         layout.setObjectName("layout")
 
-        # Iso graph and slider
-        isoLayout = QW.QVBoxLayout()
-        layout.addLayout(isoLayout, 0, 0, 1, 1)
-        self.isoGraph = IsoGraphView(self)
-        self.isoGraph.setObjectName("graph")
-        isoLayout.addWidget(self.isoGraph)
-
-        # selection slider
-        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=3, slider_range=[0, 1, 0.01], values=[0, 1])
-        self.pSlider.setMaximumHeight(50)
-        self.pSlider.setEmitWhileMoving(False)
-        isoLayout.addWidget(self.pSlider)
-
-        # Options/results box
         self.optionsBox = QW.QGroupBox(self)
-        layout.addWidget(self.optionsBox, 0, 1, 1, 1)
+        layout.addWidget(self.optionsBox, 0, 0, 1, 1)
+        self.rGraphsBox = QW.QGroupBox(self)
+        layout.addWidget(self.rGraphsBox, 1, 0, 1, 1)
+        layout.setRowStretch(0, 1)
+        layout.setRowStretch(1, 1)
 
-        self.optionsLayout = QW.QGridLayout(self.optionsBox)
+        # Options box
+        self.options_layout = QW.QHBoxLayout(self.optionsBox)
 
-        # Branch used
+        ## Iso graph and slider
+        self.isoGraph = IsoGraphView(x_range_select=True, parent=self)
+        self.isoGraph.setObjectName("isoGraph")
+        self.x_select = self.isoGraph.x_range_select
+        self.options_layout.addWidget(self.isoGraph)
+
+        ## Options sub box
+        self.optionsSubLayout = QW.QGridLayout()
+        self.options_layout.addLayout(self.optionsSubLayout)
+
+        ## Branch used
         self.branchLabel = LabelAlignRight("Branch used:")
-        self.optionsLayout.addWidget(self.branchLabel, 0, 0, 1, 1)
+        self.optionsSubLayout.addWidget(self.branchLabel, 0, 0, 1, 1)
         self.branchDropdown = QW.QComboBox(self)
-        self.optionsLayout.addWidget(self.branchDropdown, 0, 1, 1, 1)
+        self.optionsSubLayout.addWidget(self.branchDropdown, 0, 1, 1, 1)
 
-        # PSD model
+        ## PSD model
         self.modelLabel = LabelAlignRight("PSD model used:")
-        self.optionsLayout.addWidget(self.modelLabel, 1, 0, 1, 1)
+        self.optionsSubLayout.addWidget(self.modelLabel, 1, 0, 1, 1)
         self.modelDropdown = QW.QComboBox(self)
-        self.optionsLayout.addWidget(self.modelDropdown, 1, 1, 1, 1)
+        self.optionsSubLayout.addWidget(self.modelDropdown, 1, 1, 1, 1)
 
-        # Pore geometry
+        ## Pore geometry
         self.geometryLabel = LabelAlignRight("Pore geometry:")
-        self.optionsLayout.addWidget(self.geometryLabel, 2, 0, 1, 1)
+        self.optionsSubLayout.addWidget(self.geometryLabel, 2, 0, 1, 1)
         self.geometryDropdown = QW.QComboBox(self)
-        self.optionsLayout.addWidget(self.geometryDropdown, 2, 1, 1, 1)
+        self.optionsSubLayout.addWidget(self.geometryDropdown, 2, 1, 1, 1)
 
-        # material model
+        ## material model
         self.amodelLabel = LabelAlignRight("Kelvin model:")
-        self.optionsLayout.addWidget(self.amodelLabel, 3, 0, 1, 1)
+        self.optionsSubLayout.addWidget(self.amodelLabel, 3, 0, 1, 1)
         self.amodelDropdown = QW.QComboBox(self)
-        self.optionsLayout.addWidget(self.amodelDropdown, 3, 1, 1, 1)
+        self.optionsSubLayout.addWidget(self.amodelDropdown, 3, 1, 1, 1)
 
-        # Autodetermine
+        ## Autodetermine
         self.autoButton = QW.QPushButton(self)
-        self.optionsLayout.addWidget(self.autoButton, 4, 0, 1, 2)
+        self.optionsSubLayout.addWidget(self.autoButton, 4, 0, 1, 2)
 
-        # PSD graph
-        self.resGraph = GraphView(self)
-        self.resGraph.setObjectName("resGraph")
-        layout.addWidget(self.resGraph, 1, 0, 1, 2)
+        # Results graph box
+        self.rGraphsLayout = QW.QVBoxLayout(self.rGraphsBox)
+
+        ## PSD graph
+        self.res_graph = GraphView(parent=self)
+        self.rGraphsLayout.addWidget(self.res_graph)
 
         # Bottom buttons
-        self.buttonBox = QW.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Close)
-        self.buttonBox.setObjectName("buttonBox")
-        layout.addWidget(self.buttonBox, 2, 0, 1, 1)
+        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
+        layout.addWidget(self.button_box, 2, 0, 1, 1)
 
-    def connectSignals(self):
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+    def sizeHint(self) -> QC.QSize:
+        return QC.QSize(800, 900)
 
-    def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("PSDMicroDialog", "Calculate microporous PSD", None, -1))
+    def connect_signals(self):
+        pass
+
+    def translate_UI(self):
+        self.setWindowTitle(
+            QW.QApplication.translate("PSDMicroDialog", "Calculate microporous PSD", None, -1)
+        )
         self.optionsBox.setTitle(QW.QApplication.translate("PSDMicroDialog", "Options", None, -1))
+        self.rGraphsBox.setTitle(QW.QApplication.translate("PSDMicroDialog", "Results", None, -1))
         self.autoButton.setText(QW.QApplication.translate("PSDMicroDialog", "Calculate", None, -1))

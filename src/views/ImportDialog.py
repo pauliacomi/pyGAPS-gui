@@ -2,7 +2,7 @@ from qtpy import QtWidgets as QW
 
 from functools import partial
 
-from src.widgets.UtilityWidgets import ErrorMessageBox, open_files_dialog
+from src.widgets.UtilityWidgets import error_dialog, open_files_dialog
 
 IMPORT_FILES = [
     {
@@ -40,10 +40,10 @@ class ImportDialog(QW.QDialog):
         self.ftype = None
         self.fext = None
 
-        self.setupUi()
-        self.retranslateUi()
+        self.setup_UI()
+        self.translate_UI()
 
-    def setupUi(self):
+    def setup_UI(self):
         self.setObjectName("ImportDialog")
 
         # Create/set layout
@@ -81,5 +81,7 @@ class ImportDialog(QW.QDialog):
         if self.filepaths:
             self.close()
 
-    def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("ImportDialog", "Import from manufacturer file", None, -1))
+    def translate_UI(self):
+        self.setWindowTitle(
+            QW.QApplication.translate("ImportDialog", "Import from manufacturer file", None, -1)
+        )

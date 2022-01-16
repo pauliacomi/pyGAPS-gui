@@ -2,70 +2,80 @@ from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
 from src.views.GraphView import GraphView
-from src.views.IsoGraphView import IsoGraphView
 
-from src.widgets.RangeSlider import QHSpinBoxRangeSlider
 from src.widgets.UtilityWidgets import LabelAlignRight, LabelOutput, LabelResult
 
 
 class PlotTDialog(QW.QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setupUi()
-        self.retranslateUi()
-        self.connectSignals()
+        self.setup_UI()
+        self.translate_UI()
+        self.connect_signals()
 
-    def setupUi(self):
+    def setup_UI(self):
         self.setObjectName("PlotTDialog")
-        self.resize(500, 700)
 
         layout = QW.QVBoxLayout(self)
         layout.setObjectName("layout")
 
-        # T plot
-        self.tGraph = GraphView(self)
-        self.tGraph.setObjectName("tGraph")
-        layout.addWidget(self.tGraph)
-
-        # Options/results box
         self.optionsBox = QW.QGroupBox(self)
         layout.addWidget(self.optionsBox)
+        self.resultBox = QW.QGroupBox(self)
+        layout.addWidget(self.resultBox)
 
-        self.optionsLayout = QW.QGridLayout(self.optionsBox)
+        # Options box
+        self.options_layout = QW.QGridLayout(self.optionsBox)
 
-        self.optionsLayout.addWidget(LabelAlignRight("Thickness function:"), 0, 0, 1, 1)
+        ## Plot display
+        self.tGraph = GraphView(self, x_range_select=True)
+        self.tGraph.setObjectName("tGraph")
+        self.x_select = self.tGraph.x_range_select
+        self.options_layout.addWidget(self.tGraph, 0, 0, 1, 4)
+
+        self.options_layout.addWidget(LabelAlignRight("Thickness function:"), 1, 0, 1, 1)
         self.thicknessDropdown = QW.QComboBox(self)
-        self.optionsLayout.addWidget(self.thicknessDropdown, 0, 1, 1, 2)
+        self.options_layout.addWidget(self.thicknessDropdown, 1, 1, 1, 2)
+
+        self.options_layout.addWidget(LabelAlignRight("Isotherm branch:"), 2, 0, 1, 1)
+        self.branchDropdown = QW.QComboBox(self)
+        self.options_layout.addWidget(self.branchDropdown, 2, 1, 1, 2)
 
         self.auto_button = QW.QPushButton(self)
-        self.optionsLayout.addWidget(self.auto_button, 0, 3, 1, 1)
+        self.options_layout.addWidget(self.auto_button, 2, 3, 1, 1)
 
-        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=3, slider_range=[0, 1, 0.01], values=[0, 1])
-        self.pSlider.setMaximumHeight(50)
-        self.pSlider.setEmitWhileMoving(False)
-        self.optionsLayout.addWidget(self.pSlider, 1, 0, 1, 4)
+        # Results box
+        self.resultsLayout = QW.QGridLayout(self.resultBox)
 
         self.resultsTable = QW.QTableWidget(0, 5, self)
-        self.resultsTable.setHorizontalHeaderLabels(("V", "A", "R^2", "Slope", "Intercept"))
+        self.resultsTable.setHorizontalHeaderLabels(
+            ("V [cm3/g]", "A [m2/g]", "R^2", "Slope", "Intercept")
+        )
         self.resultsTable.horizontalHeader().setSectionResizeMode(QW.QHeaderView.Stretch)
-        self.optionsLayout.addWidget(self.resultsTable, 2, 0, 1, 4)
+        self.resultsLayout.addWidget(self.resultsTable, 0, 0, 1, 4)
 
-        self.optionsLayout.addWidget(QW.QLabel("Calculation log:"), 3, 0, 1, 2)
+        self.resultsLayout.addWidget(QW.QLabel("Calculation log:"), 1, 0, 1, 2)
         self.output = LabelOutput(self)
-        self.optionsLayout.addWidget(self.output, 4, 0, 1, 4)
+        self.resultsLayout.addWidget(self.output, 2, 0, 1, 4)
 
         # Bottom buttons
-        self.buttonBox = QW.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Close)
-        self.buttonBox.setObjectName("buttonBox")
-        layout.addWidget(self.buttonBox)
+        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
+        layout.addWidget(self.button_box)
 
-    def connectSignals(self):
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+    def sizeHint(self) -> QC.QSize:
+        return QC.QSize(500, 800)
 
-    def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("PlotTDialog", "Use the t-plot method", None, -1))
+    def connect_signals(self):
+        pass
+
+    def translate_UI(self):
+        self.setWindowTitle(
+            QW.QApplication.translate("PlotTDialog", "Use the t-plot method", None, -1)
+        )
         self.optionsBox.setTitle(QW.QApplication.translate("PlotTDialog", "Options", None, -1))
-        self.auto_button.setText(QW.QApplication.translate("PlotTDialog", "Auto-determine", None, -1))
+        self.resultBox.setTitle(QW.QApplication.translate("PlotTDialog", "Results", None, -1))
+        self.auto_button.setText(
+            QW.QApplication.translate("PlotTDialog", "Auto-determine", None, -1)
+        )

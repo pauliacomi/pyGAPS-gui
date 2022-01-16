@@ -14,11 +14,11 @@ class IsoUnitWidget(QW.QWidget):
 
         self.isotherm = None
         self.temperatureUnit = temp_qcombo_ref
-        self.setupUI()
-        self.retranslateUi()
-        self.connectSignals()
+        self.setup_UI()
+        self.translate_UI()
+        self.connect_signals()
 
-    def setupUI(self):
+    def setup_UI(self):
 
         self.unitPropLayout = QW.QHBoxLayout(self)
         self.pressureGrid = QW.QGroupBox(self)
@@ -57,7 +57,7 @@ class IsoUnitWidget(QW.QWidget):
         self.materialUnit.setObjectName("materialUnit")
         self.materialPropLayout.addWidget(self.materialUnit)
 
-    def connectSignals(self):
+    def connect_signals(self):
 
         self.pressureMode.currentIndexChanged.connect(self.convert_pressure)
         self.pressureUnit.currentIndexChanged.connect(self.convert_pressure)
@@ -243,16 +243,13 @@ class IsoUnitWidget(QW.QWidget):
             try:
                 self.isotherm.convert_material(basis_to=basis_to, unit_to=unit_to)
             except Exception as ex:
-                from src.widgets.UtilityWidgets import ErrorMessageBox
-
-                errorbox = ErrorMessageBox()
                 if basis_to == "volume":
-                    errorbox.setText("Could not convert material to a volume basis. Does it have a density set?")
+                    msg = "Could not convert material to a volume basis. Does it have a density set?"
                 elif basis_to == "molar":
-                    errorbox.setText("Could not convert material to a molar basis. Does it have a molar_mass set?")
+                    msg = "Could not convert material to a molar basis. Does it have a molar_mass set?"
                 else:
                     raise Exception from ex
-                errorbox.exec()
+                error_dialog(msg)
 
             self.unitsChanged.emit()
 
@@ -265,7 +262,7 @@ class IsoUnitWidget(QW.QWidget):
 
         self.unitsChanged.emit()
 
-    def retranslateUi(self):
+    def translate_UI(self):
         self.pressureGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure", None, -1))
         self.loadingGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "loading", None, -1))
         self.materialGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "material", None, -1))

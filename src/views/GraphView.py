@@ -13,29 +13,34 @@ class GraphView(QW.QWidget):
     ax = None
     navbar = None
 
-    # for selector
-    low = None
-    high = None
-    selector = None
+    # for range_select
+    x_range_select = None  # can be selector
+    low = None  # can be plt.ax
+    high = None  # can be plt.ax
 
-    def __init__(self, selector=False, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.has_selector = selector
-        self.setupUi()
+    def __init__(
+        self,
+        parent=None,
+        x_range_select=False,
+        y_range_select=False,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(parent=parent, *args, **kwargs)
+        self.x_range_select = x_range_select
+        self.setup_UI()
 
-    def setupUi(self):
+    def setup_UI(self):
         self.figure = Figure(figsize=(5, 5), tight_layout=True)
         self.canvas = FigureCanvas(self.figure)
         self.ax = self.figure.subplots()
 
         layout = QW.QVBoxLayout(self)
         layout.addWidget(self.canvas)
-        if self.has_selector:
-            self.selector = HSelectorToolbar("Selector", ax=self.ax, parent=self)
-            self.selector.slider.rangeChanged.connect(self.draw_limits)
-            self.low = self.ax.axvline(0, c="r", ls="--")
-            self.high = self.ax.axvline(1, c="r", ls="--")
-            layout.addWidget(self.selector)
+
+        if self.x_range_select:
+            self.setupRangeSelect()
+            layout.addWidget(self.x_range_select)
 
         self.setupNav()
         layout.addWidget(self.navbar)
@@ -43,21 +48,25 @@ class GraphView(QW.QWidget):
     def setupNav(self):
         self.navbar = NavigationToolbar(self.canvas, self)
 
+    def setupRangeSelect(self):
+        self.x_range_select = HSelectorToolbar("XRangeSelect", ax=self.ax, parent=self)
+        self.x_range_select.slider.rangeChanged.connect(self.draw_limits)
+        self.low = self.ax.axvline(0, c="r", ls="--")
+        self.high = self.ax.axvline(1, c="r", ls="--")
+
     def draw_limits(self, low, high):
         self.low.set_xdata([low, low])
         self.high.set_xdata([high, high])
         self.canvas.draw_idle()
 
     def clear(self):
+        # TODO: figure out why some of the clears don't work (like isosteric enthalpy)
         for ax in self.figure.axes:
             if ax == self.ax:
                 for line in ax.get_lines():
                     if line not in [self.low, self.high]:
                         line.remove()
-                    # TODO reset selector lines if needed
                 ax.relim()  # make sure all the data fits
                 ax.autoscale()  # auto-scale
-                # if self.selector:
-                #     self.selector.setRange(self.ax.get_xlim())
             else:
                 self.figure.delaxes(ax)

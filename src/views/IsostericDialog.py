@@ -4,20 +4,18 @@ from qtpy import QtWidgets as QW
 from src.views.GraphView import GraphView
 from src.views.IsoGraphView import IsoGraphView
 
-from src.widgets.RangeSlider import QHSpinBoxRangeSlider
 from src.widgets.UtilityWidgets import LabelAlignRight, LabelOutput, LabelResult
 
 
 class IsostericDialog(QW.QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setupUi()
-        self.retranslateUi()
-        self.connectSignals()
+        self.setup_UI()
+        self.translate_UI()
+        self.connect_signals()
 
-    def setupUi(self):
+    def setup_UI(self):
         self.setObjectName("IsostericDialog")
-        self.resize(900, 600)
 
         layout = QW.QGridLayout(self)
         layout.setObjectName("layout")
@@ -26,48 +24,46 @@ class IsostericDialog(QW.QDialog):
         isoLayout = QW.QVBoxLayout()
         layout.addLayout(isoLayout, 0, 0, 2, 1)
 
-        self.isoGraph = IsoGraphView(self)
-        self.isoGraph.setObjectName("graph")
+        self.isoGraph = IsoGraphView(x_range_select=True, parent=self)
+        self.isoGraph.setObjectName("isoGraph")
+        self.x_select = self.isoGraph.x_range_select
         isoLayout.addWidget(self.isoGraph)
-
-        self.pSlider = QHSpinBoxRangeSlider(parent=self, dec_pnts=3, slider_range=[0, 1, 0.01], values=[0, 1])
-        self.pSlider.setMaximumHeight(50)
-        self.pSlider.setEmitWhileMoving(False)
-        isoLayout.addWidget(self.pSlider)
 
         # Options/results box
         self.optionsBox = QW.QGroupBox(self)
         layout.addWidget(self.optionsBox, 0, 1, 1, 1)
 
-        self.optionsLayout = QW.QGridLayout(self.optionsBox)
+        self.options_layout = QW.QGridLayout(self.optionsBox)
 
         # Branch used
         self.branchLabel = LabelAlignRight("Branch used:")
-        self.optionsLayout.addWidget(self.branchLabel, 0, 0, 1, 1)
+        self.options_layout.addWidget(self.branchLabel, 0, 0, 1, 1)
         self.branchDropdown = QW.QComboBox(self)
-        self.optionsLayout.addWidget(self.branchDropdown, 0, 1, 1, 1)
+        self.options_layout.addWidget(self.branchDropdown, 0, 1, 1, 1)
 
         # Autodetermine
         self.autoButton = QW.QPushButton(self)
-        self.optionsLayout.addWidget(self.autoButton, 3, 0, 1, 2)
+        self.options_layout.addWidget(self.autoButton, 3, 0, 1, 2)
 
         # Enthalpy graph
-        self.resGraph = GraphView(self)
-        self.resGraph.setObjectName("resGraph")
-        layout.addWidget(self.resGraph, 1, 1, 1, 1)
+        self.res_graph = GraphView(self)
+        layout.addWidget(self.res_graph, 1, 1, 1, 1)
 
         # Bottom buttons
-        self.buttonBox = QW.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Close)
-        self.buttonBox.setObjectName("buttonBox")
-        layout.addWidget(self.buttonBox, 2, 0, 1, 1)
+        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Close)
+        layout.addWidget(self.button_box, 2, 0, 1, 1)
 
-    def connectSignals(self):
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+    def sizeHint(self) -> QC.QSize:
+        return QC.QSize(800, 900)
 
-    def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("IsostericDialog", "Isosteric Enthalpy", None, -1))
+    def connect_signals(self):
+        pass
+
+    def translate_UI(self):
+        self.setWindowTitle(
+            QW.QApplication.translate("IsostericDialog", "Isosteric Enthalpy", None, -1)
+        )
         self.optionsBox.setTitle(QW.QApplication.translate("IsostericDialog", "Options", None, -1))
         self.autoButton.setText(QW.QApplication.translate("IsostericDialog", "Calculate", None, -1))

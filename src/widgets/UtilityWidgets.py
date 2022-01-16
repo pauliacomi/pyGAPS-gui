@@ -2,22 +2,28 @@ from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
 
-def open_file_dialog(parent_widget, caption, directory, filter=None):
-    filename = QW.QFileDialog.getOpenFileName(parent_widget, caption=caption, directory=directory, filter=filter)
+def open_file_dialog(parent, caption, directory, filter=None):
+    filename = QW.QFileDialog.getOpenFileName(
+        parent=parent, caption=caption, dir=directory, filter=filter
+    )
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
         return str(filename[0])
     return str(filename)
 
 
-def open_files_dialog(parent_widget, caption, directory, filter=None):
-    filenames = QW.QFileDialog.getOpenFileNames(parent_widget, caption=caption, directory=directory, filter=filter)
+def open_files_dialog(parent, caption, directory, filter=None):
+    filenames = QW.QFileDialog.getOpenFileNames(
+        parent=parent, caption=caption, dir=directory, filter=filter
+    )
     if isinstance(filenames, tuple):  # PyQt5 returns a tuple...
         filenames = filenames[0]
     return filenames
 
 
-def save_file_dialog(parent_widget, caption, directory, filter=None):
-    filename = QW.QFileDialog.getSaveFileName(parent_widget, caption=caption, directory=directory, filter=filter)
+def save_file_dialog(parent, caption, directory, filter=None):
+    filename = QW.QFileDialog.getSaveFileName(
+        parent=parent, caption=caption, dir=directory, filter=filter
+    )
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
         return str(filename[0])
     return str(filename)
@@ -71,13 +77,14 @@ class LabelResult(QW.QLabel):
 
         self.setFrameStyle(QW.QFrame.Panel | QW.QFrame.Sunken)
         self.setAlignment(QC.Qt.AlignHCenter | QC.Qt.AlignVCenter)
+        self.setTextInteractionFlags(QC.Qt.TextSelectableByMouse)
 
 
-class LabelOutput(QW.QLabel):
+class LabelOutput(QW.QTextEdit):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.setFrameStyle(QW.QFrame.Panel | QW.QFrame.Sunken)
         self.setAlignment(QC.Qt.AlignLeft | QC.Qt.AlignTop)
-        self.setWordWrap(True)
-        self.setMinimumSize(50, 100)
+        self.setReadOnly(True)
+        self.setMinimumSize(50, 80)

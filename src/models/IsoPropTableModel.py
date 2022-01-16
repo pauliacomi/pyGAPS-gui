@@ -10,13 +10,17 @@ class IsoPropTableModel(MetadataTableModel):
         metadata = {
             prop: getattr(isotherm, prop)
             for prop in vars(isotherm)
-            if prop not in isotherm._required_params + list(isotherm._unit_params) + isotherm._reserved_params
+            if prop not in isotherm._required_params + list(isotherm._unit_params) +
+            isotherm._reserved_params
         }
         super().__init__(metadata, parent)
 
     def setData(self, index, value, role):
         """Set data of a cell."""
-        if index.isValid() and role == QC.Qt.EditRole:
+        if not index.isValid():
+            return False
+
+        if role == QC.Qt.EditRole:
             if index.column() == 0:
                 if value not in [p[0] for p in self.params]:
                     self.params.insert(index.row(), [value, None, None])
@@ -28,6 +32,7 @@ class IsoPropTableModel(MetadataTableModel):
 
             self.dataChanged.emit(index, index)
             return True
+
         return False
 
     def removeRows(self, position, rows=1, index=QC.QModelIndex()):

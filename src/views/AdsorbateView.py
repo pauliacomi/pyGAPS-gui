@@ -1,12 +1,21 @@
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
-from qtpy import QtSvg as QS
+
+from qtpy import PYSIDE6
+if PYSIDE6:
+    import PySide6.QtSvgWidgets as QS
+else:
+    from qtpy import QtSvg as QS
+
 from src.models.AdsPropTableModel import AdsPropTableModel
 
 from src.widgets.MetadataEditWidget import MetadataEditWidget
 from src.widgets.MetadataTableWidget import MetadataTableWidget
 from src.utilities.tex2svg import tex2svg
-from src.widgets.UtilityWidgets import ErrorMessageBox
+from src.widgets.UtilityWidgets import error_dialog
+
+from pygaps import ADSORBATE_LIST
+from pygaps import Adsorbate
 
 
 class AdsorbateView(QW.QWidget):
@@ -15,14 +24,14 @@ class AdsorbateView(QW.QWidget):
 
     def __init__(self, adsorbate=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setupUi()
+        self.setup_UI()
         if adsorbate:
             self.adsorbate = adsorbate
             self.setupModel()
-            self.connectSignals()
-        self.retranslateUi()
+            self.connect_signals()
+        self.translate_UI()
 
-    def setupUi(self):
+    def setup_UI(self):
         self.setObjectName("AdsorbateView")
         self.resize(500, 500)
 
@@ -71,7 +80,7 @@ class AdsorbateView(QW.QWidget):
 
         self.adsorbate = adsorbate
         self.setupModel()
-        self.connectSignals()
+        self.connect_signals()
 
     def setupModel(self):
         self.adsNameValue.setText(self.adsorbate.name)
@@ -91,7 +100,7 @@ class AdsorbateView(QW.QWidget):
         self.tableModel = AdsPropTableModel(self.adsorbate)
         self.tableView.setModel(self.tableModel)
 
-    def connectSignals(self):
+    def connect_signals(self):
 
         self.tableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
         self.metaButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
@@ -118,9 +127,7 @@ class AdsorbateView(QW.QWidget):
             try:
                 propValue = float(propValue)
             except ValueError:
-                errorbox = ErrorMessageBox()
-                errorbox.setText("Could not convert metadata value to number.")
-                errorbox.exec()
+                error_dialog("Could not convert metadata value to number.")
                 return
 
         self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
@@ -131,24 +138,34 @@ class AdsorbateView(QW.QWidget):
         index = self.tableView.selectionModel().currentIndex()
         self.tableModel.removeRow(index.row())
 
-    def retranslateUi(self):
-        self.adsNameLabel.setText(QW.QApplication.translate("AdsorbateView", "Adsorbate Name", None, -1))
-        self.adsAliasLabel.setText(QW.QApplication.translate("AdsorbateView", "Adsorbate Aliases", None, -1))
-        self.adsFormulaLabel.setText(QW.QApplication.translate("AdsorbateView", "Adsorbate Formula", None, -1))
-        self.adsBackendLabel.setText(QW.QApplication.translate("AdsorbateView", "Thermodynamic backend", None, -1))
-        self.metaLabel.setText(QW.QApplication.translate("AdsorbateView", "Other Metadata", None, -1))
+    def translate_UI(self):
+        self.adsNameLabel.setText(
+            QW.QApplication.translate("AdsorbateView", "Adsorbate Name", None, -1)
+        )
+        self.adsAliasLabel.setText(
+            QW.QApplication.translate("AdsorbateView", "Adsorbate Aliases", None, -1)
+        )
+        self.adsFormulaLabel.setText(
+            QW.QApplication.translate("AdsorbateView", "Adsorbate Formula", None, -1)
+        )
+        self.adsBackendLabel.setText(
+            QW.QApplication.translate("AdsorbateView", "Thermodynamic backend", None, -1)
+        )
+        self.metaLabel.setText(
+            QW.QApplication.translate("AdsorbateView", "Other Metadata", None, -1)
+        )
 
 
 class AdsorbateDialog(QW.QDialog):
     def __init__(self, adsorbate, parent=None, **kwargs) -> None:
         super().__init__(parent=parent, **kwargs)
 
-        self.setupUi()
-        self.retranslateUi()
-        self.connectSignals()
+        self.setup_UI()
+        self.translate_UI()
+        self.connect_signals()
         self.view.setAdsorbate(adsorbate)
 
-    def setupUi(self):
+    def setup_UI(self):
 
         layout = QW.QVBoxLayout(self)
 
@@ -157,14 +174,48 @@ class AdsorbateDialog(QW.QDialog):
         layout.addWidget(self.view)
 
         # Button box
-        self.buttonBox = QW.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QC.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
-        layout.addWidget(self.buttonBox)
+        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
+        layout.addWidget(self.button_box)
 
-    def connectSignals(self):
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+    def connect_signals(self):
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
 
-    def retranslateUi(self):
-        self.setWindowTitle(QW.QApplication.translate("AdsorbateDialog", "Adsorbate details", None, -1))
+    def translate_UI(self):
+        self.setWindowTitle(
+            QW.QApplication.translate("AdsorbateDialog", "Adsorbate details", None, -1)
+        )
+
+
+class AdsorbateListView(QW.QDialog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setup_UI()
+        self.translate_UI()
+        self.setupModel()
+
+    def setup_UI(self):
+
+        layout = QW.QHBoxLayout(self)
+
+        # list
+        self.adsorbateList = QW.QListWidget(parent=self)
+        layout.addWidget(self.adsorbateList)
+
+        # details
+        self.adsorbateDetails = AdsorbateView(parent=self)
+        layout.addWidget(self.adsorbateDetails)
+
+    def setupModel(self):
+        self.adsorbateList.addItems([ads.name for ads in ADSORBATE_LIST])
+        self.adsorbateList.currentItemChanged.connect(self.selectAdsorbate)
+
+    def selectAdsorbate(self, item):
+        self.adsorbateDetails.setAdsorbate(Adsorbate.find(item.text()))
+
+    def translate_UI(self):
+        self.setWindowTitle(
+            QW.QApplication.translate("AdsorbateListView", "pyGAPS Adsorbate explorer", None, -1)
+        )

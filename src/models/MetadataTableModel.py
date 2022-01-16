@@ -20,22 +20,22 @@ class MetadataTableModel(QC.QAbstractTableModel):
         return len(self.params)
 
     def columnCount(self, parent=QC.QModelIndex()):
-        """Number of columns, always two."""
+        """Number of columns, always three."""
         return 3
 
     def data(self, index, role=QC.Qt.DisplayRole):
         """Data display function."""
-        if index.isValid():
-            if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
-                return str(self.params[index.row()][index.column()])
-        return None
+        if not index.isValid():
+            return
+        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+            return str(self.params[index.row()][index.column()])
 
     def rowData(self, index, role=QC.Qt.DisplayRole):
         """Row data return function."""
-        if index.isValid():
-            if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
-                return self.params[index.row()]
-        return None
+        if not index.isValid():
+            return
+        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+            return self.params[index.row()]
 
     def insertRow(self, position, data, parent=QC.QModelIndex()):
         """Insert a single row into the model"""

@@ -2,68 +2,126 @@ import warnings
 
 from pygaps.characterisation.area_lang import (area_langmuir_raw, langmuir_transform)
 from pygaps.graphing.calc_graphs import langmuir_plot
+from pygaps.utilities.exceptions import CalculationError
+
+from src.widgets.UtilityWidgets import error_dialog
 
 
 class AreaLangModel():
-    def __init__(self, isotherm):
 
+    isotherm = None
+    view = None
+
+    # Settings
+    branch = "ads"
+    limits = None
+
+    # Calculated
+    loading = None
+    pressure = None
+    cross_section = None
+
+    # Results
+    lang_area = None
+    k_const = None
+    n_monolayer = None
+    p_monolayer = 1  # assumed by the langmuir model
+    slope = None
+    intercept = None
+    corr_coef = None
+    min_point = None
+    max_point = None
+
+    output = ""
+    success = True
+
+    def __init__(self, isotherm, view):
+        """First init"""
+        # Save refs
         self.isotherm = isotherm
-
-        # Properties
-        self.cross_section = self.isotherm.adsorbate.get_prop("cross_sectional_area")
-
-        # Loading and pressure
-        self.loading = self.isotherm.loading(
-            branch='ads', loading_unit='mol', loading_basis='molar'
-        )
-        self.pressure = self.isotherm.pressure(branch='ads', pressure_mode='relative')
-
-        self.limits = None
-        self.minimum = None
-        self.maximum = None
-
-        self.lang_area = None
-        self.k_const = None
-        self.n_monolayer = None
-        self.slope = None
-        self.intercept = None
-        self.corr_coef = None
-
-        self.output = None
-
-    def set_view(self, view):
-        """Initial actions on view connect."""
         self.view = view
 
-        # connect signals
-        self.view.auto_button.clicked.connect(self.calc_auto)
-        self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
+        # Fail condition
+        try:
+            self.isotherm.pressure(pressure_mode="relative")
+        except CalculationError:
+            error_dialog(
+                "Langmuir area cannot be defined for supercritical "
+                "adsorbates or those with an unknown saturation pressure. If "
+                "your adsorbate does not have a thermodynamic backend add a "
+                "'saturation_pressure' metadata to it."
+            )
+            self.success = False
+            return
 
-        # run
+        # View actions
+        # view setup
+        self.view.branchDropdown.addItems(["ads", "des"])
+        self.view.branchDropdown.setCurrentText(self.branch)
+        self.view.isoGraph.branch = self.branch
+        self.view.isoGraph.pressure_mode = "relative"
         self.view.isoGraph.set_isotherms([self.isotherm])
-        self.view.isoGraph.draw_isotherms()
+
+        # connect signals
+        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
+        self.view.auto_button.clicked.connect(self.calc_auto)
+        self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
+        self.view.button_box.accepted.connect(self.export_results)
+        self.view.button_box.rejected.connect(self.view.reject)
+
+        # Calculation
+        # static parameters
+        self.cross_section = self.isotherm.adsorbate.get_prop("cross_sectional_area")
+        # dynamic parameters
+        self.prepare_values()
+        # run calculation
         self.calc_auto()
+
+    def prepare_values(self):
+        # TODO: does the langmuir area require relative pressure?
+        # Loading and pressure
+        self.loading = self.isotherm.loading(
+            branch=self.branch,
+            loading_basis='molar',
+            loading_unit='mol',
+        )
+        self.pressure = self.isotherm.pressure(
+            branch=self.branch,
+            pressure_mode="relative",
+        )
+        if self.branch == 'des':
+            self.loading = self.loading[::-1]
+            self.pressure = self.pressure[::-1]
 
     def calc_auto(self):
         """Automatic calculation."""
+        self.output = ""
         self.limits = None
-        self.calculate()
-        self.output_results()
-        self.plot_calc()
-        self.slider_reset()
+        if self.calculate():
+            self.limits = [self.pressure[self.min_point], self.pressure[self.max_point]]
+            self.slider_reset()
+            self.output_results()
+            self.plot_results()
+        # if we can't calculate, we just display the isotherm and error
+        else:
+            self.view.isoGraph.draw_isotherms(branch=self.branch)
+            self.view.output.setText(self.output)
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
+        self.output = ""
         self.limits = [left, right]
-        self.calculate()
-        self.output_results()
-        self.plot_calc()
+        if self.calculate():
+            self.output_results()
+            self.plot_results()
+        # if we can't calculate, we just display the isotherm and error
+        else:
+            self.view.isoGraph.draw_isotherms(branch=self.branch)
+            self.view.output.setText(self.output)
 
     def calculate(self):
         with warnings.catch_warnings(record=True) as warning:
-
             warnings.simplefilter("always")
-
             try:
                 (
                     self.lang_area,
@@ -71,32 +129,32 @@ class AreaLangModel():
                     self.n_monolayer,
                     self.slope,
                     self.intercept,
-                    self.minimum,
-                    self.maximum,
+                    self.min_point,
+                    self.max_point,
                     self.corr_coef,
                 ) = area_langmuir_raw(
                     self.pressure,
                     self.loading,
                     self.cross_section,
-                    limits=self.limits,
+                    p_limits=self.limits,
                 )
 
             # We catch any errors or warnings and display them to the user
             except Exception as e:
-                self.output = f'<font color="red">Calculation failed! <br> {e}</font>'
-                return
+                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+                return False
 
             if warning:
-                self.output = '<br>'.join([
-                    f'<font color="red">Warning: {a.message}</font>' for a in warning
+                self.output += '<br>'.join([
+                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
                 ])
-            else:
-                self.output = None
+
+            return True
 
     def output_results(self):
         self.view.result_lang.setText(f'{self.lang_area:.4}')
         self.view.result_k.setText(f'{self.k_const:.4}')
-        self.view.result_mono_n.setText(f'{self.n_monolayer:.4}')
+        self.view.result_mono_n.setText(f'{self.n_monolayer * 1000:.4}')
         self.view.result_slope.setText(f'{self.slope:.4}')
         self.view.result_intercept.setText(f'{self.intercept:.4}')
         self.view.result_r.setText(f'{self.corr_coef:.4}')
@@ -104,24 +162,44 @@ class AreaLangModel():
         self.view.output.setText(self.output)
 
     def slider_reset(self):
-        self.view.pSlider.setValues([self.pressure[self.minimum], self.pressure[self.maximum]],
-                                    emit=False)
+        self.view.x_select.setValues(self.limits, emit=False)
+        self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
 
-    def plot_calc(self):
+    def plot_results(self):
 
-        # Clear plots
+        # Isotherm plot update
+        self.view.isoGraph.draw_isotherms(branch=self.branch)
+
+        # Generate plot of the points chosen
         self.view.langGraph.clear()
-
-        # Generate plot of the BET points chosen
         langmuir_plot(
             self.pressure,
             langmuir_transform(self.pressure, self.loading),
-            self.minimum,
-            self.maximum,
+            self.min_point,
+            self.max_point,
             self.slope,
             self.intercept,
             ax=self.view.langGraph.ax
         )
-
-        # Draw figures
         self.view.langGraph.canvas.draw()
+
+    def select_branch(self):
+        self.branch = self.view.branchDropdown.currentText()
+        self.prepare_values()
+        self.calc_auto()
+
+    def export_results(self):
+        from src.utilities.result_export import serialize
+
+        results = {
+            'Langmuir Area [m2/g]': self.lang_area,
+            'R^2': self.corr_coef,
+            'K constant': self.k_const,
+            'n_monolayer [mmol/g]': self.n_monolayer * 1000,
+            'p_monolayer [p/p0]': self.p_monolayer,
+            'Langmuir slope': self.slope,
+            'Langmuir intercept': self.intercept,
+            'Pressure limits': self.limits
+        }
+        if serialize(results, parent=self.view):
+            self.view.accept()

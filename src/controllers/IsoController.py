@@ -6,7 +6,7 @@ from qtpy import QtWidgets as QW
 
 from src.models.IsoModel import IsoModel
 from src.models.IsoPropTableModel import IsoPropTableModel
-from src.widgets.UtilityWidgets import ErrorMessageBox
+from src.widgets.UtilityWidgets import error_dialog
 
 
 class IsoController():
@@ -45,12 +45,17 @@ class IsoController():
         self.mw_widget.adsorbateEdit.insertItems(0, [ads.name for ads in pygaps.ADSORBATE_LIST])
 
         # populate units view
-        self.unit_widget.init_boxes(_PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE, _TEMPERATURE_UNITS)
+        self.unit_widget.init_boxes(
+            _PRESSURE_MODE,
+            _LOADING_MODE,
+            _MATERIAL_MODE,
+            _TEMPERATURE_UNITS,
+        )
 
         # signals between all model/views
-        self.connectSignals()
+        self.connect_signals()
 
-    def connectSignals(self):
+    def connect_signals(self):
 
         # Connect signals for list view
         self.list_view.selectionModel().currentChanged.connect(self.selection_changed)
@@ -68,12 +73,16 @@ class IsoController():
 
         # Setup property signals
         self.mw_widget.extraPropButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
-        self.mw_widget.extraPropButtonWidget.propButtonDelete.clicked.connect(self.extra_prop_delete)
+        self.mw_widget.extraPropButtonWidget.propButtonDelete.clicked.connect(
+            self.extra_prop_delete
+        )
         self.mw_widget.materialDetails.clicked.connect(self.material_detail)
         self.mw_widget.adsorbateDetails.clicked.connect(self.adsorbate_detail)
 
         # Connect signals for graph view
-        self.list_view.selectionModel().currentChanged.connect(self.iso_list_model.handle_item_select)
+        self.list_view.selectionModel().currentChanged.connect(
+            self.iso_list_model.handle_item_select
+        )
         self.iso_list_model.checkedChanged.connect(self.graph_view.update)
         self.unit_widget.unitsChanged.connect(self.update_isotherm)
 
@@ -83,7 +92,7 @@ class IsoController():
 
     def selection_changed(self, index, **kwargs):
         """What to do when the selected isotherm has changed."""
-        self.current_isotherm = self.iso_list_model.get_iso_index(index)
+        self.current_isotherm = self.iso_list_model.get_item_index(index)
 
         # Just reset if nothing to display
         self.clear_isotherm()
@@ -106,7 +115,9 @@ class IsoController():
         # Other isotherm metadata
         self.extraPropTableModel = IsoPropTableModel(self.current_isotherm)
         self.mw_widget.extraPropTableView.setModel(self.extraPropTableModel)
-        self.mw_widget.extraPropTableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
+        self.mw_widget.extraPropTableView.selectionModel().selectionChanged.connect(
+            self.extra_prop_select
+        )
 
     def update_isotherm(self):
         self.display_isotherm()
@@ -138,12 +149,16 @@ class IsoController():
 
         if isotherm.adsorbate != self.mw_widget.adsorbateEdit.lineEdit().text():
             isotherm.adsorbate = self.mw_widget.adsorbateEdit.lineEdit().text()
-            self.mw_widget.statusbar.showMessage(f'Adsorbate modified to {isotherm.adsorbate}', 2000)
+            self.mw_widget.statusbar.showMessage(
+                f'Adsorbate modified to {isotherm.adsorbate}', 2000
+            )
             modified = True
 
         if isotherm.temperature != float(self.mw_widget.temperatureEdit.text()):
             isotherm.temperature = float(self.mw_widget.temperatureEdit.text())
-            self.mw_widget.statusbar.showMessage(f'Temperature modified to {isotherm.temperature}', 2000)
+            self.mw_widget.statusbar.showMessage(
+                f'Temperature modified to {isotherm.temperature}', 2000
+            )
             modified = True
 
         if modified:
@@ -189,9 +204,7 @@ class IsoController():
             try:
                 propValue = float(propValue)
             except ValueError:
-                errorbox = ErrorMessageBox()
-                errorbox.setText("Could not convert metadata value to number.")
-                errorbox.exec()
+                error_dialog("Could not convert metadata value to number.")
                 return
 
         self.extraPropTableModel.setOrInsertRow(data=[propName, propValue, propType])
@@ -209,12 +222,14 @@ class IsoController():
 
         if self.current_isotherm:
             dialog = IsoDataDialog()
-            dialog.tableView.setModel(IsoDataTableModel(self.current_isotherm.data()))
+            dialog.table_view.setModel(IsoDataTableModel(self.current_isotherm.data()))
             ret = dialog.exec()
             if ret == QW.QDialog.Accepted:
                 self.update_isotherm()
 
     def refresh_material_edit(self):
+        # TODO change how materials are handled and updated
+        # due to errors in editing during isotherm edits
         self.mw_widget.materialEdit.clear()
         self.mw_widget.materialEdit.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
 
@@ -284,7 +299,7 @@ class IsoController():
 
     def save(self, path, ext):
         """Save isotherm to disk."""
-        isotherm = self.iso_list_model.get_iso_index(self.list_view.currentIndex())
+        isotherm = self.iso_list_model.get_item_index(self.list_view.currentIndex())
 
         import pygaps.parsing as pgp
         if ext == '.csv':

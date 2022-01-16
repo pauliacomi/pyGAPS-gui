@@ -21,11 +21,10 @@ class QSpinBoxSlider(QW.QWidget):
 
         self.value = value
 
-        layout = QW.QGridLayout(self)
-
         # label
         self.label = LabelAlignRight(self)
         self.label.setMinimumSize(5, 2)
+        self.label.setMaximumSize(20, 10)
 
         # spinbox
         self.spin_box = QW.QDoubleSpinBox(self)
@@ -74,8 +73,6 @@ class QSpinBoxSlider(QW.QWidget):
         self.spin_box.setDecimals(dec_pnts)
 
     def setValue(self, value, emit=True):
-        self.setRange(maxv=value * 2)
-
         # value
         if not emit:
             self.slider.blockSignals(True)
@@ -130,7 +127,7 @@ class QHSpinBoxSlider(QSpinBoxSlider):
     def __init__(self, value=0, parent=None, **kwargs):
         super().__init__(value=value, parent=parent, **kwargs)
 
-        layout = self.layout()
+        layout = QW.QGridLayout(self)  # sets a layout
         layout.addWidget(self.label, 0, 0, 1, 1)
-        layout.addWidget(self.spin_box, 0, 1, 1, 1)
-        layout.addWidget(self.slider, 1, 0, 1, 2)
+        layout.addWidget(self.slider, 0, 1, 1, 2)
+        layout.addWidget(self.spin_box, 0, 3, 1, 1)

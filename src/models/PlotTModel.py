@@ -3,75 +3,110 @@ import warnings
 from pygaps.characterisation.tplot import t_plot_raw
 from pygaps.characterisation.models_thickness import (_THICKNESS_MODELS, get_thickness_model)
 from pygaps.graphing.calc_graphs import tp_plot
+from pygaps.utilities.exceptions import CalculationError
+
+from src.widgets.UtilityWidgets import error_dialog
 
 from qtpy import QtWidgets as QW
 
 
 class PlotTModel():
-    def __init__(self, isotherm):
 
+    isotherm = None
+    view = None
+
+    # Settings
+    branch = "ads"
+    limits = None
+    thickness_model = None
+    molar_mass = None
+    liquid_density = None
+
+    # Results
+    t_curve = None
+    results = None
+
+    output = ""
+    success = True
+
+    def __init__(self, isotherm, view):
+        # Save refs
         self.isotherm = isotherm
-
-        # Properties
-        self.molar_mass = self.isotherm.adsorbate.molar_mass()
-        self.liquid_density = self.isotherm.adsorbate.liquid_density(isotherm.temperature)
-
-        # Loading and pressure
-        self.loading = self.isotherm.loading(
-            branch='ads', loading_unit='mol', loading_basis='molar'
-        )
-        self.pressure = self.isotherm.pressure(branch='ads', pressure_mode='relative')
-
-        self.limits = None
-        self.minimum = None
-        self.maximum = None
-
-        self.thickness_model = None
-
-        self.t_curve = None
-        self.results = None
-        self.output = None
-
-    def set_view(self, view):
-        """Initial actions on view connect."""
         self.view = view
 
+        # Fail condition
+        try:
+            self.isotherm.pressure(pressure_mode="relative")
+        except CalculationError:
+            error_dialog(
+                "T-plots cannot be defined for supercritical "
+                "adsorbates or those with an unknown saturation pressure. If "
+                "your adsorbate does not have a thermodynamic backend add a "
+                "'saturation_pressure' metadata to it."
+            )
+            self.success = False
+            return
+
+        # View actions
+
         # setup
-        self.view.thicknessDropdown.addItems(list(_THICKNESS_MODELS.keys()))
+        self.view.branchDropdown.addItems(["ads", "des"])
+        self.view.branchDropdown.setCurrentText(self.branch)
+        models = list(_THICKNESS_MODELS.keys())
+        self.view.thicknessDropdown.addItems(models)
 
         # connect signals
-        self.view.thicknessDropdown.currentIndexChanged.connect(self.save_tmodel)
+        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
+        # TODO: add the ability for custom callable models
+        self.view.thicknessDropdown.currentIndexChanged.connect(self.select_tmodel)
         self.view.auto_button.clicked.connect(self.calc_auto)
-        self.view.pSlider.rangeChanged.connect(self.calc_with_limits)
+        self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
+        self.view.button_box.accepted.connect(self.export_results)
+        self.view.button_box.rejected.connect(self.view.reject)
 
-        # run
-        self.save_tmodel()
+        # Calculation
+        # static parameters
+        self.molar_mass = self.isotherm.adsorbate.molar_mass()
+        self.liquid_density = self.isotherm.adsorbate.liquid_density(isotherm.temperature)
+        self.thickness_model = get_thickness_model(models[0])
+        # dynamic parameters
+        self.prepare_values()
+        # run calculation
         self.calc_auto()
 
-    def save_tmodel(self):
-        tmodel_text = self.view.thicknessDropdown.currentText()
-        self.thickness_model = get_thickness_model(tmodel_text)
+    def prepare_values(self):
+        # Loading and pressure
+        self.loading = self.isotherm.loading(
+            branch=self.branch,
+            loading_basis='molar',
+            loading_unit='mol',
+        )
+        self.pressure = self.isotherm.pressure(
+            branch=self.branch,
+            pressure_mode="relative",
+        )
+        if self.branch == 'des':
+            self.loading = self.loading[::-1]
+            self.pressure = self.pressure[::-1]
 
     def calc_auto(self):
         """Automatic calculation."""
         self.limits = None
         self.calculate()
-        self.output_results()
-        self.plot()
         self.slider_reset()
+        self.output_results()
+        self.plot_results()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
         self.calculate()
         self.output_results()
-        self.plot()
+        self.plot_results()
 
     def calculate(self):
         with warnings.catch_warnings(record=True) as warning:
-
             warnings.simplefilter("always")
-
             try:
                 self.results, self.t_curve = t_plot_raw(
                     self.loading,
@@ -79,20 +114,17 @@ class PlotTModel():
                     self.thickness_model,
                     self.liquid_density,
                     self.molar_mass,
-                    limits=self.limits,
+                    t_limits=self.limits,
                 )
 
             # We catch any errors or warnings and display them to the user
             except Exception as e:
-                self.output = f'<font color="red">Calculation failed! <br> {e}</font>'
-                return
+                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
 
             if warning:
-                self.output = '<br>'.join([
-                    f'<font color="red">Warning: {a.message}</font>' for a in warning
+                self.output += '<br>'.join([
+                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
                 ])
-            else:
-                self.output = None
 
     def output_results(self):
         self.view.resultsTable.setRowCount(0)
@@ -112,21 +144,50 @@ class PlotTModel():
                 index, 4, QW.QTableWidgetItem(f"{result.get('intercept'):g}")
             )
 
-    def plot(self):
+        self.view.output.setText(self.output)
+        self.output = ""
 
-        # Clear plots
-        self.view.tGraph.clear()
+    def plot_results(self):
 
         # Generate tplot
+        self.view.tGraph.clear()
         tp_plot(
             self.t_curve,
             self.loading,
             self.results,
             ax=self.view.tGraph.ax,
         )
-
-        # Draw figures
         self.view.tGraph.canvas.draw()
 
     def slider_reset(self):
-        self.view.pSlider.setValues((self.t_curve[0], self.t_curve[-1]), emit=False)
+        self.view.x_select.setRange((0, self.t_curve[-1]))
+        self.view.x_select.setValues((self.t_curve[0], self.t_curve[-1]), emit=False)
+        self.view.tGraph.draw_limits(self.t_curve[0], self.t_curve[-1])
+
+    def select_tmodel(self):
+        tmodel_text = self.view.thicknessDropdown.currentText()
+        self.thickness_model = get_thickness_model(tmodel_text)
+        self.calc_auto()
+
+    def select_branch(self):
+        self.branch = self.view.branchDropdown.currentText()
+        self.prepare_values()
+        self.calc_auto()
+
+    def export_results(self):
+        if not self.results:
+            error_dialog("No results to export.")
+            return
+        from src.utilities.result_export import serialize
+        results = {
+            e: {
+                "Pore volume [cm3/g]": result.get("adsorbed_volume"),
+                "Area [m2/g]": result.get("area"),
+                "R^2": result.get("corr_coef"),
+                "Slope": result.get("slope"),
+                "Intercept": result.get("intercept"),
+            }
+            for e, result in enumerate(self.results)
+        }
+        if serialize(results, parent=self.view):
+            self.view.accept()

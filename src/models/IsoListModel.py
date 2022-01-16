@@ -28,12 +28,12 @@ class IsoListModel(QG.QStandardItemModel):
         self.itemChanged.connect(self.handle_item_change)
         self.setItemPrototype(IsoModel())
 
-    def get_iso_index(self, index):
+    def get_item_index(self, index):
         """Return an isotherm given an index."""
         iso = self.itemFromIndex(index)
         return iso.data() if iso else None
 
-    def get_iso_checked(self):
+    def get_item_checked(self):
         """Return list of checked isotherms."""
         # There is no standard method for this
         return [
