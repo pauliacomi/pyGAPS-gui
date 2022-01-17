@@ -1,4 +1,3 @@
-import argparse
 import pathlib
 import sys
 
@@ -6,12 +5,10 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
-# Scaling for high dpi screens
+# Scaling for high dpi screens # TODO deprecated in pyside6
 QW.QApplication.setAttribute(QC.Qt.AA_EnableHighDpiScaling, True)
 QW.QApplication.setAttribute(QC.Qt.AA_UseHighDpiPixmaps, True)
 
-# Back up the reference to the exceptionhook
-sys._excepthook = sys.excepthook
 
 
 def exception_hook(exctype, value, traceback):
@@ -34,6 +31,7 @@ def get_resource(file):
 
 def process_cl_args():
     """Process known arguments."""
+    import argparse
     parser = argparse.ArgumentParser(description='Directly open isotherms.')
     parser.add_argument(
         '--file',
@@ -55,6 +53,8 @@ def process_cl_args():
 def main():
     """Main app entrypoint."""
 
+    # Back up the reference to the exceptionhook
+    sys._excepthook = sys.excepthook
     # Set the exception hook to our wrapping function
     sys.excepthook = exception_hook
 
@@ -65,20 +65,28 @@ def main():
     # Create application
     app = QW.QApplication(qt_args)
 
-    # Icon
+    # Splashscreen
+    from src.SplashScreen import SplashScreen
+    splash = SplashScreen()
+    splash.show()
+    app.processEvents()
+
+    # Resources
+    splash.showMessage("Loading resources...", 40)
     icon = QG.QIcon()
     icon.addFile('./src/resources/main_icon.png', QC.QSize(48, 48))
     icon.addFile('./src/resources/main_icon.png', QC.QSize(100, 100))
     app.setWindowIcon(icon)
 
     # Init pygaps
+    splash.showMessage("Initiating backend...", 60)
     from src.init_pygaps import init_pygaps
     init_pygaps()
 
-    # Create main window and show
+    # Create main window
+    splash.showMessage("Starting...", 80)
     from .MainWindow import MainWindow
     mainwnd = MainWindow(None)
-    mainwnd.show()
 
     # Load files from cli if needed
     if parsed_args.file:
@@ -90,5 +98,8 @@ def main():
         filepaths = [x for x in folder.iterdir() if not x.is_dir()]
         mainwnd.load_iso(filepaths)
 
+    # Show and finish
+    mainwnd.show()
+    splash.finish(mainwnd)
     # Execute
     sys.exit(app.exec_())
