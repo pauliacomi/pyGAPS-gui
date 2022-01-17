@@ -1,4 +1,5 @@
 def init_pygaps():
+    import pygaps
     import pygaps.graphing.mpl_styles as pgs
 
     pgs.FIG_STYLE = {

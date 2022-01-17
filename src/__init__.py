@@ -10,17 +10,18 @@ QW.QApplication.setAttribute(QC.Qt.AA_EnableHighDpiScaling, True)
 QW.QApplication.setAttribute(QC.Qt.AA_UseHighDpiPixmaps, True)
 
 
-
-def exception_hook(exctype, value, traceback):
+def exception_hook(exctype, exc, trace):
     """Catch qtpy exceptions."""
     # https://stackoverflow.com/questions/43039048/pyqt5-fails-with-cryptic-message
+    import traceback
 
-    from src.widgets.UtilityWidgets import error_dialog
-    error_dialog(str(value))
+    trace_s = "".join(traceback.format_tb(trace))
+
+    from src.widgets.UtilityWidgets import error_detail_dialog
+    error_detail_dialog(str(exc), trace_s)
 
     # Call the normal Exception hook after
-    sys._excepthook(exctype, value, traceback)
-    # sys.exit(1)
+    sys._excepthook(exctype, exc, trace)
 
 
 # Resources
