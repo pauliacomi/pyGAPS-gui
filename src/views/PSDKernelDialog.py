@@ -17,66 +17,65 @@ class PSDKernelDialog(QW.QDialog):
     def setup_UI(self):
         self.setObjectName("PSDKernelDialog")
 
-        layout = QW.QGridLayout(self)
-        layout.setObjectName("layout")
+        _layout = QW.QGridLayout(self)
 
-        self.optionsBox = QW.QGroupBox(self)
-        layout.addWidget(self.optionsBox, 0, 0, 1, 1)
-        self.rGraphsBox = QW.QGroupBox(self)
-        layout.addWidget(self.rGraphsBox, 1, 0, 1, 1)
-        layout.setRowStretch(0, 1)
-        layout.setRowStretch(1, 1)
+        self.options_box = QW.QGroupBox()
+        _layout.addWidget(self.options_box, 0, 0, 1, 1)
+        self.res_graphs_box = QW.QGroupBox()
+        _layout.addWidget(self.res_graphs_box, 1, 0, 1, 1)
+        _layout.setRowStretch(0, 1)
+        _layout.setRowStretch(1, 1)
 
         # Options box
-        self.options_layout = QW.QHBoxLayout(self.optionsBox)
+        self.options_layout = QW.QHBoxLayout(self.options_box)
 
         ## Iso graph and slider
-        self.isoGraph = IsoGraphView(x_range_select=True, parent=self)
-        self.isoGraph.setObjectName("isoGraph")
-        self.x_select = self.isoGraph.x_range_select
-        self.options_layout.addWidget(self.isoGraph)
+        self.iso_graph = IsoGraphView(x_range_select=True)
+        self.iso_graph.setObjectName("iso_graph")
+        self.x_select = self.iso_graph.x_range_select
+        self.options_layout.addWidget(self.iso_graph)
 
         ## Options sub box
-        self.optionsSubLayout = QW.QGridLayout()
-        self.options_layout.addLayout(self.optionsSubLayout)
+        self.options_sub_layout = QW.QGridLayout()
+        self.options_layout.addLayout(self.options_sub_layout)
 
         ## Branch used
-        self.branchLabel = LabelAlignRight("Branch used:")
-        self.optionsSubLayout.addWidget(self.branchLabel, 0, 0, 1, 1)
-        self.branchDropdown = QW.QComboBox(self)
-        self.optionsSubLayout.addWidget(self.branchDropdown, 0, 1, 1, 1)
+        self.branch_label = LabelAlignRight("Branch used:")
+        self.branch_dropdown = QW.QComboBox()
+        self.options_sub_layout.addWidget(self.branch_label, 0, 0, 1, 1)
+        self.options_sub_layout.addWidget(self.branch_dropdown, 0, 1, 1, 1)
 
         ## Kernel model
-        self.kernelLabel = LabelAlignRight("Kernel used:")
-        self.optionsSubLayout.addWidget(self.kernelLabel, 1, 0, 1, 1)
-        self.kernelDropdown = QW.QComboBox(self)
-        self.optionsSubLayout.addWidget(self.kernelDropdown, 1, 1, 1, 1)
+        self.kernel_label = LabelAlignRight("Kernel used:")
+        self.kernel_dropdown = QW.QComboBox()
+        self.options_sub_layout.addWidget(self.kernel_label, 1, 0, 1, 1)
+        self.options_sub_layout.addWidget(self.kernel_dropdown, 1, 1, 1, 1)
 
         ## spline smoothing
-        self.smoothLabel = LabelAlignRight("Spline fit order:")
-        self.optionsSubLayout.addWidget(self.smoothLabel, 2, 0, 1, 1)
-        self.smoothEdit = QW.QSpinBox(self)
-        self.smoothEdit.setMinimum(0)
-        self.optionsSubLayout.addWidget(self.smoothEdit, 2, 1, 1, 1)
+        self.smooth_label = LabelAlignRight("Spline fit order:")
+        self.smooth_input = QW.QSpinBox()
+        self.smooth_input.setMinimum(0)
+        self.options_sub_layout.addWidget(self.smooth_label, 2, 0, 1, 1)
+        self.options_sub_layout.addWidget(self.smooth_input, 2, 1, 1, 1)
 
         ## Autodetermine
-        self.autoButton = QW.QPushButton(self)
-        self.optionsSubLayout.addWidget(self.autoButton, 3, 0, 1, 2)
+        self.calc_auto_button = QW.QPushButton()
+        self.options_sub_layout.addWidget(self.calc_auto_button, 3, 0, 1, 2)
 
         # Results graph box
-        self.rGraphsLayout = QW.QVBoxLayout(self.rGraphsBox)
+        self.res_graphs_layout = QW.QVBoxLayout(self.res_graphs_box)
 
         ## PSD graph
-        self.res_graph = GraphView(parent=self)
-        self.rGraphsLayout.addWidget(self.res_graph)
+        self.res_graph = GraphView()
+        self.res_graphs_layout.addWidget(self.res_graph)
 
         # TODO Add a second graph that shows the fit of the kernel
 
         # Bottom buttons
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
-        layout.addWidget(self.button_box, 2, 0, 1, 1)
+        _layout.addWidget(self.button_box, 2, 0, 1, 1)
 
     def sizeHint(self) -> QC.QSize:
         return QC.QSize(800, 900)
@@ -85,9 +84,10 @@ class PSDKernelDialog(QW.QDialog):
         pass
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("PSDKernelDialog", "Calculate kernel fit PSD", None, -1)
-        )
-        self.optionsBox.setTitle(QW.QApplication.translate("PSDKernelDialog", "Options", None, -1))
-        self.rGraphsBox.setTitle(QW.QApplication.translate("PSDKernelDialog", "Results", None, -1))
-        self.autoButton.setText(QW.QApplication.translate("PSDKernelDialog", "Calculate", None, -1))
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("PSDKernelDialog", "Calculate kernel fit PSD", None, -1))
+        self.options_box.setTitle(QW.QApplication.translate("PSDKernelDialog", "Options", None, -1))
+        self.res_graphs_box.setTitle(QW.QApplication.translate("PSDKernelDialog", "Results", None, -1))
+        self.calc_auto_button.setText(QW.QApplication.translate("PSDKernelDialog", "Calculate", None, -1))
+        # yapf: enable

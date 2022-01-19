@@ -8,11 +8,12 @@ class IsoListView(QW.QListView):
     # Ask to delete current isotherm
     delete_current_iso = QC.Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, *args, **kwargs):
 
         # Initial init
-        super().__init__(parent)
+        super().__init__(*args, **kwargs)
 
+        # Setup properties
         self.setEditTriggers(QW.QAbstractItemView.NoEditTriggers)
         self.setSelectionMode(QW.QAbstractItemView.SingleSelection)
         self.setMovement(QW.QListView.Snap)

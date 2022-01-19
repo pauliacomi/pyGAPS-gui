@@ -2,7 +2,7 @@ from qtpy import QtWidgets as QW
 
 from functools import partial
 
-from src.widgets.UtilityWidgets import error_dialog, open_files_dialog
+from src.widgets.UtilityWidgets import open_files_dialog
 
 IMPORT_FILES = [
     {
@@ -39,6 +39,7 @@ class ImportDialog(QW.QDialog):
         self.filepaths = None
         self.ftype = None
         self.fext = None
+        self.last_dir = None
 
         self.setup_UI()
         self.translate_UI()
@@ -47,41 +48,42 @@ class ImportDialog(QW.QDialog):
         self.setObjectName("ImportDialog")
 
         # Create/set layout
-        layout = QW.QVBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
 
         # Create widgets
-        self.label = QW.QLabel("Select source file type")
-        layout.addWidget(self.label)
-        self.btns = []
+        self.label = QW.QLabel("Select source file type:")
+        _layout.addWidget(self.label)
 
+        self.choice_radio = []
         for ind, tp in enumerate(IMPORT_FILES):
-            btn = QW.QRadioButton(f"{tp['name']} (.{', .'.join(tp['ext'])})")
-            btn.toggled.connect(partial(self.setftype, tp=ind))
-            layout.addWidget(btn)
-            self.btns.append(btn)
+            radio = QW.QRadioButton(f"{tp['name']} (.{', .'.join(tp['ext'])})")
+            radio.toggled.connect(partial(self.set_ftype, tp=ind))
+            _layout.addWidget(radio)
+            self.choice_radio.append(radio)
 
-        self.buttonImport = QW.QPushButton("Select file(s)")
-        self.buttonImport.setVisible(False)
-        self.buttonImport.clicked.connect(self.importForm)
-        layout.addWidget(self.buttonImport)
+        self.import_button = QW.QPushButton("Select file(s)")
+        self.import_button.setVisible(False)
+        self.import_button.clicked.connect(self.import_form)
+        _layout.addWidget(self.import_button)
 
-    def setftype(self, act: bool, tp: int):
+    def set_ftype(self, act: bool, tp: int):
         if act:
             self.ftype = tp
-            self.buttonImport.setVisible(True)
+            self.import_button.setVisible(True)
 
-    def importForm(self):
+    def import_form(self):
         sel = IMPORT_FILES[self.ftype]
         self.filepaths = open_files_dialog(
-            parent_widget=self,
+            parent=self,
             caption="Import an isotherm from a manufacturer file",
-            directory='.',
+            directory=str(self.last_dir) if self.last_dir else '.',
             filter=f"{sel['name']} (*.{' *.'.join(sel['ext'])})"
         )
         if self.filepaths:
             self.close()
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("ImportDialog", "Import from manufacturer file", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("ImportDialog", "Import from manufacturer file", None, -1))
+        # yapf: enable

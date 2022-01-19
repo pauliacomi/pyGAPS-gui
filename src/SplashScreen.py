@@ -17,28 +17,25 @@ class SplashScreen(QW.QSplashScreen):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setGeometry(0, 0, 680, 400)
+        self.setupUi()
         screen = self.screen()
-        self.move(screen.geometry().center() - self.frameGeometry().center())
-        self.ui = SplashScreen_UI()
-        self.ui.setupUi(self)
+        self.move(screen.availableGeometry().center() - self.frameGeometry().center())
 
     def drawContents(self, painter: QG.QPainter) -> None:
         pass
 
     def showMessage(self, text: str, progress: int):
-        self.ui.label_loading.setText(text)
-        self.ui.progressBar.setValue(progress)
+        self.label_loading.setText(text)
+        self.progressbar.setValue(progress)
         self.repaint()
 
-
-class SplashScreen_UI():
-    def setupUi(self, SplashScreen):
-        if SplashScreen.objectName():
-            SplashScreen.setObjectName("SplashScreen")
+    def setupUi(self):
+        if self.objectName():
+            self.setObjectName("SplashScreen")
 
         # General window formats
-        SplashScreen.setWindowFlag(QC.Qt.FramelessWindowHint)
-        SplashScreen.setAttribute(QC.Qt.WA_TranslucentBackground)
+        self.setWindowFlag(QC.Qt.FramelessWindowHint)
+        self.setAttribute(QC.Qt.WA_TranslucentBackground)
 
         # Declare fonts
         font_large = QG.QFont()
@@ -55,7 +52,7 @@ class SplashScreen_UI():
         font_small.setPointSize(10)
 
         ## Drop shadow effect
-        self.dropShadowFrame = QW.QFrame(SplashScreen)
+        self.dropShadowFrame = QW.QFrame(self)
         self.dropShadowFrame.setObjectName("dropShadowFrame")
         self.dropShadowFrame.setStyleSheet(
             "QFrame {	\n"
@@ -66,7 +63,7 @@ class SplashScreen_UI():
         )
         self.dropShadowFrame.setFrameShape(QW.QFrame.StyledPanel)
         self.dropShadowFrame.setFrameShadow(QW.QFrame.Raised)
-        self.shadow = QW.QGraphicsDropShadowEffect(SplashScreen)
+        self.shadow = QW.QGraphicsDropShadowEffect(self)
         self.shadow.setBlurRadius(20)
         self.shadow.setXOffset(0)
         self.shadow.setYOffset(0)
@@ -87,10 +84,10 @@ class SplashScreen_UI():
         self.label_description.setStyleSheet("color: rgb(98, 114, 164);")
         self.label_description.setAlignment(QC.Qt.AlignCenter)
 
-        self.progressBar = QW.QProgressBar(self.dropShadowFrame)
-        self.progressBar.setObjectName("progressBar")
-        self.progressBar.setGeometry(QC.QRect(50, 280, 561, 23))
-        self.progressBar.setStyleSheet(
+        self.progressbar = QW.QProgressBar(self.dropShadowFrame)
+        self.progressbar.setObjectName("progressbar")
+        self.progressbar.setGeometry(QC.QRect(50, 280, 561, 23))
+        self.progressbar.setStyleSheet(
             "QProgressBar {\n"
             "	\n"
             "	background-color: rgb(98, 114, 164);\n"
@@ -104,7 +101,7 @@ class SplashScreen_UI():
             "	background-color: qlineargradient(spread:pad, x1:0, y1:0.511364, x2:1, y2:0.523, stop:0 rgba(254, 121, 199, 255), stop:1 rgba(170, 85, 255, 255));\n"
             "}"
         )
-        self.progressBar.setValue(20)
+        self.progressbar.setValue(20)
         self.label_loading = QW.QLabel(self.dropShadowFrame)
         self.label_loading.setObjectName("label_loading")
         self.label_loading.setGeometry(QC.QRect(0, 320, 661, 21))
@@ -119,25 +116,26 @@ class SplashScreen_UI():
         self.label_credits.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignTrailing | QC.Qt.AlignVCenter)
 
         # Layout
-        self.verticalLayout = QW.QVBoxLayout(SplashScreen)
-        self.verticalLayout.setSpacing(0)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.verticalLayout.setContentsMargins(10, 10, 10, 10)
-        self.verticalLayout.addWidget(self.dropShadowFrame)
+        self._layout = QW.QVBoxLayout(self)
+        self._layout.setSpacing(0)
+        self._layout.setObjectName("_layout")
+        self._layout.setContentsMargins(10, 10, 10, 10)
+        self._layout.addWidget(self.dropShadowFrame)
 
-        self.retranslateUi(SplashScreen)
+        self.retranslateUi()
 
-        QC.QMetaObject.connectSlotsByName(SplashScreen)
+        QC.QMetaObject.connectSlotsByName(self)
 
     # setupUi
 
-    def retranslateUi(self, SplashScreen):
+    def retranslateUi(self):
         # yapf: disable
-        SplashScreen.setWindowTitle(QC.QCoreApplication.translate("SplashScreen", "MainWindow", None))
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QC.QCoreApplication.translate("SplashScreen", "MainWindow", None))
         self.label_title.setText(QC.QCoreApplication.translate("SplashScreen", "<strong>py</strong>GAPS", None))
         self.label_description.setText(QC.QCoreApplication.translate("SplashScreen", "General Adsorption Processing Suite", None))
         self.label_loading.setText(QC.QCoreApplication.translate("SplashScreen", "loading...", None))
-        self.label_credits.setText(QC.QCoreApplication.translate("SplashScreen", "<strong>Created</strong>: Paul Iacomi", None))
+        self.label_credits.setText(QC.QCoreApplication.translate("SplashScreen", "<strong>Created by</strong>: Paul Iacomi", None))
         # yapf: enable
 
     # retranslateUi

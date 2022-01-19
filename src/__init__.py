@@ -51,6 +51,15 @@ def process_cl_args():
     return parsed_args, unparsed_args
 
 
+@QC.Slot()
+def sync_theme_with_system() -> None:
+    import darkdetect
+    import qdarktheme
+    theme = darkdetect.theme().lower()
+    stylesheet = qdarktheme.load_stylesheet(theme)
+    QW.QApplication.instance().setStyleSheet(stylesheet)
+
+
 def main():
     """Main app entrypoint."""
 
@@ -74,6 +83,8 @@ def main():
 
     # Resources
     splash.showMessage("Loading resources...", 40)
+    app.paletteChanged.connect(sync_theme_with_system)
+    # sync_theme_with_system()
     icon = QG.QIcon()
     icon.addFile('./src/resources/main_icon.png', QC.QSize(48, 48))
     icon.addFile('./src/resources/main_icon.png', QC.QSize(100, 100))
@@ -81,7 +92,7 @@ def main():
 
     # Init pygaps
     splash.showMessage("Initiating backend...", 60)
-    from src.init_pygaps import init_pygaps
+    from src.__init_pygaps__ import init_pygaps
     init_pygaps()
 
     # Create main window
@@ -91,13 +102,13 @@ def main():
 
     # Load files from cli if needed
     if parsed_args.file:
-        filepaths = [pathlib.Path(x) for x in parsed_args.file]
-        mainwnd.load_iso(filepaths)
+        filepaths = map(pathlib.Path, parsed_args.file)
+        mainwnd.open_iso(filepaths)
 
     elif parsed_args.folder:
         folder = pathlib.Path(parsed_args.folder)
         filepaths = [x for x in folder.iterdir() if not x.is_dir()]
-        mainwnd.load_iso(filepaths)
+        mainwnd.open_iso(filepaths)
 
     # Show and finish
     mainwnd.show()

@@ -16,8 +16,8 @@ class QSpinBoxSlider(QW.QWidget):
     """
     Range slider with label and spinbox.
     """
-    def __init__(self, value=0, parent=None, **kwargs):
-        super().__init__(parent)
+    def __init__(self, value=0, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.value = value
 
@@ -27,7 +27,7 @@ class QSpinBoxSlider(QW.QWidget):
         self.label.setMaximumSize(20, 10)
 
         # spinbox
-        self.spin_box = QW.QDoubleSpinBox(self)
+        self.spin_box = QW.QDoubleSpinBox()
         self.spin_box.setDecimals(2)
         # self.spin_box.setMinimum(slider_range[0])
         # self.spin_box.setMaximum(slider_range[1])
@@ -127,7 +127,7 @@ class QHSpinBoxSlider(QSpinBoxSlider):
     def __init__(self, value=0, parent=None, **kwargs):
         super().__init__(value=value, parent=parent, **kwargs)
 
-        layout = QW.QGridLayout(self)  # sets a layout
-        layout.addWidget(self.label, 0, 0, 1, 1)
-        layout.addWidget(self.slider, 0, 1, 1, 2)
-        layout.addWidget(self.spin_box, 0, 3, 1, 1)
+        _layout = QW.QGridLayout(self)
+        _layout.addWidget(self.label, 0, 0, 1, 1)
+        _layout.addWidget(self.slider, 0, 1, 1, 2)
+        _layout.addWidget(self.spin_box, 0, 3, 1, 1)

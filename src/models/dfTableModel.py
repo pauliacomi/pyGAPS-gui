@@ -41,7 +41,7 @@ class dfTableModel(QC.QAbstractTableModel):
             return f"{val:.5g}"
 
         if role == QC.Qt.TextAlignmentRole:
-            return QC.Qt.AlignVCenter + QC.Qt.AlignCenter
+            return QC.Qt.AlignCenter
 
     def setData(self, index, value, role: int = QC.Qt.EditRole) -> bool:
         """Set data of a cell."""

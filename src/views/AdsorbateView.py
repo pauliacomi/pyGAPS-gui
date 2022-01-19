@@ -20,106 +20,110 @@ from pygaps import Adsorbate
 
 class AdsorbateView(QW.QWidget):
 
-    adsorbate = None
+    _adsorbate = None
 
     def __init__(self, adsorbate=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
-        if adsorbate:
-            self.adsorbate = adsorbate
-            self.setupModel()
-            self.connect_signals()
         self.translate_UI()
+        self.adsorbate = adsorbate
 
     def setup_UI(self):
         self.setObjectName("AdsorbateView")
         self.resize(500, 500)
 
         # Create/set layout
-        layout = QW.QVBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
 
         # Create widgets
         #
         # Named properties
-        self.propertiesWidget = QW.QWidget(self)
-        self.propertiesLayout = QW.QFormLayout(self.propertiesWidget)
-        self.propertiesLayout.setObjectName("propertiesLayout")
+        self.properties_box = QW.QGroupBox()
+        _layout.addWidget(self.properties_box)
+        self.properties_layout = QW.QFormLayout(self.properties_box)
 
-        self.adsNameLabel = QW.QLabel(self.propertiesWidget)
-        self.adsNameValue = QW.QLabel(self.propertiesWidget)
-        self.adsAliasLabel = QW.QLabel(self.propertiesWidget)
-        self.adsAliasValues = QW.QListWidget(self.propertiesWidget)
-        self.adsFormulaLabel = QW.QLabel(self.propertiesWidget)
-        self.adsFormulaValue = QS.QSvgWidget(self.propertiesWidget)
-        self.adsFormulaValue.setMinimumSize(50, 15)
-        self.adsFormulaValue.setMaximumSize(300, 30)
-        self.adsBackendLabel = QW.QLabel(self.propertiesWidget)
-        self.adsBackendValue = QW.QLabel(self.propertiesWidget)
-        self.propertiesLayout.addRow(self.adsNameLabel, self.adsNameValue)
-        self.propertiesLayout.addRow(self.adsAliasLabel, self.adsAliasValues)
-        self.propertiesLayout.addRow(self.adsFormulaLabel, self.adsFormulaValue)
-        self.propertiesLayout.addRow(self.adsBackendLabel, self.adsBackendValue)
-
-        layout.addWidget(self.propertiesWidget)
+        self.name_label = QW.QLabel()
+        self.name_value = QW.QLabel()
+        self.alias_label = QW.QLabel()
+        self.alias_value = QW.QListWidget()
+        self.alias_value.setSizePolicy(
+            QW.QSizePolicy(QW.QSizePolicy.Minimum, QW.QSizePolicy.Minimum)
+        )
+        self.formula_label = QW.QLabel()
+        self.formula_value = QS.QSvgWidget()
+        self.formula_value.setMinimumSize(50, 15)
+        self.formula_value.setMaximumSize(300, 30)
+        self.backend_label = QW.QLabel()
+        self.backend_value = QW.QLabel()
+        self.properties_layout.addRow(self.name_label, self.name_value)
+        self.properties_layout.addRow(self.alias_label, self.alias_value)
+        self.properties_layout.addRow(self.formula_label, self.formula_value)
+        self.properties_layout.addRow(self.backend_label, self.backend_value)
 
         # metadata
-        self.metaLabel = QW.QLabel(self)
-        layout.addWidget(self.metaLabel)
+        self.metadata_box = QW.QGroupBox()
+        _layout.addWidget(self.metadata_box)
+        self.metadata_layout = QW.QVBoxLayout(self.metadata_box)
 
         # metadata edit widget
-        self.metaButtonWidget = MetadataEditWidget(self)
-        layout.addWidget(self.metaButtonWidget)
+        self.meta_edit_widget = MetadataEditWidget()
+        self.metadata_layout.addWidget(self.meta_edit_widget)
 
         # Table view
-        self.tableView = MetadataTableWidget(self)
-        layout.addWidget(self.tableView)
+        self.table_view = MetadataTableWidget()
+        self.metadata_layout.addWidget(self.table_view)
 
-    def setAdsorbate(self, adsorbate):
+    @property
+    def adsorbate(self):
+        return self._adsorbate
+
+    @adsorbate.setter
+    def adsorbate(self, adsorbate):
         if not adsorbate:
             return
 
-        self.adsorbate = adsorbate
-        self.setupModel()
+        self._adsorbate = adsorbate
+        self.setup_model()
         self.connect_signals()
 
-    def setupModel(self):
-        self.adsNameValue.setText(self.adsorbate.name)
-        self.adsAliasValues.addItems(self.adsorbate.alias)
-        self.adsAliasValues.setFixedHeight(
-            self.adsAliasValues.sizeHintForRow(0) * 4 + 2 * self.adsAliasValues.frameWidth()
+    def setup_model(self):
+        self.name_value.setText(self.adsorbate.name)
+        self.alias_value.addItems(self.adsorbate.alias)
+        self.alias_value.setFixedHeight(
+            self.alias_value.sizeHintForRow(0) * 4 + 2 * self.alias_value.frameWidth()
         )
-        self.adsFormulaValue.load(tex2svg(self.adsorbate.formula))
+        self.formula_value.load(tex2svg(self.adsorbate.formula))
         aspectRatioMode = QC.Qt.AspectRatioMode(QC.Qt.KeepAspectRatio)
-        self.adsFormulaValue.renderer().setAspectRatioMode(aspectRatioMode)
+        self.formula_value.renderer().setAspectRatioMode(aspectRatioMode)
         if self.adsorbate.properties.get("backend_name"):
             backend = "Yes"
         else:
             backend = "No"
-        self.adsBackendValue.setText(backend)
+        self.backend_value.setText(backend)
 
         self.tableModel = AdsPropTableModel(self.adsorbate)
-        self.tableView.setModel(self.tableModel)
+        self.table_view.setModel(self.tableModel)
 
     def connect_signals(self):
 
-        self.tableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
-        self.metaButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
-        self.metaButtonWidget.propButtonDelete.clicked.connect(self.extra_prop_delete)
+        self.table_view.selectionModel().selectionChanged.connect(self.extra_prop_select)
+        self.meta_edit_widget.save_button.clicked.connect(self.extra_prop_save)
+        self.meta_edit_widget.delete_button.clicked.connect(self.extra_prop_delete)
 
     def extra_prop_select(self):
-        index = self.tableView.selectionModel().currentIndex()
+        index = self.table_view.selectionModel().currentIndex()
         if index:
             data = self.tableModel.rowData(index)
             if data:
-                self.metaButtonWidget.display(*data)
+                self.meta_edit_widget.display(*data)
             else:
-                self.metaButtonWidget.clear()
+                self.meta_edit_widget.clear()
 
     def extra_prop_save(self):
 
-        propName = self.metaButtonWidget.nameEdit.text()
-        propValue = self.metaButtonWidget.valueEdit.text()
-        propType = self.metaButtonWidget.typeEdit.currentText()
+        propName = self.meta_edit_widget.name_input.text()
+        propValue = self.meta_edit_widget.value_input.text()
+        propType = self.meta_edit_widget.type_input.currentText()
         if not propName:
             return
 
@@ -131,29 +135,23 @@ class AdsorbateView(QW.QWidget):
                 return
 
         self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
-        self.tableView.resizeColumns()
+        self.table_view.resizeColumns()
 
     def extra_prop_delete(self):
 
-        index = self.tableView.selectionModel().currentIndex()
+        index = self.table_view.selectionModel().currentIndex()
         self.tableModel.removeRow(index.row())
 
     def translate_UI(self):
-        self.adsNameLabel.setText(
-            QW.QApplication.translate("AdsorbateView", "Adsorbate Name", None, -1)
-        )
-        self.adsAliasLabel.setText(
-            QW.QApplication.translate("AdsorbateView", "Adsorbate Aliases", None, -1)
-        )
-        self.adsFormulaLabel.setText(
-            QW.QApplication.translate("AdsorbateView", "Adsorbate Formula", None, -1)
-        )
-        self.adsBackendLabel.setText(
-            QW.QApplication.translate("AdsorbateView", "Thermodynamic backend", None, -1)
-        )
-        self.metaLabel.setText(
-            QW.QApplication.translate("AdsorbateView", "Other Metadata", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.properties_box.setTitle(QW.QApplication.translate("AdsorbateView", "Main properties", None, -1))
+        self.name_label.setText(QW.QApplication.translate("AdsorbateView", "Name", None, -1))
+        self.alias_label.setText(QW.QApplication.translate("AdsorbateView", "Aliases", None, -1))
+        self.formula_label.setText(QW.QApplication.translate("AdsorbateView", "Formula", None, -1))
+        self.backend_label.setText(QW.QApplication.translate("AdsorbateView", "Thermodynamic backend", None, -1))
+        self.metadata_box.setTitle(QW.QApplication.translate("AdsorbateView", "Other Metadata", None, -1))
+        # yapf: enable
 
 
 class AdsorbateDialog(QW.QDialog):
@@ -163,59 +161,74 @@ class AdsorbateDialog(QW.QDialog):
         self.setup_UI()
         self.translate_UI()
         self.connect_signals()
-        self.view.setAdsorbate(adsorbate)
+        self.view.adsorbate = adsorbate
 
     def setup_UI(self):
 
-        layout = QW.QVBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
 
         # View
-        self.view = AdsorbateView(parent=self)
-        layout.addWidget(self.view)
+        self.view = AdsorbateView()
+        _layout.addWidget(self.view)
 
         # Button box
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
-        layout.addWidget(self.button_box)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok)
+        _layout.addWidget(self.button_box)
 
     def connect_signals(self):
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("AdsorbateDialog", "Adsorbate details", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("AdsorbateDialog", "Adsorbate details", None, -1))
+        # yapf: enable
 
 
-class AdsorbateListView(QW.QDialog):
+class AdsorbateListDialog(QW.QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
         self.translate_UI()
-        self.setupModel()
+        self.connect_signals()
+        self.setup_model()
 
     def setup_UI(self):
 
-        layout = QW.QHBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
+        layout_top = QW.QHBoxLayout()
+        _layout.addLayout(layout_top)
 
         # list
-        self.adsorbateList = QW.QListWidget(parent=self)
-        layout.addWidget(self.adsorbateList)
+        self.adsorbate_list = QW.QListWidget()
+        layout_top.addWidget(self.adsorbate_list)
 
         # details
-        self.adsorbateDetails = AdsorbateView(parent=self)
-        layout.addWidget(self.adsorbateDetails)
+        self.adsorbate_details = AdsorbateView()
+        layout_top.addWidget(self.adsorbate_details)
 
-    def setupModel(self):
-        self.adsorbateList.addItems([ads.name for ads in ADSORBATE_LIST])
-        self.adsorbateList.currentItemChanged.connect(self.selectAdsorbate)
+        # Button box
+        self.button_box = QW.QDialogButtonBox()
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Close)
+        _layout.addWidget(self.button_box)
+
+    def connect_signals(self):
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+    def setup_model(self):
+        self.adsorbate_list.addItems([ads.name for ads in ADSORBATE_LIST])
+        self.adsorbate_list.currentItemChanged.connect(self.selectAdsorbate)
 
     def selectAdsorbate(self, item):
-        self.adsorbateDetails.setAdsorbate(Adsorbate.find(item.text()))
+        self.adsorbate_details.adsorbate = Adsorbate.find(item.text())
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("AdsorbateListView", "pyGAPS Adsorbate explorer", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("AdsorbateListDialog", "pyGAPS Adsorbate explorer", None, -1))
+        # yapf: enable

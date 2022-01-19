@@ -1,6 +1,6 @@
 import warnings
 
-from pygaps.characterisation.tplot import t_plot_raw
+from pygaps.characterisation.t_plots import t_plot_raw
 from pygaps.characterisation.models_thickness import (_THICKNESS_MODELS, get_thickness_model)
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
@@ -50,16 +50,16 @@ class PlotTModel():
         # View actions
 
         # setup
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
         models = list(_THICKNESS_MODELS.keys())
-        self.view.thicknessDropdown.addItems(models)
+        self.view.thickness_dropdown.addItems(models)
 
         # connect signals
-        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         # TODO: add the ability for custom callable models
-        self.view.thicknessDropdown.currentIndexChanged.connect(self.select_tmodel)
-        self.view.auto_button.clicked.connect(self.calc_auto)
+        self.view.thickness_dropdown.currentIndexChanged.connect(self.select_tmodel)
+        self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
@@ -127,20 +127,18 @@ class PlotTModel():
                 ])
 
     def output_results(self):
-        self.view.resultsTable.setRowCount(0)
-        self.view.resultsTable.setRowCount(len(self.results))
+        self.view.res_table.setRowCount(0)
+        self.view.res_table.setRowCount(len(self.results))
         for index, result in enumerate(self.results):
-            self.view.resultsTable.setItem(
+            self.view.res_table.setItem(
                 index, 0, QW.QTableWidgetItem(f"{result.get('adsorbed_volume'):g}")
             )
-            self.view.resultsTable.setItem(index, 1, QW.QTableWidgetItem(f"{result.get('area'):g}"))
-            self.view.resultsTable.setItem(
+            self.view.res_table.setItem(index, 1, QW.QTableWidgetItem(f"{result.get('area'):g}"))
+            self.view.res_table.setItem(
                 index, 2, QW.QTableWidgetItem(f"{result.get('corr_coef'):g}")
             )
-            self.view.resultsTable.setItem(
-                index, 3, QW.QTableWidgetItem(f"{result.get('slope'):g}")
-            )
-            self.view.resultsTable.setItem(
+            self.view.res_table.setItem(index, 3, QW.QTableWidgetItem(f"{result.get('slope'):g}"))
+            self.view.res_table.setItem(
                 index, 4, QW.QTableWidgetItem(f"{result.get('intercept'):g}")
             )
 
@@ -150,27 +148,27 @@ class PlotTModel():
     def plot_results(self):
 
         # Generate tplot
-        self.view.tGraph.clear()
+        self.view.res_graph.clear()
         tp_plot(
             self.t_curve,
             self.loading,
             self.results,
-            ax=self.view.tGraph.ax,
+            ax=self.view.res_graph.ax,
         )
-        self.view.tGraph.canvas.draw()
+        self.view.res_graph.canvas.draw()
 
     def slider_reset(self):
         self.view.x_select.setRange((0, self.t_curve[-1]))
         self.view.x_select.setValues((self.t_curve[0], self.t_curve[-1]), emit=False)
-        self.view.tGraph.draw_limits(self.t_curve[0], self.t_curve[-1])
+        self.view.res_graph.draw_limits(self.t_curve[0], self.t_curve[-1])
 
     def select_tmodel(self):
-        tmodel_text = self.view.thicknessDropdown.currentText()
+        tmodel_text = self.view.thickness_dropdown.currentText()
         self.thickness_model = get_thickness_model(tmodel_text)
         self.calc_auto()
 
     def select_branch(self):
-        self.branch = self.view.branchDropdown.currentText()
+        self.branch = self.view.branch_dropdown.currentText()
         self.prepare_values()
         self.calc_auto()
 

@@ -15,53 +15,52 @@ class IASTVLEDialog(QW.QDialog):
     def setup_UI(self):
         self.setObjectName("IASTVLEDialog")
 
-        layout = QW.QGridLayout(self)
-        layout.setObjectName("layout")
+        _layout = QW.QGridLayout(self)
 
         # Options
         self.options_layout = QW.QGridLayout()
-        layout.addLayout(self.options_layout, 0, 0)
+        _layout.addLayout(self.options_layout, 0, 0)
 
         ## Adsorbate selection
-        self.adsorbate_label = LabelAlignRight("Adsorbate of interest:", parent=self)
+        self.adsorbate_label = LabelAlignRight("Adsorbate of interest:")
         self.options_layout.addWidget(self.adsorbate_label, 0, 0, 1, 1)
-        self.adsorbate_input = QW.QComboBox(self)
+        self.adsorbate_input = QW.QComboBox()
         self.options_layout.addWidget(self.adsorbate_input, 0, 1, 1, 2)
 
         ## Pressure selection
-        self.pressure_label = LabelAlignRight("Total pressure:", parent=self)
+        self.pressure_label = LabelAlignRight("Total pressure:")
         self.options_layout.addWidget(self.pressure_label, 1, 0, 1, 1)
-        self.pressure_input = QW.QDoubleSpinBox(self)
+        self.pressure_input = QW.QDoubleSpinBox()
         self.pressure_input.setDecimals(2)
         self.pressure_input.setValue(1)
         self.options_layout.addWidget(self.pressure_input, 1, 1, 1, 2)
 
         ## Point selection
-        self.point_label = LabelAlignRight("Number of points:", parent=self)
+        self.point_label = LabelAlignRight("Number of points:")
         self.options_layout.addWidget(self.point_label, 2, 0, 1, 1)
-        self.point_input = QW.QSpinBox(self)
+        self.point_input = QW.QSpinBox()
         self.point_input.setValue(30)
         self.options_layout.addWidget(self.point_input, 2, 1, 1, 2)
 
         ## Button to calculate
-        self.calc_button = QW.QPushButton(self)
+        self.calc_button = QW.QPushButton()
         self.options_layout.addWidget(self.calc_button, 3, 0, 1, 3)
 
         ## Output log
-        self.output_label = QW.QLabel("Output log:")
+        self.output_label = QW.QLabel("Calculation log:")
+        self.output = LabelOutput()
         self.options_layout.addWidget(self.output_label, 4, 0)
-        self.output = LabelOutput(self)
         self.options_layout.addWidget(self.output, 5, 0, 1, 3)
 
         # Result display
-        self.res_graph = GraphView(self)
-        layout.addWidget(self.res_graph, 0, 1, 1, 1)
+        self.res_graph = GraphView()
+        _layout.addWidget(self.res_graph, 0, 1, 1, 1)
 
         # Bottom buttons
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Cancel)
-        layout.addWidget(self.button_box, 1, 0, 1, 2)
+        _layout.addWidget(self.button_box, 1, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:
         return QC.QSize(1000, 800)
@@ -71,9 +70,8 @@ class IASTVLEDialog(QW.QDialog):
         self.button_box.rejected.connect(self.reject)
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("IASTVLEDialog", "IAST: bulk-adsorbed equilibrium", None, -1)
-        )
-        self.calc_button.setText(
-            QW.QApplication.translate("IsoModelByDialog", "Calculate", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("IASTVLEDialog", "IAST: bulk-adsorbed equilibrium", None, -1))
+        self.calc_button.setText(QW.QApplication.translate("IsoModelByDialog", "Calculate", None, -1))
+        # yapf: enable

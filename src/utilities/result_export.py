@@ -5,6 +5,7 @@ from src.widgets.UtilityWidgets import error_dialog, save_file_dialog
 
 def serialize(obj: dict, parent=None):
 
+    # TODO get last directory here too
     filename = save_file_dialog(
         parent, "Export results", '.', filter=";;".join([
             'CSV (*.csv)',

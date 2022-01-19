@@ -1,9 +1,11 @@
+import pathlib
+
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 from qtpy import QtGui as QG
 
 
-def open_files_dialog(parent, caption, directory, filter=None):
+def open_files_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
     """Abstract dialog for file opening."""
     filenames = QW.QFileDialog.getOpenFileNames(
         parent=parent,
@@ -13,10 +15,10 @@ def open_files_dialog(parent, caption, directory, filter=None):
     )
     if isinstance(filenames, tuple):  # PyQt5 returns a tuple...
         filenames = filenames[0]
-    return filenames
+    return tuple(map(pathlib.Path, filenames))
 
 
-def save_file_dialog(parent, caption, directory, filter=None):
+def save_file_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
     """Abstract dialog for file saving."""
     filename = QW.QFileDialog.getSaveFileName(
         parent=parent,

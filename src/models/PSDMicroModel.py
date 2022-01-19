@@ -49,19 +49,19 @@ class PSDMicroModel():
 
         # View actions
         # view setup
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
-        self.view.modelDropdown.addItems(_MICRO_PSD_MODELS)
-        self.view.geometryDropdown.addItems(_PORE_GEOMETRIES)
-        self.view.amodelDropdown.addItems(_ADSORBENT_MODELS)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
+        self.view.model_dropdown.addItems(_MICRO_PSD_MODELS)
+        self.view.geometry_dropdown.addItems(_PORE_GEOMETRIES)
+        self.view.amodel_dropdown.addItems(_ADSORBENT_MODELS)
 
         # plot isotherm
-        self.view.isoGraph.branch = self.branch
-        self.view.isoGraph.pressure_mode = "relative"
-        self.view.isoGraph.set_isotherms([self.isotherm])
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.pressure_mode = "relative"
+        self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
-        self.view.autoButton.clicked.connect(self.calc_auto)
+        self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
@@ -92,10 +92,10 @@ class PSDMicroModel():
     def calculate(self):
         with warnings.catch_warnings(record=True) as warning:
             warnings.simplefilter("always")
-            self.branch = self.view.branchDropdown.currentText()
-            self.psd_model = self.view.modelDropdown.currentText()
-            self.material_model = self.view.amodelDropdown.currentText()
-            self.pore_geometry = self.view.geometryDropdown.currentText()
+            self.branch = self.view.branch_dropdown.currentText()
+            self.psd_model = self.view.model_dropdown.currentText()
+            self.material_model = self.view.amodel_dropdown.currentText()
+            self.pore_geometry = self.view.geometry_dropdown.currentText()
             try:
                 self.results = psd_microporous(
                     self.isotherm,
@@ -125,7 +125,7 @@ class PSDMicroModel():
     def plot_results(self):
 
         # Isotherm plot update
-        self.view.isoGraph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms(branch=self.branch)
 
         # PSD plot
         self.view.res_graph.clear()
@@ -133,7 +133,7 @@ class PSDMicroModel():
             self.results['pore_widths'],
             self.results['pore_distribution'],
             self.results['pore_volume_cumulative'],
-            method=self.view.modelDropdown.currentText(),
+            method=self.view.model_dropdown.currentText(),
             log=False,
             right=5,
             ax=self.view.res_graph.ax
@@ -142,7 +142,7 @@ class PSDMicroModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
 
     def export_results(self):
         if not self.results:

@@ -58,15 +58,15 @@ class AreaBETModel():
         # view setup
         self.view.label_area.setText(f"BET area [m2/{self.isotherm.material_unit}]:")
         self.view.label_n_mono.setText(f"Monolayer uptake [mmol/{self.isotherm.material_unit}]:")
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
-        self.view.isoGraph.branch = self.branch
-        self.view.isoGraph.pressure_mode = "relative"
-        self.view.isoGraph.set_isotherms([self.isotherm])
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.pressure_mode = "relative"
+        self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
-        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.auto_button.clicked.connect(self.calc_auto)
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
+        self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
@@ -104,7 +104,7 @@ class AreaBETModel():
             self.plot_results()
         # if we can't calculate, we just display the isotherm and error
         else:
-            self.view.isoGraph.draw_isotherms(branch=self.branch)
+            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.view.output.setText(self.output)
             self.output = ""
 
@@ -116,7 +116,7 @@ class AreaBETModel():
             self.plot_results()
         # if we can't calculate, we just display the isotherm and error
         else:
-            self.view.isoGraph.draw_isotherms(branch=self.branch)
+            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.view.output.setText(self.output)
             self.output = ""
 
@@ -168,10 +168,10 @@ class AreaBETModel():
     def plot_results(self):
 
         # Isotherm plot update
-        self.view.isoGraph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms(branch=self.branch)
 
         # Generate plot of the BET points chosen
-        self.view.betGraph.clear()
+        self.view.bet_graph.clear()
         bet_plot(
             self.pressure,
             bet_transform(self.pressure, self.loading),
@@ -181,12 +181,12 @@ class AreaBETModel():
             self.intercept,
             self.p_monolayer,
             bet_transform(self.p_monolayer, self.n_monolayer),
-            ax=self.view.betGraph.ax
+            ax=self.view.bet_graph.ax
         )
-        self.view.betGraph.canvas.draw()
+        self.view.bet_graph.canvas.draw()
 
         # Generate plot of the Rouquerol points chosen
-        self.view.rouqGraph.clear()
+        self.view.rouq_graph.clear()
         roq_plot(
             self.pressure,
             roq_transform(self.pressure, self.loading),
@@ -194,16 +194,16 @@ class AreaBETModel():
             self.max_point,
             self.p_monolayer,
             roq_transform(self.p_monolayer, self.n_monolayer),
-            ax=self.view.rouqGraph.ax
+            ax=self.view.rouq_graph.ax
         )
-        self.view.rouqGraph.canvas.draw()
+        self.view.rouq_graph.canvas.draw()
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
 
     def select_branch(self):
-        self.branch = self.view.branchDropdown.currentText()
+        self.branch = self.view.branch_dropdown.currentText()
         self.prepare_values()
         self.calc_auto()
 

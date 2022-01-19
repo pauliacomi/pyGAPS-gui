@@ -24,35 +24,35 @@ class RangeGenWidget(QW.QWidget):
         self.setObjectName("RangeGenWidget")
 
         # Create/set layout
-        layout = QW.QVBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
 
         # Create widgets
         #
         # Options
-        self.options_widget = QW.QWidget(self)
-        layout.addWidget(self.options_widget)
+        self.options_widget = QW.QWidget()
+        _layout.addWidget(self.options_widget)
         self.options_layout = QW.QFormLayout(self.options_widget)
         self.options_layout.setObjectName("options_layout")
 
-        self.prop_label = QW.QLabel(parent=self)
-        self.prop_value = QW.QComboBox(parent=self)
+        self.prop_label = QW.QLabel()
+        self.prop_value = QW.QComboBox()
         self.prop_value.addItems(self.data.columns)
-        self.start_label = QW.QLabel(parent=self)
-        self.start_value = QW.QDoubleSpinBox(parent=self)
+        self.start_label = QW.QLabel()
+        self.start_value = QW.QDoubleSpinBox()
         self.start_value.setSingleStep(0.1)
         self.start_value.setMinimum(0)
         self.start_value.setMaximum(1000)
-        self.end_label = QW.QLabel(parent=self)
-        self.end_value = QW.QDoubleSpinBox(parent=self)
+        self.end_label = QW.QLabel()
+        self.end_value = QW.QDoubleSpinBox()
         self.end_value.setSingleStep(0.1)
         self.end_value.setMinimum(0)
         self.end_value.setMaximum(1000)
-        self.points_label = QW.QLabel(parent=self)
-        self.points_value = QW.QSpinBox(parent=self)
+        self.points_label = QW.QLabel()
+        self.points_value = QW.QSpinBox()
         self.points_value.setMinimum(1)
         self.points_value.setMaximum(500)
-        self.dist_label = QW.QLabel(parent=self)
-        self.dist_value = QW.QComboBox(parent=self)
+        self.dist_label = QW.QLabel()
+        self.dist_value = QW.QComboBox()
         self.dist_value.addItems(["Linear", "Logarithmic"])
         self.options_layout.addRow(self.prop_label, self.prop_value)
         self.options_layout.addRow(self.start_label, self.start_value)
@@ -60,19 +60,19 @@ class RangeGenWidget(QW.QWidget):
         self.options_layout.addRow(self.dist_label, self.dist_value)
         self.options_layout.addRow(self.points_label, self.points_value)
 
-        self.generate_btn = QW.QPushButton(parent=self)
-        self.erase_btn = QW.QPushButton(parent=self)
+        self.generate_btn = QW.QPushButton()
+        self.erase_btn = QW.QPushButton()
         self.options_layout.addRow(self.generate_btn, self.erase_btn)
 
         # Range Table
-        self.range_label = QW.QLabel(self)
-        layout.addWidget(self.range_label)
+        self.range_label = QW.QLabel()
         self.range_table = QW.QTableView(self)
         self.range_model = dfTableModel(self.data)
         self.range_table.setModel(self.range_model)
         horizontal_header = self.range_table.horizontalHeader()
         horizontal_header.setSectionResizeMode(QW.QHeaderView.Stretch)
-        layout.addWidget(self.range_table)
+        _layout.addWidget(self.range_label)
+        _layout.addWidget(self.range_table)
 
     def connect_signals(self):
         self.prop_value.currentIndexChanged.connect(self.handle_propchange)
@@ -134,25 +134,22 @@ class RangeGenWidget(QW.QWidget):
         self.data = self.range_model._data
 
     def translate_UI(self):
+        # yapf: disable
+        # pylint: disable=line-too-long
         self.prop_label.setText(QW.QApplication.translate("RangeGenWidget", "Property", None, -1))
         self.start_label.setText(QW.QApplication.translate("RangeGenWidget", "Start", None, -1))
         self.end_label.setText(QW.QApplication.translate("RangeGenWidget", "End", None, -1))
-        self.points_label.setText(
-            QW.QApplication.translate("RangeGenWidget", "Total points", None, -1)
-        )
-        self.dist_label.setText(
-            QW.QApplication.translate("RangeGenWidget", "Distribution", None, -1)
-        )
-        self.generate_btn.setText(
-            QW.QApplication.translate("RangeGenWidget", "Auto Generate", None, -1)
-        )
+        self.points_label.setText(QW.QApplication.translate("RangeGenWidget", "Total points", None, -1))
+        self.dist_label.setText(QW.QApplication.translate("RangeGenWidget", "Distribution", None, -1))
+        self.generate_btn.setText(QW.QApplication.translate("RangeGenWidget", "Auto Generate", None, -1))
         self.erase_btn.setText(QW.QApplication.translate("RangeGenWidget", "Clear", None, -1))
         self.range_label.setText(QW.QApplication.translate("RangeGenWidget", "Range", None, -1))
+        # yapf: enable
 
 
 class RangeGenDialog(QW.QDialog):
-    def __init__(self, parent=None, props=None, data=None, **kwargs) -> None:
-        super().__init__(parent=parent, **kwargs)
+    def __init__(self, props=None, data=None, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
         self.setup_UI(props=props, data=data)
         self.translate_UI()
@@ -160,23 +157,24 @@ class RangeGenDialog(QW.QDialog):
 
     def setup_UI(self, props, data):
 
-        layout = QW.QVBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
 
         # View
-        self.widget = RangeGenWidget(parent=self, props=props, data=data)
-        layout.addWidget(self.widget)
+        self.widget = RangeGenWidget(props=props, data=data)
+        _layout.addWidget(self.widget)
 
         # Button box
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
-        layout.addWidget(self.button_box)
+        _layout.addWidget(self.button_box)
 
     def connect_signals(self):
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("RangeGenDialog", "Range generator", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("RangeGenDialog", "Range generator", None, -1))
+        # yapf: enable

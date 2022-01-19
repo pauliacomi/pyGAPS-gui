@@ -453,16 +453,15 @@ class QSpinBoxRangeSlider(QW.QWidget):
     """
     doubleClick = QC.Signal(bool)
 
-    def __init__(self, slider_range, values, parent=None, **kwargs):
-        super().__init__(parent)
+    def __init__(self, slider_range, values, *args, **kwargs):
+        dec_pnts = kwargs.pop('dec_pnts', None)
+        super().__init__(*args, **kwargs)
 
         self.max_val = values[1]
         self.min_val = values[0]
         self.range_slider = False
 
-        if 'dec_pnts' in kwargs:
-            dec_pnts = kwargs['dec_pnts']
-        else:
+        if not dec_pnts:
             # Attempt to calculate the appropriate number of decimal points.
             dec_pnts = abs(decimal.Decimal(slider_range[2]).as_tuple().exponent)
 
@@ -624,18 +623,18 @@ class QHSpinBoxRangeSlider(QSpinBoxRangeSlider):
     @param values [initial minimum setting, initial maximum setting].
     @param parent (Optional) The PyQt parent of this widget.
     """
-    def __init__(self, slider_range, values, parent=None, flags=None, **kwargs):
-        super().__init__(slider_range, values, parent=parent, flags=flags, **kwargs)
+    def __init__(self, slider_range, values, *args, **kwargs):
+        super().__init__(slider_range, values, *args, **kwargs)
 
         self.addRangeSlider(QHRangeSlider(slider_range, values, self))
 
-        if (not parent):
+        if 'parent' not in kwargs:
             self.setGeometry(200, 200, 300, 100)
 
-        layout = QW.QHBoxLayout(self)
-        layout.addWidget(self.min_spin_box)
-        layout.addWidget(self.range_slider)
-        layout.addWidget(self.max_spin_box)
+        _layout = QW.QHBoxLayout(self)
+        _layout.addWidget(self.min_spin_box)
+        _layout.addWidget(self.range_slider)
+        _layout.addWidget(self.max_spin_box)
 
 
 class QVSpinBoxRangeSlider(QSpinBoxRangeSlider):
@@ -646,15 +645,15 @@ class QVSpinBoxRangeSlider(QSpinBoxRangeSlider):
     @param values [initial minimum setting, initial maximum setting].
     @param parent (Optional) The PyQt parent of this widget.
     """
-    def __init__(self, slider_range, values, parent=None, flags=None, **kwargs):
-        super().__init__(slider_range, values, parent=parent, flags=flags, **kwargs)
+    def __init__(self, slider_range, values, *args, **kwargs):
+        super().__init__(slider_range, values, *args, **kwargs)
 
         self.addRangeSlider(QVRangeSlider(slider_range, values, self))
 
-        if (not parent):
+        if 'parent' not in kwargs:
             self.setGeometry(200, 200, 100, 300)
 
-        layout = QW.QVBoxLayout(self)
-        layout.addWidget(self.max_spin_box)
-        layout.addWidget(self.range_slider)
-        layout.addWidget(self.min_spin_box)
+        _layout = QW.QVBoxLayout(self)
+        _layout.addWidget(self.max_spin_box)
+        _layout.addWidget(self.range_slider)
+        _layout.addWidget(self.min_spin_box)

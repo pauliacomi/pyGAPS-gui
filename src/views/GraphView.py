@@ -20,13 +20,12 @@ class GraphView(QW.QWidget):
 
     def __init__(
         self,
-        parent=None,
         x_range_select=False,
         y_range_select=False,
         *args,
         **kwargs,
     ):
-        super().__init__(parent=parent, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.x_range_select = x_range_select
         self.setup_UI()
 
@@ -35,21 +34,21 @@ class GraphView(QW.QWidget):
         self.canvas = FigureCanvas(self.figure)
         self.ax = self.figure.subplots()
 
-        layout = QW.QVBoxLayout(self)
-        layout.addWidget(self.canvas)
+        _layout = QW.QVBoxLayout(self)
+        _layout.addWidget(self.canvas)
 
         if self.x_range_select:
             self.setupRangeSelect()
-            layout.addWidget(self.x_range_select)
+            _layout.addWidget(self.x_range_select)
 
         self.setupNav()
-        layout.addWidget(self.navbar)
+        _layout.addWidget(self.navbar)
 
     def setupNav(self):
         self.navbar = NavigationToolbar(self.canvas, self)
 
     def setupRangeSelect(self):
-        self.x_range_select = HSelectorToolbar("XRangeSelect", ax=self.ax, parent=self)
+        self.x_range_select = HSelectorToolbar("XRangeSelect", ax=self.ax)
         self.x_range_select.slider.rangeChanged.connect(self.draw_limits)
         self.low = self.ax.axvline(0, c="r", ls="--")
         self.high = self.ax.axvline(1, c="r", ls="--")

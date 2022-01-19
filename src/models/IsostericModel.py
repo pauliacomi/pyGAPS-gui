@@ -24,6 +24,7 @@ class IsostericModel():
     output = ""
     success = True
 
+    # TODO finish implementation
     def __init__(self, isotherms, view):
         """First init"""
         # Save refs
@@ -31,16 +32,16 @@ class IsostericModel():
         self.view = view
 
         # view setup
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
 
         # plot isotherm
-        self.view.isoGraph.branch = self.branch
-        self.view.isoGraph.set_isotherms(self.isotherms)
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.set_isotherms(self.isotherms)
 
         # connect signals
-        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.autoButton.clicked.connect(self.calc_auto)
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
+        self.view.calc_auto_button.clicked.connect(self.calc_auto)
         # self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
@@ -94,9 +95,11 @@ class IsostericModel():
             self.output = ""
 
     def plot_results(self):
+        if not self.results:
+            return
 
         # Isotherm plot update
-        self.view.isoGraph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms(branch=self.branch)
 
         # Generate plot of the points chosen
         self.view.res_graph.clear()
@@ -111,10 +114,10 @@ class IsostericModel():
     def slider_reset(self):
         if self.limits:
             self.view.x_select.setValues(self.limits, emit=False)
-            self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
+            self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
 
     def select_branch(self):
-        self.branch = self.view.branchDropdown.currentText()
+        self.branch = self.view.branch_dropdown.currentText()
         self.calc_auto()
 
     def export_results(self):

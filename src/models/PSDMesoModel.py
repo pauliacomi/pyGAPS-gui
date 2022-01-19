@@ -51,20 +51,20 @@ class PSDMesoModel():
 
         # View actions
         # view setup
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
-        self.view.tmodelDropdown.addItems(_MESO_PSD_MODELS)
-        self.view.geometryDropdown.addItems(_PORE_GEOMETRIES)
-        self.view.thicknessDropdown.addItems(_THICKNESS_MODELS)
-        self.view.kmodelDropdown.addItems(_KELVIN_MODELS)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
+        self.view.tmodel_dropdown.addItems(_MESO_PSD_MODELS)
+        self.view.geometry_dropdown.addItems(_PORE_GEOMETRIES)
+        self.view.thickness_dropdown.addItems(_THICKNESS_MODELS)
+        self.view.kmodel_dropdown.addItems(_KELVIN_MODELS)
 
         # plot isotherm
-        self.view.isoGraph.branch = self.branch
-        self.view.isoGraph.pressure_mode = "relative"
-        self.view.isoGraph.set_isotherms([self.isotherm])
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.pressure_mode = "relative"
+        self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
-        self.view.autoButton.clicked.connect(self.calc_auto)
+        self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
@@ -95,11 +95,11 @@ class PSDMesoModel():
     def calculate(self):
         with warnings.catch_warnings(record=True) as warning:
             warnings.simplefilter("always")
-            self.branch = self.view.branchDropdown.currentText()
-            self.psd_model = self.view.tmodelDropdown.currentText()
-            self.pore_geometry = self.view.geometryDropdown.currentText()
-            self.thickness_model = self.view.thicknessDropdown.currentText()
-            self.kelvin_model = self.view.kmodelDropdown.currentText()
+            self.branch = self.view.branch_dropdown.currentText()
+            self.psd_model = self.view.tmodel_dropdown.currentText()
+            self.pore_geometry = self.view.geometry_dropdown.currentText()
+            self.thickness_model = self.view.thickness_dropdown.currentText()
+            self.kelvin_model = self.view.kmodel_dropdown.currentText()
             try:
                 self.results = psd_mesoporous(
                     self.isotherm,
@@ -130,7 +130,7 @@ class PSDMesoModel():
     def plot_results(self):
 
         # Isotherm plot update
-        self.view.isoGraph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms(branch=self.branch)
 
         # PSD plot
         self.view.res_graph.clear()
@@ -146,7 +146,7 @@ class PSDMesoModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
 
     def export_results(self):
         if not self.results:

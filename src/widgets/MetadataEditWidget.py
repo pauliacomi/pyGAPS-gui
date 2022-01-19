@@ -4,62 +4,61 @@ from qtpy import QtCore as QC
 
 
 class MetadataEditWidget(QW.QWidget):
-    def __init__(self, parent=None) -> None:
-        super().__init__(parent=parent)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.meta_types = ["text", "number"]
         self.setup_UI()
         self.translate_UI()
 
     def setup_UI(self):
 
-        # metadata buttons
-        layout = QW.QGridLayout(self)
+        _layout = QW.QGridLayout(self)
 
-        self.nameLabel = QW.QLabel(self)
-        self.nameLabel.setObjectName("nameLabel")
-        layout.addWidget(self.nameLabel, 0, 0, 1, 1)
+        # metadata
+        self.name_label = QW.QLabel()
+        self.name_label.setObjectName("name_label")
+        self.name_input = QW.QLineEdit(self)
+        self.name_input.setObjectName("name_input")
+        self.value_label = QW.QLabel()
+        self.value_label.setObjectName("value_label")
+        self.value_input = QW.QLineEdit(self)
+        self.value_input.setObjectName("value_input")
+        self.type_input = QW.QComboBox()
+        self.type_input.setObjectName("type_input")
+        self.type_input.addItems(self.meta_types)
 
-        self.valueLabel = QW.QLabel(self)
-        self.valueLabel.setObjectName("valueLabel")
-        layout.addWidget(self.valueLabel, 1, 0, 1, 1)
+        _layout.addWidget(self.name_label, 0, 0, 1, 1)
+        _layout.addWidget(self.value_label, 1, 0, 1, 1)
+        _layout.addWidget(self.name_input, 0, 1, 1, 2)
+        _layout.addWidget(self.type_input, 0, 3, 1, 1)
+        _layout.addWidget(self.value_input, 1, 1, 1, 3)
 
-        self.nameEdit = QW.QLineEdit(self)
-        self.nameEdit.setObjectName("nameEdit")
-        layout.addWidget(self.nameEdit, 0, 1, 1, 2)
+        # buttons
+        self.save_button = QW.QPushButton()
+        self.save_button.setObjectName("save_button")
+        self.delete_button = QW.QPushButton()
+        self.delete_button.setObjectName("delete_button")
 
-        self.typeEdit = QW.QComboBox(self)
-        self.typeEdit.setObjectName("typeEdit")
-        self.typeEdit.addItems(self.meta_types)
-        layout.addWidget(self.typeEdit, 0, 3, 1, 1)
-
-        self.valueEdit = QW.QLineEdit(self)
-        self.valueEdit.setObjectName("valueEdit")
-        layout.addWidget(self.valueEdit, 1, 1, 1, 3)
-
-        self.propButtonSave = QW.QPushButton(self)
-        self.propButtonSave.setObjectName("propButtonSave")
-        layout.addWidget(self.propButtonSave, 2, 0, 1, 2)
-
-        self.propButtonDelete = QW.QPushButton(self)
-        self.propButtonDelete.setObjectName("propButtonDelete")
-        layout.addWidget(self.propButtonDelete, 2, 2, 1, 2)
-
-    def translate_UI(self):
-        self.nameLabel.setText(QW.QApplication.translate("MetaEditWidget", "Name", None, -1))
-        self.valueLabel.setText(QW.QApplication.translate("MetaEditWidget", "Value", None, -1))
-        self.propButtonSave.setText(QW.QApplication.translate("MetaEditWidget", "save", None, -1))
-        self.propButtonDelete.setText(
-            QW.QApplication.translate("MetaEditWidget", "delete", None, -1)
-        )
+        _layout.addWidget(self.save_button, 2, 0, 1, 2)
+        _layout.addWidget(self.delete_button, 2, 2, 1, 2)
 
     def display(self, name, value, mtype):
 
-        self.nameEdit.setText(str(name))
-        self.valueEdit.setText(str(value))
-        self.typeEdit.setCurrentIndex(self.meta_types.index(str(mtype)))
+        self.name_input.setText(str(name))
+        self.value_input.setText(str(value))
+        self.type_input.setCurrentIndex(self.meta_types.index(str(mtype)))
 
     def clear(self):
 
-        self.nameEdit.clear()
-        self.valueEdit.clear()
-        self.typeEdit.setCurrentIndex(0)
+        self.name_input.clear()
+        self.value_input.clear()
+        self.type_input.setCurrentIndex(0)
+
+    def translate_UI(self):
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.name_label.setText(QW.QApplication.translate("MetaEditWidget", "Name", None, -1))
+        self.value_label.setText(QW.QApplication.translate("MetaEditWidget", "Value", None, -1))
+        self.save_button.setText(QW.QApplication.translate("MetaEditWidget", "save", None, -1))
+        self.delete_button.setText(QW.QApplication.translate("MetaEditWidget", "delete", None, -1))
+        # yapf: enable

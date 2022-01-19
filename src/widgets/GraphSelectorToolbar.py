@@ -19,10 +19,9 @@ class HSelectorToolbar(QW.QToolBar):
 
     def setup_UI(self, slider_range):
         self.slider = QHSpinBoxRangeSlider(
-            parent=self,
-            dec_pnts=2,
             slider_range=slider_range,
             values=slider_range[:-1],
+            dec_pnts=2,
         )
         self.slider.setFixedHeight(35)
         self.slider.setEmitWhileMoving(False)

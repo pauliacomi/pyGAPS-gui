@@ -16,53 +16,52 @@ class PlotTDialog(QW.QDialog):
     def setup_UI(self):
         self.setObjectName("PlotTDialog")
 
-        layout = QW.QVBoxLayout(self)
-        layout.setObjectName("layout")
+        _layout = QW.QVBoxLayout(self)
 
-        self.optionsBox = QW.QGroupBox(self)
-        layout.addWidget(self.optionsBox)
-        self.resultBox = QW.QGroupBox(self)
-        layout.addWidget(self.resultBox)
+        self.options_box = QW.QGroupBox()
+        _layout.addWidget(self.options_box)
+        self.res_text_box = QW.QGroupBox()
+        _layout.addWidget(self.res_text_box)
 
         # Options box
-        self.options_layout = QW.QGridLayout(self.optionsBox)
+        self.options_layout = QW.QGridLayout(self.options_box)
 
         ## Plot display
-        self.tGraph = GraphView(self, x_range_select=True)
-        self.tGraph.setObjectName("tGraph")
-        self.x_select = self.tGraph.x_range_select
-        self.options_layout.addWidget(self.tGraph, 0, 0, 1, 4)
+        self.res_graph = GraphView(x_range_select=True)
+        self.res_graph.setObjectName("res_graph")
+        self.x_select = self.res_graph.x_range_select
+        self.options_layout.addWidget(self.res_graph, 0, 0, 1, 4)
 
         self.options_layout.addWidget(LabelAlignRight("Thickness function:"), 1, 0, 1, 1)
-        self.thicknessDropdown = QW.QComboBox(self)
-        self.options_layout.addWidget(self.thicknessDropdown, 1, 1, 1, 2)
+        self.thickness_dropdown = QW.QComboBox()
+        self.options_layout.addWidget(self.thickness_dropdown, 1, 1, 1, 2)
 
         self.options_layout.addWidget(LabelAlignRight("Isotherm branch:"), 2, 0, 1, 1)
-        self.branchDropdown = QW.QComboBox(self)
-        self.options_layout.addWidget(self.branchDropdown, 2, 1, 1, 2)
+        self.branch_dropdown = QW.QComboBox()
+        self.options_layout.addWidget(self.branch_dropdown, 2, 1, 1, 2)
 
-        self.auto_button = QW.QPushButton(self)
-        self.options_layout.addWidget(self.auto_button, 2, 3, 1, 1)
+        self.calc_auto_button = QW.QPushButton()
+        self.options_layout.addWidget(self.calc_auto_button, 2, 3, 1, 1)
 
         # Results box
-        self.resultsLayout = QW.QGridLayout(self.resultBox)
+        self.res_text_layout = QW.QGridLayout(self.res_text_box)
 
-        self.resultsTable = QW.QTableWidget(0, 5, self)
-        self.resultsTable.setHorizontalHeaderLabels(
+        self.res_table = QW.QTableWidget(0, 5, self)
+        self.res_table.setHorizontalHeaderLabels(
             ("V [cm3/g]", "A [m2/g]", "R^2", "Slope", "Intercept")
         )
-        self.resultsTable.horizontalHeader().setSectionResizeMode(QW.QHeaderView.Stretch)
-        self.resultsLayout.addWidget(self.resultsTable, 0, 0, 1, 4)
+        self.res_table.horizontalHeader().setSectionResizeMode(QW.QHeaderView.Stretch)
+        self.res_text_layout.addWidget(self.res_table, 0, 0, 1, 4)
 
-        self.resultsLayout.addWidget(QW.QLabel("Calculation log:"), 1, 0, 1, 2)
-        self.output = LabelOutput(self)
-        self.resultsLayout.addWidget(self.output, 2, 0, 1, 4)
+        self.res_text_layout.addWidget(QW.QLabel("Calculation log:"), 1, 0, 1, 2)
+        self.output = LabelOutput()
+        self.res_text_layout.addWidget(self.output, 2, 0, 1, 4)
 
         # Bottom buttons
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
-        layout.addWidget(self.button_box)
+        _layout.addWidget(self.button_box)
 
     def sizeHint(self) -> QC.QSize:
         return QC.QSize(500, 800)
@@ -71,11 +70,10 @@ class PlotTDialog(QW.QDialog):
         pass
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("PlotTDialog", "Use the t-plot method", None, -1)
-        )
-        self.optionsBox.setTitle(QW.QApplication.translate("PlotTDialog", "Options", None, -1))
-        self.resultBox.setTitle(QW.QApplication.translate("PlotTDialog", "Results", None, -1))
-        self.auto_button.setText(
-            QW.QApplication.translate("PlotTDialog", "Auto-determine", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("PlotTDialog", "Use the t-plot method", None, -1))
+        self.options_box.setTitle(QW.QApplication.translate("PlotTDialog", "Options", None, -1))
+        self.res_text_box.setTitle(QW.QApplication.translate("PlotTDialog", "Results", None, -1))
+        self.calc_auto_button.setText(QW.QApplication.translate("PlotTDialog", "Auto-determine", None, -1))
+        # yapf: enable

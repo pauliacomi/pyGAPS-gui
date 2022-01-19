@@ -12,105 +12,106 @@ from pygaps import Material
 
 class MaterialView(QW.QWidget):
 
-    material = None
+    _material = None
 
     def __init__(self, material=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
         self.translate_UI()
-        if material:
-            self.material = material
-            self.setupModel()
-            self.connect_signals()
+        self.material = material
 
     def setup_UI(self):
         self.setObjectName("MaterialView")
         self.resize(400, 500)
 
         # Create/set layout
-        layout = QW.QVBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
 
         # Create widgets
         #
         # Named properties
-        self.propertiesWidget = QW.QWidget(self)
-        self.propertiesLayout = QW.QFormLayout(self.propertiesWidget)
-        self.propertiesLayout.setObjectName("propertiesLayout")
+        self.properties_box = QW.QGroupBox()
+        _layout.addWidget(self.properties_box)
+        self.properties_layout = QW.QFormLayout(self.properties_box)
 
-        self.matNameLabel = QW.QLabel(self.propertiesWidget)
-        self.matNameValue = QW.QLineEdit(self.propertiesWidget)
-        self.matDensityLabel = QW.QLabel(self.propertiesWidget)
-        self.matDensityValue = QW.QLineEdit(self.propertiesWidget)
-        self.matMMLabel = QW.QLabel(self.propertiesWidget)
-        self.matMMValue = QW.QLineEdit(self.propertiesWidget)
-        self.propertiesLayout.addRow(self.matNameLabel, self.matNameValue)
-        self.propertiesLayout.addRow(self.matDensityLabel, self.matDensityValue)
-        self.propertiesLayout.addRow(self.matMMLabel, self.matMMValue)
-
-        layout.addWidget(self.propertiesWidget)
+        self.name_label = QW.QLabel()
+        self.name_value = QW.QLineEdit()
+        self.density_label = QW.QLabel()
+        self.density_value = QW.QLineEdit()
+        self.mm_label = QW.QLabel()
+        self.mm_value = QW.QLineEdit()
+        self.properties_layout.addRow(self.name_label, self.name_value)
+        self.properties_layout.addRow(self.density_label, self.density_value)
+        self.properties_layout.addRow(self.mm_label, self.mm_value)
 
         # metadata
-        self.metaLabel = QW.QLabel(self)
-        layout.addWidget(self.metaLabel)
+        self.metadata_box = QW.QGroupBox()
+        _layout.addWidget(self.metadata_box)
+        self.metadata_layout = QW.QVBoxLayout(self.metadata_box)
 
         # metadata edit widget
-        self.metaButtonWidget = MetadataEditWidget(self)
-        layout.addWidget(self.metaButtonWidget)
+        self.meta_edit_widget = MetadataEditWidget()
+        self.metadata_layout.addWidget(self.meta_edit_widget)
 
         # Table view
-        self.tableView = MetadataTableWidget(self)
-        layout.addWidget(self.tableView)
+        self.table_view = MetadataTableWidget()
+        self.metadata_layout.addWidget(self.table_view)
 
-    def setMaterial(self, material):
+    @property
+    def material(self):
+        return self._material
+
+    @material.setter
+    def material(self, material):
         if not material:
             return
 
-        self.material = material
-        self.setupModel()
+        self._material = material
+        self.setup_model()
         self.connect_signals()
 
-    def setupModel(self):
-        self.matNameValue.setText(self.material.name)
+    def setup_model(self):
+        self.name_value.setText(self.material.name)
         density = self.material.density
         density = str(density) if density else density
-        self.matDensityValue.setText(density)
+        self.density_value.setText(density)
         mmass = self.material.molar_mass
         mmass = str(mmass) if mmass else mmass
-        self.matMMValue.setText(mmass)
+        self.mm_value.setText(mmass)
 
         self.tableModel = MatPropTableModel(self.material)
-        self.tableView.setModel(self.tableModel)
+        self.table_view.setModel(self.tableModel)
 
     def connect_signals(self):
-        self.tableView.selectionModel().selectionChanged.connect(self.extra_prop_select)
-        self.metaButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
-        self.metaButtonWidget.propButtonDelete.clicked.connect(self.extra_prop_delete)
+        self.table_view.selectionModel().selectionChanged.connect(self.extra_prop_select)
+        self.meta_edit_widget.save_button.clicked.connect(self.extra_prop_save)
+        self.meta_edit_widget.delete_button.clicked.connect(self.extra_prop_delete)
 
     def accept(self) -> None:
 
-        if self.matNameValue.text() != self.material.name:
-            self.material.name = self.matNameValue.text()
+        if self.name_value.text() != self.material.name:
+            self.material.name = self.name_value.text()
 
-        if self.matDensityValue.text() != self.material.density:
-            self.material.density = self.matDensityValue.text()
+        if self.density_value.text() != self.material.density:
+            self.material.density = self.density_value.text()
 
-        if self.matMMValue.text() != self.material.molar_mass:
-            self.material.molar_mass = self.matMMValue.text()
+        if self.mm_value.text() != self.material.molar_mass:
+            self.material.molar_mass = self.mm_value.text()
 
     def extra_prop_select(self):
-        index = self.tableView.selectionModel().currentIndex()
+        index = self.table_view.selectionModel().currentIndex()
         if index:
             data = self.tableModel.rowData(index)
             if data:
-                self.metaButtonWidget.display(*data)
+                self.meta_edit_widget.display(*data)
             else:
-                self.metaButtonWidget.clear()
+                self.meta_edit_widget.clear()
 
     def extra_prop_save(self):
 
-        propName = self.metaButtonWidget.nameEdit.text()
-        propValue = self.metaButtonWidget.valueEdit.text()
-        propType = self.metaButtonWidget.typeEdit.currentText()
+        propName = self.meta_edit_widget.name_input.text()
+        propValue = self.meta_edit_widget.value_input.text()
+        propType = self.meta_edit_widget.type_input.currentText()
         if not propName:
             return
 
@@ -122,25 +123,21 @@ class MaterialView(QW.QWidget):
                 return
 
         self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
-        self.tableView.resizeColumns()
+        self.table_view.resizeColumns()
 
     def extra_prop_delete(self):
-        index = self.tableView.selectionModel().currentIndex()
+        index = self.table_view.selectionModel().currentIndex()
         self.tableModel.removeRow(index.row())
 
     def translate_UI(self):
-        self.matNameLabel.setText(
-            QW.QApplication.translate("MaterialView", "Material Name", None, -1)
-        )
-        self.matDensityLabel.setText(
-            QW.QApplication.translate("MaterialView", "Material Density", None, -1)
-        )
-        self.matMMLabel.setText(
-            QW.QApplication.translate("MaterialView", "Material Molar Mass", None, -1)
-        )
-        self.metaLabel.setText(
-            QW.QApplication.translate("MaterialView", "Other Metadata", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.properties_box.setTitle(QW.QApplication.translate("AdsorbateView", "Main properties", None, -1))
+        self.name_label.setText(QW.QApplication.translate("MaterialView", "Name", None, -1))
+        self.density_label.setText(QW.QApplication.translate("MaterialView", "Density", None, -1))
+        self.mm_label.setText(QW.QApplication.translate("MaterialView", "Molar Mass", None, -1))
+        self.metadata_box.setTitle(QW.QApplication.translate("MaterialView", "Other Metadata", None, -1))
+        # yapf: enable
 
 
 class MaterialDialog(QW.QDialog):
@@ -150,21 +147,21 @@ class MaterialDialog(QW.QDialog):
         self.setup_UI()
         self.translate_UI()
         self.connect_signals()
-        self.view.setMaterial(material)
+        self.view.material = material
 
     def setup_UI(self):
 
-        layout = QW.QVBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
 
         # View
-        self.view = MaterialView(parent=self)
-        layout.addWidget(self.view)
+        self.view = MaterialView()
+        _layout.addWidget(self.view)
 
         # Button box
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
-        layout.addWidget(self.button_box)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok)
+        _layout.addWidget(self.button_box)
 
     def connect_signals(self):
         self.button_box.accepted.connect(self.accept)
@@ -175,36 +172,52 @@ class MaterialDialog(QW.QDialog):
         return super().accept()
 
     def translate_UI(self):
-        self.setWindowTitle(QW.QApplication.translate("MaterialView", "Material details", None, -1))
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("MaterialDialog", "Material details", None, -1))
+        # yapf: enable
 
 
-class MaterialListView(QW.QDialog):
+class MaterialListDialog(QW.QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
         self.translate_UI()
-        self.setupModel()
+        self.setup_model()
 
     def setup_UI(self):
 
-        layout = QW.QHBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
+        layout_top = QW.QHBoxLayout()
+        _layout.addLayout(layout_top)
 
         # list
-        self.materialList = QW.QListWidget(parent=self)
-        layout.addWidget(self.materialList)
+        self.materialList = QW.QListWidget()
+        layout_top.addWidget(self.materialList)
 
         # details
-        self.materialDetails = MaterialView(parent=self)
-        layout.addWidget(self.materialDetails)
+        self.material_details = MaterialView()
+        layout_top.addWidget(self.material_details)
 
-    def setupModel(self):
+        # Button box
+        self.button_box = QW.QDialogButtonBox()
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Close)
+        _layout.addWidget(self.button_box)
+
+    def connect_signals(self):
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+    def setup_model(self):
         self.materialList.addItems([mat.name for mat in MATERIAL_LIST])
         self.materialList.currentItemChanged.connect(self.selectMaterial)
 
     def selectMaterial(self, item):
-        self.materialDetails.setMaterial(Material.find(item.text()))
+        self.material_details.material = Material.find(item.text())
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("MaterialListView", "pyGAPS Material explorer", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("MaterialListDialog", "pyGAPS Material explorer", None, -1))
+        # yapf: enable

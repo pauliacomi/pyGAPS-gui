@@ -33,20 +33,20 @@ class PSDKernelModel():
         self.view = view
 
         # view setup
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
-        self.view.kernelDropdown.addItems(_KERNELS),
-        self.view.smoothEdit.setValue(self.bspline_order)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
+        self.view.kernel_dropdown.addItems(_KERNELS),
+        self.view.smooth_input.setValue(self.bspline_order)
 
         # plot isotherm
-        self.view.isoGraph.branch = self.branch
-        self.view.isoGraph.pressure_mode = "relative"
-        self.view.isoGraph.set_isotherms([self.isotherm])
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.pressure_mode = "relative"
+        self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
-        self.view.autoButton.clicked.connect(self.calc_auto)
+        self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
-        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
 
@@ -78,9 +78,9 @@ class PSDKernelModel():
     def calculate(self):
         with warnings.catch_warnings(record=True) as warning:
             warnings.simplefilter("always")
-            self.branch = self.view.branchDropdown.currentText()
-            self.kernel = self.view.kernelDropdown.currentText()
-            self.bspline_order = int(self.view.smoothEdit.cleanText())
+            self.branch = self.view.branch_dropdown.currentText()
+            self.kernel = self.view.kernel_dropdown.currentText()
+            self.bspline_order = int(self.view.smooth_input.cleanText())
             try:
                 self.results = psd_dft(
                     self.isotherm,
@@ -128,8 +128,8 @@ class PSDKernelModel():
         self.view.res_graph.canvas.draw()
 
         # Isotherm plot
-        self.view.isoGraph.draw_isotherms(branch=self.branch)
-        self.view.isoGraph.ax.plot(
+        self.view.iso_graph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.ax.plot(
             self.pressure[self.limit_indices[0]:self.limit_indices[1] + 1],
             self.results['kernel_loading'],
             'r-',
@@ -138,10 +138,10 @@ class PSDKernelModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
 
     def select_branch(self):
-        self.branch = self.view.branchDropdown.currentText()
+        self.branch = self.view.branch_dropdown.currentText()
         self.prepare_values()
 
     def export_results(self):

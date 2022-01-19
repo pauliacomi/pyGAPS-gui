@@ -13,11 +13,11 @@ class IsoDataDialog(QW.QDialog):
         self.setObjectName("IsoDataDialog")
 
         # Create/set layout
-        layout = QW.QVBoxLayout(self)
+        _layout = QW.QVBoxLayout(self)
 
         # Table View
         self.table_view = QW.QTableView(self)
-        layout.addWidget(self.table_view)
+        _layout.addWidget(self.table_view)
 
         # Qtable_view Headers
         self.horizontal_header = self.table_view.horizontalHeader()
@@ -26,10 +26,10 @@ class IsoDataDialog(QW.QDialog):
         self.vertical_header.setSectionResizeMode(QW.QHeaderView.Stretch)
 
         # Button box
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
-        layout.addWidget(self.button_box)
+        _layout.addWidget(self.button_box)
 
     def connect_signals(self):
         # Button box connections
@@ -40,4 +40,7 @@ class IsoDataDialog(QW.QDialog):
         return QC.QSize(self.table_view.model().columnCount() * 100, 300)
 
     def translate_UI(self):
+        # yapf: disable
+        # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("IsoDataDialog", "Isotherm Data", None, -1))
+        # yapf: enable

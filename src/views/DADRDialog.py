@@ -20,83 +20,83 @@ class DADRDialog(QW.QDialog):
     def setup_UI(self):
         self.setObjectName("DADRDialog")
 
-        layout = QW.QGridLayout(self)
-        layout.setObjectName("layout")
+        _layout = QW.QGridLayout(self)
 
-        self.optionsBox = QW.QGroupBox(self)
-        layout.addWidget(self.optionsBox, 0, 0, 1, 1)
-        self.rGraphsBox = QW.QGroupBox(self)
-        layout.addWidget(self.rGraphsBox, 0, 1, 2, 1)
-        self.resultBox = QW.QGroupBox(self)
-        layout.addWidget(self.resultBox, 1, 0, 1, 1)
+        self.options_box = QW.QGroupBox()
+        _layout.addWidget(self.options_box, 0, 0, 1, 1)
+        self.res_graphs_box = QW.QGroupBox()
+        _layout.addWidget(self.res_graphs_box, 0, 1, 2, 1)
+        self.res_text_box = QW.QGroupBox()
+        _layout.addWidget(self.res_text_box, 1, 0, 1, 1)
 
         # Options box
-        self.options_layout = QW.QGridLayout(self.optionsBox)
+        self.options_layout = QW.QGridLayout(self.options_box)
         row = 0
 
         ## Isotherm display
-        self.isoGraph = IsoGraphView(x_range_select=True, parent=self)
-        self.isoGraph.setObjectName("isoGraph")
-        self.x_select = self.isoGraph.x_range_select
-        self.options_layout.addWidget(self.isoGraph, row, 0, 1, 4)
+        self.iso_graph = IsoGraphView(x_range_select=True)
+        self.iso_graph.setObjectName("iso_graph")
+        self.x_select = self.iso_graph.x_range_select
+        self.options_layout.addWidget(self.iso_graph, row, 0, 1, 4)
         row = row + 1
 
         ## other options
-        self.branchLabel = LabelAlignRight("Branch used:")
-        self.options_layout.addWidget(self.branchLabel, row, 0, 1, 1)
-        self.branchDropdown = QW.QComboBox(self)
-        self.options_layout.addWidget(self.branchDropdown, row, 1, 1, 1)
+        self.branch_label = LabelAlignRight("Branch used:")
+        self.branch_dropdown = QW.QComboBox()
+        self.options_layout.addWidget(self.branch_label, row, 0, 1, 1)
+        self.options_layout.addWidget(self.branch_dropdown, row, 1, 1, 1)
 
         if self.ptype == "DA":
+            self.dr_exp_input = QW.QDoubleSpinBox()
+            self.dr_exp_input.setSingleStep(0.1)
             self.options_layout.addWidget(LabelAlignRight("D-A Exponent:"), row, 2, 1, 1)
-            self.DRExponent = QW.QDoubleSpinBox(self)
-            self.DRExponent.setSingleStep(0.1)
-            self.options_layout.addWidget(self.DRExponent, row, 3, 1, 1)
+            self.options_layout.addWidget(self.dr_exp_input, row, 3, 1, 1)
 
         row = row + 1
 
-        self.auto_button = QW.QPushButton(self)
-        self.options_layout.addWidget(self.auto_button, row, 0, 1, 4)
+        self.calc_auto_button = QW.QPushButton()
+        self.options_layout.addWidget(self.calc_auto_button, row, 0, 1, 4)
 
         # Results graph box
-        self.rGraphsLayout = QW.QGridLayout(self.rGraphsBox)
+        self.res_graphs_layout = QW.QGridLayout(self.res_graphs_box)
 
         ## DA/DR plot
-        self.rgraph = GraphView(self)
+        self.rgraph = GraphView()
         self.rgraph.setObjectName("DADRGraph")
-        self.rGraphsLayout.addWidget(self.rgraph, 0, 1, 1, 1)
+        self.res_graphs_layout.addWidget(self.rgraph, 0, 1, 1, 1)
 
         # Results box
-        self.resultsLayout = QW.QGridLayout(self.resultBox)
+        self.res_text_layout = QW.QGridLayout(self.res_text_box)
 
         # description labels
-        self.resultsLayout.addWidget(LabelAlignRight("Fit (R^2):"), 0, 2, 1, 1)
-        self.resultsLayout.addWidget(LabelAlignRight("Micropore Volume [cm3/g]"), 1, 0, 1, 1)
-        self.resultsLayout.addWidget(LabelAlignRight("Effective Potential [kJ/mol]"), 1, 2, 1, 1)
-        self.resultsLayout.addWidget(LabelAlignRight("Slope:"), 2, 0, 1, 1)
-        self.resultsLayout.addWidget(LabelAlignRight("Intercept:"), 2, 2, 1, 1)
+        self.res_text_layout.addWidget(LabelAlignRight("Fit (R^2):"), 0, 2, 1, 1)
+        self.res_text_layout.addWidget(LabelAlignRight("Micropore Volume [cm3/g]"), 1, 0, 1, 1)
+        self.res_text_layout.addWidget(LabelAlignRight("Effective Potential [kJ/mol]"), 1, 2, 1, 1)
+        self.res_text_layout.addWidget(LabelAlignRight("Slope:"), 2, 0, 1, 1)
+        self.res_text_layout.addWidget(LabelAlignRight("Intercept:"), 2, 2, 1, 1)
 
         # result labels
-        self.result_r = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_r, 0, 3, 1, 1)
-        self.result_microporevol = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_microporevol, 1, 1, 1, 1)
-        self.result_adspotential = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_adspotential, 1, 3, 1, 1)
-        self.result_slope = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_slope, 2, 1, 1, 1)
-        self.result_intercept = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_intercept, 2, 3, 1, 1)
+        self.result_r = LabelResult()
+        self.result_microporevol = LabelResult()
+        self.result_adspotential = LabelResult()
+        self.result_slope = LabelResult()
+        self.result_intercept = LabelResult()
+        self.res_text_layout.addWidget(self.result_r, 0, 3, 1, 1)
+        self.res_text_layout.addWidget(self.result_microporevol, 1, 1, 1, 1)
+        self.res_text_layout.addWidget(self.result_adspotential, 1, 3, 1, 1)
+        self.res_text_layout.addWidget(self.result_slope, 2, 1, 1, 1)
+        self.res_text_layout.addWidget(self.result_intercept, 2, 3, 1, 1)
 
-        self.resultsLayout.addWidget(QW.QLabel("Calculation log:"), 3, 0, 1, 2)
-        self.output = LabelOutput(self)
-        self.resultsLayout.addWidget(self.output, 4, 0, 2, 4)
+        self.output_label = QW.QLabel("Calculation log:")
+        self.output = LabelOutput()
+        self.res_text_layout.addWidget(self.output_label, 3, 0, 1, 2)
+        self.res_text_layout.addWidget(self.output, 4, 0, 2, 4)
 
         # Bottom buttons
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
-        layout.addWidget(self.button_box, 2, 0, 1, 2)
+        _layout.addWidget(self.button_box, 2, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:
         return QC.QSize(1000, 800)
@@ -108,9 +108,10 @@ class DADRDialog(QW.QDialog):
         key = "Dubinin-Radushkevich plot"
         if self.ptype == "DA":
             key = "Dubinin-Astakov plot"
+        # yapf: disable
+        # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("DADRDialog", key, None, -1))
-        self.optionsBox.setTitle(QW.QApplication.translate("DADRDialog", "Options", None, -1))
-        self.resultBox.setTitle(QW.QApplication.translate("DADRDialog", "Results", None, -1))
-        self.auto_button.setText(
-            QW.QApplication.translate("DADRDialog", "Auto-determine", None, -1)
-        )
+        self.options_box.setTitle(QW.QApplication.translate("DADRDialog", "Options", None, -1))
+        self.res_text_box.setTitle(QW.QApplication.translate("DADRDialog", "Results", None, -1))
+        self.calc_auto_button.setText(QW.QApplication.translate("DADRDialog", "Auto-determine", None, -1))
+        # yapf: enabke

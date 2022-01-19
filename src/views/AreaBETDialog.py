@@ -17,52 +17,51 @@ class AreaBETDialog(QW.QDialog):
     def setup_UI(self):
         self.setObjectName("AreaBETDialog")
 
-        layout = QW.QGridLayout(self)
-        layout.setObjectName("layout")
+        _layout = QW.QGridLayout(self)
 
-        self.optionsBox = QW.QGroupBox(self)
-        layout.addWidget(self.optionsBox, 0, 0, 1, 1)
-        self.rGraphsBox = QW.QGroupBox(self)
-        layout.addWidget(self.rGraphsBox, 0, 1, 2, 1)
-        self.resultBox = QW.QGroupBox(self)
-        layout.addWidget(self.resultBox, 1, 0, 1, 1)
+        self.options_box = QW.QGroupBox()
+        _layout.addWidget(self.options_box, 0, 0, 1, 1)
+        self.res_graphs_box = QW.QGroupBox()
+        _layout.addWidget(self.res_graphs_box, 0, 1, 2, 1)
+        self.res_text_box = QW.QGroupBox()
+        _layout.addWidget(self.res_text_box, 1, 0, 1, 1)
 
         # Options box
-        self.options_layout = QW.QGridLayout(self.optionsBox)
+        self.options_layout = QW.QGridLayout(self.options_box)
 
         ## Isotherm display
-        self.isoGraph = IsoGraphView(x_range_select=True, parent=self)
-        self.isoGraph.setObjectName("isoGraph")
-        self.x_select = self.isoGraph.x_range_select
+        self.iso_graph = IsoGraphView(x_range_select=True)
+        self.iso_graph.setObjectName("iso_graph")
+        self.x_select = self.iso_graph.x_range_select
 
         ## other options
-        self.branchLabel = LabelAlignRight("Branch used:")
-        self.branchDropdown = QW.QComboBox(self)
-        self.auto_button = QW.QPushButton(self)
+        self.branch_label = LabelAlignRight("Branch used:")
+        self.branch_dropdown = QW.QComboBox()
+        self.calc_auto_button = QW.QPushButton()
 
         ## Layout them
-        self.options_layout.addWidget(self.isoGraph, 0, 0, 1, 4)
-        self.options_layout.addWidget(self.branchLabel, 1, 0, 1, 1)
-        self.options_layout.addWidget(self.branchDropdown, 1, 1, 1, 1)
-        self.options_layout.addWidget(self.auto_button, 1, 3, 1, 1)
+        self.options_layout.addWidget(self.iso_graph, 0, 0, 1, 4)
+        self.options_layout.addWidget(self.branch_label, 1, 0, 1, 1)
+        self.options_layout.addWidget(self.branch_dropdown, 1, 1, 1, 1)
+        self.options_layout.addWidget(self.calc_auto_button, 1, 3, 1, 1)
 
         # Results graph box
-        self.rGraphsLayout = QW.QGridLayout(self.rGraphsBox)
+        self.res_graphs_layout = QW.QGridLayout(self.res_graphs_box)
 
         ## BET plot
-        self.betGraph = GraphView(parent=self)
-        self.betGraph.setObjectName("betGraph")
+        self.bet_graph = GraphView()
+        self.bet_graph.setObjectName("bet_graph")
 
         ## Rouquerol plot
-        self.rouqGraph = GraphView(parent=self)
-        self.rouqGraph.setObjectName("rouqGraph")
+        self.rouq_graph = GraphView()
+        self.rouq_graph.setObjectName("rouq_graph")
 
         ## Layout them
-        self.rGraphsLayout.addWidget(self.betGraph, 0, 0, 1, 1)
-        self.rGraphsLayout.addWidget(self.rouqGraph, 1, 0, 1, 1)
+        self.res_graphs_layout.addWidget(self.bet_graph, 0, 0, 1, 1)
+        self.res_graphs_layout.addWidget(self.rouq_graph, 1, 0, 1, 1)
 
         # Results box
-        self.resultsLayout = QW.QGridLayout(self.resultBox)
+        self.res_text_layout = QW.QGridLayout(self.res_text_box)
 
         # description labels
         self.label_fit = LabelAlignRight("Fit (R^2):")
@@ -72,39 +71,40 @@ class AreaBETDialog(QW.QDialog):
         self.label_p_mono = LabelAlignRight("Monolayer pressure [p/p0]:")
         self.label_slope = LabelAlignRight("Slope:")
         self.label_intercept = LabelAlignRight("Intercept:")
-        self.resultsLayout.addWidget(self.label_fit, 0, 1, 1, 1)
-        self.resultsLayout.addWidget(self.label_area, 1, 0, 1, 1)
-        self.resultsLayout.addWidget(self.label_c, 1, 2, 1, 1)
-        self.resultsLayout.addWidget(self.label_n_mono, 2, 0, 1, 1)
-        self.resultsLayout.addWidget(self.label_p_mono, 2, 2, 1, 1)
-        self.resultsLayout.addWidget(self.label_slope, 3, 0, 1, 1)
-        self.resultsLayout.addWidget(self.label_intercept, 3, 2, 1, 1)
+        self.res_text_layout.addWidget(self.label_fit, 0, 1, 1, 1)
+        self.res_text_layout.addWidget(self.label_area, 1, 0, 1, 1)
+        self.res_text_layout.addWidget(self.label_c, 1, 2, 1, 1)
+        self.res_text_layout.addWidget(self.label_n_mono, 2, 0, 1, 1)
+        self.res_text_layout.addWidget(self.label_p_mono, 2, 2, 1, 1)
+        self.res_text_layout.addWidget(self.label_slope, 3, 0, 1, 1)
+        self.res_text_layout.addWidget(self.label_intercept, 3, 2, 1, 1)
 
         # result labels
-        self.result_r = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_r, 0, 2, 1, 1)
-        self.result_bet = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_bet, 1, 1, 1, 1)
-        self.result_c = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_c, 1, 3, 1, 1)
-        self.result_mono_n = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_mono_n, 2, 1, 1, 1)
-        self.result_mono_p = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_mono_p, 2, 3, 1, 1)
-        self.result_slope = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_slope, 3, 1, 1, 1)
-        self.result_intercept = LabelResult(self)
-        self.resultsLayout.addWidget(self.result_intercept, 3, 3, 1, 1)
+        self.result_r = LabelResult()
+        self.result_bet = LabelResult()
+        self.result_c = LabelResult()
+        self.result_mono_n = LabelResult()
+        self.result_mono_p = LabelResult()
+        self.result_slope = LabelResult()
+        self.result_intercept = LabelResult()
+        self.res_text_layout.addWidget(self.result_r, 0, 2, 1, 1)
+        self.res_text_layout.addWidget(self.result_bet, 1, 1, 1, 1)
+        self.res_text_layout.addWidget(self.result_c, 1, 3, 1, 1)
+        self.res_text_layout.addWidget(self.result_mono_n, 2, 1, 1, 1)
+        self.res_text_layout.addWidget(self.result_mono_p, 2, 3, 1, 1)
+        self.res_text_layout.addWidget(self.result_slope, 3, 1, 1, 1)
+        self.res_text_layout.addWidget(self.result_intercept, 3, 3, 1, 1)
 
-        self.resultsLayout.addWidget(QW.QLabel("Calculation log:"), 4, 0, 1, 2)
-        self.output = LabelOutput(self)
-        self.resultsLayout.addWidget(self.output, 5, 0, 2, 4)
+        self.output_label = QW.QLabel("Calculation log:")
+        self.output = LabelOutput()
+        self.res_text_layout.addWidget(self.output_label, 4, 0, 1, 2)
+        self.res_text_layout.addWidget(self.output, 5, 0, 2, 4)
 
         # Bottom buttons
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
-        layout.addWidget(self.button_box, 2, 0, 1, 2)
+        _layout.addWidget(self.button_box, 2, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:
         return QC.QSize(1000, 700)
@@ -113,14 +113,11 @@ class AreaBETDialog(QW.QDialog):
         pass
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("AreaBETDialog", "Calculate BET area", None, -1)
-        )
-        self.optionsBox.setTitle(QW.QApplication.translate("AreaBETDialog", "Options", None, -1))
-        self.rGraphsBox.setTitle(
-            QW.QApplication.translate("AreaBETDialog", "Output Graphs", None, -1)
-        )
-        self.resultBox.setTitle(QW.QApplication.translate("AreaBETDialog", "Results", None, -1))
-        self.auto_button.setText(
-            QW.QApplication.translate("AreaBETDialog", "Auto-determine", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("AreaBETDialog", "Calculate BET area", None, -1))
+        self.options_box.setTitle(QW.QApplication.translate("AreaBETDialog", "Options", None, -1))
+        self.res_graphs_box.setTitle(QW.QApplication.translate("AreaBETDialog", "Output Graphs", None, -1))
+        self.res_text_box.setTitle(QW.QApplication.translate("AreaBETDialog", "Results", None, -1))
+        self.calc_auto_button.setText(QW.QApplication.translate("AreaBETDialog", "Auto-determine", None, -1))
+        # yapf: disable

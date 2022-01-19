@@ -11,8 +11,8 @@ class IsoGraphDataSel(QW.QDialog):
 
     changed = False
 
-    def __init__(self, datas, x_data, y1_data, y2_data, parent=None) -> None:
-        super().__init__(parent=parent)
+    def __init__(self, datas, x_data, y1_data, y2_data, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
         self.datas = datas
         self.x_data = x_data
@@ -26,9 +26,9 @@ class IsoGraphDataSel(QW.QDialog):
     def setup_UI(self):
         self.dataLayout = QW.QFormLayout(self)
 
-        self.xCombo = QW.QComboBox(self)
-        self.y1Combo = QW.QComboBox(self)
-        self.y2Combo = QW.QComboBox(self)
+        self.xCombo = QW.QComboBox()
+        self.y1Combo = QW.QComboBox()
+        self.y2Combo = QW.QComboBox()
 
         self.dataLayout.addRow(
             QW.QLabel("X Axis Data"),
@@ -44,7 +44,7 @@ class IsoGraphDataSel(QW.QDialog):
         )
 
         # Bottom buttons
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
         self.dataLayout.addWidget(self.button_box)

@@ -4,8 +4,8 @@ from qtpy import QtCore as QC
 
 
 class MetadataTableWidget(QW.QTableView):
-    def __init__(self, parent=None) -> None:
-        super().__init__(parent=parent)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.setSelectionMode(QW.QTableView.SingleSelection)
         self.setSelectionBehavior(QW.QTableView.SelectRows)
         self.verticalHeader().setVisible(False)

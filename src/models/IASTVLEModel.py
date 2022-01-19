@@ -91,6 +91,8 @@ class IASTVLEModel():
         self.output = ""
 
     def plot_results(self):
+        if self.results is None:
+            return
         self.view.res_graph.clear()
         plot_iast_vle(
             self.results['x'],

@@ -25,45 +25,44 @@ class IsoModelGuessDialog(QW.QDialog):
     def setup_UI(self):
         self.setObjectName("IsoModelByDialog")
 
-        layout = QW.QGridLayout(self)
-        layout.setObjectName("layout")
+        _layout = QW.QGridLayout(self)
 
         # Model selection and parameters
         self.options_layout = QW.QVBoxLayout()
-        layout.addLayout(self.options_layout, 0, 0)
+        _layout.addLayout(self.options_layout, 0, 0)
 
         # list
         self.options_layout.addWidget(QW.QLabel("Available models:"))
-        self.modelList = QW.QListWidget(parent=self)
-        self.options_layout.addWidget(self.modelList)
+        self.model_list = QW.QListWidget()
+        self.options_layout.addWidget(self.model_list)
 
-        modelLayout = QW.QFormLayout()
-        self.options_layout.addLayout(modelLayout)
+        model_layout = QW.QFormLayout()
+        self.options_layout.addLayout(model_layout)
 
         # Branch selection
-        self.branchLabel = LabelAlignRight("Branch:", parent=self)
-        self.branchDropdown = QW.QComboBox(self)
-        modelLayout.addRow(self.branchLabel, self.branchDropdown)
+        self.branch_label = LabelAlignRight("Branch:")
+        self.branch_dropdown = QW.QComboBox()
+        model_layout.addRow(self.branch_label, self.branch_dropdown)
 
-        self.autoButton = QW.QPushButton(self)
-        self.options_layout.addWidget(self.autoButton)
+        self.calc_auto_button = QW.QPushButton()
+        self.options_layout.addWidget(self.calc_auto_button)
 
         # Output log
         self.output_label = QW.QLabel("Output log:")
-        layout.addWidget(self.output_label, 1, 0)
-        self.output = LabelOutput(self)
-        layout.addWidget(self.output, 2, 0)
+        self.output = LabelOutput()
+        _layout.addWidget(self.output_label, 1, 0)
+        _layout.addWidget(self.output, 2, 0)
 
         # Isotherm display
-        self.isoGraph = IsoModelGraphView(self, x_range_select=True)
-        self.x_select = self.isoGraph.x_range_select
-        layout.addWidget(self.isoGraph, 0, 1, 3, 1)
+        self.iso_graph = IsoModelGraphView(x_range_select=True)
+        self.x_select = self.iso_graph.x_range_select
+        _layout.addWidget(self.iso_graph, 0, 1, 3, 1)
 
         # Bottom buttons
-        self.button_box = QW.QDialogButtonBox(self)
+        self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Cancel)
-        layout.addWidget(self.button_box, 3, 0, 1, 2)
+        _layout.addWidget(self.button_box, 3, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:
         return QC.QSize(1000, 800)
@@ -73,9 +72,8 @@ class IsoModelGuessDialog(QW.QDialog):
         self.button_box.rejected.connect(self.reject)
 
     def translate_UI(self):
-        self.setWindowTitle(
-            QW.QApplication.translate("IsoModelGuessDialog", "Isotherm model fitting", None, -1)
-        )
-        self.autoButton.setText(
-            QW.QApplication.translate("IsoModelGuessDialog", "Fit selected models", None, -1)
-        )
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("IsoModelGuessDialog", "Isotherm model fitting", None, -1))
+        self.calc_auto_button.setText(QW.QApplication.translate("IsoModelGuessDialog", "Fit selected models", None, -1))
+        # yapf: enable

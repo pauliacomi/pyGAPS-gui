@@ -43,20 +43,20 @@ class IsoModelByModel():
             return
 
         # view setup
-        self.view.modelDropdown.addItems(_MODELS),
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
+        self.view.model_dropdown.addItems(_MODELS),
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
 
         # plot setup
-        self.view.isoGraph.set_isotherms([self.isotherm])
-        self.limits = self.view.isoGraph.x_range
+        self.view.iso_graph.set_isotherms([self.isotherm])
+        self.limits = self.view.iso_graph.x_range
 
         # connect signals
-        self.view.modelDropdown.currentIndexChanged.connect(self.select_model)
-        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
+        self.view.model_dropdown.currentIndexChanged.connect(self.select_model)
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.x_select.slider.rangeChanged.connect(self.model_with_limits)
-        self.view.autoButton.clicked.connect(self.model_auto)
-        self.view.manualButton.clicked.connect(self.model_manual)
+        self.view.calc_auto_button.clicked.connect(self.model_auto)
+        self.view.calc_manual_button.clicked.connect(self.model_manual)
 
         # populate initial
         self.select_model()
@@ -127,17 +127,17 @@ class IsoModelByModel():
 
     def select_model(self):
         self.model_isotherm = None
-        self.current_model_name = self.view.modelDropdown.currentText()
+        self.current_model_name = self.view.model_dropdown.currentText()
         self.current_model = get_isotherm_model(self.current_model_name)
 
         # Model formula display
         if self.current_model.formula:
-            self.view.modelFormulaValue.setVisible(True)
-            self.view.modelFormulaValue.load(tex2svg(self.current_model.formula))
+            self.view.model_formula.setVisible(True)
+            self.view.model_formula.load(tex2svg(self.current_model.formula))
             aspectRatioMode = QC.Qt.AspectRatioMode(QC.Qt.KeepAspectRatio)
-            self.view.modelFormulaValue.renderer().setAspectRatioMode(aspectRatioMode)
+            self.view.model_formula.renderer().setAspectRatioMode(aspectRatioMode)
         else:
-            self.view.modelFormulaValue.setVisible(False)
+            self.view.model_formula.setVisible(False)
 
         # Model parameters
         for param in self.view.paramWidgets:
@@ -145,7 +145,7 @@ class IsoModelByModel():
         self.view.paramWidgets = {}
 
         for param in self.current_model.param_names:
-            widget = QHSpinBoxSlider(parent=self.view.paramBox)
+            widget = QHSpinBoxSlider()
             widget.setText(param)
             minv, maxv = self.current_model.param_bounds[param]
             if not minv or minv == -numpy.inf:
@@ -153,7 +153,7 @@ class IsoModelByModel():
             if not maxv or maxv == numpy.inf:
                 maxv = 100
             widget.setRange(minv=minv, maxv=maxv)
-            self.view.paramLayout.addWidget(widget)
+            self.view.param_layout.addWidget(widget)
             self.view.paramWidgets[param] = widget
 
         # Update plot
@@ -183,19 +183,19 @@ class IsoModelByModel():
         self.current_model.loading_range = [min(loading), max(loading)]
 
     def select_branch(self):
-        self.branch = self.view.branchDropdown.currentText()
-        self.view.isoGraph.branch = self.branch
+        self.branch = self.view.branch_dropdown.currentText()
+        self.view.iso_graph.branch = self.branch
         self.model_isotherm = None
         self.plot_results()
 
     def slider_reset(self):
         self.view.p_selector.setValues(self.limits, emit=False)
-        self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
 
     def output_results(self):
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
-        self.view.isoGraph.model_isotherm = self.model_isotherm
-        self.view.isoGraph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.model_isotherm = self.model_isotherm
+        self.view.iso_graph.draw_isotherms(branch=self.branch)

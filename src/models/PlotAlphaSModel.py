@@ -2,7 +2,7 @@ import warnings
 
 from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
-from pygaps.characterisation.alphas import alpha_s_raw
+from pygaps.characterisation.alphas_plots import alpha_s_raw
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
 
@@ -54,18 +54,18 @@ class PlotAlphaSModel():
             return
 
         # View setup
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
-        self.view.refbranchDropdown.addItems(["ads", "des"])
-        self.view.refbranchDropdown.setCurrentText(self.ref_branch)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
+        self.view.refbranch_dropdown.addItems(["ads", "des"])
+        self.view.refbranch_dropdown.setCurrentText(self.ref_branch)
 
         # connect signals
-        self.view.areaDropdown.currentIndexChanged.connect(self.select_area)
-        self.view.areaInput.editingFinished.connect(self.select_area)
-        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.refbranchDropdown.currentIndexChanged.connect(self.select_refbranch)
+        self.view.refarea_dropdown.currentIndexChanged.connect(self.select_area)
+        self.view.refarea_input.editingFinished.connect(self.select_area)
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
+        self.view.refbranch_dropdown.currentIndexChanged.connect(self.select_refbranch)
         self.view.pressure_input.editingFinished.connect(self.select_redpressure)
-        self.view.auto_button.clicked.connect(self.calc_auto)
+        self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
@@ -163,20 +163,18 @@ class PlotAlphaSModel():
                 ])
 
     def output_results(self):
-        self.view.resultsTable.setRowCount(0)
-        self.view.resultsTable.setRowCount(len(self.results))
+        self.view.res_table.setRowCount(0)
+        self.view.res_table.setRowCount(len(self.results))
         for index, result in enumerate(self.results):
-            self.view.resultsTable.setItem(
+            self.view.res_table.setItem(
                 index, 0, QW.QTableWidgetItem(f"{result.get('adsorbed_volume'):g}")
             )
-            self.view.resultsTable.setItem(index, 1, QW.QTableWidgetItem(f"{result.get('area'):g}"))
-            self.view.resultsTable.setItem(
+            self.view.res_table.setItem(index, 1, QW.QTableWidgetItem(f"{result.get('area'):g}"))
+            self.view.res_table.setItem(
                 index, 2, QW.QTableWidgetItem(f"{result.get('corr_coef'):g}")
             )
-            self.view.resultsTable.setItem(
-                index, 3, QW.QTableWidgetItem(f"{result.get('slope'):g}")
-            )
-            self.view.resultsTable.setItem(
+            self.view.res_table.setItem(index, 3, QW.QTableWidgetItem(f"{result.get('slope'):g}"))
+            self.view.res_table.setItem(
                 index, 4, QW.QTableWidgetItem(f"{result.get('intercept'):g}")
             )
 
@@ -186,33 +184,33 @@ class PlotAlphaSModel():
     def plot_results(self):
 
         # Generate alphas plot
-        self.view.tGraph.clear()
+        self.view.res_graph.clear()
         tp_plot(
             self.alphas_curve,
             self.loading,
             self.results,
-            ax=self.view.tGraph.ax,
+            ax=self.view.res_graph.ax,
             alpha_s=True,
             alpha_reducing_p=self.reducing_pressure
         )
-        self.view.tGraph.canvas.draw()
+        self.view.res_graph.canvas.draw()
 
     def slider_reset(self):
         self.view.x_select.setRange((0, self.alphas_curve[-1]))
         self.view.x_select.setValues((self.alphas_curve[0], self.alphas_curve[-1]), emit=False)
-        self.view.tGraph.draw_limits(self.alphas_curve[0], self.alphas_curve[-1])
+        self.view.res_graph.draw_limits(self.alphas_curve[0], self.alphas_curve[-1])
 
     def select_area(self):
-        area_type = self.view.areaDropdown.currentText().lower()
+        area_type = self.view.refarea_dropdown.currentText().lower()
         if area_type == "bet":
             self.reference_area = area_BET(self.ref_isotherm).get('area')
-            self.view.areaInput.setEnabled(False)
+            self.view.refarea_input.setEnabled(False)
         elif area_type == "langmuir":
             self.reference_area = area_langmuir(self.ref_isotherm).get('area')
-            self.view.areaInput.setEnabled(False)
+            self.view.refarea_input.setEnabled(False)
         else:
-            self.view.areaInput.setEnabled(True)
-            ref_area_str = self.view.areaInput.text()
+            self.view.refarea_input.setEnabled(True)
+            ref_area_str = self.view.refarea_input.text()
             if not ref_area_str:
                 return
             self.reference_area = float(ref_area_str)
@@ -221,12 +219,12 @@ class PlotAlphaSModel():
         self.calc_auto()
 
     def select_branch(self):
-        self.branch = self.view.branchDropdown.currentText()
+        self.branch = self.view.branch_dropdown.currentText()
         self.prepare_values()
         self.calc_auto()
 
     def select_refbranch(self):
-        self.ref_branch = self.view.refbranchDropdown.currentText()
+        self.ref_branch = self.view.refbranch_dropdown.currentText()
         self.prepare_values()
         self.calc_auto()
 

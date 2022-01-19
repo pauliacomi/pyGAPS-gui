@@ -55,18 +55,18 @@ class DADRModel():
 
         # View actions
         # plot setup
-        self.view.branchDropdown.addItems(["ads", "des"])
-        self.view.branchDropdown.setCurrentText(self.branch)
-        self.view.isoGraph.branch = self.branch
-        self.view.isoGraph.pressure_mode = "relative"
-        self.view.isoGraph.set_isotherms([self.isotherm])
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.pressure_mode = "relative"
+        self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
-        self.view.auto_button.clicked.connect(self.calc_auto)
+        self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         if self.ptype == "DA":
-            self.view.DRExponent.valueChanged.connect(self.select_exp)
-        self.view.branchDropdown.currentIndexChanged.connect(self.select_branch)
+            self.view.dr_exp_input.valueChanged.connect(self.select_exp)
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
 
@@ -152,16 +152,16 @@ class DADRModel():
         self.view.result_microporevol.setText(f"{self.microp_volume:g}")
         self.view.result_adspotential.setText(f"{self.potential:g}")
         if self.ptype == "DA":
-            self.view.DRExponent.blockSignals(True)
-            self.view.DRExponent.setValue(self.exponent)
-            self.view.DRExponent.blockSignals(False)
+            self.view.dr_exp_input.blockSignals(True)
+            self.view.dr_exp_input.setValue(self.exponent)
+            self.view.dr_exp_input.blockSignals(False)
         self.view.result_slope.setText(f'{self.slope:.4}')
         self.view.result_intercept.setText(f'{self.intercept:.4}')
 
     def plot_results(self):
 
         # Isotherm plot update
-        self.view.isoGraph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms(branch=self.branch)
 
         # DR/DA plot
         self.view.rgraph.clear()
@@ -178,7 +178,7 @@ class DADRModel():
         self.view.rgraph.canvas.draw()
 
     def select_exp(self):
-        exp = self.view.DRExponent.cleanText()
+        exp = self.view.dr_exp_input.cleanText()
         # Check consistency of exponent
         if exp:
             exp = float(exp)
@@ -190,10 +190,10 @@ class DADRModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.isoGraph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
 
     def select_branch(self):
-        self.branch = self.view.branchDropdown.currentText()
+        self.branch = self.view.branch_dropdown.currentText()
         self.prepare_values()
         self.calc_auto()
 

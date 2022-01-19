@@ -13,7 +13,7 @@ class IsoUnitWidget(QW.QWidget):
         super().__init__(*args, **kwargs)
 
         self.isotherm = None
-        self.temperatureUnit = temp_qcombo_ref
+        self.temperature_unit = temp_qcombo_ref
         self.setup_UI()
         self.translate_UI()
         self.connect_signals()
@@ -21,9 +21,9 @@ class IsoUnitWidget(QW.QWidget):
     def setup_UI(self):
 
         self.unitPropLayout = QW.QHBoxLayout(self)
-        self.pressureGrid = QW.QGroupBox(self)
-        self.loadingGrid = QW.QGroupBox(self)
-        self.materialGrid = QW.QGroupBox(self)
+        self.pressureGrid = QW.QGroupBox()
+        self.loadingGrid = QW.QGroupBox()
+        self.materialGrid = QW.QGroupBox()
 
         self.unitPropLayout.addWidget(self.pressureGrid)
         self.unitPropLayout.addWidget(self.loadingGrid)
@@ -65,7 +65,7 @@ class IsoUnitWidget(QW.QWidget):
         self.loadingUnit.currentIndexChanged.connect(self.convert_loading)
         self.materialBasis.currentIndexChanged.connect(self.convert_material)
         self.materialUnit.currentIndexChanged.connect(self.convert_material)
-        self.temperatureUnit.currentIndexChanged.connect(self.convert_temperature)
+        self.temperature_unit.currentIndexChanged.connect(self.convert_temperature)
 
     def blockComboSignals(self, state):
         self.pressureMode.blockSignals(state)
@@ -75,7 +75,7 @@ class IsoUnitWidget(QW.QWidget):
         self.materialBasis.blockSignals(state)
         self.materialUnit.blockSignals(state)
         self.materialUnit.blockSignals(state)
-        self.temperatureUnit.blockSignals(state)
+        self.temperature_unit.blockSignals(state)
 
     def init_boxes(self, p_dict, l_dict, m_dict, t_dict):
 
@@ -97,8 +97,8 @@ class IsoUnitWidget(QW.QWidget):
         self.materialUnit.setEnabled(False)
 
         self.t_dict = t_dict
-        self.temperatureUnit.addItems(list(t_dict.keys()))
-        self.temperatureUnit.setEnabled(False)
+        self.temperature_unit.addItems(list(t_dict.keys()))
+        self.temperature_unit.setEnabled(False)
 
         self.blockComboSignals(False)
 
@@ -169,7 +169,7 @@ class IsoUnitWidget(QW.QWidget):
 
     def init_temperature(self, temperature_unit):
 
-        self.temperatureUnit.setEnabled(True)
+        self.temperature_unit.setEnabled(True)
         temperature_units = list(self.t_dict.keys())
         self.tm_index = temperature_units.index(temperature_unit)
         self.loadingBasis.setCurrentIndex(self.lm_index)
@@ -182,7 +182,7 @@ class IsoUnitWidget(QW.QWidget):
         self.loadingUnit.setEnabled(False)
         self.materialBasis.setEnabled(False)
         self.materialUnit.setEnabled(False)
-        self.temperatureUnit.setEnabled(False)
+        self.temperature_unit.setEnabled(False)
 
     def convert_pressure(self):
         if not self.isotherm:
@@ -257,7 +257,7 @@ class IsoUnitWidget(QW.QWidget):
         if not self.isotherm:
             return
 
-        unit_to = self.temperatureUnit.currentText()
+        unit_to = self.temperature_unit.currentText()
         self.isotherm.convert_temperature(unit_to=unit_to)
 
         self.unitsChanged.emit()

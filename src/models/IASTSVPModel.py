@@ -53,7 +53,7 @@ class IASTSVPModel():
 
     def create_points(self):
         from src.widgets.RangeGenerator import RangeGenDialog
-        dialog = RangeGenDialog(props=["Pressure"], data=self.pressure_points)
+        dialog = RangeGenDialog(props=["Pressure"], data=self.pressure_points, parent=self.view)
         ret = dialog.exec()
 
         if ret == QW.QDialog.Accepted:

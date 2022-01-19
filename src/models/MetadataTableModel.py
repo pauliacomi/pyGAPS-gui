@@ -15,11 +15,11 @@ class MetadataTableModel(QC.QAbstractTableModel):
                 tpstr = "number"
             self.params.append([prop, propval, tpstr])
 
-    def rowCount(self, parent=QC.QModelIndex()):
+    def rowCount(self, index=QC.QModelIndex()):
         """Number of rows."""
         return len(self.params)
 
-    def columnCount(self, parent=QC.QModelIndex()):
+    def columnCount(self, index=QC.QModelIndex()):
         """Number of columns, always three."""
         return 3
 
@@ -27,8 +27,12 @@ class MetadataTableModel(QC.QAbstractTableModel):
         """Data display function."""
         if not index.isValid():
             return
+
         if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
             return str(self.params[index.row()][index.column()])
+
+        if role == QC.Qt.TextAlignmentRole:
+            return QC.Qt.AlignCenter
 
     def rowData(self, index, role=QC.Qt.DisplayRole):
         """Row data return function."""
@@ -88,4 +92,4 @@ class MetadataTableModel(QC.QAbstractTableModel):
         """Set flags for the model."""
         if index.column() == 2:
             return QC.Qt.ItemIsSelectable
-        return QC.Qt.ItemIsEnabled | QC.Qt.ItemIsSelectable | QC.Qt.ItemIsEditable
+        return QC.Qt.ItemIsEnabled | QC.Qt.ItemIsSelectable

@@ -11,38 +11,39 @@ from src.widgets.UtilityWidgets import error_dialog
 
 class IsoController():
     """
-    Interface between the Isotherm Models (list, single) and main window Isotherm views.
+    Interface between Isotherms loaded in memory and main window Isotherm views.
 
     The Isotherm List Model is the collection of isotherms that have been loaded
     in memory, which are stored in a custom QT QStandardItemModel.
 
     The main window has various views into this collection, such as:
 
-        - displaying a list of all isotherms (IsoExplorer)
-        - displaying metadata and unit for a selected isotherm (IsoDetails)
-        - plotting one or more selected isotherms (IsoGraph)
-
-    This is also the only place where the pygaps package is imported and used
-    for the main window.
+        - displaying a list of all isotherms (iso_explorer)
+        - displaying metadata and unit for a selected isotherm (iso_details)
+        - plotting one or more selected isotherms (iso_graph)
 
     """
-    def __init__(self, mainWindowWidget, listModel):
+    iso_current = None
+
+    def __init__(self, main_window, iso_list_model):
         """Connect the MVC architecture."""
 
-        self.mw_widget = mainWindowWidget
-        self.unit_widget = mainWindowWidget.unitPropButtonWidget
-        self.list_view = mainWindowWidget.isoExplorer
-        self.graph_view = mainWindowWidget.isoGraph
+        # Store refs to main widgets
+        self.mw_widget = main_window
+        self.unit_widget = main_window.prop_unit_widget
+        self.list_view = main_window.iso_explorer
+        self.graph_view = main_window.iso_graph
 
-        self.iso_list_model = listModel
-        self.current_isotherm = None  # nothing here
+        # Store ref to model
+        self.iso_list_model = iso_list_model
 
+        # Connect model/view
         self.list_view.setModel(self.iso_list_model)
         self.graph_view.setModel(self.iso_list_model)
 
         # populate adsorbates and materials
-        self.mw_widget.materialEdit.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
-        self.mw_widget.adsorbateEdit.insertItems(0, [ads.name for ads in pygaps.ADSORBATE_LIST])
+        self.mw_widget.material_input.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
+        self.mw_widget.adsorbate_input.insertItems(0, [ads.name for ads in pygaps.ADSORBATE_LIST])
 
         # populate units view
         self.unit_widget.init_boxes(
@@ -57,29 +58,24 @@ class IsoController():
 
     def connect_signals(self):
 
-        # Connect signals for list view
+        # Connect signals for iso explorer
         self.list_view.selectionModel().currentChanged.connect(self.selection_changed)
         self.list_view.delete_current_iso.connect(self.delete_current_iso)
+        self.mw_widget.exp_select_button.clicked.connect(self.iso_list_model.tick_all)
+        self.mw_widget.exp_deselect_button.clicked.connect(self.iso_list_model.untick_all)
+        self.mw_widget.exp_remove_button.clicked.connect(self.delete_current_iso)
 
-        self.mw_widget.selectAllButton.clicked.connect(self.iso_list_model.tick_all)
-        self.mw_widget.deselectAllButton.clicked.connect(self.iso_list_model.untick_all)
-        self.mw_widget.removeButton.clicked.connect(self.delete_current_iso)
+        # Connect signals for iso details
+        self.mw_widget.material_input.lineEdit().editingFinished.connect(self.modify_iso_baseprops)
+        self.mw_widget.adsorbate_input.lineEdit().editingFinished.connect(self.modify_iso_baseprops)
+        self.mw_widget.temperature_input.editingFinished.connect(self.modify_iso_baseprops)
+        self.mw_widget.data_button.clicked.connect(self.display_iso_data)
+        self.mw_widget.prop_extra_edit_widget.save_button.clicked.connect(self.extra_prop_save)
+        self.mw_widget.prop_extra_edit_widget.delete_button.clicked.connect(self.extra_prop_delete)
+        self.mw_widget.material_details.clicked.connect(self.material_detail)
+        self.mw_widget.adsorbate_details.clicked.connect(self.adsorbate_detail)
 
-        # Create isotherm data view
-        self.mw_widget.materialEdit.lineEdit().editingFinished.connect(self.modify_iso_baseprops)
-        self.mw_widget.adsorbateEdit.lineEdit().editingFinished.connect(self.modify_iso_baseprops)
-        self.mw_widget.temperatureEdit.editingFinished.connect(self.modify_iso_baseprops)
-        self.mw_widget.dataButton.clicked.connect(self.display_iso_data)
-
-        # Setup property signals
-        self.mw_widget.extraPropButtonWidget.propButtonSave.clicked.connect(self.extra_prop_save)
-        self.mw_widget.extraPropButtonWidget.propButtonDelete.clicked.connect(
-            self.extra_prop_delete
-        )
-        self.mw_widget.materialDetails.clicked.connect(self.material_detail)
-        self.mw_widget.adsorbateDetails.clicked.connect(self.adsorbate_detail)
-
-        # Connect signals for graph view
+        # Connect signals for iso graph
         self.list_view.selectionModel().currentChanged.connect(
             self.iso_list_model.handle_item_select
         )
@@ -92,11 +88,11 @@ class IsoController():
 
     def selection_changed(self, index, **kwargs):
         """What to do when the selected isotherm has changed."""
-        self.current_isotherm = self.iso_list_model.get_item_index(index)
+        self.iso_current = self.iso_list_model.get_item_index(index)
 
         # Just reset if nothing to display
         self.clear_isotherm()
-        if not self.current_isotherm:
+        if not self.iso_current:
             return
 
         # Otherwise detail all the isotherm
@@ -105,17 +101,18 @@ class IsoController():
     def display_isotherm(self):
 
         # Essential metadata
-        self.mw_widget.materialEdit.setCurrentText(str(self.current_isotherm.material))
-        self.mw_widget.adsorbateEdit.setCurrentText(str(self.current_isotherm.adsorbate))
-        self.mw_widget.temperatureEdit.setText(f"{self.current_isotherm._temperature:g}")
+        self.mw_widget.material_input.setCurrentText(str(self.iso_current.material))
+        self.mw_widget.adsorbate_input.setCurrentText(str(self.iso_current.adsorbate))
+        self.mw_widget.temperature_input.setText(f"{self.iso_current._temperature:g}")
 
         # Units setup
-        self.unit_widget.init_units(self.current_isotherm)
+        self.unit_widget.init_units(self.iso_current)
 
         # Other isotherm metadata
-        self.extraPropTableModel = IsoPropTableModel(self.current_isotherm)
-        self.mw_widget.extraPropTableView.setModel(self.extraPropTableModel)
-        self.mw_widget.extraPropTableView.selectionModel().selectionChanged.connect(
+        self.prop_extra_table_view = IsoPropTableModel(self.iso_current)
+        #TODO would it not be easier to set data?
+        self.mw_widget.prop_extra_table_view.setModel(self.prop_extra_table_view)
+        self.mw_widget.prop_extra_table_view.selectionModel().selectionChanged.connect(
             self.extra_prop_select
         )
 
@@ -127,35 +124,36 @@ class IsoController():
         """Reset all the display."""
 
         # Essential metadata
-        self.mw_widget.materialEdit.lineEdit().clear()
-        self.mw_widget.adsorbateEdit.lineEdit().clear()
-        self.mw_widget.temperatureEdit.clear()
+        self.mw_widget.material_input.lineEdit().clear()
+        self.mw_widget.adsorbate_input.lineEdit().clear()
+        self.mw_widget.temperature_input.clear()
 
         # Units
         self.unit_widget.clear()
 
         # Other metadata
-        self.mw_widget.extraPropButtonWidget.clear()
+        self.mw_widget.prop_extra_edit_widget.clear()
+        #TODO does this clear the tableview?
 
     def modify_iso_baseprops(self):
-        isotherm = self.current_isotherm
+        isotherm = self.iso_current
         modified = False
 
-        if isotherm.material != self.mw_widget.materialEdit.lineEdit().text():
-            isotherm.material = self.mw_widget.materialEdit.lineEdit().text()
+        if isotherm.material != self.mw_widget.material_input.lineEdit().text():
+            isotherm.material = self.mw_widget.material_input.lineEdit().text()
             self.mw_widget.statusbar.showMessage(f'Material modified to {isotherm.material}', 2000)
             self.refresh_material_edit()
             modified = True
 
-        if isotherm.adsorbate != self.mw_widget.adsorbateEdit.lineEdit().text():
-            isotherm.adsorbate = self.mw_widget.adsorbateEdit.lineEdit().text()
+        if isotherm.adsorbate != self.mw_widget.adsorbate_input.lineEdit().text():
+            isotherm.adsorbate = self.mw_widget.adsorbate_input.lineEdit().text()
             self.mw_widget.statusbar.showMessage(
                 f'Adsorbate modified to {isotherm.adsorbate}', 2000
             )
             modified = True
 
-        if isotherm.temperature != float(self.mw_widget.temperatureEdit.text()):
-            isotherm.temperature = float(self.mw_widget.temperatureEdit.text())
+        if isotherm.temperature != float(self.mw_widget.temperature_input.text()):
+            isotherm.temperature = float(self.mw_widget.temperature_input.text())
             self.mw_widget.statusbar.showMessage(
                 f'Temperature modified to {isotherm.temperature}', 2000
             )
@@ -165,37 +163,37 @@ class IsoController():
             self.update_isotherm()
 
     def material_detail(self):
+        if not self.iso_current:
+            return
         from src.views.MaterialView import MaterialDialog
-
-        if self.current_isotherm:
-            dialog = MaterialDialog(self.current_isotherm.material)
-            ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
-                self.update_isotherm()
+        dialog = MaterialDialog(self.iso_current.material, parent=self.mw_widget)
+        ret = dialog.exec()
+        if ret == QW.QDialog.Accepted:
+            self.update_isotherm()
 
     def adsorbate_detail(self):
+        if not self.iso_current:
+            return
         from src.views.AdsorbateView import AdsorbateDialog
-
-        if self.current_isotherm:
-            dialog = AdsorbateDialog(self.current_isotherm.adsorbate)
-            ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
-                self.update_isotherm()
+        dialog = AdsorbateDialog(self.iso_current.adsorbate, parent=self.mw_widget)
+        ret = dialog.exec()
+        if ret == QW.QDialog.Accepted:
+            self.update_isotherm()
 
     def extra_prop_select(self):
-        index = self.mw_widget.extraPropTableView.selectionModel().currentIndex()
+        index = self.mw_widget.prop_extra_table_view.selectionModel().currentIndex()
         if index:
-            data = self.extraPropTableModel.rowData(index)
+            data = self.prop_extra_table_view.rowData(index)
             if data:
-                self.mw_widget.extraPropButtonWidget.display(*data)
+                self.mw_widget.prop_extra_edit_widget.display(*data)
             else:
-                self.mw_widget.extraPropButtonWidget.clear()
+                self.mw_widget.prop_extra_edit_widget.clear()
 
     def extra_prop_save(self):
 
-        propName = self.mw_widget.extraPropButtonWidget.nameEdit.text()
-        propValue = self.mw_widget.extraPropButtonWidget.valueEdit.text()
-        propType = self.mw_widget.extraPropButtonWidget.typeEdit.currentText()
+        propName = self.mw_widget.prop_extra_edit_widget.name_input.text()
+        propValue = self.mw_widget.prop_extra_edit_widget.value_input.text()
+        propType = self.mw_widget.prop_extra_edit_widget.type_input.currentText()
         if not propName:
             self.mw_widget.statusbar.showMessage("Fill property name!", 2000)
             return
@@ -207,31 +205,31 @@ class IsoController():
                 error_dialog("Could not convert metadata value to number.")
                 return
 
-        self.extraPropTableModel.setOrInsertRow(data=[propName, propValue, propType])
+        self.prop_extra_table_view.setOrInsertRow(data=[propName, propValue, propType])
         self.mw_widget.statusbar.showMessage(f"Added property named {propName}")
-        self.mw_widget.extraPropTableView.resizeColumns()
+        self.mw_widget.prop_extra_table_view.resizeColumns()
 
     def extra_prop_delete(self):
-        index = self.mw_widget.extraPropTableView.selectionModel().currentIndex()
+        index = self.mw_widget.prop_extra_table_view.selectionModel().currentIndex()
         self.mw_widget.statusbar.showMessage(f"Deleted property named {index}")
-        self.extraPropTableModel.removeRow(index.row())
+        self.prop_extra_table_view.removeRow(index.row())
 
     def display_iso_data(self):
+        if not self.iso_current:
+            return
         from src.views.IsoDataDialog import IsoDataDialog
         from src.models.IsoDataTableModel import IsoDataTableModel
-
-        if self.current_isotherm:
-            dialog = IsoDataDialog()
-            dialog.table_view.setModel(IsoDataTableModel(self.current_isotherm.data()))
-            ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
-                self.update_isotherm()
+        dialog = IsoDataDialog(parent=self.mw_widget)
+        dialog.table_view.setModel(IsoDataTableModel(self.iso_current.data()))
+        ret = dialog.exec()
+        if ret == QW.QDialog.Accepted:
+            self.update_isotherm()
 
     def refresh_material_edit(self):
         # TODO change how materials are handled and updated
         # due to errors in editing during isotherm edits
-        self.mw_widget.materialEdit.clear()
-        self.mw_widget.materialEdit.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
+        self.mw_widget.material_input.clear()
+        self.mw_widget.material_input.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
 
     ########################################################
     # Add and remove functionality
@@ -270,10 +268,10 @@ class IsoController():
         elif iso_type == 2:  # mic report
             isotherm = pgp.isotherm_from_xl(path, fmt='mic')
         elif iso_type == 3:  # qnt report
-            isotherm = pgp.isotherm_from_xl(fmt='qnt')
+            isotherm = pgp.isotherm_from_xl(path, fmt='qnt')
             # TODO implement Quantachrome report
         elif iso_type == 4:  # 3P report:
-            isotherm = pgp.isotherm_from_xl(fmt='3p')
+            isotherm = pgp.isotherm_from_xl(path, fmt='3p')
             # TODO implement 3p report
         else:
             raise Exception(f"Could not determine import type '{iso_type}'.")
@@ -299,7 +297,7 @@ class IsoController():
 
     def save(self, path, ext):
         """Save isotherm to disk."""
-        isotherm = self.iso_list_model.get_item_index(self.list_view.currentIndex())
+        isotherm = self.iso_current
 
         import pygaps.parsing as pgp
         if ext == '.csv':
