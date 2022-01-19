@@ -108,41 +108,41 @@ class MainWindowUI():
 
         self.material_label = QW.QLabel()
         self.material_label.setObjectName("material_label")
-        self.prop_base_layout.addWidget(self.material_label, 0, 0, 1, 1)
         self.material_input = QW.QComboBox()
         self.material_input.setInsertPolicy(QW.QComboBox.NoInsert)
         self.material_input.setObjectName("material_input")
         self.material_input.setEditable(True)
-        self.prop_base_layout.addWidget(self.material_input, 0, 1, 1, 1)
         self.material_details = QW.QPushButton()
         self.material_details.setObjectName("material_details")
+        self.prop_base_layout.addWidget(self.material_label, 0, 0, 1, 1)
+        self.prop_base_layout.addWidget(self.material_input, 0, 1, 1, 1)
         self.prop_base_layout.addWidget(self.material_details, 0, 2, 1, 1)
 
         self.adsorbate_label = QW.QLabel()
         self.adsorbate_label.setObjectName("adsorbate_label")
-        self.prop_base_layout.addWidget(self.adsorbate_label, 1, 0, 1, 1)
         self.adsorbate_input = QW.QComboBox()
         self.adsorbate_input.setInsertPolicy(QW.QComboBox.NoInsert)
         self.adsorbate_input.setObjectName("adsorbate_input")
         self.adsorbate_input.setEditable(True)
-        self.prop_base_layout.addWidget(self.adsorbate_input, 1, 1, 1, 1)
         self.adsorbate_details = QW.QPushButton()
         self.adsorbate_details.setObjectName("adsorbate_details")
+        self.prop_base_layout.addWidget(self.adsorbate_label, 1, 0, 1, 1)
+        self.prop_base_layout.addWidget(self.adsorbate_input, 1, 1, 1, 1)
         self.prop_base_layout.addWidget(self.adsorbate_details, 1, 2, 1, 1)
 
         self.temperature_label = QW.QLabel()
         self.temperature_label.setObjectName("temperature_label")
-        self.prop_base_layout.addWidget(self.temperature_label, 2, 0, 1, 1)
         self.temperature_input = QW.QLineEdit()
         self.temperature_input.setObjectName("temperature_input")
+        self.prop_base_layout.addWidget(self.temperature_label, 2, 0, 1, 1)
         self.prop_base_layout.addWidget(self.temperature_input, 2, 1, 1, 1)
 
         # then, units for isotherm physical quantities
         # the temperature combo is "given" to the unitWidget
         self.temperature_unit = QW.QComboBox()
         self.temperature_unit.setObjectName("temperature_unit")
-        self.prop_base_layout.addWidget(self.temperature_unit, 2, 2, 1, 1)
         self.prop_unit_widget = IsoUnitWidget(self.temperature_unit)
+        self.prop_base_layout.addWidget(self.temperature_unit, 2, 2, 1, 1)
         self.properties_layout.addWidget(self.prop_unit_widget, 1, 0, 1, 2)
 
         # then, isotherm metadata

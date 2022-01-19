@@ -1,14 +1,10 @@
-import os
-
 from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
 
 from src.controllers.IsoController import IsoController
 from src.models.IsoListModel import IsoListModel
 from src.MainWindowUI import MainWindowUI
-from src.widgets.UtilityWidgets import (
-    error_dialog, error_detail_dialog, open_files_dialog, save_file_dialog
-)
+from src.widgets.UtilityWidgets import (error_dialog, open_files_dialog, save_file_dialog)
 
 
 class MainWindow(QW.QMainWindow):
