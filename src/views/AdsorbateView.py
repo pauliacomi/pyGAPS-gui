@@ -155,8 +155,8 @@ class AdsorbateView(QW.QWidget):
 
 
 class AdsorbateDialog(QW.QDialog):
-    def __init__(self, adsorbate, parent=None, **kwargs) -> None:
-        super().__init__(parent=parent, **kwargs)
+    def __init__(self, adsorbate, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
         self.setup_UI()
         self.translate_UI()

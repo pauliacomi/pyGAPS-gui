@@ -166,7 +166,10 @@ class IsoController():
         if not self.iso_current:
             return
         from src.views.MaterialView import MaterialDialog
-        dialog = MaterialDialog(self.iso_current.material, parent=self.mw_widget)
+        dialog = MaterialDialog(
+            self.iso_current.material,
+            parent=self.mw_widget.central_widget,
+        )
         ret = dialog.exec()
         if ret == QW.QDialog.Accepted:
             self.update_isotherm()
@@ -175,7 +178,10 @@ class IsoController():
         if not self.iso_current:
             return
         from src.views.AdsorbateView import AdsorbateDialog
-        dialog = AdsorbateDialog(self.iso_current.adsorbate, parent=self.mw_widget)
+        dialog = AdsorbateDialog(
+            self.iso_current.adsorbate,
+            parent=self.mw_widget.central_widget,
+        )
         ret = dialog.exec()
         if ret == QW.QDialog.Accepted:
             self.update_isotherm()

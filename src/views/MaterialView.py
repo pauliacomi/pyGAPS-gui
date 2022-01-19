@@ -141,8 +141,8 @@ class MaterialView(QW.QWidget):
 
 
 class MaterialDialog(QW.QDialog):
-    def __init__(self, material, parent=None, **kwargs) -> None:
-        super().__init__(parent=parent, **kwargs)
+    def __init__(self, material, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
         self.setup_UI()
         self.translate_UI()
