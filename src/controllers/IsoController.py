@@ -60,9 +60,8 @@ class IsoController():
 
         # Connect signals for iso explorer
         self.list_view.selectionModel().currentChanged.connect(self.selection_changed)
-        self.list_view.delete_current_iso.connect(self.delete_current_iso)
-        self.mw_widget.exp_select_button.clicked.connect(self.iso_list_model.tick_all)
-        self.mw_widget.exp_deselect_button.clicked.connect(self.iso_list_model.untick_all)
+        self.mw_widget.exp_select_button.clicked.connect(self.iso_list_model.check_all)
+        self.mw_widget.exp_deselect_button.clicked.connect(self.iso_list_model.uncheck_all)
         self.mw_widget.exp_remove_button.clicked.connect(self.delete_current_iso)
 
         # Connect signals for iso details
@@ -79,16 +78,17 @@ class IsoController():
         self.list_view.selectionModel().currentChanged.connect(
             self.iso_list_model.handle_item_select
         )
-        self.iso_list_model.checkedChanged.connect(self.graph_view.update)
-        self.unit_widget.unitsChanged.connect(self.update_isotherm)
+        self.iso_list_model.checked_changed.connect(self.graph_view.update)
+        self.unit_widget.units_changed.connect(self.update_isotherm)
 
     ########################################################
     # Display functionality
     ########################################################
 
-    def selection_changed(self, index, **kwargs):
-        """What to do when the selected isotherm has changed."""
-        self.iso_current = self.iso_list_model.get_item_index(index)
+    def selection_changed(self, current, previous):
+        """Do when selected isotherm has changed."""
+        if current.isValid():
+            self.iso_current = self.iso_list_model.itemFromIndex(current).data()
 
         # Just reset if nothing to display
         self.clear_isotherm()
@@ -328,4 +328,4 @@ class IsoController():
 
     def delete_current_iso(self):
         """Remove current isotherm from model."""
-        self.iso_list_model.delete(self.list_view.currentIndex())
+        self.iso_list_model.removeRow(self.list_view.currentIndex().row())

@@ -7,7 +7,7 @@ from src.widgets.UtilityWidgets import error_dialog
 
 class IsoUnitWidget(QW.QWidget):
 
-    unitsChanged = QC.Signal()
+    units_changed = QC.Signal()
 
     def __init__(self, temp_qcombo_ref, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -203,7 +203,7 @@ class IsoUnitWidget(QW.QWidget):
             except Exception as ex:
                 error_dialog("Could not convert pressure, is your isotherm supercritical?")
 
-            self.unitsChanged.emit()
+            self.units_changed.emit()
 
     def convert_loading(self):
         if not self.isotherm:
@@ -224,7 +224,7 @@ class IsoUnitWidget(QW.QWidget):
             except Exception as ex:
                 error_dialog("Could not convert loading, is your isotherm supercritical?")
 
-            self.unitsChanged.emit()
+            self.units_changed.emit()
 
     def convert_material(self):
         if not self.isotherm:
@@ -251,7 +251,7 @@ class IsoUnitWidget(QW.QWidget):
                     raise Exception from ex
                 error_dialog(msg)
 
-            self.unitsChanged.emit()
+            self.units_changed.emit()
 
     def convert_temperature(self):
         if not self.isotherm:
@@ -260,7 +260,7 @@ class IsoUnitWidget(QW.QWidget):
         unit_to = self.temperature_unit.currentText()
         self.isotherm.convert_temperature(unit_to=unit_to)
 
-        self.unitsChanged.emit()
+        self.units_changed.emit()
 
     def translate_UI(self):
         self.pressureGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure", None, -1))

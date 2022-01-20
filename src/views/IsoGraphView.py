@@ -125,7 +125,7 @@ class IsoListGraphView(IsoGraphView):
         self.model = model
 
     def update(self):
-        self.set_isotherms(self.model.get_item_checked())
+        self.set_isotherms(self.model.get_checked())
         self.draw_isotherms()
 
 
