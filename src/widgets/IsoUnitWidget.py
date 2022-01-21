@@ -2,267 +2,224 @@ from pygaps.core.pointisotherm import PointIsotherm
 from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
 
-from src.widgets.UtilityWidgets import error_dialog
-
 
 class IsoUnitWidget(QW.QWidget):
 
-    units_changed = QC.Signal()
+    pressure_changed = QC.Signal(str, str)
+    loading_changed = QC.Signal(str, str)
+    material_changed = QC.Signal(str, str)
+    temperature_changed = QC.Signal(str)
 
-    def __init__(self, temp_qcombo_ref, *args, **kwargs):
+    units_active: bool = False
+
+    def __init__(self, temp_combo_ref, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.isotherm = None
-        self.temperature_unit = temp_qcombo_ref
+        self.temperature_unit = temp_combo_ref
         self.setup_UI()
         self.translate_UI()
         self.connect_signals()
 
     def setup_UI(self):
 
-        self.unitPropLayout = QW.QHBoxLayout(self)
-        self.pressureGrid = QW.QGroupBox()
-        self.loadingGrid = QW.QGroupBox()
-        self.materialGrid = QW.QGroupBox()
+        _layout = QW.QHBoxLayout(self)
+        self.pressure_box = QW.QGroupBox()
+        self.loading_box = QW.QGroupBox()
+        self.material_box = QW.QGroupBox()
 
-        self.unitPropLayout.addWidget(self.pressureGrid)
-        self.unitPropLayout.addWidget(self.loadingGrid)
-        self.unitPropLayout.addWidget(self.materialGrid)
+        _layout.addWidget(self.pressure_box)
+        _layout.addWidget(self.loading_box)
+        _layout.addWidget(self.material_box)
 
-        self.pressurePropLayout = QW.QVBoxLayout(self.pressureGrid)
-        self.loadingPropLayout = QW.QVBoxLayout(self.loadingGrid)
-        self.materialPropLayout = QW.QVBoxLayout(self.materialGrid)
+        self.pressure_box_layout = QW.QVBoxLayout(self.pressure_box)
+        self.loading_box_layout = QW.QVBoxLayout(self.loading_box)
+        self.material_box_layout = QW.QVBoxLayout(self.material_box)
 
-        self.pressureMode = QW.QComboBox()
-        self.pressureMode.setObjectName("pressureMode")
-        self.pressurePropLayout.addWidget(self.pressureMode)
+        self.pressure_mode = QW.QComboBox()
+        self.pressure_mode.setObjectName("pressure_mode")
+        self.pressure_box_layout.addWidget(self.pressure_mode)
 
-        self.pressureUnit = QW.QComboBox()
-        self.pressureUnit.setObjectName("pressureUnit")
-        self.pressurePropLayout.addWidget(self.pressureUnit)
+        self.pressure_unit = QW.QComboBox()
+        self.pressure_unit.setObjectName("pressure_unit")
+        self.pressure_box_layout.addWidget(self.pressure_unit)
 
-        self.loadingBasis = QW.QComboBox()
-        self.loadingBasis.setObjectName("loadingBasis")
-        self.loadingPropLayout.addWidget(self.loadingBasis)
+        self.loading_basis = QW.QComboBox()
+        self.loading_basis.setObjectName("loading_basis")
+        self.loading_box_layout.addWidget(self.loading_basis)
 
-        self.loadingUnit = QW.QComboBox()
-        self.loadingUnit.setObjectName("loadingUnit")
-        self.loadingPropLayout.addWidget(self.loadingUnit)
+        self.loading_unit = QW.QComboBox()
+        self.loading_unit.setObjectName("loading_unit")
+        self.loading_box_layout.addWidget(self.loading_unit)
 
-        self.materialBasis = QW.QComboBox()
-        self.materialBasis.setObjectName("materialBasis")
-        self.materialPropLayout.addWidget(self.materialBasis)
+        self.material_basis = QW.QComboBox()
+        self.material_basis.setObjectName("material_basis")
+        self.material_box_layout.addWidget(self.material_basis)
 
-        self.materialUnit = QW.QComboBox()
-        self.materialUnit.setObjectName("materialUnit")
-        self.materialPropLayout.addWidget(self.materialUnit)
+        self.material_unit = QW.QComboBox()
+        self.material_unit.setObjectName("material_unit")
+        self.material_box_layout.addWidget(self.material_unit)
 
     def connect_signals(self):
 
-        self.pressureMode.currentIndexChanged.connect(self.convert_pressure)
-        self.pressureUnit.currentIndexChanged.connect(self.convert_pressure)
-        self.loadingBasis.currentIndexChanged.connect(self.convert_loading)
-        self.loadingUnit.currentIndexChanged.connect(self.convert_loading)
-        self.materialBasis.currentIndexChanged.connect(self.convert_material)
-        self.materialUnit.currentIndexChanged.connect(self.convert_material)
-        self.temperature_unit.currentIndexChanged.connect(self.convert_temperature)
+        self.pressure_mode.currentIndexChanged.connect(self.handle_pressure_change)
+        self.pressure_unit.currentIndexChanged.connect(self.emit_pressure)
+        self.loading_basis.currentIndexChanged.connect(self.handle_loading_change)
+        self.loading_unit.currentIndexChanged.connect(self.emit_loading)
+        self.material_basis.currentIndexChanged.connect(self.handle_material_change)
+        self.material_unit.currentIndexChanged.connect(self.emit_material)
+        self.temperature_unit.currentIndexChanged.connect(self.emit_temperature)
 
-    def blockComboSignals(self, state):
-        self.pressureMode.blockSignals(state)
-        self.pressureUnit.blockSignals(state)
-        self.loadingBasis.blockSignals(state)
-        self.loadingUnit.blockSignals(state)
-        self.materialBasis.blockSignals(state)
-        self.materialUnit.blockSignals(state)
-        self.materialUnit.blockSignals(state)
+    def block_signals(self, state):
+        self.pressure_mode.blockSignals(state)
+        self.pressure_unit.blockSignals(state)
+        self.loading_basis.blockSignals(state)
+        self.loading_unit.blockSignals(state)
+        self.material_basis.blockSignals(state)
+        self.material_unit.blockSignals(state)
+        self.material_unit.blockSignals(state)
         self.temperature_unit.blockSignals(state)
+
+    def clear(self):
+        self.units_active = None
+        self.pressure_mode.setEnabled(False)
+        self.pressure_unit.setEnabled(False)
+        self.loading_basis.setEnabled(False)
+        self.loading_unit.setEnabled(False)
+        self.material_basis.setEnabled(False)
+        self.material_unit.setEnabled(False)
+        self.temperature_unit.setEnabled(False)
 
     def init_boxes(self, p_dict, l_dict, m_dict, t_dict):
 
-        self.blockComboSignals(True)
+        self.block_signals(True)
 
         self.pressure_dict = p_dict
-        self.pressureMode.addItems(list(p_dict.keys()))
-        self.pressureMode.setEnabled(False)
-        self.pressureUnit.setEnabled(False)
+        self.pressure_mode.addItems(list(p_dict.keys()))
+        self.pressure_mode.setEnabled(False)
+        self.pressure_unit.setEnabled(False)
 
         self.loading_dict = l_dict
-        self.loadingBasis.addItems(list(l_dict.keys()))
-        self.loadingBasis.setEnabled(False)
-        self.loadingUnit.setEnabled(False)
+        self.loading_basis.addItems(list(l_dict.keys()))
+        self.loading_basis.setEnabled(False)
+        self.loading_unit.setEnabled(False)
 
         self.material_dict = m_dict
-        self.materialBasis.addItems(list(m_dict.keys()))
-        self.materialBasis.setEnabled(False)
-        self.materialUnit.setEnabled(False)
+        self.material_basis.addItems(list(m_dict.keys()))
+        self.material_basis.setEnabled(False)
+        self.material_unit.setEnabled(False)
 
-        self.t_dict = t_dict
+        self.temperature_dict = t_dict
         self.temperature_unit.addItems(list(t_dict.keys()))
         self.temperature_unit.setEnabled(False)
 
-        self.blockComboSignals(False)
+        self.block_signals(False)
 
     def init_units(self, isotherm):
 
-        self.isotherm = isotherm
+        self.block_signals(True)
         self.units_active = isinstance(isotherm, PointIsotherm)
-        self.blockComboSignals(True)
         self.init_pressure(isotherm.pressure_mode, isotherm.pressure_unit)
         self.init_loading(isotherm.loading_basis, isotherm.loading_unit)
         self.init_material(isotherm.material_basis, isotherm.material_unit)
         self.init_temperature(isotherm.temperature_unit)
-        self.blockComboSignals(False)
+        self.block_signals(False)
 
     def init_pressure(self, pressure_mode, pressure_unit):
 
-        if self.units_active:
-            self.pressureMode.setEnabled(True)
-        pressure_modes = list(self.pressure_dict.keys())
-        self.pm_index = pressure_modes.index(pressure_mode)
-        self.pressureMode.setCurrentIndex(self.pm_index)
+        self.pressure_mode.setEnabled(self.units_active)
+        self.pressure_mode.setCurrentText(pressure_mode)
 
-        self.pressureUnit.clear()
+        self.init_pressure_unit(pressure_mode, pressure_unit)
+
+    def init_pressure_unit(self, pressure_mode, pressure_unit):
+        self.pressure_unit.clear()
+        self.pressure_unit.setEnabled(False)
         pressure_units = self.pressure_dict.get(pressure_mode, None)
-        if pressure_units:
-            if self.units_active:
-                self.pressureUnit.setEnabled(True)
-            pressure_units = list(pressure_units.keys())
-            self.pu_index = pressure_units.index(pressure_unit)
-            self.pressureUnit.addItems(pressure_units)
-            self.pressureUnit.setCurrentIndex(self.pu_index)
+        if not pressure_units:
+            return
+        self.pressure_unit.setEnabled(self.units_active)
+        pressure_units = list(pressure_units.keys())
+        self.pressure_unit.addItems(pressure_units)
+        self.pressure_unit.setCurrentText(pressure_unit)
 
     def init_loading(self, loading_basis, loading_unit):
 
-        if self.units_active:
-            self.loadingBasis.setEnabled(True)
-        loading_bases = list(self.loading_dict.keys())
-        self.lm_index = loading_bases.index(loading_basis)
-        self.loadingBasis.setCurrentIndex(self.lm_index)
+        self.loading_basis.setEnabled(self.units_active)
+        self.loading_basis.setCurrentText(loading_basis)
 
-        self.loadingUnit.clear()
+        self.init_loading_unit(loading_basis, loading_unit)
+
+    def init_loading_unit(self, loading_basis, loading_unit):
+        self.loading_unit.clear()
+        self.loading_unit.setEnabled(False)
         loading_units = self.loading_dict.get(loading_basis, None)
-        if loading_units:
-            if self.units_active:
-                self.loadingUnit.setEnabled(True)
-            loading_units = list(loading_units.keys())
-            self.lu_index = loading_units.index(loading_unit)
-            self.loadingUnit.addItems(loading_units)
-            self.loadingUnit.setCurrentIndex(self.lu_index)
+        if not loading_units:
+            return
+        self.loading_unit.setEnabled(self.units_active)
+        loading_units = list(loading_units.keys())
+        self.loading_unit.addItems(loading_units)
+        self.loading_unit.setCurrentText(loading_unit)
 
     def init_material(self, material_basis, material_unit):
 
-        if self.units_active:
-            self.materialBasis.setEnabled(True)
-        material_bases = list(self.material_dict.keys())
-        self.mm_index = material_bases.index(material_basis)
-        self.materialBasis.setCurrentIndex(self.mm_index)
+        self.material_basis.setEnabled(self.units_active)
+        self.material_basis.setCurrentText(material_basis)
 
-        self.materialUnit.clear()
+        self.init_material_unit(material_basis, material_unit)
+
+    def init_material_unit(self, material_basis, material_unit):
+        self.material_unit.clear()
+        self.material_unit.setEnabled(False)
         material_units = self.material_dict.get(material_basis, None)
-        if material_units:
-            if self.units_active:
-                self.materialUnit.setEnabled(True)
-            material_units = list(material_units.keys())
-            self.mu_index = material_units.index(material_unit)
-            self.materialUnit.addItems(material_units)
-            self.materialUnit.setCurrentIndex(self.mu_index)
+        if not material_units:
+            return
+        self.material_unit.setEnabled(self.units_active)
+        material_units = list(material_units.keys())
+        self.material_unit.addItems(material_units)
+        self.material_unit.setCurrentText(material_unit)
 
     def init_temperature(self, temperature_unit):
-
         self.temperature_unit.setEnabled(True)
-        temperature_units = list(self.t_dict.keys())
-        self.tm_index = temperature_units.index(temperature_unit)
-        self.loadingBasis.setCurrentIndex(self.lm_index)
+        self.temperature_unit.setCurrentText(temperature_unit)
 
-    def clear(self):
-        self.isotherm = None
-        self.pressureMode.setEnabled(False)
-        self.pressureUnit.setEnabled(False)
-        self.loadingBasis.setEnabled(False)
-        self.loadingUnit.setEnabled(False)
-        self.materialBasis.setEnabled(False)
-        self.materialUnit.setEnabled(False)
-        self.temperature_unit.setEnabled(False)
+    def handle_pressure_change(self):
+        pressure_mode = self.pressure_mode.currentText()
+        pressure_unit = self.pressure_unit.currentText()
+        self.init_pressure_unit(pressure_mode, pressure_unit)
 
-    def convert_pressure(self):
-        if not self.isotherm:
-            return
+    def emit_pressure(self):
+        mode_to = self.pressure_mode.currentText()
+        unit_to = self.pressure_unit.currentText()
+        self.pressure_changed.emit(mode_to, unit_to)
 
-        mode_to = self.pressureMode.currentText()
-        unit_to = self.pressureUnit.currentText()
+    def handle_loading_change(self):
+        loading_basis = self.loading_basis.currentText()
+        loading_unit = self.loading_unit.currentText()
+        self.init_loading_unit(loading_basis, loading_unit)
 
-        if (self.isotherm.pressure_mode != mode_to or self.isotherm.pressure_unit != unit_to):
+    def emit_loading(self):
+        basis_to = self.loading_basis.currentText()
+        unit_to = self.loading_unit.currentText()
+        self.loading_changed.emit(basis_to, unit_to)
 
-            if self.isotherm.pressure_mode != mode_to:
-                units = self.pressure_dict[mode_to]
-                if units:
-                    unit_to = list(units.keys())[0]
+    def handle_material_change(self):
+        material_basis = self.material_basis.currentText()
+        material_unit = self.material_unit.currentText()
+        self.init_material_unit(material_basis, material_unit)
 
-            try:
-                self.isotherm.convert_pressure(mode_to=mode_to, unit_to=unit_to)
-            except Exception as ex:
-                error_dialog("Could not convert pressure, is your isotherm supercritical?")
+    def emit_material(self):
+        basis_to = self.material_basis.currentText()
+        unit_to = self.material_unit.currentText()
+        self.material_changed.emit(basis_to, unit_to)
 
-            self.units_changed.emit()
-
-    def convert_loading(self):
-        if not self.isotherm:
-            return
-
-        basis_to = self.loadingBasis.currentText()
-        unit_to = self.loadingUnit.currentText()
-
-        if (self.isotherm.loading_basis != basis_to or self.isotherm.loading_unit != unit_to):
-
-            if self.isotherm.loading_basis != basis_to:
-                units = self.loading_dict[basis_to]
-                if units:
-                    unit_to = list(units.keys())[0]
-
-            try:
-                self.isotherm.convert_loading(basis_to=basis_to, unit_to=unit_to)
-            except Exception as ex:
-                error_dialog("Could not convert loading, is your isotherm supercritical?")
-
-            self.units_changed.emit()
-
-    def convert_material(self):
-        if not self.isotherm:
-            return
-
-        basis_to = self.materialBasis.currentText()
-        unit_to = self.materialUnit.currentText()
-
-        if (self.isotherm.material_basis != basis_to or self.isotherm.material_unit != unit_to):
-
-            if self.isotherm.material_basis != basis_to:
-                units = self.material_dict[basis_to]
-                if units:
-                    unit_to = list(units.keys())[0]
-
-            try:
-                self.isotherm.convert_material(basis_to=basis_to, unit_to=unit_to)
-            except Exception as ex:
-                if basis_to == "volume":
-                    msg = "Could not convert material to a volume basis. Does it have a density set?"
-                elif basis_to == "molar":
-                    msg = "Could not convert material to a molar basis. Does it have a molar_mass set?"
-                else:
-                    raise Exception from ex
-                error_dialog(msg)
-
-            self.units_changed.emit()
-
-    def convert_temperature(self):
-        if not self.isotherm:
-            return
-
+    def emit_temperature(self):
         unit_to = self.temperature_unit.currentText()
-        self.isotherm.convert_temperature(unit_to=unit_to)
-
-        self.units_changed.emit()
+        self.temperature_changed.emit(unit_to)
 
     def translate_UI(self):
-        self.pressureGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure", None, -1))
-        self.loadingGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "loading", None, -1))
-        self.materialGrid.setTitle(QW.QApplication.translate("IsoUnitWidget", "material", None, -1))
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.pressure_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure", None, -1))
+        self.loading_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "loading", None, -1))
+        self.material_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "material", None, -1))
+        # yapf: enable
