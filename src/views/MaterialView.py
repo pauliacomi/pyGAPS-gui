@@ -3,7 +3,7 @@ from qtpy import QtWidgets as QW
 
 from src.models.MatPropTableModel import MatPropTableModel
 from src.widgets.MetadataEditWidget import MetadataEditWidget
-from src.widgets.MetadataTableWidget import MetadataTableWidget
+from src.widgets.MetadataTableView import MetadataTableWidget
 from src.widgets.UtilityWidgets import error_dialog
 
 from pygaps import MATERIAL_LIST
@@ -79,13 +79,13 @@ class MaterialView(QW.QWidget):
         mmass = str(mmass) if mmass else mmass
         self.mm_value.setText(mmass)
 
-        self.tableModel = MatPropTableModel(self.material)
-        self.table_view.setModel(self.tableModel)
+        self.table_model = MatPropTableModel(self.material)
+        self.table_view.setModel(self.table_model)
 
     def connect_signals(self):
-        self.table_view.selectionModel().selectionChanged.connect(self.extra_prop_select)
-        self.meta_edit_widget.save_button.clicked.connect(self.extra_prop_save)
-        self.meta_edit_widget.delete_button.clicked.connect(self.extra_prop_delete)
+        self.table_view.selectionModel().selectionChanged.connect(self.metadata_select)
+        self.meta_edit_widget.save_button.clicked.connect(self.metadata_save)
+        self.meta_edit_widget.delete_button.clicked.connect(self.metadata_delete)
 
     def accept(self) -> None:
 
@@ -98,36 +98,36 @@ class MaterialView(QW.QWidget):
         if self.mm_value.text() != self.material.molar_mass:
             self.material.molar_mass = self.mm_value.text()
 
-    def extra_prop_select(self):
-        index = self.table_view.selectionModel().currentIndex()
+    def metadata_select(self):
+        index = self.table_view.currentIndex()
         if index:
-            data = self.tableModel.rowData(index)
+            data = self.table_model.rowData(index)
             if data:
                 self.meta_edit_widget.display(*data)
             else:
                 self.meta_edit_widget.clear()
 
-    def extra_prop_save(self):
+    def metadata_save(self):
 
-        propName = self.meta_edit_widget.name_input.text()
-        propValue = self.meta_edit_widget.value_input.text()
-        propType = self.meta_edit_widget.type_input.currentText()
-        if not propName:
+        meta_name = self.meta_edit_widget.name_input.text()
+        meta_value = self.meta_edit_widget.value_input.text()
+        meta_type = self.meta_edit_widget.type_input.currentText()
+        if not meta_name:
             return
 
-        if propType == "number":
+        if meta_type == "number":
             try:
-                propValue = float(propValue)
+                meta_value = float(meta_value)
             except ValueError:
                 error_dialog("Could not convert metadata value to number.")
                 return
 
-        self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
+        self.table_model.setOrInsertRow(data=[meta_name, meta_value, meta_type])
         self.table_view.resizeColumns()
 
-    def extra_prop_delete(self):
-        index = self.table_view.selectionModel().currentIndex()
-        self.tableModel.removeRow(index.row())
+    def metadata_delete(self):
+        index = self.table_view.currentIndex()
+        self.table_model.removeRow(index.row())
 
     def translate_UI(self):
         # yapf: disable

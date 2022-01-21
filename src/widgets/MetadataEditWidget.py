@@ -43,13 +43,13 @@ class MetadataEditWidget(QW.QWidget):
         _layout.addWidget(self.delete_button, 2, 2, 1, 2)
 
     def display(self, name, value, mtype):
-
+        """Display one metadata."""
         self.name_input.setText(str(name))
         self.value_input.setText(str(value))
         self.type_input.setCurrentIndex(self.meta_types.index(str(mtype)))
 
     def clear(self):
-
+        """Clear all data and reset."""
         self.name_input.clear()
         self.value_input.clear()
         self.type_input.setCurrentIndex(0)

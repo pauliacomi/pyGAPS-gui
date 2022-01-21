@@ -41,6 +41,8 @@ class IsoGraphView(GraphView):
     def set_isotherms(self, isotherms):
 
         self.isotherms = isotherms
+        if not isotherms:
+            return
 
         # data
         keys = list(getattr(iso, "other_keys", []) for iso in isotherms)
@@ -123,6 +125,7 @@ class IsoListGraphView(IsoGraphView):
 
     def setModel(self, model):
         self.model = model
+        self.model.checked_changed.connect(self.update)
 
     def update(self):
         self.set_isotherms(self.model.get_checked())

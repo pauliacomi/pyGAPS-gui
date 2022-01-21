@@ -132,7 +132,7 @@ class MainWindow(QW.QMainWindow):
 
         for fp in filepaths:
             self.last_dir = fp.parent
-            self.iso_controller.loadImport(fp, fp.stem, ftype)
+            self.iso_controller.load_import(fp, fp.stem, ftype)
         self.iso_controller.select_last_iso()
 
     def save_iso(self, filepath=None):

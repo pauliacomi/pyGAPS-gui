@@ -89,12 +89,12 @@ class IsoModelManualModel():
                     adsorbate=self.view.adsorbate_input.lineEdit().text(),
                     temperature=float(self.view.temperature_input.text()),
                     temperature_unit=self.view.temperature_unit.currentText(),
-                    pressure_mode=self.view.unit_widget.pressureMode.currentText(),
-                    pressure_unit=self.view.unit_widget.pressureUnit.currentText(),
-                    loading_basis=self.view.unit_widget.loadingBasis.currentText(),
-                    loading_unit=self.view.unit_widget.loadingUnit.currentText(),
-                    material_basis=self.view.unit_widget.materialBasis.currentText(),
-                    material_unit=self.view.unit_widget.materialUnit.currentText(),
+                    pressure_mode=self.view.unit_widget.pressure_mode.currentText(),
+                    pressure_unit=self.view.unit_widget.pressure_unit.currentText(),
+                    loading_basis=self.view.unit_widget.loading_basis.currentText(),
+                    loading_unit=self.view.unit_widget.loading_unit.currentText(),
+                    material_basis=self.view.unit_widget.material_basis.currentText(),
+                    material_unit=self.view.unit_widget.material_unit.currentText(),
                 )
 
             # We catch any errors or warnings and display them to the user

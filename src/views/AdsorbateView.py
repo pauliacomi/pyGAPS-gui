@@ -10,9 +10,9 @@ else:
 from src.models.AdsPropTableModel import AdsPropTableModel
 
 from src.widgets.MetadataEditWidget import MetadataEditWidget
-from src.widgets.MetadataTableWidget import MetadataTableWidget
+from src.widgets.MetadataTableView import MetadataTableWidget
 from src.utilities.tex2svg import tex2svg
-from src.widgets.UtilityWidgets import error_dialog
+from src.widgets.UtilityWidgets import error_dialog, LabelAlignCenter
 
 from pygaps import ADSORBATE_LIST
 from pygaps import Adsorbate
@@ -43,7 +43,7 @@ class AdsorbateView(QW.QWidget):
         self.properties_layout = QW.QFormLayout(self.properties_box)
 
         self.name_label = QW.QLabel()
-        self.name_value = QW.QLabel()
+        self.name_value = LabelAlignCenter()
         self.alias_label = QW.QLabel()
         self.alias_value = QW.QListWidget()
         self.alias_value.setSizePolicy(
@@ -54,7 +54,7 @@ class AdsorbateView(QW.QWidget):
         self.formula_value.setMinimumSize(50, 15)
         self.formula_value.setMaximumSize(300, 30)
         self.backend_label = QW.QLabel()
-        self.backend_value = QW.QLabel()
+        self.backend_value = LabelAlignCenter()
         self.properties_layout.addRow(self.name_label, self.name_value)
         self.properties_layout.addRow(self.alias_label, self.alias_value)
         self.properties_layout.addRow(self.formula_label, self.formula_value)
@@ -101,46 +101,46 @@ class AdsorbateView(QW.QWidget):
             backend = "No"
         self.backend_value.setText(backend)
 
-        self.tableModel = AdsPropTableModel(self.adsorbate)
-        self.table_view.setModel(self.tableModel)
+        self.table_model = AdsPropTableModel(self.adsorbate)
+        self.table_view.setModel(self.table_model)
 
     def connect_signals(self):
 
         self.table_view.selectionModel().selectionChanged.connect(self.extra_prop_select)
-        self.meta_edit_widget.save_button.clicked.connect(self.extra_prop_save)
-        self.meta_edit_widget.delete_button.clicked.connect(self.extra_prop_delete)
+        self.meta_edit_widget.save_button.clicked.connect(self.metadata_save)
+        self.meta_edit_widget.delete_button.clicked.connect(self.metadata_delete)
 
-    def extra_prop_select(self):
-        index = self.table_view.selectionModel().currentIndex()
+    def metadata_select(self):
+        index = self.table_view.currentIndex()
         if index:
-            data = self.tableModel.rowData(index)
+            data = self.table_model.rowData(index)
             if data:
                 self.meta_edit_widget.display(*data)
             else:
                 self.meta_edit_widget.clear()
 
-    def extra_prop_save(self):
+    def metadata_save(self):
 
-        propName = self.meta_edit_widget.name_input.text()
-        propValue = self.meta_edit_widget.value_input.text()
-        propType = self.meta_edit_widget.type_input.currentText()
-        if not propName:
+        meta_name = self.meta_edit_widget.name_input.text()
+        meta_value = self.meta_edit_widget.value_input.text()
+        meta_type = self.meta_edit_widget.type_input.currentText()
+        if not meta_name:
             return
 
-        if propType == "number":
+        if meta_type == "number":
             try:
-                propValue = float(propValue)
+                meta_value = float(meta_value)
             except ValueError:
                 error_dialog("Could not convert metadata value to number.")
                 return
 
-        self.tableModel.setOrInsertRow(data=[propName, propValue, propType])
+        self.table_model.setOrInsertRow(data=[meta_name, meta_value, meta_type])
         self.table_view.resizeColumns()
 
-    def extra_prop_delete(self):
+    def metadata_delete(self):
 
-        index = self.table_view.selectionModel().currentIndex()
-        self.tableModel.removeRow(index.row())
+        index = self.table_view.currentIndex()
+        self.table_model.removeRow(index.row())
 
     def translate_UI(self):
         # yapf: disable

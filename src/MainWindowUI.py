@@ -7,7 +7,7 @@ from src.views.IsoGraphView import IsoListGraphView
 from src.views.IsoListView import IsoListView
 from src.widgets.IsoUnitWidget import IsoUnitWidget
 from src.widgets.MetadataEditWidget import MetadataEditWidget
-from src.widgets.MetadataTableWidget import MetadataTableWidget
+from src.widgets.MetadataTableView import MetadataTableWidget
 
 
 class MainWindowUI():
@@ -155,9 +155,9 @@ class MainWindowUI():
         self.prop_extra_layout.addWidget(self.prop_extra_edit_widget)
 
         # metadata table
-        self.prop_extra_table_view = MetadataTableWidget()
-        self.prop_extra_table_view.setObjectName("prop_extra_table_view")
-        self.prop_extra_layout.addWidget(self.prop_extra_table_view)
+        self.metadata_table_view = MetadataTableWidget()
+        self.metadata_table_view.setObjectName("metadata_table_view")
+        self.prop_extra_layout.addWidget(self.metadata_table_view)
 
         # bottom buttons
         self.details_button_layout = QW.QHBoxLayout()

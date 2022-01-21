@@ -13,9 +13,8 @@ class MetadataTableWidget(QW.QTableView):
         self.verticalHeader().setSectionResizeMode(QW.QHeaderView.ResizeToContents)
 
     def setModel(self, model: QC.QAbstractItemModel) -> None:
-        ret = super().setModel(model)
+        super().setModel(model)
         self.resizeColumns()
-        return ret
 
     def resizeColumns(self) -> None:
         # TODO may be a better way to do this

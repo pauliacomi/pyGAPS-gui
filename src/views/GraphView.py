@@ -65,6 +65,9 @@ class GraphView(QW.QWidget):
                 for line in ax.get_lines():
                     if line not in [self.low, self.high]:
                         line.remove()
+                lgd = ax.get_legend()
+                if lgd:
+                    lgd.remove()
                 ax.relim()  # make sure all the data fits
                 ax.autoscale()  # auto-scale
             else:
