@@ -4,6 +4,7 @@ from qtpy import QtWidgets as QW
 import numpy as np
 import pandas as pd
 
+from src.widgets.SciDoubleSpinbox import SciFloatDelegate
 from src.models.dfTableModel import dfTableModel
 
 
@@ -69,6 +70,8 @@ class RangeGenWidget(QW.QWidget):
         self.range_table = QW.QTableView(self)
         self.range_model = dfTableModel(self.data)
         self.range_table.setModel(self.range_model)
+        delegate = SciFloatDelegate()
+        self.range_table.setItemDelegate(delegate)
         horizontal_header = self.range_table.horizontalHeader()
         horizontal_header.setSectionResizeMode(QW.QHeaderView.Stretch)
         _layout.addWidget(self.range_label)

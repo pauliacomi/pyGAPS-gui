@@ -102,6 +102,13 @@ class LabelAlignRight(QW.QLabel):
         self.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignVCenter)
 
 
+class LabelAlignCenter(QW.QLabel):
+    """Center-aligned Label."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setAlignment(QC.Qt.AlignCenter | QC.Qt.AlignVCenter)
+
+
 class LabelResult(QW.QLabel):
     """Label used for results (selectable)."""
     def __init__(self, *args, **kwargs):

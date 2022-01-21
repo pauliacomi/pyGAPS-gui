@@ -3,6 +3,7 @@ from pygaps.utilities.converter_mode import _PRESSURE_MODE, _LOADING_MODE, _MATE
 from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
 
 from qtpy import QtWidgets as QW
+from qtpy import QtCore as QC
 
 from src.models.IsoModel import IsoModel
 from src.models.IsoPropTableModel import IsoPropTableModel
@@ -117,6 +118,12 @@ class IsoController():
         self.mw_widget.metadata_table_view.selectionModel().selectionChanged.connect(
             self.metadata_select
         )
+
+        # Model/Point specific
+        if isinstance(self.iso_current, pygaps.ModelIsotherm):
+            self.mw_widget.data_button.setText("Isotherm Parameters")
+        elif isinstance(self.iso_current, pygaps.PointIsotherm):
+            self.mw_widget.data_button.setText("Isotherm Points")
 
     def iso_display_update(self):
         """Update all the isotherm display."""
@@ -262,7 +269,7 @@ class IsoController():
 
     def metadata_select(self):
         """Update display when a metadata point is selected."""
-        index = self.mw_widget.metadata_table_view.selectionModel().currentIndex()
+        index = self.mw_widget.metadata_table_view.currentIndex()
         if not index.isValid():
             return
         data = self.metadata_table_model.rowData(index)
@@ -282,42 +289,39 @@ class IsoController():
 
         if meta_type == "number":
             try:
-                meta_value = float(meta_type)
+                meta_value = float(meta_value)
             except ValueError:
                 error_dialog("Could not convert metadata value to number.")
                 return
 
         self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, meta_type])
-        self.mw_widget.statusbar.showMessage(f"Added property named {meta_name}")
+        self.mw_widget.statusbar.showMessage(f"Added property named '{meta_name}")
         self.mw_widget.metadata_table_view.resizeColumns()
 
     def metadata_delete(self):
         """Delete a metadata point."""
-        index = self.mw_widget.metadata_table_view.selectionModel().currentIndex()
+        index = self.mw_widget.metadata_table_view.currentIndex()
         if not index.isValid():
             return
+        name = self.metadata_table_model.rowData(index)[0]
         self.metadata_table_model.removeRow(index.row())
-        self.mw_widget.statusbar.showMessage(f"Deleted property named {index}")
+        self.mw_widget.statusbar.showMessage(f"Deleted property named '{name}'.")
 
     def iso_display_data(self):
         """Bring up widget with current isotherm data."""
         if not self.iso_current:
             return
-        ret = 0
 
         if isinstance(self.iso_current, pygaps.PointIsotherm):
             from src.views.IsoDataDialog import IsoDataDialog
-            from src.models.IsoDataTableModel import IsoDataTableModel
-            model = IsoDataTableModel(self.iso_current.data())
-            dialog = IsoDataDialog(parent=self.mw_widget.central_widget)
-            dialog.table_view.setModel(model)
-            ret = dialog.exec()
+            dialog = IsoDataDialog(self.iso_current, parent=self.mw_widget.central_widget)
+            dialog.exec()
+            # TODO deleting plotted columns results in error, should update graph
         elif isinstance(self.iso_current, pygaps.ModelIsotherm):
             #TODO implement viewer for modelisotherms
             pass
 
-        if ret == QW.QDialog.Accepted:
-            self.iso_display_update()
+        self.iso_display_update()
 
     def refresh_material_edit(self):
         # TODO change how materials are handled and updated

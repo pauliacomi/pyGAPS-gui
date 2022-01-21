@@ -19,7 +19,7 @@ class IsoListView(QW.QListView):
 
     def keyPressEvent(self, event):
         if event.key() == QC.Qt.Key_Delete:
-            self.model().delete(self.currentIndex())
+            self.model().removeRow(self.currentIndex().row())
             return
         super().keyPressEvent(event)
 
