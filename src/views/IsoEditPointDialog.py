@@ -6,7 +6,7 @@ from src.models.IsoDataTableModel import IsoDataTableModel
 from src.widgets.UtilityWidgets import LabelAlignCenter
 
 
-class IsoDataDialog(QW.QDialog):
+class IsoEditPointDialog(QW.QDialog):
     def __init__(self, isotherm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
@@ -18,13 +18,13 @@ class IsoDataDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
-        self.setObjectName("IsoDataDialog")
+        self.setObjectName("IsoEditPointDialog")
 
         # Create/set layout
         _layout = QW.QVBoxLayout(self)
 
         # Table View
-        self.table_view = QW.QTableView(self)
+        self.table_view = QW.QTableView()
         delegate = SciFloatDelegate()
         self.table_view.setItemDelegateForColumn(0, delegate)
         self.table_view.setItemDelegateForColumn(1, delegate)
@@ -105,10 +105,10 @@ class IsoDataDialog(QW.QDialog):
     def translate_UI(self):
         # yapf: disable
         # pylint: disable=line-too-long
-        self.setWindowTitle(QW.QApplication.translate("IsoDataDialog", "Isotherm Data", None, -1))
-        self.edit_label.setText(QW.QApplication.translate("IsoDataDialog", "Double click to edit individual points.", None, -1))
-        self.edit_add_row.setText(QW.QApplication.translate("IsoDataDialog", "Insert Row", None, -1))
-        self.edit_del_row.setText(QW.QApplication.translate("IsoDataDialog", "Delete Row", None, -1))
-        self.edit_add_col.setText(QW.QApplication.translate("IsoDataDialog", "New data type", None, -1))
-        self.edit_del_col.setText(QW.QApplication.translate("IsoDataDialog", "Delete data type", None, -1))
+        self.setWindowTitle(QW.QApplication.translate("IsoEditPointDialog", "Isotherm Data", None, -1))
+        self.edit_label.setText(QW.QApplication.translate("IsoEditPointDialog", "Double click to edit individual points.", None, -1))
+        self.edit_add_row.setText(QW.QApplication.translate("IsoEditPointDialog", "Insert Row", None, -1))
+        self.edit_del_row.setText(QW.QApplication.translate("IsoEditPointDialog", "Delete Row", None, -1))
+        self.edit_add_col.setText(QW.QApplication.translate("IsoEditPointDialog", "New data type", None, -1))
+        self.edit_del_col.setText(QW.QApplication.translate("IsoEditPointDialog", "Delete data type", None, -1))
         # yapf: enable
