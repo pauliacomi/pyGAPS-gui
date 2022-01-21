@@ -316,7 +316,6 @@ class IsoController():
             from src.views.IsoEditPointDialog import IsoEditPointDialog
             dialog = IsoEditPointDialog(self.iso_current, parent=self.mw_widget.central_widget)
             dialog.exec()
-            # TODO deleting plotted columns results in error, should update graph
         elif isinstance(self.iso_current, pygaps.ModelIsotherm):
             from src.views.IsoEditModelDialog import IsoEditModelDialog
             dialog = IsoEditModelDialog(self.iso_current, parent=self.mw_widget.central_widget)

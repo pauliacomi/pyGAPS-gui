@@ -97,6 +97,10 @@ class IsoEditPointDialog(QW.QDialog):
 
     def accept(self) -> None:
         self.isotherm.data_raw = self.model._data
+        self.isotherm.other_keys = [
+            c for c in self.model._data.columns
+            if c not in [self.isotherm.pressure_key, self.isotherm.loading_key, "branch"]
+        ]
         return super().accept()
 
     def sizeHint(self) -> QC.QSize:

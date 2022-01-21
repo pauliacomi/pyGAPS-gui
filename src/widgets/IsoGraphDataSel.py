@@ -55,8 +55,8 @@ class IsoGraphDataSel(QW.QDialog):
         self.y1Combo.addItems(self.datas)
         self.y1Combo.setCurrentText(self.y1_data)
 
-        if self.y2_data:
-            self.y2Combo.addItems(self.datas)
+        if len(self.datas) > 2:
+            self.y2Combo.addItems(["None"] + self.datas)
             self.y2Combo.setCurrentText(self.y2_data)
         else:
             self.y2Combo.setDisabled(True)
@@ -73,4 +73,7 @@ class IsoGraphDataSel(QW.QDialog):
 
         self.x_data = self.xCombo.currentText()
         self.y1_data = self.y1Combo.currentText()
-        self.y2_data = self.y2Combo.currentText()
+        y2_data = self.y2Combo.currentText()
+        if y2_data == "None":
+            y2_data = None
+        self.y2_data = y2_data

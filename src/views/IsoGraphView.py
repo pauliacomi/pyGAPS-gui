@@ -108,9 +108,13 @@ class IsoGraphView(GraphView):
     def handle_data_sel(self):
         from src.widgets.IsoGraphDataSel import IsoGraphDataSel
         dialog = IsoGraphDataSel(
-            self.data_types, self.x_data, self.y1_data, self.y2_data, parent=self
+            self.data_types,
+            self.x_data,
+            self.y1_data,
+            self.y2_data,
+            parent=self,
         )
-        if dialog.exec_():
+        if dialog.exec():
             if dialog.changed:
                 self.x_data = dialog.x_data
                 self.y1_data = dialog.y1_data
