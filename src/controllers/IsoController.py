@@ -315,12 +315,11 @@ class IsoController():
         if isinstance(self.iso_current, pygaps.PointIsotherm):
             from src.views.IsoEditPointDialog import IsoEditPointDialog
             dialog = IsoEditPointDialog(self.iso_current, parent=self.mw_widget.central_widget)
-            dialog.exec()
         elif isinstance(self.iso_current, pygaps.ModelIsotherm):
             from src.views.IsoEditModelDialog import IsoEditModelDialog
             dialog = IsoEditModelDialog(self.iso_current, parent=self.mw_widget.central_widget)
-            dialog.exec()
 
+        dialog.exec()
         self.iso_display_update()
 
     def refresh_material_edit(self):
