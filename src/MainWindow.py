@@ -277,7 +277,7 @@ class MainWindow(QW.QMainWindow):
         ret = dialog.exec()
 
         if ret == QW.QDialog.Accepted and model.model_isotherm:
-            name = f"{isotherm.material} {isotherm.adsorbate} model"
+            name = f"{isotherm.material} {isotherm.adsorbate.formula} {model.model_isotherm.model.name}"
             self.iso_controller.add_isotherm(name, model.model_isotherm)
             self.iso_controller.select_last_iso()
 
@@ -292,7 +292,7 @@ class MainWindow(QW.QMainWindow):
         ret = dialog.exec()
 
         if ret == QW.QDialog.Accepted and model.model_isotherm:
-            name = f"{isotherm.material} {isotherm.adsorbate} model"
+            name = f"{isotherm.material} {isotherm.adsorbate.formula} {model.model_isotherm.model.name}"
             self.iso_controller.add_isotherm(name, model.model_isotherm)
             self.iso_controller.select_last_iso()
 
