@@ -59,9 +59,9 @@ class GraphView(QW.QWidget):
         self.canvas.draw_idle()
 
     def clear(self):
-        # TODO: figure out why some of the clears don't work (like isosteric enthalpy)
         for ax in self.figure.axes:
             if ax == self.ax:
+                ax.set_prop_cycle(None)
                 for line in ax.get_lines():
                     if line not in [self.low, self.high]:
                         line.remove()

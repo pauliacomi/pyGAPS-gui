@@ -7,12 +7,7 @@ class IsoPropTableModel(MetadataTableModel):
     """Table model to display various isotherm properties."""
     def __init__(self, isotherm, parent=None):
         self.isotherm = isotherm
-        metadata = {
-            prop: getattr(isotherm, prop)
-            for prop in vars(isotherm)
-            if prop not in isotherm._required_params + list(isotherm._unit_params) +
-            isotherm._reserved_params
-        }
+        metadata = self.isotherm.properties
         super().__init__(metadata, parent)
 
     def setData(self, index, value, role):

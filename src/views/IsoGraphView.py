@@ -45,7 +45,7 @@ class IsoGraphView(GraphView):
             return
 
         # data
-        keys = list(getattr(iso, "other_keys", []) for iso in isotherms)
+        keys = list(iso.other_keys for iso in isotherms)
         self.data_types = ["pressure", "loading"]
         self.y2_data = None
         if any(keys):

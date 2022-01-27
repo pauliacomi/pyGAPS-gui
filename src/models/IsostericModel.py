@@ -103,6 +103,7 @@ class IsostericModel():
 
         # Generate plot of the points chosen
         self.view.res_graph.clear()
+        # TODO: there's a new legend every time...
         isosteric_enthalpy_plot(
             self.results["loading"],
             self.results["isosteric_enthalpy"],
