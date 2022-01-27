@@ -13,6 +13,7 @@ from pygaps import Material
 class MaterialView(QW.QWidget):
 
     _material = None
+    material_changed = QC.Signal(str)
 
     def __init__(self, material=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,15 +89,18 @@ class MaterialView(QW.QWidget):
         self.meta_edit_widget.delete_button.clicked.connect(self.metadata_delete)
 
     def accept(self) -> None:
-
+        changed = False
         if self.name_value.text() != self.material.name:
             self.material.name = self.name_value.text()
-
+            changed = True
         if self.density_value.text() != self.material.density:
             self.material.density = self.density_value.text()
-
+            changed = True
         if self.mm_value.text() != self.material.molar_mass:
             self.material.molar_mass = self.mm_value.text()
+            changed = True
+        if changed:
+            self.material_changed.emit(str(self.material))
 
     def metadata_select(self):
         index = self.table_view.currentIndex()
@@ -123,11 +127,13 @@ class MaterialView(QW.QWidget):
                 return
 
         self.table_model.setOrInsertRow(data=[meta_name, meta_value, meta_type])
+        self.material_changed.emit(str(self.material))
         self.table_view.resizeColumns()
 
     def metadata_delete(self):
         index = self.table_view.currentIndex()
         self.table_model.removeRow(index.row())
+        self.material_changed.emit(str(self.material))
 
     def translate_UI(self):
         # yapf: disable
@@ -141,6 +147,8 @@ class MaterialView(QW.QWidget):
 
 
 class MaterialDialog(QW.QDialog):
+    material_changed = QC.Signal(str)
+
     def __init__(self, material, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -164,6 +172,7 @@ class MaterialDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        self.view.material_changed.connect(self.material_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
@@ -179,10 +188,13 @@ class MaterialDialog(QW.QDialog):
 
 
 class MaterialListDialog(QW.QDialog):
+    material_changed = QC.Signal(str)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
         self.translate_UI()
+        self.connect_signals()
         self.setup_model()
 
     def setup_UI(self):
@@ -202,10 +214,11 @@ class MaterialListDialog(QW.QDialog):
         # Button box
         self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Close)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok)
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        self.material_details.material_changed.connect(self.material_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
@@ -215,6 +228,10 @@ class MaterialListDialog(QW.QDialog):
 
     def selectMaterial(self, item):
         self.material_details.material = Material.find(item.text())
+
+    def accept(self) -> None:
+        self.material_details.accept()
+        return super().accept()
 
     def translate_UI(self):
         # yapf: disable

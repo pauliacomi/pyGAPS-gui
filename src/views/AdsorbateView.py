@@ -21,6 +21,7 @@ from pygaps import Adsorbate
 class AdsorbateView(QW.QWidget):
 
     _adsorbate = None
+    adsorbate_changed = QC.Signal(str)
 
     def __init__(self, adsorbate=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -106,7 +107,7 @@ class AdsorbateView(QW.QWidget):
 
     def connect_signals(self):
 
-        self.table_view.selectionModel().selectionChanged.connect(self.extra_prop_select)
+        self.table_view.selectionModel().selectionChanged.connect(self.metadata_select)
         self.meta_edit_widget.save_button.clicked.connect(self.metadata_save)
         self.meta_edit_widget.delete_button.clicked.connect(self.metadata_delete)
 
@@ -135,12 +136,14 @@ class AdsorbateView(QW.QWidget):
                 return
 
         self.table_model.setOrInsertRow(data=[meta_name, meta_value, meta_type])
+        self.adsorbate_changed.emit(self.adsorbate.name)
         self.table_view.resizeColumns()
 
     def metadata_delete(self):
 
         index = self.table_view.currentIndex()
         self.table_model.removeRow(index.row())
+        self.adsorbate_changed.emit(self.adsorbate.name)
 
     def translate_UI(self):
         # yapf: disable
@@ -155,6 +158,8 @@ class AdsorbateView(QW.QWidget):
 
 
 class AdsorbateDialog(QW.QDialog):
+    adsorbate_changed = QC.Signal(str)
+
     def __init__(self, adsorbate, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -178,6 +183,7 @@ class AdsorbateDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        self.view.adsorbate_changed.connect(self.adsorbate_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
@@ -189,6 +195,8 @@ class AdsorbateDialog(QW.QDialog):
 
 
 class AdsorbateListDialog(QW.QDialog):
+    adsorbate_changed = QC.Signal(str)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
@@ -217,6 +225,7 @@ class AdsorbateListDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        self.adsorbate_details.adsorbate_changed.connect(self.adsorbate_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 

@@ -360,12 +360,14 @@ class MainWindow(QW.QMainWindow):
         """Explore/modify pyGAPS adsorbates."""
         from src.views.AdsorbateView import AdsorbateListDialog
         dialog = AdsorbateListDialog(parent=self)
+        dialog.adsorbate_changed.connect(self.iso_controller.handle_material_changed)
         dialog.exec()
 
     def material_explorer(self):
         """Explore/modify pyGAPS materials."""
         from src.views.MaterialView import MaterialListDialog
         dialog = MaterialListDialog(parent=self)
+        dialog.material_changed.connect(self.iso_controller.handle_adsorbate_changed)
         dialog.exec()
 
     ########################################################

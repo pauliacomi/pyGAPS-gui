@@ -218,7 +218,7 @@ class IsoController():
         if isotherm.material != self.mw_widget.material_input.lineEdit().text():
             isotherm.material = self.mw_widget.material_input.lineEdit().text()
             self.mw_widget.statusbar.showMessage(f'Material modified to {isotherm.material}', 2000)
-            self.refresh_material_edit()
+            self.refresh_material_edit(isotherm.material.name)
             modified = True
 
         if isotherm.adsorbate != self.mw_widget.adsorbate_input.lineEdit().text():
@@ -250,9 +250,18 @@ class IsoController():
             self.iso_current.material,
             parent=self.mw_widget.central_widget,
         )
-        ret = dialog.exec()
-        if ret == QW.QDialog.Accepted:
-            self.iso_display_update()
+        dialog.material_changed.connect(self.handle_material_changed)
+        dialog.exec()
+
+    def handle_material_changed(self, material):
+        self.iso_display_update()
+        self.refresh_material_edit(material)
+
+    def refresh_material_edit(self, material=None):
+        self.mw_widget.material_input.clear()
+        self.mw_widget.material_input.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
+        if material:
+            self.mw_widget.material_input.setCurrentText(material)
 
     def adsorbate_detail(self):
         """Bring up widget with current isotherm adsorbate details."""
@@ -263,9 +272,11 @@ class IsoController():
             self.iso_current.adsorbate,
             parent=self.mw_widget.central_widget,
         )
-        ret = dialog.exec()
-        if ret == QW.QDialog.Accepted:
-            self.iso_display_update()
+        dialog.adsorbate_changed.connect(self.handle_adsorbate_changed)
+        dialog.exec()
+
+    def handle_adsorbate_changed(self, adsorbate):
+        self.iso_display_update()
 
     def metadata_select(self):
         """Update display when a metadata point is selected."""
@@ -321,12 +332,6 @@ class IsoController():
 
         dialog.exec()
         self.iso_display_update()
-
-    def refresh_material_edit(self):
-        # TODO change how materials are handled and updated
-        # due to errors in editing during isotherm edits
-        self.mw_widget.material_input.clear()
-        self.mw_widget.material_input.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
 
     ########################################################
     # Add and remove functionality
@@ -387,7 +392,7 @@ class IsoController():
         # Add adsorbates to the list
         if isotherm.material not in pygaps.MATERIAL_LIST:
             pygaps.MATERIAL_LIST.append(isotherm.material)
-            self.refresh_material_edit()
+            self.refresh_material_edit(isotherm.material.name)
 
         # Create the model to store the isotherm
         iso_model = IsoModel(name)
