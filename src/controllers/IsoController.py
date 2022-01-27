@@ -342,7 +342,7 @@ class IsoController():
             isotherm = pgp.isotherm_from_csv(path)
         elif ext == '.json':
             isotherm = pgp.isotherm_from_json(path)
-        elif ext in ['.xls', '.xlsx']:
+        elif ext == '.xls':
             isotherm = pgp.isotherm_from_xl(path)
         elif ext == '.aif':
             isotherm = pgp.isotherm_from_aif(path)
@@ -358,18 +358,22 @@ class IsoController():
         isotherm = None
 
         import pygaps.parsing as pgp
-        if iso_type == 0:  # bel raw
-            isotherm = pgp.isotherm_from_bel(path)
-        elif iso_type == 1:  # bel report
-            isotherm = pgp.isotherm_from_xl(path, fmt='bel')
-        elif iso_type == 2:  # mic report
-            isotherm = pgp.isotherm_from_xl(path, fmt='mic')
-        elif iso_type == 3:  # qnt report
-            isotherm = pgp.isotherm_from_xl(path, fmt='qnt')
-            # TODO implement Quantachrome report
-        elif iso_type == 4:  # 3P report:
-            isotherm = pgp.isotherm_from_xl(path, fmt='3p')
-            # TODO implement 3p report
+        if iso_type == 'bel_dat':
+            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='dat')
+        elif iso_type == 'bel_xl':
+            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='xl')
+        elif iso_type == 'bel_csv':
+            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='csv')
+        elif iso_type == 'bel_csv_jis':
+            isotherm = pgp.isotherm_from_commercial(
+                path=path, manufacturer='bel', fmt='csv', lang="JPN"
+            )
+        elif iso_type == 'mic_xl':
+            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='mic', fmt='xl')
+        elif iso_type == '3p_xl':
+            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='3p', fmt='xl')
+        elif iso_type == 'qnt_txt':
+            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='qnt', fmt='txt')
         else:
             raise Exception(f"Could not determine import type '{iso_type}'.")
 

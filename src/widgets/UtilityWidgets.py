@@ -27,8 +27,8 @@ def save_file_dialog(parent, caption, directory, filter=None) -> "list[pathlib.P
         filter=filter,
     )
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
-        return str(filename[0])
-    return str(filename)
+        filename = filename[0]
+    return pathlib.Path(filename)
 
 
 def error_dialog(error: str):

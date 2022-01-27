@@ -151,6 +151,7 @@ class MainWindow(QW.QMainWindow):
                 suggested_name,
                 filter=";;".join([
                     'pyGAPS JSON Isotherm (*.json)',
+                    'AIF Isotherm (*.aif)',
                     'pyGAPS CSV Isotherm (*.csv)',
                     'pyGAPS Excel Isotherm (*.xls)',
                 ])
@@ -159,7 +160,7 @@ class MainWindow(QW.QMainWindow):
                 return
 
         self.last_dir = filepath.parent
-        self.iso_controller.save(filepath, filepath.ext)
+        self.iso_controller.save(filepath, filepath.suffix)
 
     ########################################################
     # Characterisation / modelling / etc
