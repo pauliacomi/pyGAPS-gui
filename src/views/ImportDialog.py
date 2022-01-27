@@ -7,28 +7,38 @@ from src.widgets.UtilityWidgets import open_files_dialog
 IMPORT_FILES = [
     {
         "ind": "bel_dat",
-        "name": "BELSORP MAX raw",
+        "name": "BEL japan",
         "ext": ("DAT", )
     },
     {
         "ind": "bel_xl",
-        "name": "BELSORP MAX report",
-        "ext": ("xls", "xlsx")
+        "name": "BEL japan report",
+        "ext": ("xls", )
     },
     {
-        "ind": "mic_rep",
+        "ind": "bel_csv",
+        "name": "BEL japan CSV",
+        "ext": ("csv", )
+    },
+    {
+        "ind": "bel_csv_jis",
+        "name": "BEL japan JIS CSV",
+        "ext": ("csv", )
+    },
+    {
+        "ind": "mic_xl",
         "name": "Micromeritics report",
-        "ext": ("xls", "xlsx")
+        "ext": ("xls", )
     },
     {
-        "ind": "qnt_rep",
+        "ind": "3p_xl",
+        "name": "3P report",
+        "ext": ("xlsx", )
+    },
+    {
+        "ind": "qnt_txt",
         "name": "Quantachrome report",
         "ext": ("txt", )
-    },
-    {
-        "ind": "3p_rep",
-        "name": "3P report",
-        "ext": ("xls", "xlsx")
     },
 ]
 
@@ -68,11 +78,11 @@ class ImportDialog(QW.QDialog):
 
     def set_ftype(self, act: bool, tp: int):
         if act:
-            self.ftype = tp
+            self.ftype = IMPORT_FILES[tp]['ind']
             self.import_button.setVisible(True)
 
     def import_form(self):
-        sel = IMPORT_FILES[self.ftype]
+        sel = next(v for v in IMPORT_FILES if v['ind'] == self.ftype)
         self.filepaths = open_files_dialog(
             parent=self,
             caption="Import an isotherm from a manufacturer file",
