@@ -1,4 +1,4 @@
-import warnings
+from src.utilities.log_hook import log_hook
 
 from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
@@ -43,6 +43,7 @@ class PlotAlphaSModel():
         # Fail condition
         try:
             self.isotherm.pressure(pressure_mode="relative")
+            self.ref_isotherm.pressure(pressure_mode="relative")
         except CalculationError:
             error_dialog(
                 "Alpha-s plots cannot be defined for supercritical "
@@ -54,6 +55,10 @@ class PlotAlphaSModel():
             return
 
         # View setup
+        self.view.setWindowTitle(
+            self.view.windowTitle() +
+            f" '{isotherm.material} - {isotherm.adsorbate} - {isotherm._temperature:.2g} {isotherm.temperature_unit}'"
+        )
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
         self.view.refbranch_dropdown.addItems(["ads", "des"])
@@ -77,28 +82,27 @@ class PlotAlphaSModel():
 
         self.reference_area = area_BET(self.ref_isotherm).get('area')
         # dynamic parameters
-        self.prepare_values()
-        # run calculation
-        self.calc_auto()
+        if self.prepare_values():
+            # run calculation
+            self.calc_auto()
 
     def prepare_values(self):
         # Loading and pressure
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
-            try:
-                self.loading = self.isotherm.loading(
-                    branch=self.branch,
-                    loading_basis='molar',
-                    loading_unit='mol',
-                )
-                self.pressure = self.isotherm.pressure(
-                    branch=self.branch,
-                    pressure_mode="relative",
-                )
-                if self.branch == 'des':
-                    self.loading = self.loading[::-1]
-                    self.pressure = self.pressure[::-1]
+        self.loading = self.isotherm.loading(
+            branch=self.branch,
+            loading_basis='molar',
+            loading_unit='mol',
+        )
+        self.pressure = self.isotherm.pressure(
+            branch=self.branch,
+            pressure_mode="relative",
+        )
+        if self.branch == 'des':
+            self.loading = self.loading[::-1]
+            self.pressure = self.pressure[::-1]
 
+        with log_hook:
+            try:
                 self.alpha_s_point = self.ref_isotherm.loading_at(
                     self.reducing_pressure,
                     branch=self.ref_branch,
@@ -114,34 +118,38 @@ class PlotAlphaSModel():
                 )
                 if self.ref_branch == 'des':
                     self.reference_loading = self.reference_loading[::-1]
+            except Exception as err:
+                self.output += f'<font color="red">Error: The reference isotherm does not cover the same pressure range! <br></font>'
+                self.output_log()
+                return False
 
-            # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
-
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
-                ])
+            self.output += log_hook.getLogs()
+            return True
 
     def calc_auto(self):
         """Automatic calculation."""
         self.limits = None
-        self.calculate()
-        self.slider_reset()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.limits = (0, self.alphas_curve[-1])
+            self.slider_reset()
+            self.output_results()
+            self.output_log()
+            self.plot_results()
+        else:
+            self.output_log()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        self.calculate()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_results()
+            self.output_log()
+            self.plot_results()
+        else:
+            self.output_log()
 
     def calculate(self):
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
+        with log_hook:
             try:
                 self.results, self.alphas_curve = alpha_s_raw(
                     self.loading,
@@ -156,11 +164,9 @@ class PlotAlphaSModel():
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
-
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
-                ])
+                return False
+            self.output += log_hook.getLogs()
+            return True
 
     def output_results(self):
         self.view.res_table.setRowCount(0)
@@ -178,11 +184,11 @@ class PlotAlphaSModel():
                 index, 4, QW.QTableWidgetItem(f"{result.get('intercept'):g}")
             )
 
+    def output_log(self):
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
-
         # Generate alphas plot
         self.view.res_graph.clear()
         tp_plot(
@@ -193,12 +199,13 @@ class PlotAlphaSModel():
             alpha_s=True,
             alpha_reducing_p=self.reducing_pressure
         )
+        self.view.res_graph.ax.set_title("")
         self.view.res_graph.canvas.draw()
 
     def slider_reset(self):
-        self.view.x_select.setRange((0, self.alphas_curve[-1]))
+        self.view.x_select.setRange(self.limits)
         self.view.x_select.setValues((self.alphas_curve[0], self.alphas_curve[-1]), emit=False)
-        self.view.res_graph.draw_limits(self.alphas_curve[0], self.alphas_curve[-1])
+        self.view.res_graph.draw_xlimits(self.alphas_curve[0], self.alphas_curve[-1])
 
     def select_area(self):
         area_type = self.view.refarea_dropdown.currentText().lower()
@@ -215,23 +222,23 @@ class PlotAlphaSModel():
                 return
             self.reference_area = float(ref_area_str)
 
-        self.prepare_values()
-        self.calc_auto()
+        if self.prepare_values():
+            self.calc_auto()
 
     def select_branch(self):
         self.branch = self.view.branch_dropdown.currentText()
-        self.prepare_values()
-        self.calc_auto()
+        if self.prepare_values():
+            self.calc_auto()
 
     def select_refbranch(self):
         self.ref_branch = self.view.refbranch_dropdown.currentText()
-        self.prepare_values()
-        self.calc_auto()
+        if self.prepare_values():
+            self.calc_auto()
 
     def select_redpressure(self):
         self.reducing_pressure = float(self.view.pressure_input.text())
-        self.prepare_values()
-        self.calc_auto()
+        if self.prepare_values():
+            self.calc_auto()
 
     def export_results(self):
         if not self.results:

@@ -1,4 +1,6 @@
 import logging
+
+logging.captureWarnings(True)
 from io import StringIO
 
 
@@ -23,4 +25,13 @@ class LogHook():
         return True
 
     def getLogs(self):
-        return self.log_stream.getvalue()
+        logs = self.log_stream.getvalue().replace("\n", "<br>")
+        self.log_stream.truncate(0)
+        self.log_stream.seek(0)
+        if logs:
+            return f'<font color="magenta">Warning: {logs}</font>'
+        else:
+            return ''
+
+
+log_hook = LogHook()

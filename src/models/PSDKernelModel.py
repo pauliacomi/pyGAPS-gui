@@ -1,4 +1,4 @@
-import warnings
+from src.utilities.log_hook import log_hook
 
 from pygaps.characterisation.psd_kernel import psd_dft
 from pygaps.characterisation.psd_kernel import _KERNELS
@@ -18,8 +18,8 @@ class PSDKernelModel():
     branch = "ads"
     kernel = None
     bspline_order = 2
-    limits = None
     limit_indices = None
+    limits = None
 
     # Results
     results = None
@@ -33,6 +33,10 @@ class PSDKernelModel():
         self.view = view
 
         # view setup
+        self.view.setWindowTitle(
+            self.view.windowTitle() +
+            f" '{isotherm.material} - {isotherm.adsorbate} - {isotherm._temperature:.2g} {isotherm.temperature_unit}'"
+        )
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
         self.view.kernel_dropdown.addItems(_KERNELS),
@@ -40,6 +44,7 @@ class PSDKernelModel():
 
         # plot isotherm
         self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.lgd_keys = ["material"]
         self.view.iso_graph.pressure_mode = "relative"
         self.view.iso_graph.set_isotherms([self.isotherm])
 
@@ -59,25 +64,36 @@ class PSDKernelModel():
     def calc_auto(self):
         """Automatic calculation."""
         self.limits = None
-        self.calculate()
-        self.output_results()
-        self.plot_results()
-        self.slider_reset()
+        if self.calculate():
+            self.limits = (
+                self.pressure[self.limit_indices[0]],
+                self.pressure[self.limit_indices[1]],
+            )
+            self.slider_reset()
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.view.iso_graph.draw_isotherms(branch=self.branch)
+            self.output_log()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        self.calculate()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.view.iso_graph.draw_isotherms(branch=self.branch)
+            self.output_log()
 
     def prepare_values(self):
         # Pressure
         self.pressure = self.isotherm.pressure(branch=self.branch)
 
     def calculate(self):
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
+        with log_hook:
             self.branch = self.view.branch_dropdown.currentText()
             self.kernel = self.view.kernel_dropdown.currentText()
             self.bspline_order = int(self.view.smooth_input.cleanText())
@@ -90,30 +106,22 @@ class PSDKernelModel():
                     p_limits=self.limits,
                 )
                 self.limit_indices = self.results.get('limits')
-                self.limits = [
-                    self.pressure[self.limit_indices[0]],
-                    self.pressure[self.limit_indices[1]],
-                ]
-
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
-                self.limit_indices = [0, 0]
-                self.limits = [self.pressure[0], self.pressure[-1]]
-
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
-                ])
+                return False
+            self.output += log_hook.getLogs()
+            return True
 
     def output_results(self):
+        pass
+
+    def output_log(self):
         if self.output:
             error_dialog(self.output)
             self.output = ""
 
     def plot_results(self):
-        # TODO: if the results are missing this will fail
-
         # PSD plot
         self.view.res_graph.clear()
         psd_plot(
@@ -138,7 +146,7 @@ class PSDKernelModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def select_branch(self):
         self.branch = self.view.branch_dropdown.currentText()
@@ -150,9 +158,8 @@ class PSDKernelModel():
             return
         from src.utilities.result_export import serialize
         results = {
-            "Pore widths [nm]": self.results.get("pore_widths").tolist(),
-            "Pore distribution [dV/dW]": self.results.get("pore_distribution").tolist(),
-            "Pore cumulative volume [cm3/g]": self.results.get("pore_volume_cumulative").tolist(),
+            "Pore widths [nm]": self.results.get("pore_widths"),
+            "Pore distribution [dV/dW]": self.results.get("pore_distribution"),
+            "Pore cumulative volume [cm3/g]": self.results.get("pore_volume_cumulative"),
         }
-        if serialize(results, parent=self.view):
-            self.view.accept()
+        serialize(results, how="V", parent=self.view)

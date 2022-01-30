@@ -3,7 +3,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from qtpy import QtWidgets as QW
 
-from src.widgets.GraphSelectorToolbar import HSelectorToolbar
+from src.widgets.GraphSelectorToolbar import HSelectorToolbar, VSelectorToolbar
 
 
 class GraphView(QW.QWidget):
@@ -15,6 +15,7 @@ class GraphView(QW.QWidget):
 
     # for range_select
     x_range_select = None  # can be selector
+    y_range_select = None  # can be selector
     low = None  # can be plt.ax
     high = None  # can be plt.ax
 
@@ -26,7 +27,10 @@ class GraphView(QW.QWidget):
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
+        # Ensure some minimum height
+        self.setMinimumSize(300, 300)
         self.x_range_select = x_range_select
+        self.y_range_select = y_range_select
         self.setup_UI()
 
     def setup_UI(self):
@@ -34,28 +38,48 @@ class GraphView(QW.QWidget):
         self.canvas = FigureCanvas(self.figure)
         self.ax = self.figure.subplots()
 
-        _layout = QW.QVBoxLayout(self)
-        _layout.addWidget(self.canvas)
+        _layout = QW.QGridLayout(self)
+        row = 0
+        col = 0
+
+        if self.y_range_select:
+            self.setupYRangeSelect()
+            _layout.addWidget(self.y_range_select, 0, 0, 1, 1)
+            col = 1
 
         if self.x_range_select:
-            self.setupRangeSelect()
-            _layout.addWidget(self.x_range_select)
+            self.setupXRangeSelect()
+            _layout.addWidget(self.x_range_select, 1, col, 1, 1)
+            row = 1
 
         self.setupNav()
-        _layout.addWidget(self.navbar)
+
+        _layout.addWidget(self.canvas, 0, col, 1, 1)
+        _layout.addWidget(self.navbar, row + 1, col, 1, 1)
 
     def setupNav(self):
         self.navbar = NavigationToolbar(self.canvas, self)
 
-    def setupRangeSelect(self):
-        self.x_range_select = HSelectorToolbar("XRangeSelect", ax=self.ax)
-        self.x_range_select.slider.rangeChanged.connect(self.draw_limits)
+    def setupXRangeSelect(self):
+        self.x_range_select = HSelectorToolbar("HRangeSelect", ax=self.ax)
+        self.x_range_select.slider.rangeChanged.connect(self.draw_xlimits)
         self.low = self.ax.axvline(0, c="r", ls="--")
         self.high = self.ax.axvline(1, c="r", ls="--")
 
-    def draw_limits(self, low, high):
+    def setupYRangeSelect(self):
+        self.y_range_select = VSelectorToolbar("VRangeSelect", ax=self.ax)
+        self.y_range_select.slider.rangeChanged.connect(self.draw_ylimits)
+        self.low = self.ax.axhline(0, c="r", ls="--")
+        self.high = self.ax.axhline(1, c="r", ls="--")
+
+    def draw_xlimits(self, low, high):
         self.low.set_xdata([low, low])
         self.high.set_xdata([high, high])
+        self.canvas.draw_idle()
+
+    def draw_ylimits(self, low, high):
+        self.low.set_ydata([low, low])
+        self.high.set_ydata([high, high])
         self.canvas.draw_idle()
 
     def clear(self):

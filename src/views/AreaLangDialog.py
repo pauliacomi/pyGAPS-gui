@@ -58,13 +58,20 @@ class AreaLangDialog(QW.QDialog):
         self.res_text_layout = QW.QGridLayout(self.res_text_box)
 
         # description labels
-        self.res_text_layout.addWidget(LabelAlignRight("Fit (R^2):"), 0, 1, 1, 1)
-        self.res_text_layout.addWidget(LabelAlignRight("Langmuir area [m2/g]:"), 1, 0, 1, 1)
-        self.res_text_layout.addWidget(LabelAlignRight("K constant:"), 1, 2, 1, 1)
-        self.res_text_layout.addWidget(LabelAlignRight("Monolayer uptake [mmol/g]:"), 2, 0, 1, 1)
-        self.res_text_layout.addWidget(LabelAlignRight("Monolayer pressure [p/p0]:"), 2, 2, 1, 1)
-        self.res_text_layout.addWidget(LabelAlignRight("Slope:"), 3, 0, 1, 1)
-        self.res_text_layout.addWidget(LabelAlignRight("Intercept:"), 3, 2, 1, 1)
+        self.label_fit = LabelAlignRight("Fit (R^2):")
+        self.label_area = LabelAlignRight("Langmuir area [m2/g]:")
+        self.label_k = LabelAlignRight("K constant:")
+        self.label_n_mono = LabelAlignRight("Monolayer uptake [mmol/g]:")
+        self.label_p_mono = LabelAlignRight("Monolayer pressure [p/p0]:")
+        self.label_slope = LabelAlignRight("Slope:")
+        self.label_intercept = LabelAlignRight("Intercept:")
+        self.res_text_layout.addWidget(self.label_fit, 0, 1, 1, 1)
+        self.res_text_layout.addWidget(self.label_area, 1, 0, 1, 1)
+        self.res_text_layout.addWidget(self.label_k, 1, 2, 1, 1)
+        self.res_text_layout.addWidget(self.label_n_mono, 2, 0, 1, 1)
+        self.res_text_layout.addWidget(self.label_p_mono, 2, 2, 1, 1)
+        self.res_text_layout.addWidget(self.label_slope, 3, 0, 1, 1)
+        self.res_text_layout.addWidget(self.label_intercept, 3, 2, 1, 1)
 
         # result labels
         self.result_r = LabelResult()

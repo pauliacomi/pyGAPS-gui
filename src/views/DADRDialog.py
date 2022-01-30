@@ -69,8 +69,9 @@ class DADRDialog(QW.QDialog):
         self.res_text_layout = QW.QGridLayout(self.res_text_box)
 
         # description labels
+        self.label_vol = LabelAlignRight("Micropore Volume [cm3/g]")
         self.res_text_layout.addWidget(LabelAlignRight("Fit (R^2):"), 0, 2, 1, 1)
-        self.res_text_layout.addWidget(LabelAlignRight("Micropore Volume [cm3/g]"), 1, 0, 1, 1)
+        self.res_text_layout.addWidget(self.label_vol, 1, 0, 1, 1)
         self.res_text_layout.addWidget(LabelAlignRight("Effective Potential [kJ/mol]"), 1, 2, 1, 1)
         self.res_text_layout.addWidget(LabelAlignRight("Slope:"), 2, 0, 1, 1)
         self.res_text_layout.addWidget(LabelAlignRight("Intercept:"), 2, 2, 1, 1)

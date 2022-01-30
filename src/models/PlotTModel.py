@@ -1,4 +1,4 @@
-import warnings
+from src.utilities.log_hook import log_hook
 
 from pygaps.characterisation.t_plots import t_plot_raw
 from pygaps.characterisation.models_thickness import (_THICKNESS_MODELS, get_thickness_model)
@@ -48,11 +48,22 @@ class PlotTModel():
             return
 
         # View actions
-
-        # setup
+        # view setup
+        self.view.setWindowTitle(
+            self.view.windowTitle() +
+            f" '{isotherm.material} - {isotherm.adsorbate} - {isotherm._temperature:.2g} {isotherm.temperature_unit}'"
+        )
+        self.view.res_table.setHorizontalHeaderLabels((
+            f"V [cm3/{self.isotherm.material_unit}]",
+            f"A [m2/{self.isotherm.material_unit}]",
+            "R^2",
+            "Slope",
+            "Intercept",
+        ))
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
         models = list(_THICKNESS_MODELS.keys())
+        models.remove("Zero thickness")  # Not an option
         self.view.thickness_dropdown.addItems(models)
 
         # connect signals
@@ -92,21 +103,27 @@ class PlotTModel():
     def calc_auto(self):
         """Automatic calculation."""
         self.limits = None
-        self.calculate()
-        self.slider_reset()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.limits = (0, self.t_curve[-1])
+            self.slider_reset()
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        self.calculate()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
 
     def calculate(self):
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
+        with log_hook:
             try:
                 self.results, self.t_curve = t_plot_raw(
                     self.loading,
@@ -116,15 +133,12 @@ class PlotTModel():
                     self.molar_mass,
                     t_limits=self.limits,
                 )
-
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
-
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
-                ])
+                return False
+            self.output += log_hook.getLogs()
+            return True
 
     def output_results(self):
         self.view.res_table.setRowCount(0)
@@ -142,6 +156,7 @@ class PlotTModel():
                 index, 4, QW.QTableWidgetItem(f"{result.get('intercept'):g}")
             )
 
+    def output_log(self):
         self.view.output.setText(self.output)
         self.output = ""
 
@@ -155,12 +170,13 @@ class PlotTModel():
             self.results,
             ax=self.view.res_graph.ax,
         )
+        self.view.res_graph.ax.set_title("")
         self.view.res_graph.canvas.draw()
 
     def slider_reset(self):
-        self.view.x_select.setRange((0, self.t_curve[-1]))
+        self.view.x_select.setRange(self.limits)
         self.view.x_select.setValues((self.t_curve[0], self.t_curve[-1]), emit=False)
-        self.view.res_graph.draw_limits(self.t_curve[0], self.t_curve[-1])
+        self.view.res_graph.draw_xlimits(self.t_curve[0], self.t_curve[-1])
 
     def select_tmodel(self):
         tmodel_text = self.view.thickness_dropdown.currentText()
@@ -179,13 +195,12 @@ class PlotTModel():
         from src.utilities.result_export import serialize
         results = {
             e: {
-                "Pore volume [cm3/g]": result.get("adsorbed_volume"),
-                "Area [m2/g]": result.get("area"),
+                f"Pore volume [cm3/{self.isotherm.material_unit}]": result.get("adsorbed_volume"),
+                f"Area [m2/{self.isotherm.material_unit}]": result.get("area"),
                 "R^2": result.get("corr_coef"),
                 "Slope": result.get("slope"),
                 "Intercept": result.get("intercept"),
             }
             for e, result in enumerate(self.results)
         }
-        if serialize(results, parent=self.view):
-            self.view.accept()
+        serialize(results, parent=self.view)

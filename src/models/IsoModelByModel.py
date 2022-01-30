@@ -1,5 +1,4 @@
-from math import inf
-import warnings
+from src.utilities.log_hook import log_hook
 import numpy
 
 from pygaps.modelling import _MODELS
@@ -84,8 +83,7 @@ class IsoModelByModel():
 
     def model(self):
         self.model_isotherm = None
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
+        with log_hook:
             try:
                 if self.auto:
 
@@ -115,15 +113,12 @@ class IsoModelByModel():
                         branch=self.branch,
                         **self.isotherm.to_dict(),
                     )
-
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Model fitting failed! <br> {e}</font>'
-
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="red">Fitting warning: {a.message}</font>' for a in warning
-                ])
+                return False
+            self.output += log_hook.getLogs()
+            return True
 
     def select_model(self):
         self.model_isotherm = None
@@ -190,7 +185,7 @@ class IsoModelByModel():
 
     def slider_reset(self):
         self.view.p_selector.setValues(self.limits, emit=False)
-        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def output_results(self):
         self.view.output.setText(self.output)

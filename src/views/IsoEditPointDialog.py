@@ -34,7 +34,7 @@ class IsoEditPointDialog(QW.QDialog):
         self.horizontal_header = self.table_view.horizontalHeader()
         self.vertical_header = self.table_view.verticalHeader()
         self.horizontal_header.setSectionResizeMode(QW.QHeaderView.Stretch)
-        self.vertical_header.setSectionResizeMode(QW.QHeaderView.Stretch)
+        self.vertical_header.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
 
         # Edit functions
         edit_widget = QW.QWidget()

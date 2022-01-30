@@ -20,16 +20,17 @@ class IsoGraphView(GraphView):
     y2_data: str = None
 
     x_range: list = None
+    y1_range: list = None
 
     pressure_mode = None
     pressure_unit = None
 
-    def state_pressure(self, iso):
-        return iso.pressure(
-            branch=self.branch,
-            pressure_mode=self.pressure_mode,
-            pressure_unit=self.pressure_unit,
-        )
+    lgd_keys = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # anything less and it looks too cramped
+        self.setMinimumSize(400, 400)
 
     def setupNav(self):
         "Override parent nav to add custom toolbar."
@@ -50,22 +51,13 @@ class IsoGraphView(GraphView):
         self.y2_data = None
         if any(keys):
             self.data_types = self.data_types + list(set(itertools.chain.from_iterable(keys)))
-            self.y2_data = self.data_types[-1]
         if self.y1_data not in self.data_types:
             self.y1_data = "loading"
         if self.x_data not in self.data_types:
             self.x_data = "pressure"
 
         # range
-        self.x_range = (
-            min([min(self.state_pressure(i)) for i in self.isotherms]),
-            max([max(self.state_pressure(i)) for i in self.isotherms]),
-        )
-        if self.x_range_select:
-            self.x_range_select.setRange(self.x_range)
-            self.x_range_select.setValues(self.x_range, emit=False)
-            self.low.set_xdata([self.x_range[0], self.x_range[0]])
-            self.high.set_xdata([self.x_range[1], self.x_range[1]])
+        self.find_xrange()
 
     def draw_isotherms(self, branch=None):
 
@@ -88,13 +80,39 @@ class IsoGraphView(GraphView):
                     y2_data=self.y2_data,
                     pressure_mode=self.pressure_mode,
                     pressure_unit=self.pressure_unit,
+                    lgd_keys=self.lgd_keys,
                 )
                 self.ax.autoscale()  # auto-scale
             except pge.GraphingError:
                 error_dialog(
                     "X-axis and Y1-axis must display data that is shared by all isotherms (i.e. pressure or loading)."
                 )
+            except pge.CalculationError:
+                error_dialog(
+                    "Cannot plot multiple isotherms that are impossible to convert to the same units / modes."
+                )
         self.canvas.draw_idle()
+
+    def set_branch(self, branch):
+        pass
+
+    def find_xrange(self):
+        self.x_range = (
+            min([min(self.state_pressure(i)) for i in self.isotherms]),
+            max([max(self.state_pressure(i)) for i in self.isotherms]),
+        )
+        if self.x_range_select:
+            self.x_range_select.setRange(self.x_range)
+            self.x_range_select.setValues(self.x_range, emit=False)
+            self.low.set_xdata([self.x_range[0], self.x_range[0]])
+            self.high.set_xdata([self.x_range[1], self.x_range[1]])
+
+    def state_pressure(self, iso):
+        return iso.pressure(
+            branch=self.branch,
+            pressure_mode=self.pressure_mode,
+            pressure_unit=self.pressure_unit,
+        )
 
     def handle_logx(self, is_set: bool):
         self.logx = is_set
@@ -104,6 +122,8 @@ class IsoGraphView(GraphView):
 
     def handle_logy(self, is_set: bool):
         self.logy = is_set
+        if self.y_range_select:
+            self.y_range_select.setLogScale(is_set)
 
     def handle_data_sel(self):
         from src.widgets.IsoGraphDataSel import IsoGraphDataSel
@@ -155,7 +175,7 @@ class IsoModelGraphView(IsoGraphView):
                 ax=self.ax,
                 branch=self.branch,
                 logx=self.logx,
-                logy=self.logy,
+                logy1=self.logy,
                 lgd_pos=None,
             )
             if self.model_isotherm:
@@ -164,7 +184,7 @@ class IsoModelGraphView(IsoGraphView):
                     ax=self.ax,
                     branch=self.branch,
                     logx=self.logx,
-                    logy=self.logy,
+                    logy1=self.logy,
                     lgd_pos=None,
                     color="r",
                     # TODO does not work if model calculates pressure

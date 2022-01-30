@@ -54,6 +54,7 @@ class IsoModelManualDialog(QW.QDialog):
         self.temperature_input = QW.QDoubleSpinBox()
         self.temperature_input.setDecimals(2)
         self.temperature_input.setValue(77)
+        self.temperature_input.setMaximum(1000)
         self.temperature_unit = QW.QComboBox()
         self.temperature_unit.setObjectName("temperature_unit")
         model_layout.addWidget(self.temperature_label, 2, 0, 1, 1)

@@ -47,10 +47,9 @@ class PlotTDialog(QW.QDialog):
         self.res_text_layout = QW.QGridLayout(self.res_text_box)
 
         self.res_table = QW.QTableWidget(0, 5, self)
-        self.res_table.setHorizontalHeaderLabels(
-            ("V [cm3/g]", "A [m2/g]", "R^2", "Slope", "Intercept")
-        )
         self.res_table.horizontalHeader().setSectionResizeMode(QW.QHeaderView.Stretch)
+        self.res_table.verticalHeader().setSectionResizeMode(QW.QHeaderView.ResizeToContents)
+        self.res_table.setMinimumHeight(100)
         self.res_text_layout.addWidget(self.res_table, 0, 0, 1, 4)
 
         self.res_text_layout.addWidget(QW.QLabel("Calculation log:"), 1, 0, 1, 2)

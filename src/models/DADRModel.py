@@ -1,4 +1,4 @@
-import warnings
+from src.utilities.log_hook import log_hook
 
 from pygaps.characterisation.dr_da_plots import da_plot_raw, log_p_exp, log_v_adj
 from pygaps.graphing.calc_graphs import dra_plot
@@ -55,6 +55,11 @@ class DADRModel():
 
         # View actions
         # plot setup
+        self.view.setWindowTitle(
+            self.view.windowTitle() +
+            f" '{isotherm.material} - {isotherm.adsorbate} - {isotherm._temperature:.2g} {isotherm.temperature_unit}'"
+        )
+        self.view.label_vol.setText(f"Micropore Volume [cm3/{self.isotherm.material_unit}]")
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
         self.view.iso_graph.branch = self.branch
@@ -98,22 +103,29 @@ class DADRModel():
     def calc_auto(self):
         """Automatic calculation."""
         self.limits = None
-        self.calculate()
-        self.limits = [self.pressure[self.min_point], self.pressure[self.max_point]]
-        self.slider_reset()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.limits = (self.pressure[self.min_point], self.pressure[self.max_point])
+            self.slider_reset()
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.view.iso_graph.draw_isotherms(branch=self.branch)
+            self.output_log()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        self.calculate()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.view.iso_graph.draw_isotherms(branch=self.branch)
+            self.output_log()
 
     def calculate(self):
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
+        with log_hook:
             try:
                 (
                     self.microp_volume,
@@ -135,19 +147,14 @@ class DADRModel():
                 )
                 if self.ptype == "DA":
                     self.exponent = exp
-
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
-                return
-
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
-                ])
+                return False
+            self.output += log_hook.getLogs()
+            return True
 
     def output_results(self):
-
         self.view.result_r.setText(f'{self.corr_coef:.4}')
         self.view.result_microporevol.setText(f"{self.microp_volume:g}")
         self.view.result_adspotential.setText(f"{self.potential:g}")
@@ -157,6 +164,10 @@ class DADRModel():
             self.view.dr_exp_input.blockSignals(False)
         self.view.result_slope.setText(f'{self.slope:.4}')
         self.view.result_intercept.setText(f'{self.intercept:.4}')
+
+    def output_log(self):
+        self.view.output.setText(self.output)
+        self.output = ""
 
     def plot_results(self):
 
@@ -190,7 +201,7 @@ class DADRModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def select_branch(self):
         self.branch = self.view.branch_dropdown.currentText()
@@ -201,7 +212,7 @@ class DADRModel():
         from src.utilities.result_export import serialize
 
         results = {
-            'Mircropore Volume [cm3/g]': self.microp_volume * 1000,
+            f'Mircropore Volume [cm3/{self.isotherm.material_unit}]': self.microp_volume * 1000,
             'Effective potential [kJ/mol]': self.potential,
             'R^2': self.corr_coef,
             'Slope': self.slope,
@@ -211,5 +222,4 @@ class DADRModel():
         if self.ptype != "DR":
             results['DR Exponent'] = self.exp
 
-        if serialize(results, parent=self.view):
-            self.view.accept()
+        serialize(results, parent=self.view)

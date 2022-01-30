@@ -1,4 +1,4 @@
-import warnings
+from src.utilities.log_hook import log_hook
 
 from pygaps.characterisation.psd_meso import psd_mesoporous
 from pygaps.characterisation.psd_meso import _MESO_PSD_MODELS
@@ -23,6 +23,7 @@ class PSDMesoModel():
     pore_geometry = None
     thickness_model = None
     kelvin_model = None
+    limit_indices = None
     limits = None
 
     # Results
@@ -51,6 +52,10 @@ class PSDMesoModel():
 
         # View actions
         # view setup
+        self.view.setWindowTitle(
+            self.view.windowTitle() +
+            f" '{isotherm.material} - {isotherm.adsorbate} - {isotherm._temperature:.2g} {isotherm.temperature_unit}'"
+        )
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
         self.view.tmodel_dropdown.addItems(_MESO_PSD_MODELS)
@@ -60,6 +65,7 @@ class PSDMesoModel():
 
         # plot isotherm
         self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.lgd_keys = ["material"]
         self.view.iso_graph.pressure_mode = "relative"
         self.view.iso_graph.set_isotherms([self.isotherm])
 
@@ -76,25 +82,32 @@ class PSDMesoModel():
     def calc_auto(self):
         """Automatic calculation."""
         self.limits = None
-        self.calculate()
-        pressure = self.isotherm.pressure(branch=self.branch, pressure_mode="relative")
-        if self.branch == 'des':
-            pressure = pressure[::-1]
-        self.limits = [pressure[self.limits[0]], pressure[self.limits[1]]]
-        self.output_results()
-        self.plot_results()
-        self.slider_reset()
+        if self.calculate():
+            pressure = self.isotherm.pressure(branch=self.branch, pressure_mode="relative")
+            if self.branch == 'des':
+                pressure = pressure[::-1]
+            self.limits = (pressure[self.limit_indices[0]], pressure[self.limit_indices[1]])
+            self.slider_reset()
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.view.iso_graph.draw_isotherms(branch=self.branch)
+            self.output_log()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        self.calculate()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.view.iso_graph.draw_isotherms(branch=self.branch)
+            self.output_log()
 
     def calculate(self):
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
+        with log_hook:
             self.branch = self.view.branch_dropdown.currentText()
             self.psd_model = self.view.tmodel_dropdown.currentText()
             self.pore_geometry = self.view.geometry_dropdown.currentText()
@@ -110,19 +123,19 @@ class PSDMesoModel():
                     kelvin_model=self.kelvin_model,
                     p_limits=self.limits,
                 )
-                self.limits = self.results.get('limits')
+                self.limit_indices = self.results.get('limits')
 
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
-                self.limits = [0, 0]
-
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
-                ])
+                return False
+            self.output += log_hook.getLogs()
+            return True
 
     def output_results(self):
+        pass
+
+    def output_log(self):
         if self.output:
             error_dialog(self.output)
             self.output = ""
@@ -146,7 +159,7 @@ class PSDMesoModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def export_results(self):
         if not self.results:
@@ -154,9 +167,8 @@ class PSDMesoModel():
             return
         from src.utilities.result_export import serialize
         results = {
-            "Pore widths [nm]": self.results.get("pore_widths").tolist(),
-            "Pore distribution [dV/dW]": self.results.get("pore_distribution").tolist(),
-            "Pore cumulative volume [cm3/g]": self.results.get("pore_volume_cumulative").tolist(),
+            "Pore widths [nm]": self.results.get("pore_widths"),
+            "Pore distribution [dV/dW]": self.results.get("pore_distribution"),
+            "Pore cumulative volume [cm3/g]": self.results.get("pore_volume_cumulative"),
         }
-        if serialize(results, parent=self.view):
-            self.view.accept()
+        serialize(results, how="V", parent=self.view)

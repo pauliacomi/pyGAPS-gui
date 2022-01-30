@@ -1,9 +1,10 @@
 import os
+import pandas
 
 from src.widgets.UtilityWidgets import error_dialog, save_file_dialog
 
 
-def serialize(obj: dict, parent=None):
+def serialize(obj: dict, how: str = "H", parent=None):
 
     # TODO get last directory here too
     filename = save_file_dialog(
@@ -17,29 +18,38 @@ def serialize(obj: dict, parent=None):
         _, ext = os.path.splitext(filename)
         try:
             if ext == '.csv':
-                import csv
                 with open(filename, 'w', newline='', encoding='utf-8') as f:
-                    writer = csv.writer(f)
+                    if how == "V":
+                        df = pandas.DataFrame(obj)
+                        df.to_csv(f, index=None)
+                        return True
+                    else:
+                        import csv
+                        writer = csv.writer(f)
 
-                    def recurse(obj):
-                        for item in obj.items():
-                            if isinstance(item[1], dict):
-                                writer.writerow((item[0], ))
-                                recurse(item[1])
-                            elif isinstance(item[1], list):
-                                writer.writerow([item[0]] + item[1])
-                            else:
-                                writer.writerow(item)
+                        def recurse(obj):
+                            for item in obj.items():
+                                if isinstance(item[1], dict):
+                                    writer.writerow((item[0], ))
+                                    recurse(item[1])
+                                elif isinstance(item[1], list):
+                                    writer.writerow([item[0]] + item[1])
+                                else:
+                                    writer.writerow(item)
 
-                    recurse(obj)
-                    return True
+                        recurse(obj)
+                        return True
 
             elif ext == '.json':
                 import json
                 with open(filename, 'w', encoding='utf-8') as f:
-                    json.dump(obj, f)
-                    return True
-
+                    if how == "V":
+                        df = pandas.DataFrame(obj).T
+                        df.to_json(f, orient="split")
+                        return True
+                    else:
+                        json.dump(obj, f)
+                        return True
             else:
                 raise Exception("Unknown file save format.")
 

@@ -485,7 +485,8 @@ class QSpinBoxRangeSlider(QW.QWidget):
 
         # Make range slider take as much of the space as possible.
         size_policy = QW.QSizePolicy(
-            QW.QSizePolicy.MinimumExpanding, QW.QSizePolicy.MinimumExpanding
+            QW.QSizePolicy.MinimumExpanding,
+            QW.QSizePolicy.MinimumExpanding,
         )
         self.range_slider.setSizePolicy(size_policy)
 

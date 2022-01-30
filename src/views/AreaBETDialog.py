@@ -107,7 +107,7 @@ class AreaBETDialog(QW.QDialog):
         _layout.addWidget(self.button_box, 2, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:
-        return QC.QSize(1000, 700)
+        return QC.QSize(1000, 900)
 
     def connect_signals(self):
         pass

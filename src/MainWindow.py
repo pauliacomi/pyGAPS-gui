@@ -1,3 +1,4 @@
+import pathlib
 from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
 
@@ -45,7 +46,7 @@ class MainWindow(QW.QMainWindow):
             event.ignore()
 
     def dropEvent(self, event):
-        filepaths = [u.toLocalFile() for u in event.mimeData().urls()]
+        filepaths = [pathlib.Path(u.toLocalFile()) for u in event.mimeData().urls()]
         self.open_iso(filepaths)
 
     ########################################################
@@ -197,7 +198,7 @@ class MainWindow(QW.QMainWindow):
         isotherm = self.iso_controller.iso_current
         isotherms = self.iso_model.get_checked()
         if len(isotherms) != 2:
-            error_dialog("Select two isotherms")
+            error_dialog("Select two isotherms: one to characterize and one for reference.")
             return
         isotherms.remove(isotherm)
         if len(isotherms) != 1:

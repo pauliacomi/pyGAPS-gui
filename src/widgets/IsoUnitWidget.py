@@ -131,7 +131,7 @@ class IsoUnitWidget(QW.QWidget):
 
         self.init_pressure_unit(pressure_mode, pressure_unit)
 
-    def init_pressure_unit(self, pressure_mode, pressure_unit):
+    def init_pressure_unit(self, pressure_mode, pressure_unit=None):
         self.pressure_unit.clear()
         self.pressure_unit.setEnabled(False)
         pressure_units = self.pressure_dict.get(pressure_mode, None)
@@ -139,6 +139,8 @@ class IsoUnitWidget(QW.QWidget):
             return
         self.pressure_unit.setEnabled(self.units_active)
         pressure_units = list(pressure_units.keys())
+        if not pressure_unit:
+            pressure_unit = pressure_units[0]
         self.pressure_unit.addItems(pressure_units)
         self.pressure_unit.setCurrentText(pressure_unit)
 
@@ -149,7 +151,7 @@ class IsoUnitWidget(QW.QWidget):
 
         self.init_loading_unit(loading_basis, loading_unit)
 
-    def init_loading_unit(self, loading_basis, loading_unit):
+    def init_loading_unit(self, loading_basis, loading_unit=None):
         self.loading_unit.clear()
         self.loading_unit.setEnabled(False)
         loading_units = self.loading_dict.get(loading_basis, None)
@@ -158,6 +160,8 @@ class IsoUnitWidget(QW.QWidget):
         self.loading_unit.setEnabled(self.units_active)
         loading_units = list(loading_units.keys())
         self.loading_unit.addItems(loading_units)
+        if not loading_unit:
+            loading_unit = loading_units[0]
         self.loading_unit.setCurrentText(loading_unit)
 
     def init_material(self, material_basis, material_unit):
@@ -165,9 +169,11 @@ class IsoUnitWidget(QW.QWidget):
         self.material_basis.setEnabled(self.units_active)
         self.material_basis.setCurrentText(material_basis)
 
+        self.material_unit.blockSignals(True)
         self.init_material_unit(material_basis, material_unit)
+        self.material_unit.blockSignals(False)
 
-    def init_material_unit(self, material_basis, material_unit):
+    def init_material_unit(self, material_basis, material_unit=None):
         self.material_unit.clear()
         self.material_unit.setEnabled(False)
         material_units = self.material_dict.get(material_basis, None)
@@ -176,6 +182,8 @@ class IsoUnitWidget(QW.QWidget):
         self.material_unit.setEnabled(self.units_active)
         material_units = list(material_units.keys())
         self.material_unit.addItems(material_units)
+        if not material_unit:
+            material_unit = material_units[0]
         self.material_unit.setCurrentText(material_unit)
 
     def init_temperature(self, temperature_unit):
@@ -184,8 +192,10 @@ class IsoUnitWidget(QW.QWidget):
 
     def handle_pressure_change(self):
         pressure_mode = self.pressure_mode.currentText()
-        pressure_unit = self.pressure_unit.currentText()
-        self.init_pressure_unit(pressure_mode, pressure_unit)
+        self.loading_unit.blockSignals(True)
+        self.init_pressure_unit(pressure_mode, None)
+        self.loading_unit.blockSignals(False)
+        self.emit_pressure()
 
     def emit_pressure(self):
         mode_to = self.pressure_mode.currentText()
@@ -194,8 +204,10 @@ class IsoUnitWidget(QW.QWidget):
 
     def handle_loading_change(self):
         loading_basis = self.loading_basis.currentText()
-        loading_unit = self.loading_unit.currentText()
-        self.init_loading_unit(loading_basis, loading_unit)
+        self.loading_unit.blockSignals(True)
+        self.init_loading_unit(loading_basis, None)
+        self.loading_unit.blockSignals(False)
+        self.emit_loading()
 
     def emit_loading(self):
         basis_to = self.loading_basis.currentText()
@@ -204,8 +216,10 @@ class IsoUnitWidget(QW.QWidget):
 
     def handle_material_change(self):
         material_basis = self.material_basis.currentText()
-        material_unit = self.material_unit.currentText()
-        self.init_material_unit(material_basis, material_unit)
+        self.material_unit.blockSignals(True)
+        self.init_material_unit(material_basis, None)
+        self.material_unit.blockSignals(False)
+        self.emit_material()
 
     def emit_material(self):
         basis_to = self.material_basis.currentText()

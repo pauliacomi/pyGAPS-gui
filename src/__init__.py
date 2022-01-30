@@ -83,7 +83,7 @@ def main():
 
     # Resources
     splash.showMessage("Loading resources...", 40)
-    app.paletteChanged.connect(sync_theme_with_system)
+    # app.paletteChanged.connect(sync_theme_with_system)
     # sync_theme_with_system()
     icon = QG.QIcon()
     icon.addFile('./src/resources/main_icon.png', QC.QSize(48, 48))

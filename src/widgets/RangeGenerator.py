@@ -74,6 +74,8 @@ class RangeGenWidget(QW.QWidget):
         self.range_table.setItemDelegate(delegate)
         horizontal_header = self.range_table.horizontalHeader()
         horizontal_header.setSectionResizeMode(QW.QHeaderView.Stretch)
+        vertical_header = self.range_table.verticalHeader()
+        vertical_header.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
         _layout.addWidget(self.range_label)
         _layout.addWidget(self.range_table)
 

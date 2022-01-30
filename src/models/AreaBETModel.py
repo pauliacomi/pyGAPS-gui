@@ -1,9 +1,8 @@
-import warnings
-
 from pygaps.characterisation.area_bet import (area_BET_raw, bet_transform, roq_transform)
 from pygaps.graphing.calc_graphs import bet_plot, roq_plot
 from pygaps.utilities.exceptions import CalculationError
 
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 
@@ -56,13 +55,21 @@ class AreaBETModel():
 
         # View actions
         # view setup
+        self.view.setWindowTitle(
+            self.view.windowTitle() +
+            f" '{isotherm.material} - {isotherm.adsorbate} - {isotherm._temperature:.2g} {isotherm.temperature_unit}'"
+        )
         self.view.label_area.setText(f"BET area [m2/{self.isotherm.material_unit}]:")
         self.view.label_n_mono.setText(f"Monolayer uptake [mmol/{self.isotherm.material_unit}]:")
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
+
+        # view graph
         self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.lgd_keys = ["adsorbate", "key"]
         self.view.iso_graph.pressure_mode = "relative"
-        self.view.iso_graph.set_isotherms([self.isotherm])
+        self.view.iso_graph.y2_data = None
+        self.view.iso_graph.set_isotherms([self.isotherm])  # always last
 
         # connect signals
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
@@ -98,31 +105,30 @@ class AreaBETModel():
         """Automatic calculation."""
         self.limits = None
         if self.calculate():
-            self.limits = [self.pressure[self.min_point], self.pressure[self.max_point]]
+            self.limits = (self.pressure[self.min_point], self.pressure[self.max_point])
             self.slider_reset()
+            self.output_log()
             self.output_results()
             self.plot_results()
         # if we can't calculate, we just display the isotherm and error
         else:
             self.view.iso_graph.draw_isotherms(branch=self.branch)
-            self.view.output.setText(self.output)
-            self.output = ""
+            self.output_log()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
         if self.calculate():
+            self.output_log()
             self.output_results()
             self.plot_results()
         # if we can't calculate, we just display the isotherm and error
         else:
             self.view.iso_graph.draw_isotherms(branch=self.branch)
-            self.view.output.setText(self.output)
-            self.output = ""
+            self.output_log()
 
     def calculate(self):
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
+        with log_hook:
             # TODO Should put all these into a dictionary
             try:
                 (
@@ -141,16 +147,11 @@ class AreaBETModel():
                     self.cross_section,
                     p_limits=self.limits,
                 )
-
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
                 return False
-
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="magenta">Warning: {a.message}</font>' for a in warning
-                ])
+            self.output += log_hook.getLogs()
             return True
 
     def output_results(self):
@@ -162,6 +163,7 @@ class AreaBETModel():
         self.view.result_intercept.setText(f'{self.intercept:.4}')
         self.view.result_r.setText(f'{self.corr_coef:.4}')
 
+    def output_log(self):
         self.view.output.setText(self.output)
         self.output = ""
 
@@ -200,7 +202,7 @@ class AreaBETModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def select_branch(self):
         self.branch = self.view.branch_dropdown.currentText()
@@ -211,14 +213,13 @@ class AreaBETModel():
         from src.utilities.result_export import serialize
 
         results = {
-            'BET Area [m2/g]': self.bet_area,
+            f"BET area [m2/{self.isotherm.material_unit}]": self.bet_area,
             'R^2': self.corr_coef,
             'C constant': self.c_const,
-            'n_monolayer [mmol/g]': self.n_monolayer * 1000,
+            f"Monolayer uptake [mmol/{self.isotherm.material_unit}]": self.n_monolayer * 1000,
             'p_monolayer [p/p0]': self.p_monolayer,
             'BET slope': self.slope,
             'BET intercept': self.intercept,
             'Pressure limits': self.limits
         }
-        if serialize(results, parent=self.view):
-            self.view.accept()
+        serialize(results, parent=self.view)

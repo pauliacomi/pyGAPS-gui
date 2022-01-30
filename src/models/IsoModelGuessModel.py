@@ -1,4 +1,4 @@
-import warnings
+from src.utilities.log_hook import log_hook
 
 from pygaps import ModelIsotherm
 from pygaps.modelling import _GUESS_MODELS, _MODELS
@@ -7,7 +7,7 @@ from pygaps.utilities.exceptions import CalculationError
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
-from src.utilities.log_hook import LogHook
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 
@@ -104,42 +104,37 @@ class IsoModelGuessModel():
             for row in range(self.view.model_list.count())
             if self.view.model_list.item(row).checkState() == QC.Qt.Checked
         ]
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
-            with LogHook() as hook:
-                try:
-                    for model in checked_models:
-                        try:
-                            isotherm = ModelIsotherm(
-                                pressure=self.pressure,
-                                loading=self.loading,
-                                branch=self.branch,
-                                model=model,
-                                verbose=True,
-                                plot_fit=False,
-                                **self.iso_params,
-                            )
-                            self.model_attempts.append(isotherm)
-                        except CalculationError as e:
-                            hook.logger.info(
-                                f'<font color="red">Modelling using {model} failed.</font>'
-                            )
+        with log_hook:
+            try:
+                for model in checked_models:
+                    try:
+                        isotherm = ModelIsotherm(
+                            pressure=self.pressure,
+                            loading=self.loading,
+                            branch=self.branch,
+                            model=model,
+                            verbose=True,
+                            plot_fit=False,
+                            **self.iso_params,
+                        )
+                        self.model_attempts.append(isotherm)
+                    except CalculationError as err:
+                        log_hook.logger.info(
+                            f'<font color="red">Modelling using {model} failed.</font>'
+                        )
                 # We catch any errors or warnings and display them to the user
-                except Exception as e:
-                    self.output += f'<font color="red">Model fitting failed! <br> {e}</font>'
-
-            self.output += hook.getLogs().replace("\n", "<br>")
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="red">Fitting warning: {a.message}</font>' for a in warning
-                ])
+            except Exception as err:
+                self.output += f'<font color="red">Model fitting failed! <br> {err}</font>'
+                return False
+            self.output += log_hook.getLogs()
 
             if not self.model_attempts:
                 self.output += '<font color="red">No model could be reliably fit on the isotherm.</font><br>'
-                return
+                return False
 
             errors = [x.model.rmse for x in self.model_attempts]
             self.model_isotherm = self.model_attempts[errors.index(min(errors))]
+            return True
 
     def select_branch(self):
         self.branch = self.view.branch_dropdown.currentText()
@@ -149,7 +144,7 @@ class IsoModelGuessModel():
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
-        self.view.iso_graph.draw_limits(self.limits[0], self.limits[1])
+        self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def output_results(self):
         self.view.output.setText(self.output)

@@ -1,4 +1,4 @@
-import warnings
+from src.utilities.log_hook import log_hook
 
 import pygaps
 from pygaps.iast import iast_binary_svp
@@ -84,8 +84,7 @@ class IASTSVPModel():
             reverse=True,
         )
 
-        with warnings.catch_warnings(record=True) as warning:
-            warnings.simplefilter("always")
+        with log_hook:
             try:
                 self.results = iast_binary_svp(
                     self.isotherms,
@@ -96,10 +95,9 @@ class IASTSVPModel():
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Model failed! <br> {e}</font>'
-            if warning:
-                self.output += '<br>'.join([
-                    f'<font color="red">Warning: {a.message}</font>' for a in warning
-                ])
+                return False
+            self.output += log_hook.getLogs()
+            return True
 
     def output_results(self):
         self.view.output.setText(self.output)
