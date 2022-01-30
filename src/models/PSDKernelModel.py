@@ -42,7 +42,7 @@ class PSDKernelModel():
         self.view.kernel_dropdown.addItems(_KERNELS),
         self.view.smooth_input.setValue(self.bspline_order)
 
-        # plot isotherm
+        # plot setup
         self.view.iso_graph.branch = self.branch
         self.view.iso_graph.lgd_keys = ["material"]
         self.view.iso_graph.pressure_mode = "relative"
@@ -74,8 +74,8 @@ class PSDKernelModel():
             self.output_results()
             self.plot_results()
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -85,8 +85,8 @@ class PSDKernelModel():
             self.output_results()
             self.plot_results()
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def prepare_values(self):
         # Pressure
@@ -133,10 +133,10 @@ class PSDKernelModel():
             right=5,
             ax=self.view.res_graph.ax
         )
-        self.view.res_graph.canvas.draw()
+        self.view.res_graph.canvas.draw_idle()
 
         # Isotherm plot
-        self.view.iso_graph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms()
         self.view.iso_graph.ax.plot(
             self.pressure[self.limit_indices[0]:self.limit_indices[1] + 1],
             self.results['kernel_loading'],
@@ -144,12 +144,19 @@ class PSDKernelModel():
             label="fit",
         )
 
+    def plot_clear(self):
+        self.view.iso_graph.draw_isotherms()
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw_idle()
+
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def select_branch(self):
         self.branch = self.view.branch_dropdown.currentText()
+        self.view.iso_graph.set_branch(self.branch)
+        self.plot_clear()
         self.prepare_values()
 
     def export_results(self):
@@ -158,8 +165,11 @@ class PSDKernelModel():
             return
         from src.utilities.result_export import serialize
         results = {
-            "Pore widths [nm]": self.results.get("pore_widths"),
-            "Pore distribution [dV/dW]": self.results.get("pore_distribution"),
-            "Pore cumulative volume [cm3/g]": self.results.get("pore_volume_cumulative"),
+            "Pore widths [nm]":
+            self.results.get("pore_widths"),
+            "Pore distribution [dV/dW]":
+            self.results.get("pore_distribution"),
+            "Pore cumulative volume [cm3/{self.isotherm.material_unit}]":
+            self.results.get("pore_volume_cumulative"),
         }
         serialize(results, how="V", parent=self.view)

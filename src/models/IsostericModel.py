@@ -24,7 +24,6 @@ class IsostericModel():
     output = ""
     success = True
 
-    # TODO finish implementation
     def __init__(self, isotherms, view):
         """First init"""
         # Save refs
@@ -41,7 +40,7 @@ class IsostericModel():
         self.view.branch_dropdown.setCurrentText(self.branch)
         self.view.points_input.setValue(self.loading_point_no)
 
-        # plot isotherm
+        # plot setup
         self.view.iso_graph.branch = self.branch
         self.view.iso_graph.lgd_keys = ["temperature"]
         self.view.iso_graph.set_isotherms(self.isotherms)
@@ -69,8 +68,8 @@ class IsostericModel():
             self.output_results()
             self.plot_results()
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def calc_with_limits(self, down, up):
         """Set limits on calculation."""
@@ -81,8 +80,8 @@ class IsostericModel():
             self.output_results()
             self.plot_results()
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def calculate(self):
         with log_hook:
@@ -109,7 +108,7 @@ class IsostericModel():
 
     def plot_results(self):
         # Isotherm plot update
-        self.view.iso_graph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms()
 
         # Generate plot of the points chosen
         self.view.res_graph.ax.clear()
@@ -120,7 +119,12 @@ class IsostericModel():
             self.results["std_errs"],
             ax=self.view.res_graph.ax,
         )
-        self.view.res_graph.canvas.draw()
+        self.view.res_graph.canvas.draw_idle()
+
+    def plot_clear(self):
+        self.view.iso_graph.draw_isotherms()
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw_idle()
 
     def slider_reset(self):
         if self.limits:
@@ -130,6 +134,7 @@ class IsostericModel():
 
     def select_branch(self, branch):
         self.branch = self.view.branch_dropdown.currentText()
+        self.view.iso_graph.set_branch(self.branch)
         self.calc_auto()
 
     def select_points(self, npoints):

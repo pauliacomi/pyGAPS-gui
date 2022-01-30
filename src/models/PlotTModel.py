@@ -111,6 +111,7 @@ class PlotTModel():
             self.plot_results()
         else:
             self.output_log()
+            self.plot_clear()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -121,6 +122,7 @@ class PlotTModel():
             self.plot_results()
         else:
             self.output_log()
+            self.plot_clear()
 
     def calculate(self):
         with log_hook:
@@ -161,7 +163,6 @@ class PlotTModel():
         self.output = ""
 
     def plot_results(self):
-
         # Generate tplot
         self.view.res_graph.clear()
         tp_plot(
@@ -171,7 +172,11 @@ class PlotTModel():
             ax=self.view.res_graph.ax,
         )
         self.view.res_graph.ax.set_title("")
-        self.view.res_graph.canvas.draw()
+        self.view.res_graph.canvas.draw_idle()
+
+    def plot_clear(self):
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw_idle()
 
     def slider_reset(self):
         self.view.x_select.setRange(self.limits)

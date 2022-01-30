@@ -63,7 +63,7 @@ class PSDMesoModel():
         self.view.thickness_dropdown.addItems(_THICKNESS_MODELS)
         self.view.kmodel_dropdown.addItems(_KELVIN_MODELS)
 
-        # plot isotherm
+        # plot setup
         self.view.iso_graph.branch = self.branch
         self.view.iso_graph.lgd_keys = ["material"]
         self.view.iso_graph.pressure_mode = "relative"
@@ -72,6 +72,7 @@ class PSDMesoModel():
         # connect signals
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
 
@@ -92,8 +93,8 @@ class PSDMesoModel():
             self.output_results()
             self.plot_results()
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -103,12 +104,11 @@ class PSDMesoModel():
             self.output_results()
             self.plot_results()
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def calculate(self):
         with log_hook:
-            self.branch = self.view.branch_dropdown.currentText()
             self.psd_model = self.view.tmodel_dropdown.currentText()
             self.pore_geometry = self.view.geometry_dropdown.currentText()
             self.thickness_model = self.view.thickness_dropdown.currentText()
@@ -143,7 +143,7 @@ class PSDMesoModel():
     def plot_results(self):
 
         # Isotherm plot update
-        self.view.iso_graph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms()
 
         # PSD plot
         self.view.res_graph.clear()
@@ -155,11 +155,21 @@ class PSDMesoModel():
             left=1.5,
             ax=self.view.res_graph.ax
         )
-        self.view.res_graph.canvas.draw()
+        self.view.res_graph.canvas.draw_idle()
+
+    def plot_clear(self):
+        self.view.iso_graph.draw_isotherms()
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw_idle()
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
+
+    def select_branch(self):
+        self.branch = self.view.branch_dropdown.currentText()
+        self.view.iso_graph.set_branch(self.branch)
+        self.plot_clear()
 
     def export_results(self):
         if not self.results:
@@ -167,8 +177,11 @@ class PSDMesoModel():
             return
         from src.utilities.result_export import serialize
         results = {
-            "Pore widths [nm]": self.results.get("pore_widths"),
-            "Pore distribution [dV/dW]": self.results.get("pore_distribution"),
-            "Pore cumulative volume [cm3/g]": self.results.get("pore_volume_cumulative"),
+            "Pore widths [nm]":
+            self.results.get("pore_widths"),
+            "Pore distribution [dV/dW]":
+            self.results.get("pore_distribution"),
+            "Pore cumulative volume [cm3/{self.isotherm.material_unit}]":
+            self.results.get("pore_volume_cumulative"),
         }
         serialize(results, how="V", parent=self.view)

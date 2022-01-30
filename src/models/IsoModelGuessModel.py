@@ -11,7 +11,7 @@ from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 
-class IsoModelGuessModel():
+class IsoModelGuesscalculate():
 
     isotherm = None
     model_isotherm = None
@@ -45,6 +45,9 @@ class IsoModelGuessModel():
             return
 
         # view setup
+        self.view.setWindowTitle(
+            self.view.windowTitle() + f" '{isotherm.material} - {isotherm.adsorbate}'"
+        )
         for model in _MODELS:
             item = QW.QListWidgetItem(model)
             if model in _GUESS_MODELS:
@@ -56,20 +59,21 @@ class IsoModelGuessModel():
         self.view.branch_dropdown.setCurrentText(self.branch)
 
         # plot setup
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.lgd_keys = ["material"]
         self.view.iso_graph.set_isotherms([self.isotherm])
         self.limits = self.view.iso_graph.x_range
 
         # connect signals
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.x_select.slider.rangeChanged.connect(self.model_with_limits)
-        self.view.calc_auto_button.clicked.connect(self.model_auto)
+        self.view.x_select.slider.rangeChanged.connect(self.calculate_with_limits)
+        self.view.calc_auto_button.clicked.connect(self.calculate_auto)
 
         # populate initial
         self.prepare_values()
-        self.view.iso_graph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms()
 
     def prepare_values(self):
-        # Loading and pressure
         self.iso_params = self.isotherm.to_dict()
         pressure = self.isotherm.pressure(
             branch=self.branch,
@@ -84,20 +88,23 @@ class IsoModelGuessModel():
         self.pressure = pressure.values
         self.loading = loading.values
 
-    def model_auto(self):
+    def calculate_auto(self):
         """Automatic calculation."""
         self.auto = True
-        self.model()
-        self.slider_reset()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
+            self.plot_clear()
 
-    def model_with_limits(self, left, right):
+    def calculate_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
         self.prepare_values()
 
-    def model(self):
+    def calculate(self):
         self.model_attempts = []
         checked_models = [
             self.view.model_list.item(row).data(QC.Qt.DisplayRole)
@@ -136,20 +143,26 @@ class IsoModelGuessModel():
             self.model_isotherm = self.model_attempts[errors.index(min(errors))]
             return True
 
-    def select_branch(self):
-        self.branch = self.view.branch_dropdown.currentText()
-        self.view.iso_graph.branch = self.branch
-        self.model_isotherm = None
-        self.plot_results()
+    def plot_results(self):
+        self.view.iso_graph.model_isotherm = self.model_isotherm
+        self.view.iso_graph.draw_isotherms()
+
+    def plot_clear(self):
+        self.view.iso_graph.draw_isotherms()
+
+    def output_results(self):
+        pass
+
+    def output_log(self):
+        self.view.output.setText(self.output)
+        self.output = ""
 
     def slider_reset(self):
         self.view.x_select.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
-    def output_results(self):
-        self.view.output.setText(self.output)
-        self.output = ""
-
-    def plot_results(self):
-        self.view.iso_graph.model_isotherm = self.model_isotherm
-        self.view.iso_graph.draw_isotherms(branch=self.branch)
+    def select_branch(self):
+        self.branch = self.view.branch_dropdown.currentText()
+        self.view.iso_graph.branch = self.branch
+        self.model_isotherm = None
+        self.plot_results()

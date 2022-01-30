@@ -1,16 +1,14 @@
-from src.utilities.log_hook import log_hook
-
+import numpy
 import pygaps
-from pygaps.utilities.converter_mode import _PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE
-from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
-from pygaps.modelling import _MODELS
-from pygaps.modelling import get_isotherm_model
 from pygaps import ModelIsotherm
-
+from pygaps.modelling import _MODELS, get_isotherm_model
+from pygaps.utilities.converter_mode import (_LOADING_MODE, _MATERIAL_MODE, _PRESSURE_MODE)
+from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
 from qtpy import QtCore as QC
+
+from src.utilities.log_hook import log_hook
 from src.utilities.tex2svg import tex2svg
 from src.widgets.SpinBoxSlider import QHSpinBoxSlider
-
 from src.widgets.UtilityWidgets import error_dialog
 
 
@@ -38,10 +36,7 @@ class IsoModelManualModel():
         self.view.model_dropdown.addItems(_MODELS),
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
-        self.view.adsorbate_input.insertItems(
-            0,
-            [ads.name for ads in pygaps.ADSORBATE_LIST],
-        )
+        self.view.adsorbate_input.addItems([ads.name for ads in pygaps.ADSORBATE_LIST], )
         # populate units view
         self.view.unit_widget.init_boxes(
             _PRESSURE_MODE,
@@ -55,30 +50,36 @@ class IsoModelManualModel():
         self.view.unit_widget.init_material("mass", "g")
 
         # plot setup
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.lgd_keys = ["material", "adsorbate", "temperature"]
         self.limits = [0, 1]
 
         # connect signals
         self.view.model_dropdown.currentIndexChanged.connect(self.select_model)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.x_select.slider.rangeChanged.connect(self.model_with_limits)
-        self.view.calc_manual_button.clicked.connect(self.model_manual)
+        self.view.x_select.slider.rangeChanged.connect(self.calculate_with_limits)
+        self.view.calc_manual_button.clicked.connect(self.calculate_manual)
 
         # populate initial
         self.select_model()
 
-    def model_with_limits(self, left, right):
+    def calculate_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        self.model_manual()
+        self.calculate_manual()
 
-    def model_manual(self):
+    def calculate_manual(self):
         """Use model parameters."""
         self.get_model_params()
-        self.model()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
+            self.plot_clear()
 
-    def model(self):
+    def calculate(self):
         with log_hook:
             try:
                 self.model_isotherm = ModelIsotherm(
@@ -125,11 +126,31 @@ class IsoModelManualModel():
         for param in self.current_model.param_names:
             widget = QHSpinBoxSlider()
             widget.setText(param)
+            minv, maxv = self.current_model.param_bounds[param]
+            if not minv or minv == -numpy.inf:
+                minv = 0
+            if not maxv or maxv == numpy.inf:
+                maxv = 100
+            widget.setRange(minv=minv, maxv=maxv)
             self.view.param_layout.addWidget(widget)
             self.view.paramWidgets[param] = widget
 
-        # Update plot
-        self.plot_results()
+        self.plot_clear()
+
+    def output_results(self):
+        pass
+
+    def output_log(self):
+        self.view.output.setText(self.output)
+        self.output = ""
+
+    def plot_results(self):
+        self.view.iso_graph.set_isotherms([self.model_isotherm])
+        self.view.iso_graph.draw_isotherms()
+
+    def plot_clear(self):
+        self.view.iso_graph.model_isotherm = self.model_isotherm
+        self.view.iso_graph.draw_isotherms()
 
     def get_model_params(self):
         for param in self.current_model.params:
@@ -148,17 +169,8 @@ class IsoModelManualModel():
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.model_isotherm = None
-        self.plot_results()
+        self.plot_clear()
 
     def slider_reset(self):
         self.view.p_selector.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
-
-    def output_results(self):
-        self.view.output.setText(self.output)
-        self.output = ""
-
-    def plot_results(self):
-        if self.model_isotherm:
-            self.view.iso_graph.set_isotherms([self.model_isotherm])
-            self.view.iso_graph.draw_isotherms(branch=self.branch)

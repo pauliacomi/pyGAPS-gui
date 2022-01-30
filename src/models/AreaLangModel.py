@@ -110,10 +110,9 @@ class AreaLangModel():
             self.output_log()
             self.output_results()
             self.plot_results()
-        # if we can't calculate, we just display the isotherm and error
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -122,9 +121,8 @@ class AreaLangModel():
             self.output_log()
             self.output_results()
             self.plot_results()
-        # if we can't calculate, we just display the isotherm and error
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
+            self.plot_clear()
             self.output_log()
 
     def calculate(self):
@@ -171,7 +169,7 @@ class AreaLangModel():
     def plot_results(self):
 
         # Isotherm plot update
-        self.view.iso_graph.draw_isotherms(branch=self.branch)
+        self.view.iso_graph.draw_isotherms()
 
         # Generate plot of the points chosen
         self.view.lang_graph.clear()
@@ -184,14 +182,23 @@ class AreaLangModel():
             self.intercept,
             ax=self.view.lang_graph.ax
         )
-        self.view.lang_graph.canvas.draw()
+        self.view.lang_graph.canvas.draw_idle()
+
+    def plot_clear(self):
+        self.view.iso_graph.draw_isotherms()
+        self.view.lang_graph.clear()
+        self.view.lang_graph.canvas.draw_idle()
 
     def select_branch(self):
         self.branch = self.view.branch_dropdown.currentText()
+        self.view.iso_graph.set_branch(self.branch)
         self.prepare_values()
         self.calc_auto()
 
     def export_results(self):
+        if not self.lang_area:
+            error_dialog("No results to export.")
+            return
         from src.utilities.result_export import serialize
 
         results = {

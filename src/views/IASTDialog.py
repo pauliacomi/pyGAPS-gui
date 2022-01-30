@@ -22,21 +22,26 @@ class IASTDialog(QW.QDialog):
         self.options_layout = QW.QGridLayout()
         _layout.addLayout(self.options_layout, 0, 0)
 
+        ## Branch
+        self.branch_label = LabelAlignRight("Branch used:")
+        self.options_layout.addWidget(self.branch_label, 1, 0, 1, 1)
+        self.branch_dropdown = QW.QComboBox()
+        self.options_layout.addWidget(self.branch_dropdown, 1, 1, 1, 2)
+
         ## Data selection
-        self.data_label = LabelAlignRight("Adsorbate of interest:")
         self.data_table = RangeGenWidget()
-        self.options_layout.addWidget(self.data_label, 0, 0)
-        self.options_layout.addWidget(self.data_table, 1, 0, 1, 3)
+        self.data_table.setMinimumWidth(300)
+        self.options_layout.addWidget(self.data_table, 2, 0, 1, 3)
 
         ## Button to calculate
         self.calc_button = QW.QPushButton()
-        self.options_layout.addWidget(self.calc_button, 2, 0, 1, 3)
+        self.options_layout.addWidget(self.calc_button, 3, 0, 1, 3)
 
         ## Output log
         self.output_label = QW.QLabel("Calculation log:")
         self.output = LabelOutput()
-        self.options_layout.addWidget(self.output_label, 3, 0)
-        self.options_layout.addWidget(self.output, 4, 0, 1, 3)
+        self.options_layout.addWidget(self.output_label, 4, 0)
+        self.options_layout.addWidget(self.output, 5, 0, 1, 3)
 
         # Result display
         self.res_graph = GraphView()
@@ -46,15 +51,14 @@ class IASTDialog(QW.QDialog):
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Cancel)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
         _layout.addWidget(self.button_box, 1, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:
         return QC.QSize(1000, 800)
 
     def connect_signals(self):
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
+        pass
 
     def translate_UI(self):
         # yapf: disable

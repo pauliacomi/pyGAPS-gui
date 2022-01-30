@@ -1,14 +1,12 @@
-from src.utilities.log_hook import log_hook
-
-import pygaps
-from pygaps.iast.pgiast import iast_point_fraction
-from pygaps.graphing.iast_graphs import plot_iast
-
 import numpy as np
-
-from src.widgets.UtilityWidgets import error_dialog
-
+import pygaps
+from pygaps.graphing.iast_graphs import plot_iast
+from pygaps.graphing.labels import label_units_iso
+from pygaps.iast.pgiast import iast_point_fraction
 from qtpy import QtWidgets as QW
+
+from src.utilities.log_hook import log_hook
+from src.widgets.UtilityWidgets import error_dialog
 
 
 class IASTModel():
@@ -18,6 +16,7 @@ class IASTModel():
 
     # Settings
     setting_data = None
+    branch = "ads"
 
     # Results
     results = None
@@ -40,22 +39,28 @@ class IASTModel():
 
         # View actions
         # view setup
-        props = ["Total P"] + [f"{i.adsorbate} R" for i in self.isotherms]
+        props = ["Total P"] + [f"{i.adsorbate} fraction" for i in self.isotherms]
         self.view.data_table.set_data(props=props, data=self.setting_data)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
 
         # connect signals
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.calc_button.clicked.connect(self.calc_auto)
-
-        # TODO export
-        # self.view.button_box.accepted.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.export_results)
+        self.view.button_box.rejected.connect(self.view.reject)
 
         # Calculation
 
     def calc_auto(self):
         """Automatic calculation."""
-        self.calculate()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
+            self.plot_clear()
 
     def calculate(self):
 
@@ -77,6 +82,7 @@ class IASTModel():
                         self.isotherms,
                         gas_mole_fraction=fraction,
                         total_pressure=pressures_t[ind],
+                        branch=self.branch,
                     )
                 self.results = results
                 self.pressures = pressures_t
@@ -89,19 +95,43 @@ class IASTModel():
             return True
 
     def output_results(self):
+        pass
+
+    def output_log(self):
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
-        if self.results is None:
-            return
         self.view.res_graph.clear()
         plot_iast(
             self.pressures,
             self.results,
             [i.adsorbate for i in self.isotherms],
-            "bar",
-            "mmol/g",
+            label_units_iso(self.isotherms[0], "pressure"),
+            label_units_iso(self.isotherms[0], "loading"),
             ax=self.view.res_graph.ax,
         )
         self.view.res_graph.canvas.draw()
+
+    def plot_clear(self):
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw()
+
+    def select_branch(self):
+        self.branch = self.view.branch_dropdown.currentText()
+        self.plot_clear()
+
+    def export_results(self):
+        if self.results is None:
+            error_dialog("No results to export.")
+            return
+        from src.utilities.result_export import serialize
+        p_label = label_units_iso(self.isotherms[0], "pressure")
+        l_label = label_units_iso(self.isotherms[0], "loading")
+        results = {f"Total {p_label}": self.pressures}
+        results.update({
+            f"{iso.adsorbate} {l_label}": self.results.T[i]
+            for i, iso in enumerate(self.isotherms)
+        })
+
+        serialize(results, how="V", parent=self.view)

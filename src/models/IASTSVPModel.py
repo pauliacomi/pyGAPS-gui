@@ -1,12 +1,11 @@
-from src.utilities.log_hook import log_hook
-
 import pygaps
-from pygaps.iast import iast_binary_svp
 from pygaps.graphing.iast_graphs import plot_iast_svp
-
-from src.widgets.UtilityWidgets import error_dialog
-
+from pygaps.graphing.labels import label_units_iso
+from pygaps.iast import iast_binary_svp
 from qtpy import QtWidgets as QW
+
+from src.utilities.log_hook import log_hook
+from src.widgets.UtilityWidgets import error_dialog
 
 
 class IASTSVPModel():
@@ -18,6 +17,7 @@ class IASTSVPModel():
     main_adsorbate = None
     mole_fractions = None
     pressure_points = None
+    branch = "ads"
 
     # Results
     results = None
@@ -42,12 +42,15 @@ class IASTSVPModel():
         # view setup
         self.view.adsorbate_input.addItems([i.adsorbate.name for i in isotherms])
         self.view.adsorbate_input.setCurrentText(isotherms[0].adsorbate.name)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
 
         # connect signals
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.points_button.clicked.connect(self.create_points)
         self.view.calc_button.clicked.connect(self.calc_auto)
-        # TODO export
-        # self.view.button_box.accepted.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.export_results)
+        self.view.button_box.rejected.connect(self.view.reject)
 
         # Calculation
 
@@ -67,9 +70,13 @@ class IASTSVPModel():
 
     def calc_auto(self):
         """Automatic calculation."""
-        self.calculate()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
+            self.plot_clear()
 
     def calculate(self):
         if self.pressure_points is None:
@@ -90,6 +97,7 @@ class IASTSVPModel():
                     self.isotherms,
                     mole_fractions=self.mole_fractions,
                     pressures=self.pressure_points,
+                    branch=self.branch,
                     warningoff=False,
                 )
             # We catch any errors or warnings and display them to the user
@@ -100,12 +108,13 @@ class IASTSVPModel():
             return True
 
     def output_results(self):
+        pass
+
+    def output_log(self):
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
-        if self.results is None:
-            return
         self.view.res_graph.clear()
         plot_iast_svp(
             self.results['pressure'],
@@ -117,3 +126,23 @@ class IASTSVPModel():
             ax=self.view.res_graph.ax,
         )
         self.view.res_graph.canvas.draw()
+
+    def plot_clear(self):
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw()
+
+    def select_branch(self):
+        self.branch = self.view.branch_dropdown.currentText()
+        self.plot_clear()
+
+    def export_results(self):
+        if not self.results:
+            error_dialog("No results to export.")
+            return
+        from src.utilities.result_export import serialize
+        p_units = label_units_iso(self.isotherms[0], "pressure")
+        results = {
+            f"Total {p_units}": self.results['pressure'],
+            f"Selectivity for {self.main_adsorbate}": self.results['selectivity'],
+        }
+        serialize(results, how="V", parent=self.view)

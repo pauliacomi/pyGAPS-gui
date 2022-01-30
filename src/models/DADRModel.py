@@ -54,7 +54,7 @@ class DADRModel():
             return
 
         # View actions
-        # plot setup
+        # view setup
         self.view.setWindowTitle(
             self.view.windowTitle() +
             f" '{isotherm.material} - {isotherm.adsorbate} - {isotherm._temperature:.2g} {isotherm.temperature_unit}'"
@@ -62,6 +62,8 @@ class DADRModel():
         self.view.label_vol.setText(f"Micropore Volume [cm3/{self.isotherm.material_unit}]")
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
+
+        # plot setup
         self.view.iso_graph.branch = self.branch
         self.view.iso_graph.pressure_mode = "relative"
         self.view.iso_graph.set_isotherms([self.isotherm])
@@ -110,8 +112,8 @@ class DADRModel():
             self.output_results()
             self.plot_results()
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -121,8 +123,8 @@ class DADRModel():
             self.output_results()
             self.plot_results()
         else:
-            self.view.iso_graph.draw_isotherms(branch=self.branch)
             self.output_log()
+            self.plot_clear()
 
     def calculate(self):
         with log_hook:
@@ -170,10 +172,8 @@ class DADRModel():
         self.output = ""
 
     def plot_results(self):
-
         # Isotherm plot update
-        self.view.iso_graph.draw_isotherms(branch=self.branch)
-
+        self.view.iso_graph.draw_isotherms()
         # DR/DA plot
         self.view.rgraph.clear()
         dra_plot(
@@ -186,7 +186,12 @@ class DADRModel():
             self.exponent,
             ax=self.view.rgraph.ax
         )
-        self.view.rgraph.canvas.draw()
+        self.view.rgraph.canvas.draw_idle()
+
+    def plot_clear(self):
+        self.view.iso_graph.draw_isotherms()
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw_idle()
 
     def select_exp(self):
         exp = self.view.dr_exp_input.cleanText()
@@ -205,10 +210,14 @@ class DADRModel():
 
     def select_branch(self):
         self.branch = self.view.branch_dropdown.currentText()
+        self.view.iso_graph.set_branch(self.branch)
         self.prepare_values()
         self.calc_auto()
 
     def export_results(self):
+        if not self.microp_volume:
+            error_dialog("No results to export.")
+            return
         from src.utilities.result_export import serialize
 
         results = {

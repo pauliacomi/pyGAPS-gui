@@ -59,20 +59,14 @@ class IsoGraphView(GraphView):
         # range
         self.find_xrange()
 
-    def draw_isotherms(self, branch=None):
-
-        if not branch:
-            branch = self.branch
-        else:
-            self.branch = branch
-
+    def draw_isotherms(self):
         self.clear()
         if self.isotherms:
             try:
                 pgg.plot_iso(
                     self.isotherms,
                     ax=self.ax,
-                    branch=branch,
+                    branch=self.branch,
                     logx=self.logx,
                     logy1=self.logy,
                     x_data=self.x_data,
@@ -94,7 +88,8 @@ class IsoGraphView(GraphView):
         self.canvas.draw_idle()
 
     def set_branch(self, branch):
-        pass
+        self.branch = branch
+        self.find_xrange()
 
     def find_xrange(self):
         self.x_range = (
@@ -161,12 +156,7 @@ class IsoModelGraphView(IsoGraphView):
     model_isotherm = None
     branch: str = "ads"
 
-    def draw_isotherms(self, branch=None):
-
-        if not branch:
-            branch = self.branch
-        else:
-            self.branch = branch
+    def draw_isotherms(self):
 
         self.clear()
         if self.isotherms:

@@ -6,6 +6,7 @@ import pandas as pd
 
 from src.widgets.SciDoubleSpinbox import SciFloatDelegate
 from src.models.dfTableModel import dfTableModel
+from src.widgets.UtilityWidgets import HeightHeaderView
 
 
 class RangeGenWidget(QW.QWidget):
@@ -56,10 +57,10 @@ class RangeGenWidget(QW.QWidget):
         self.dist_value = QW.QComboBox()
         self.dist_value.addItems(["Linear", "Logarithmic"])
         self.options_layout.addRow(self.prop_label, self.prop_value)
+        self.options_layout.addRow(self.points_label, self.points_value)
         self.options_layout.addRow(self.start_label, self.start_value)
         self.options_layout.addRow(self.end_label, self.end_value)
         self.options_layout.addRow(self.dist_label, self.dist_value)
-        self.options_layout.addRow(self.points_label, self.points_value)
 
         self.generate_btn = QW.QPushButton()
         self.erase_btn = QW.QPushButton()
@@ -72,8 +73,8 @@ class RangeGenWidget(QW.QWidget):
         self.range_table.setModel(self.range_model)
         delegate = SciFloatDelegate()
         self.range_table.setItemDelegate(delegate)
-        horizontal_header = self.range_table.horizontalHeader()
-        horizontal_header.setSectionResizeMode(QW.QHeaderView.Stretch)
+        h_header = HeightHeaderView()
+        self.range_table.setHorizontalHeader(h_header)
         vertical_header = self.range_table.verticalHeader()
         vertical_header.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
         _layout.addWidget(self.range_label)
@@ -131,9 +132,8 @@ class RangeGenWidget(QW.QWidget):
 
         # populate table
         self.range_model.setRowCount(npoints)
-        for ind, val in enumerate(rng):
-            index = self.range_model.index(ind, prop)
-            self.range_model.setData(index, val, role=QC.Qt.EditRole)
+        index = self.range_model.index(0, prop)
+        self.range_model.setColumnData(index.column(), rng, role=QC.Qt.EditRole)
 
     def save(self):
         self.data = self.range_model._data
@@ -141,12 +141,12 @@ class RangeGenWidget(QW.QWidget):
     def translate_UI(self):
         # yapf: disable
         # pylint: disable=line-too-long
-        self.prop_label.setText(QW.QApplication.translate("RangeGenWidget", "Property", None, -1))
+        self.prop_label.setText(QW.QApplication.translate("RangeGenWidget", "Column", None, -1))
         self.start_label.setText(QW.QApplication.translate("RangeGenWidget", "Start", None, -1))
         self.end_label.setText(QW.QApplication.translate("RangeGenWidget", "End", None, -1))
         self.points_label.setText(QW.QApplication.translate("RangeGenWidget", "Total points", None, -1))
         self.dist_label.setText(QW.QApplication.translate("RangeGenWidget", "Distribution", None, -1))
-        self.generate_btn.setText(QW.QApplication.translate("RangeGenWidget", "Auto Generate", None, -1))
+        self.generate_btn.setText(QW.QApplication.translate("RangeGenWidget", "Generate", None, -1))
         self.erase_btn.setText(QW.QApplication.translate("RangeGenWidget", "Clear", None, -1))
         self.range_label.setText(QW.QApplication.translate("RangeGenWidget", "Range", None, -1))
         # yapf: enable

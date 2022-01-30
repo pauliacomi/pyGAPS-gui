@@ -59,6 +59,13 @@ class PlotAlphaSModel():
             self.view.windowTitle() +
             f" '{isotherm.material} - {isotherm.adsorbate} - {isotherm._temperature:.2g} {isotherm.temperature_unit}'"
         )
+        self.view.res_table.setHorizontalHeaderLabels((
+            f"V [cm3/{self.isotherm.material_unit}]",
+            f"A [m2/{self.isotherm.material_unit}]",
+            "R^2",
+            "Slope",
+            "Intercept",
+        ))
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
         self.view.refbranch_dropdown.addItems(["ads", "des"])
@@ -137,16 +144,18 @@ class PlotAlphaSModel():
             self.plot_results()
         else:
             self.output_log()
+            self.plot_clear()
 
     def calc_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
         if self.calculate():
-            self.output_results()
             self.output_log()
+            self.output_results()
             self.plot_results()
         else:
             self.output_log()
+            self.plot_clear()
 
     def calculate(self):
         with log_hook:
@@ -200,7 +209,11 @@ class PlotAlphaSModel():
             alpha_reducing_p=self.reducing_pressure
         )
         self.view.res_graph.ax.set_title("")
-        self.view.res_graph.canvas.draw()
+        self.view.res_graph.canvas.draw_idle()
+
+    def plot_clear(self):
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw_idle()
 
     def slider_reset(self):
         self.view.x_select.setRange(self.limits)
@@ -209,18 +222,20 @@ class PlotAlphaSModel():
 
     def select_area(self):
         area_type = self.view.refarea_dropdown.currentText().lower()
-        if area_type == "bet":
-            self.reference_area = area_BET(self.ref_isotherm).get('area')
-            self.view.refarea_input.setEnabled(False)
-        elif area_type == "langmuir":
-            self.reference_area = area_langmuir(self.ref_isotherm).get('area')
-            self.view.refarea_input.setEnabled(False)
-        else:
-            self.view.refarea_input.setEnabled(True)
-            ref_area_str = self.view.refarea_input.text()
-            if not ref_area_str:
-                return
-            self.reference_area = float(ref_area_str)
+        with log_hook:
+            if area_type == "bet":
+                self.reference_area = area_BET(self.ref_isotherm).get('area')
+                self.view.refarea_input.setEnabled(False)
+            elif area_type == "langmuir":
+                self.reference_area = area_langmuir(self.ref_isotherm).get('area')
+                self.view.refarea_input.setEnabled(False)
+            else:
+                self.view.refarea_input.setEnabled(True)
+                ref_area_str = self.view.refarea_input.text()
+                if not ref_area_str:
+                    return
+                self.reference_area = float(ref_area_str)
+            self.output += log_hook.getLogs()
 
         if self.prepare_values():
             self.calc_auto()
@@ -247,8 +262,8 @@ class PlotAlphaSModel():
         from src.utilities.result_export import serialize
         results = {
             e: {
-                "Pore volume [cm3/g]": result.get("adsorbed_volume"),
-                "Area [m2/g]": result.get("area"),
+                f"Pore volume [cm3/{self.isotherm.material_unit}]": result.get("adsorbed_volume"),
+                f"Area [m2/{self.isotherm.material_unit}]": result.get("area"),
                 "R^2": result.get("corr_coef"),
                 "Slope": result.get("slope"),
                 "Intercept": result.get("intercept"),

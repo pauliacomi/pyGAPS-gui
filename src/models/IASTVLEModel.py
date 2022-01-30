@@ -17,6 +17,7 @@ class IASTVLEModel():
     main_adsorbate = None
     total_pressure = None
     number_points = None
+    branch = "ads"
 
     # Results
     results = None
@@ -45,19 +46,24 @@ class IASTVLEModel():
         # view setup
         self.view.adsorbate_input.addItems([i.adsorbate.name for i in isotherms])
         self.view.adsorbate_input.setCurrentText(isotherms[0].adsorbate.name)
+        self.view.branch_dropdown.addItems(["ads", "des"])
+        self.view.branch_dropdown.setCurrentText(self.branch)
 
         # connect signals
+        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.calc_button.clicked.connect(self.calc_auto)
-        # TODO export
-        # self.view.button_box.accepted.connect(self.export_results)
-
-        # Calculation
+        self.view.button_box.accepted.connect(self.export_results)
+        self.view.button_box.rejected.connect(self.view.reject)
 
     def calc_auto(self):
         """Automatic calculation."""
-        self.calculate()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
+            self.plot_clear()
 
     def calculate(self):
         self.total_pressure = float(self.view.pressure_input.text())
@@ -75,6 +81,7 @@ class IASTVLEModel():
                     self.isotherms,
                     total_pressure=self.total_pressure,
                     npoints=self.number_points,
+                    branch=self.branch,
                     warningoff=False,
                 )
             # We catch any errors or warnings and display them to the user
@@ -85,12 +92,13 @@ class IASTVLEModel():
             return True
 
     def output_results(self):
+        pass
+
+    def output_log(self):
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
-        if self.results is None:
-            return
         self.view.res_graph.clear()
         plot_iast_vle(
             self.results['x'],
@@ -102,3 +110,22 @@ class IASTVLEModel():
             ax=self.view.res_graph.ax,
         )
         self.view.res_graph.canvas.draw()
+
+    def plot_clear(self):
+        self.view.res_graph.clear()
+        self.view.res_graph.canvas.draw()
+
+    def select_branch(self):
+        self.branch = self.view.branch_dropdown.currentText()
+        self.plot_clear()
+
+    def export_results(self):
+        if not self.results:
+            error_dialog("No results to export.")
+            return
+        from src.utilities.result_export import serialize
+        results = {
+            f"Fraction {self.main_adsorbate} in bulk phase": self.results['y'],
+            f"Fraction {self.main_adsorbate} in adsorbed phase": self.results['x'],
+        }
+        serialize(results, how="V", parent=self.view)

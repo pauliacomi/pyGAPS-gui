@@ -216,3 +216,18 @@ class CollapsibleBox(QW.QWidget):
         animation.setDuration(60)
         animation.setStartValue(0)
         animation.setEndValue(max_width)
+
+
+class HeightHeaderView(QW.QHeaderView):
+    def __init__(self, parent=None):
+        super().__init__(QC.Qt.Horizontal, parent=parent)
+        self.setSectionResizeMode(QW.QHeaderView.Stretch)
+        self.setStretchLastSection(True)
+        self.setDefaultAlignment(QC.Qt.AlignCenter | QC.Qt.Alignment(QC.Qt.TextWordWrap))
+
+    def sectionSizeFromContents(self, logicalIndex):
+        text = self.model().headerData(logicalIndex, self.orientation(), QC.Qt.DisplayRole)
+        alignment = self.defaultAlignment()
+        metrics = QG.QFontMetrics(self.fontMetrics())
+        rect = metrics.boundingRect(QC.QRect(), alignment, text)
+        return rect.size()

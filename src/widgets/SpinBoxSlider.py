@@ -3,6 +3,7 @@ import math
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
+from src.widgets.SciDoubleSpinbox import ScientificDoubleSpinBox
 
 from src.widgets.UtilityWidgets import LabelAlignRight
 
@@ -27,11 +28,8 @@ class QSpinBoxSlider(QW.QWidget):
         self.label.setMaximumSize(20, 10)
 
         # spinbox
-        self.spin_box = QW.QDoubleSpinBox()
-        self.spin_box.setDecimals(2)
-        # self.spin_box.setMinimum(slider_range[0])
-        # self.spin_box.setMaximum(slider_range[1])
-        # self.spin_box.setSingleStep(slider_range[2])
+        self.spin_box = ScientificDoubleSpinBox()
+        self.spin_box.setDecimals(3)
         self.spin_box.setValue(value)
         self.spin_box.valueChanged.connect(self.handleSpinBox)
 

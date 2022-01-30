@@ -54,6 +54,21 @@ class dfTableModel(QC.QAbstractTableModel):
 
         return False
 
+    def setColumnData(self, col, values, role: int = QC.Qt.EditRole) -> bool:
+        """Set data of a column."""
+        start = self.index(0, col)
+        end = self.index(self._data.shape[0] - 1, col)
+        if not start.isValid() or not end.isValid():
+            return False
+
+        if role == QC.Qt.EditRole:
+            colname = self._data.columns[col]
+            self._data[colname] = values
+            self.dataChanged.emit(start, end)
+            return True
+
+        return False
+
     def headerData(self, section, orientation, role=QC.Qt.DisplayRole):
         if role != QC.Qt.DisplayRole:
             return None

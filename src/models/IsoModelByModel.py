@@ -42,51 +42,63 @@ class IsoModelByModel():
             return
 
         # view setup
+        self.view.setWindowTitle(
+            self.view.windowTitle() + f" '{isotherm.material} - {isotherm.adsorbate}'"
+        )
         self.view.model_dropdown.addItems(_MODELS),
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
 
         # plot setup
+        self.view.iso_graph.branch = self.branch
+        self.view.iso_graph.lgd_keys = ["material"]
         self.view.iso_graph.set_isotherms([self.isotherm])
         self.limits = self.view.iso_graph.x_range
 
         # connect signals
         self.view.model_dropdown.currentIndexChanged.connect(self.select_model)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.x_select.slider.rangeChanged.connect(self.model_with_limits)
-        self.view.calc_auto_button.clicked.connect(self.model_auto)
-        self.view.calc_manual_button.clicked.connect(self.model_manual)
+        self.view.x_select.slider.rangeChanged.connect(self.calculate_with_limits)
+        self.view.calc_auto_button.clicked.connect(self.calculate_auto)
+        self.view.calc_manual_button.clicked.connect(self.calculate_manual)
 
         # populate initial
         self.select_model()
 
-    def model_auto(self):
+    def calculate_auto(self):
         """Automatic calculation."""
         self.auto = True
-        self.model()
-        self.set_model_params()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.set_model_params()
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
+            self.plot_clear()
 
-    def model_with_limits(self, left, right):
+    def calculate_with_limits(self, left, right):
         """Set limits on calculation."""
         self.limits = [left, right]
-        # self.model_auto()
+        self.calculate_auto()
 
-    def model_manual(self):
+    def calculate_manual(self):
         """Use model parameters."""
         self.auto = False
         self.get_model_params()
-        self.model()
-        self.output_results()
-        self.plot_results()
+        if self.calculate():
+            self.output_log()
+            self.output_results()
+            self.plot_results()
+        else:
+            self.output_log()
+            self.plot_clear()
 
-    def model(self):
+    def calculate(self):
         self.model_isotherm = None
         with log_hook:
             try:
                 if self.auto:
-
                     iso_params = self.isotherm.to_dict()
                     pressure = self.isotherm.pressure(
                         branch=self.branch,
@@ -120,6 +132,21 @@ class IsoModelByModel():
             self.output += log_hook.getLogs()
             return True
 
+    def output_results(self):
+        pass
+
+    def output_log(self):
+        self.view.output.setText(self.output)
+        self.output = ""
+
+    def plot_results(self):
+        self.view.iso_graph.model_isotherm = self.model_isotherm
+        self.view.iso_graph.draw_isotherms()
+
+    def plot_clear(self):
+        self.view.iso_graph.model_isotherm = self.model_isotherm
+        self.view.iso_graph.draw_isotherms()
+
     def select_model(self):
         self.model_isotherm = None
         self.current_model_name = self.view.model_dropdown.currentText()
@@ -152,7 +179,7 @@ class IsoModelByModel():
             self.view.paramWidgets[param] = widget
 
         # Update plot
-        self.plot_results()
+        self.plot_clear()
 
     def set_model_params(self):
         for param in self.current_model.param_names:
@@ -181,16 +208,8 @@ class IsoModelByModel():
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.model_isotherm = None
-        self.plot_results()
+        self.plot_clear()
 
     def slider_reset(self):
         self.view.p_selector.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
-
-    def output_results(self):
-        self.view.output.setText(self.output)
-        self.output = ""
-
-    def plot_results(self):
-        self.view.iso_graph.model_isotherm = self.model_isotherm
-        self.view.iso_graph.draw_isotherms(branch=self.branch)
