@@ -73,7 +73,7 @@ class IsoGraphToolbar(NavigationToolbar):
                 self.canvas.parent(), 'Customize', 'Select axes:', titles, 0, False
             )
             if not ok:
-                return
+                return None, None
             ax = axes[titles.index(item)]
         return ax, len(axes)
 
@@ -108,6 +108,8 @@ class IsoGraphToolbar(NavigationToolbar):
     def log_y(self):
         # Get axis
         axes, naxes = self.get_ax()
+        if not axes:
+            return
 
         ymin, ymax = map(float, axes.get_ylim())
 
