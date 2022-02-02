@@ -1,6 +1,7 @@
 from qtpy import QtWidgets as QW
 
-from src.widgets.RangeSlider import QHSpinBoxRangeSlider, QVSpinBoxRangeSlider
+from src.widgets.RangeSlider import QHSpinBoxRangeSlider
+from src.widgets.RangeSlider import QVSpinBoxRangeSlider
 
 
 class SelectorToolbar(QW.QToolBar):

@@ -1,10 +1,8 @@
-from src.utilities.log_hook import log_hook
-
-from pygaps.characterisation.psd_kernel import psd_dft
 from pygaps.characterisation.psd_kernel import _KERNELS
+from pygaps.characterisation.psd_kernel import psd_dft
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
-
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 

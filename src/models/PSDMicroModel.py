@@ -1,12 +1,10 @@
-from src.utilities.log_hook import log_hook
-
-from pygaps.characterisation.psd_micro import psd_microporous
+from pygaps.characterisation.models_hk import _ADSORBENT_MODELS
 from pygaps.characterisation.psd_micro import _MICRO_PSD_MODELS
 from pygaps.characterisation.psd_micro import _PORE_GEOMETRIES
-from pygaps.characterisation.models_hk import _ADSORBENT_MODELS
+from pygaps.characterisation.psd_micro import psd_microporous
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
-
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 

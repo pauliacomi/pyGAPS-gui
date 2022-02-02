@@ -1,6 +1,6 @@
-from qtpy import QtWidgets as QW
-from qtpy import QtGui as QG
 from qtpy import QtCore as QC
+from qtpy import QtGui as QG
+from qtpy import QtWidgets as QW
 
 
 class MetadataTableWidget(QW.QTableView):

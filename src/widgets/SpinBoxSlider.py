@@ -3,8 +3,8 @@ import math
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
-from src.widgets.SciDoubleSpinbox import ScientificDoubleSpinBox
 
+from src.widgets.SciDoubleSpinbox import ScientificDoubleSpinBox
 from src.widgets.UtilityWidgets import LabelAlignRight
 
 

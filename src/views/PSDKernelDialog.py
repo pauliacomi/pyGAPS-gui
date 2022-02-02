@@ -3,8 +3,9 @@ from qtpy import QtWidgets as QW
 
 from src.views.GraphView import GraphView
 from src.views.IsoGraphView import IsoGraphView
-
-from src.widgets.UtilityWidgets import LabelAlignRight, LabelOutput, LabelResult
+from src.widgets.UtilityWidgets import LabelAlignRight
+from src.widgets.UtilityWidgets import LabelOutput
+from src.widgets.UtilityWidgets import LabelResult
 
 
 class PSDKernelDialog(QW.QDialog):

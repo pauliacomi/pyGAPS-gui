@@ -1,10 +1,8 @@
-from src.utilities.log_hook import log_hook
-
 import pygaps
+from pygaps.graphing.iast_graphs import plot_iast_vle
 from pygaps.iast import iast_binary_vle
 from pygaps.utilities.exceptions import CalculationError
-from pygaps.graphing.iast_graphs import plot_iast_vle
-
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 

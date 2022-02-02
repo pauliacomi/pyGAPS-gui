@@ -1,8 +1,9 @@
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
-from src.widgets.SciDoubleSpinbox import SciFloatDelegate, ScientificDoubleSpinBox
 from src.models.IsoDataTableModel import IsoDataTableModel
+from src.widgets.SciDoubleSpinbox import ScientificDoubleSpinBox
+from src.widgets.SciDoubleSpinbox import SciFloatDelegate
 from src.widgets.UtilityWidgets import LabelAlignCenter
 
 

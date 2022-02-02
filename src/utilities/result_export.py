@@ -1,7 +1,9 @@
 import os
+
 import pandas
 
-from src.widgets.UtilityWidgets import error_dialog, save_file_dialog
+from src.widgets.UtilityWidgets import error_dialog
+from src.widgets.UtilityWidgets import save_file_dialog
 
 
 def serialize(obj: dict, how: str = "H", parent=None):

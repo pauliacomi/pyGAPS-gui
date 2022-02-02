@@ -1,6 +1,6 @@
-from qtpy import QtWidgets as QW
-
 from functools import partial
+
+from qtpy import QtWidgets as QW
 
 from src.widgets.UtilityWidgets import open_files_dialog
 

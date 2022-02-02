@@ -1,7 +1,9 @@
-from pygaps.characterisation.area_bet import (area_BET_raw, bet_transform, roq_transform)
-from pygaps.graphing.calc_graphs import bet_plot, roq_plot
+from pygaps.characterisation.area_bet import area_BET_raw
+from pygaps.characterisation.area_bet import bet_transform
+from pygaps.characterisation.area_bet import roq_transform
+from pygaps.graphing.calc_graphs import bet_plot
+from pygaps.graphing.calc_graphs import roq_plot
 from pygaps.utilities.exceptions import CalculationError
-
 from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 

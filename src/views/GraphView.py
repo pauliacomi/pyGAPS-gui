@@ -3,7 +3,8 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from qtpy import QtWidgets as QW
 
-from src.widgets.GraphSelectorToolbar import HSelectorToolbar, VSelectorToolbar
+from src.widgets.GraphSelectorToolbar import HSelectorToolbar
+from src.widgets.GraphSelectorToolbar import VSelectorToolbar
 
 
 class GraphView(QW.QWidget):

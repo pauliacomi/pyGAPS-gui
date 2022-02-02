@@ -1,9 +1,9 @@
-from src.utilities.log_hook import log_hook
-
-from pygaps.characterisation.dr_da_plots import da_plot_raw, log_p_exp, log_v_adj
+from pygaps.characterisation.dr_da_plots import da_plot_raw
+from pygaps.characterisation.dr_da_plots import log_p_exp
+from pygaps.characterisation.dr_da_plots import log_v_adj
 from pygaps.graphing.calc_graphs import dra_plot
 from pygaps.utilities.exceptions import CalculationError
-
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 

@@ -1,5 +1,5 @@
-from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
 
 
 class IsoListView(QW.QListView):

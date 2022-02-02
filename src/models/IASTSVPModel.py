@@ -1,9 +1,9 @@
+from qtpy import QtWidgets as QW
+
 import pygaps
 from pygaps.graphing.iast_graphs import plot_iast_svp
 from pygaps.graphing.labels import label_units_iso
 from pygaps.iast import iast_binary_svp
-from qtpy import QtWidgets as QW
-
 from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 

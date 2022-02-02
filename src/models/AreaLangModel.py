@@ -1,9 +1,8 @@
-from src.utilities.log_hook import log_hook
-
-from pygaps.characterisation.area_lang import (area_langmuir_raw, langmuir_transform)
+from pygaps.characterisation.area_lang import area_langmuir_raw
+from pygaps.characterisation.area_lang import langmuir_transform
 from pygaps.graphing.calc_graphs import langmuir_plot
 from pygaps.utilities.exceptions import CalculationError
-
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 

@@ -1,11 +1,14 @@
 import pathlib
-from qtpy import QtWidgets as QW
+
 from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
 
 from src.controllers.IsoController import IsoController
-from src.models.IsoListModel import IsoListModel
 from src.MainWindowUI import MainWindowUI
-from src.widgets.UtilityWidgets import (error_dialog, open_files_dialog, save_file_dialog)
+from src.models.IsoListModel import IsoListModel
+from src.widgets.UtilityWidgets import error_dialog
+from src.widgets.UtilityWidgets import open_files_dialog
+from src.widgets.UtilityWidgets import save_file_dialog
 
 
 class MainWindow(QW.QMainWindow):

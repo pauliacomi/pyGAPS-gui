@@ -1,14 +1,12 @@
-from src.utilities.log_hook import log_hook
+from qtpy import QtWidgets as QW
 
+from pygaps.characterisation.alphas_plots import alpha_s_raw
 from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
-from pygaps.characterisation.alphas_plots import alpha_s_raw
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
-
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
-
-from qtpy import QtWidgets as QW
 
 
 class PlotAlphaSModel():

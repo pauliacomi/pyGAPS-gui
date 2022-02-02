@@ -1,7 +1,7 @@
-import pygaps as pg
-
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
+
+import pygaps as pg
 
 
 class IsoModel(QG.QStandardItem):

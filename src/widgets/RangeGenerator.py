@@ -1,11 +1,10 @@
+import numpy as np
+import pandas as pd
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
-import numpy as np
-import pandas as pd
-
-from src.widgets.SciDoubleSpinbox import SciFloatDelegate
 from src.models.dfTableModel import dfTableModel
+from src.widgets.SciDoubleSpinbox import SciFloatDelegate
 from src.widgets.UtilityWidgets import HeightHeaderView
 
 

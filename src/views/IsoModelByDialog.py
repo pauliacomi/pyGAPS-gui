@@ -1,14 +1,17 @@
+from qtpy import PYSIDE6
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
-from qtpy import PYSIDE6
 if PYSIDE6:
     import PySide6.QtSvgWidgets as QS
 else:
     from qtpy import QtSvg as QS
 
 from src.views.IsoGraphView import IsoModelGraphView
-from src.widgets.UtilityWidgets import (EditAlignRight, LabelAlignRight, LabelOutput, LabelResult)
+from src.widgets.UtilityWidgets import EditAlignRight
+from src.widgets.UtilityWidgets import LabelAlignRight
+from src.widgets.UtilityWidgets import LabelOutput
+from src.widgets.UtilityWidgets import LabelResult
 
 
 class IsoModelByDialog(QW.QDialog):

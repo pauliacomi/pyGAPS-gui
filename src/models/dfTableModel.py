@@ -1,6 +1,5 @@
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 from qtpy import QtCore as QC
 
 from src.widgets.UtilityWidgets import error_dialog

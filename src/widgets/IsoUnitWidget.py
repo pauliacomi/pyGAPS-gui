@@ -1,6 +1,7 @@
-from pygaps.core.pointisotherm import PointIsotherm
-from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
+
+from pygaps.core.pointisotherm import PointIsotherm
 
 
 class IsoUnitWidget(QW.QWidget):

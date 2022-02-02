@@ -1,11 +1,14 @@
 import numpy
-import pygaps
-from pygaps import ModelIsotherm
-from pygaps.modelling import _MODELS, get_isotherm_model
-from pygaps.utilities.converter_mode import (_LOADING_MODE, _MATERIAL_MODE, _PRESSURE_MODE)
-from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
 from qtpy import QtCore as QC
 
+import pygaps
+from pygaps import ModelIsotherm
+from pygaps.modelling import _MODELS
+from pygaps.modelling import get_isotherm_model
+from pygaps.utilities.converter_mode import _LOADING_MODE
+from pygaps.utilities.converter_mode import _MATERIAL_MODE
+from pygaps.utilities.converter_mode import _PRESSURE_MODE
+from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
 from src.utilities.log_hook import log_hook
 from src.utilities.tex2svg import tex2svg
 from src.widgets.SpinBoxSlider import QHSpinBoxSlider

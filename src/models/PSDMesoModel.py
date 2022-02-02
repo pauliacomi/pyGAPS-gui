@@ -1,13 +1,11 @@
-from src.utilities.log_hook import log_hook
-
-from pygaps.characterisation.psd_meso import psd_mesoporous
+from pygaps.characterisation.models_kelvin import _KELVIN_MODELS
+from pygaps.characterisation.models_thickness import _THICKNESS_MODELS
 from pygaps.characterisation.psd_meso import _MESO_PSD_MODELS
 from pygaps.characterisation.psd_meso import _PORE_GEOMETRIES
-from pygaps.characterisation.models_thickness import _THICKNESS_MODELS
-from pygaps.characterisation.models_kelvin import _KELVIN_MODELS
+from pygaps.characterisation.psd_meso import psd_mesoporous
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
-
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 
 

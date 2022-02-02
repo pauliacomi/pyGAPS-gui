@@ -1,8 +1,11 @@
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
-from src.views.GraphView import GraphView
 
-from src.widgets.UtilityWidgets import (EditAlignRight, LabelAlignRight, LabelOutput, LabelResult)
+from src.views.GraphView import GraphView
+from src.widgets.UtilityWidgets import EditAlignRight
+from src.widgets.UtilityWidgets import LabelAlignRight
+from src.widgets.UtilityWidgets import LabelOutput
+from src.widgets.UtilityWidgets import LabelResult
 
 
 class IASTVLEDialog(QW.QDialog):

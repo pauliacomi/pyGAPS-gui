@@ -1,13 +1,12 @@
-from src.utilities.log_hook import log_hook
+from qtpy import QtWidgets as QW
 
+from pygaps.characterisation.models_thickness import _THICKNESS_MODELS
+from pygaps.characterisation.models_thickness import get_thickness_model
 from pygaps.characterisation.t_plots import t_plot_raw
-from pygaps.characterisation.models_thickness import (_THICKNESS_MODELS, get_thickness_model)
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
-
+from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
-
-from qtpy import QtWidgets as QW
 
 
 class PlotTModel():

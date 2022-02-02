@@ -1,13 +1,12 @@
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
+from pygaps import MATERIAL_LIST
+from pygaps import Material
 from src.models.MatPropTableModel import MatPropTableModel
 from src.widgets.MetadataEditWidget import MetadataEditWidget
 from src.widgets.MetadataTableView import MetadataTableWidget
 from src.widgets.UtilityWidgets import error_dialog
-
-from pygaps import MATERIAL_LIST
-from pygaps import Material
 
 
 class MaterialView(QW.QWidget):

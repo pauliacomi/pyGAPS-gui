@@ -1,8 +1,10 @@
-from qtpy import QtWidgets as QW
-from qtpy import QtGui as QG
-from qtpy import QtCore as QC
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.backends.qt_compat import _setDevicePixelRatio, _devicePixelRatioF
+from matplotlib.backends.qt_compat import _devicePixelRatioF
+from matplotlib.backends.qt_compat import _setDevicePixelRatio
+from qtpy import QtCore as QC
+from qtpy import QtGui as QG
+from qtpy import QtWidgets as QW
+
 from .. import get_resource
 
 

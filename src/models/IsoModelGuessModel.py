@@ -1,12 +1,10 @@
-from src.utilities.log_hook import log_hook
-
-from pygaps import ModelIsotherm
-from pygaps.modelling import _GUESS_MODELS, _MODELS
-from pygaps.utilities.exceptions import CalculationError
-
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
+from pygaps import ModelIsotherm
+from pygaps.modelling import _GUESS_MODELS
+from pygaps.modelling import _MODELS
+from pygaps.utilities.exceptions import CalculationError
 from src.utilities.log_hook import log_hook
 from src.widgets.UtilityWidgets import error_dialog
 

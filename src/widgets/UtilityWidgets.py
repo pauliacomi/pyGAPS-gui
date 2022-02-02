@@ -1,8 +1,8 @@
 import pathlib
 
 from qtpy import QtCore as QC
-from qtpy import QtWidgets as QW
 from qtpy import QtGui as QG
+from qtpy import QtWidgets as QW
 
 
 def open_files_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":

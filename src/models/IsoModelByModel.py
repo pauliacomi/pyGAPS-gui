@@ -1,14 +1,12 @@
-from src.utilities.log_hook import log_hook
 import numpy
+from qtpy import QtCore as QC
 
+from pygaps import ModelIsotherm
 from pygaps.modelling import _MODELS
 from pygaps.modelling import get_isotherm_model
-from pygaps import ModelIsotherm
-
-from qtpy import QtCore as QC
+from src.utilities.log_hook import log_hook
 from src.utilities.tex2svg import tex2svg
 from src.widgets.SpinBoxSlider import QHSpinBoxSlider
-
 from src.widgets.UtilityWidgets import error_dialog
 
 

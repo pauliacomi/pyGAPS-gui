@@ -1,21 +1,20 @@
+from qtpy import PYSIDE6
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
-from qtpy import PYSIDE6
 if PYSIDE6:
     import PySide6.QtSvgWidgets as QS
 else:
     from qtpy import QtSvg as QS
 
-from src.models.AdsPropTableModel import AdsPropTableModel
-
-from src.widgets.MetadataEditWidget import MetadataEditWidget
-from src.widgets.MetadataTableView import MetadataTableWidget
-from src.utilities.tex2svg import tex2svg
-from src.widgets.UtilityWidgets import error_dialog, LabelAlignCenter
-
 from pygaps import ADSORBATE_LIST
 from pygaps import Adsorbate
+from src.models.AdsPropTableModel import AdsPropTableModel
+from src.utilities.tex2svg import tex2svg
+from src.widgets.MetadataEditWidget import MetadataEditWidget
+from src.widgets.MetadataTableView import MetadataTableWidget
+from src.widgets.UtilityWidgets import LabelAlignCenter
+from src.widgets.UtilityWidgets import error_dialog
 
 
 class AdsorbateView(QW.QWidget):

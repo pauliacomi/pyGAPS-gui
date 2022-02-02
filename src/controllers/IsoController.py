@@ -1,10 +1,11 @@
-import pygaps
-from pygaps.utilities.converter_mode import _PRESSURE_MODE, _LOADING_MODE, _MATERIAL_MODE
-from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
-
-from qtpy import QtWidgets as QW
 from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
 
+import pygaps
+from pygaps.utilities.converter_mode import _LOADING_MODE
+from pygaps.utilities.converter_mode import _MATERIAL_MODE
+from pygaps.utilities.converter_mode import _PRESSURE_MODE
+from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
 from src.models.IsoModel import IsoModel
 from src.models.IsoPropTableModel import IsoPropTableModel
 from src.widgets.UtilityWidgets import error_dialog
