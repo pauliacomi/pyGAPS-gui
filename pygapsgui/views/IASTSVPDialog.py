@@ -2,6 +2,7 @@ from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
 from pygapsgui.views.GraphView import GraphView
+from pygapsgui.widgets.RangeGenerator import RangeGenWidget
 from pygapsgui.widgets.SpinBoxSlider import QHSpinBoxSlider
 from pygapsgui.widgets.UtilityWidgets import EditAlignRight
 from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
@@ -39,15 +40,17 @@ class IASTSVPDialog(QW.QDialog):
 
         ## Molar fraction selection
         self.fraction_slider = QHSpinBoxSlider()
-        self.fraction_slider.label.setText("Molar fraction:")
+        self.fraction_slider.label.setText("Fraction:")
+        self.fraction_slider.label.setWordWrap(True)
         self.fraction_slider.label.setMaximumSize(50, 10)
         self.fraction_slider.setRange(0, 1)
         self.fraction_slider.setValue(0.5, emit=False)
         self.options_layout.addWidget(self.fraction_slider, 2, 0, 1, 3)
 
         ## Point selection
-        self.points_button = QW.QPushButton()
-        self.options_layout.addWidget(self.points_button, 3, 0, 1, 3)
+        self.data_table = RangeGenWidget()
+        self.data_table.setMinimumWidth(300)
+        self.options_layout.addWidget(self.data_table, 3, 0, 1, 3)
 
         ## Button to calculate
         self.calc_button = QW.QPushButton()
@@ -80,6 +83,5 @@ class IASTSVPDialog(QW.QDialog):
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("IASTSVPDialog", "IAST: selectivity-pressure calculation", None, -1))
-        self.points_button.setText(QW.QApplication.translate("IASTSVPDialog", "Specify pressure", None, -1))
         self.calc_button.setText(QW.QApplication.translate("IASTSVPDialog", "Calculate", None, -1))
         # yapf: enable

@@ -47,26 +47,12 @@ class IASTSVPModel():
 
         # connect signals
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.points_button.clicked.connect(self.create_points)
+        self.view.data_table.set_data(props=["Pressure"], data=self.pressure_points)
         self.view.calc_button.clicked.connect(self.calc_auto)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
 
         # Calculation
-
-    def create_points(self):
-        from pygapsgui.widgets.RangeGenerator import RangeGenDialog
-        dialog = RangeGenDialog(props=["Pressure"], data=self.pressure_points, parent=self.view)
-        ret = dialog.exec()
-
-        if ret == QW.QDialog.Accepted:
-            points = dialog.widget.data["Pressure"].to_numpy()
-            if points is not None and len(points) > 0:
-                self.pressure_points = points
-                self.view.points_button.setText("Modify pressure")
-            else:
-                self.pressure_points = None
-                self.view.points_button.setText("Specify pressure")
 
     def calc_auto(self):
         """Automatic calculation."""
@@ -79,6 +65,7 @@ class IASTSVPModel():
             self.plot_clear()
 
     def calculate(self):
+        self.pressure_points = self.view.data_table.data["Pressure"].to_numpy()
         if self.pressure_points is None:
             error_dialog("First specify pressure points.")
             return
