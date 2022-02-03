@@ -53,5 +53,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
           name: winbuild_zip
-          path: dist/pyGAPS-gui?.zip
+          path: dist/*.zip
+          if-no-files-found: error
           retention-days: 1
