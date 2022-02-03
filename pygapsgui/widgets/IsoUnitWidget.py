@@ -234,7 +234,7 @@ class IsoUnitWidget(QW.QWidget):
     def translate_UI(self):
         # yapf: disable
         # pylint: disable=line-too-long
-        self.pressure_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure", None, -1))
-        self.loading_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "loading", None, -1))
-        self.material_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "material", None, -1))
+        self.pressure_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure units", None, -1))
+        self.loading_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "loading units", None, -1))
+        self.material_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "material units", None, -1))
         # yapf: enable
