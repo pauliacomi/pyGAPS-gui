@@ -39,3 +39,19 @@ jobs:
       run: |
          cd ./dist/pyGAPS-gui
          pyGAPS-gui.exe
+
+    - name: Compress App
+      run: |
+        cd dist\pyGAPS-gui*
+        $folderName = pwd | Select-Object | %{$_.ProviderPath.Split("\")[-1]}
+        cd ..
+        $zipName = $folderName + '.zip'
+        Compress-Archive $folderName $zipName
+        Write-Host((Get-Item $zipName).length/1MB)
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+          name: winbuild_zip
+          path: dist/pyGAPS-gui?.zip
+          retention-days: 1
