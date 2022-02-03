@@ -35,10 +35,10 @@ jobs:
         ./.venv/Scripts/activate
         pyinstaller pyGAPS-gui.spec
 
-    - name: Run Executable
-      run: |
-         cd ./dist/pyGAPS-gui
-         pyGAPS-gui.exe
+    # - name: Run Executable
+    #   run: |
+    #      cd ./dist/pyGAPS-gui
+    #      pyGAPS-gui.exe
 
     - name: Compress App
       run: |
