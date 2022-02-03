@@ -172,6 +172,8 @@ class MainWindow(QW.QMainWindow):
 
     def area_bet(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.AreaBETModel import AreaBETModel
         from pygapsgui.views.AreaBETDialog import AreaBETDialog
         dialog = AreaBETDialog(parent=self)
@@ -181,6 +183,8 @@ class MainWindow(QW.QMainWindow):
 
     def area_langmuir(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.AreaLangModel import AreaLangModel
         from pygapsgui.views.AreaLangDialog import AreaLangDialog
         dialog = AreaLangDialog(parent=self)
@@ -190,6 +194,8 @@ class MainWindow(QW.QMainWindow):
 
     def t_plot(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.PlotTModel import PlotTModel
         from pygapsgui.views.PlotTDialog import PlotTDialog
         dialog = PlotTDialog(parent=self)
@@ -199,6 +205,8 @@ class MainWindow(QW.QMainWindow):
 
     def alpha_s_plot(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         isotherms = self.iso_model.get_checked()
         if len(isotherms) != 2:
             error_dialog("Select two isotherms: one to characterize and one for reference.")
@@ -224,6 +232,8 @@ class MainWindow(QW.QMainWindow):
 
     def dadr_plot(self, ptype):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.DADRModel import DADRModel
         from pygapsgui.views.DADRDialog import DADRDialog
         dialog = DADRDialog(ptype=ptype, parent=self)
@@ -233,6 +243,8 @@ class MainWindow(QW.QMainWindow):
 
     def psd_micro(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.PSDMicroModel import PSDMicroModel
         from pygapsgui.views.PSDMicroDialog import PSDMicroDialog
         dialog = PSDMicroDialog(parent=self)
@@ -242,6 +254,8 @@ class MainWindow(QW.QMainWindow):
 
     def psd_meso(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.PSDMesoModel import PSDMesoModel
         from pygapsgui.views.PSDMesoDialog import PSDMesoDialog
         dialog = PSDMesoDialog(parent=self)
@@ -251,6 +265,8 @@ class MainWindow(QW.QMainWindow):
 
     def psd_kernel(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.PSDKernelModel import PSDKernelModel
         from pygapsgui.views.PSDKernelDialog import PSDKernelDialog
         dialog = PSDKernelDialog(parent=self)
@@ -273,6 +289,8 @@ class MainWindow(QW.QMainWindow):
 
     def model_by(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.IsoModelByModel import IsoModelByModel
         from pygapsgui.views.IsoModelByDialog import IsoModelByDialog
         dialog = IsoModelByDialog(parent=self)
@@ -288,6 +306,8 @@ class MainWindow(QW.QMainWindow):
 
     def model_guess(self):
         isotherm = self.iso_controller.iso_current
+        if not isotherm:
+            return
         from pygapsgui.models.IsoModelGuessModel import IsoModelGuessModel
         from pygapsgui.views.IsoModelGuessDialog import IsoModelGuessDialog
         dialog = IsoModelGuessDialog(parent=self)

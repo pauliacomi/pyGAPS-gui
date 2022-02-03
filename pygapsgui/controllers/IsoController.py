@@ -213,6 +213,8 @@ class IsoController():
 
     def modify_iso_baseprops(self):
         """Modify one of the current isotherm base properties (material/adsorbate/temperature)."""
+        if not self.iso_current:
+            return
         isotherm = self.iso_current
         modified = False
 
