@@ -2,7 +2,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 setup(
-    name='pygaps-gui',
+    name='pygapsgui',
     use_scm_version={
         'local_scheme': 'dirty-tag',
         'write_to': 'pygapsgui/_version.py',
@@ -13,9 +13,9 @@ setup(
     author="Paul Iacomi",
     author_email='mail@pauliacomi.com',
     url='https://github.com/pauliacomi/pyGAPS-gui',
-    packages=find_packages('pygapsgui'),
-    package_data={'pygaps-gui': ['resources/*']},
-    entry_points={'console_scripts': ['pygaps-gui=pygaps-gui.app:main']},
+    packages=find_packages(),
+    package_data={'pygapsgui': ['resources/*']},
+    entry_points={'console_scripts': ['pygapsgui=pygapsgui:main']},
     classifiers=[  # Classifier list at https://pypi.org/pypi?%3Aaction=list_classifiers
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
@@ -31,13 +31,14 @@ setup(
         'Topic :: Scientific/Engineering :: Chemistry',
     ],
     keywords=['adsorption', 'characterization', 'porous materials'],
-    python_requires='>=3.6',
-    install_requires={
+    python_requires='>=3.8',
+    install_requires=[
         'pyside6',
         'qtpy',
-        'pyGAPS',
-    },
+        'pygaps',
+    ],
     setup_requires=[
+        'setuptools_scm',
         'pyinstaller > 4.0'
     ]
 )

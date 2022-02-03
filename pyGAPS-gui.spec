@@ -5,12 +5,22 @@ import pathlib
 folder = pathlib.Path.cwd()
 
 import pygaps
+import pygapsgui
+
+pgversion = pygaps.__version__
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    pggversion = version("pygapsgui")
+except PackageNotFoundError:
+    pggversion = pygapsgui.__version__
+    pass
 
 pygaps_dir = pathlib.Path(pygaps.__file__).parent
 
 extra_datas = [
     ("pygapsgui/resources", "pygapsgui/resources"),
-    (str(pygaps_dir / "data"), "pyGAPS/data"),
+    (str(pygaps_dir / "data"), "pygaps/data"),
 ]
 
 # Modules that should not be in the distribution
@@ -96,5 +106,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name='pyGAPS-gui',
+    name=f'pyGAPS-gui v{pggversion} (with pyGAPS v{pggversion})',
 )
