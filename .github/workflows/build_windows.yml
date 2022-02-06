@@ -50,7 +50,7 @@ jobs:
         $folderName = pwd
         cd ..\..
         python .\ci\collect_dist.py msi zip $folderName
-        candle.exe .\dist\pyGAPS-gui.wxs
+        candle.exe .\dist\pyGAPS-gui.wxs -o .\dist\pyGAPS-gui.wixobj
         light.exe .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui.msi -ext WixUIExtension.dll
 
     - name: Upload Artifacts
