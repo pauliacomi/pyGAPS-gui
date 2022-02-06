@@ -40,19 +40,16 @@ jobs:
     #      cd ./dist/pyGAPS-gui
     #      pyGAPS-gui.exe
 
-    - name: Compress App
+    - name: Make MSI
       run: |
-        cd dist\pyGAPS-gui*
-        $folderName = pwd | Select-Object | %{$_.ProviderPath.Split("\")[-1]}
-        cd ..
-        $zipName = $folderName + '.zip'
-        Compress-Archive $folderName $zipName
-        Write-Host((Get-Item $zipName).length/1MB)
+        python .\ci\collect_dist.py msi '.\dist\pyGAPS-gui*'
+        candle .\dist\pyGAPS-gui.wxs
+        light .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui.msi -ext WixUIExtension.dll
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
-          name: winbuild_zip
-          path: dist/*.zip
+          name: wininstaller
+          path: dist/*.msi
           if-no-files-found: error
           retention-days: 1

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <Product Id="*"
+             Name="pyGAPS-gui" Version="{major}.{minor}.{micro}"
+             Manufacturer="Paul Iacomi" Language="1033"
+             Codepage="1252"
+             UpgradeCode="d1e78d89-d5fd-4f41-8c84-05d8fa0f2f1d">
+
+        <Package Id="*" Keywords="Scientific, Adsorption"
+                 Description="pyGAPS-gui {major}.{minor}.{micro} Installer"
+                 InstallerVersion="200"
+                 Compressed="yes"
+                 Languages="1033"
+                 SummaryCodepage="1252"
+                 Platform='x86'
+                 Manufacturer="Paul Iacomi" />
+
+        <!-- Useless media tag -->
+        <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
+
+        <!-- Path to upgrade pygaps -->
+        <Upgrade Id='3b4bdb09-19b1-4155-8799-d97fd49f6c05'>
+            <UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND'
+                            Minimum='{major}.{minor}.0' IncludeMinimum='yes'
+                            Maximum='{major}.{minor}.{micro}' IncludeMaximum='no' />
+        </Upgrade>
+
+        <!-- when to uninstall existing installation -->
+        <InstallExecuteSequence>
+            <RemoveExistingProducts After="InstallInitialize"/>
+        </InstallExecuteSequence>
+
+        <!-- Where to install on the target machine -->
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <!-- Main app directory in Program Files -->
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLDIR" Name="pyGAPS-gui" />
+            </Directory>
+            <!-- Shortcut in the Start Menu -->
+            <Directory Id="ProgramMenuFolder" Name="PFiles">
+                <Directory Id="StartMenuShortcutDir" Name="pyGAPS-gui"/>
+            </Directory>
+            <!-- Shortcut in the Desktop -->
+            <Directory Id="DesktopFolder" Name="Desktop" />
+        </Directory>
+
+        <!-- Detailing the components of the main app directory -->
+        <DirectoryRef Id="INSTALLDIR">
+            <Component Id='MainExecutable' Guid='e1d55783-1707-485f-a9e8-a27ffb12c114'>
+                <File Name="pyGAPS-gui.exe" Source="pyGAPS-gui v0.1.dev132+dirty (with pyGAPS v0.1.dev132+dirty)\pyGAPS-gui.exe" Id="MainExecutableExe" />
+            </Component>
+            {distfiles}
+        </DirectoryRef>
+
+        <!-- Detailing the components of Start Menu shortcut -->
+        <DirectoryRef Id="StartMenuShortcutDir">
+            <Component Id="ApplicationStartMenuShortcut" Guid="dd573908-bc26-4f88-9626-c15b87344df5">
+                <Shortcut Id="ApplicationStartMenuShortcut"
+                          Name="pyGAPS-gui"
+                          Description="A framework for adsorption data processing."
+                          Target="[INSTALLDIR]pyGAPS-gui.exe"
+                          WorkingDirectory="INSTALLDIR"
+                          Icon="pyGAPSgui.exe"
+                          IconIndex="0"/>
+                <RemoveFolder Id="StartMenuShortcutDir" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\pyGAPS-gui" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+           </Component>
+        </DirectoryRef>
+
+        <!-- Detailing the components of Desktop shortcut -->
+        <DirectoryRef Id="DesktopFolder">
+            <Component Id="ApplicationDesktopShortcut" Guid="8c149b23-237a-4c41-83ec-c169f600c632">
+                <Shortcut Id="ApplicationDesktopShortcut"
+                          Name="pyGAPS-gui"
+                          Description="A framework for adsorption data processing."
+                          Target="[INSTALLDIR]pyGAPS-gui.exe"
+                          WorkingDirectory="INSTALLDIR"
+                          Icon="pyGAPSgui.exe"
+                          IconIndex="0"/>
+                <RemoveFolder Id="DesktopFolder" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\pyGAPS-gui" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+           </Component>
+        </DirectoryRef>
+
+        <!-- Install features: product install, shortcut etc. -->
+        <Feature Id='Complete' Title="pyGAPS-gui" Description='The complete package.'
+            Display='expand' ConfigurableDirectory="INSTALLDIR" Level='1'>
+
+            <Feature Id="MainProgram" Title="pyGAPS-gui" Description="Install pyGAPS-gui" Level='1'>
+                <ComponentRef Id="MainExecutable" />
+                {distcomponents}
+                <!-- Install the shortcuts -->
+                <ComponentRef Id="ApplicationStartMenuShortcut" />
+                <ComponentRef Id="ApplicationDesktopShortcut" />
+            </Feature>
+
+        </Feature>
+
+        <!-- This is to display a GUI for the installer -->
+        <UIRef Id="WixUI_Mondo" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+
+        <Icon Id="pyGAPSgui.exe" SourceFile="pyGAPS-gui v0.1.dev132+dirty (with pyGAPS v0.1.dev132+dirty)/pyGAPS-gui.exe" />
+
+    </Product>
+</Wix>

@@ -106,5 +106,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name=f'pyGAPS-gui v{pggversion} (with pyGAPS v{pggversion})',
+    name=f'pyGAPS-gui v{pggversion} (with pyGAPS v{pgversion})',
 )
