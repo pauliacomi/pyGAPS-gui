@@ -47,9 +47,9 @@ jobs:
     - name: Make MSI
       run: |
         cd dist\pyGAPS-gui*
-        $folderName = pwd | Select-Object | %{$_.ProviderPath.Split("\")[-1]}
+        $folderName = pwd
         cd ..\..
-        python .\ci\collect_dist.py msi $folderName
+        python .\ci\collect_dist.py msi zip $folderName
         candle.exe .\dist\pyGAPS-gui.wxs
         light.exe .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui.msi -ext WixUIExtension.dll
 
