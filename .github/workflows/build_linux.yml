@@ -25,6 +25,9 @@ jobs:
     - name: Install Apt Dependencies
       run: |
         sudo apt-get update
+        # x-system
+        sudo apt-get install libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
+          libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev
         sudo apt-get install build-essential libgl1-mesa-dev
 
     - name: Create venv
@@ -47,7 +50,7 @@ jobs:
 
     - name: Compress Executable
       run: |
-        export DIST_FOLDER=$(ls ./dist | grep pyGAPS)
+        export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui ")
         echo $DIST_FOLDER
         tar -zcvf $DIST_FOLDER.tar.gz $DIST_FOLDER
         du -sh $DIST_FOLDER.tar.gz
