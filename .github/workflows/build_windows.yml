@@ -13,27 +13,27 @@ jobs:
       with:
         python-version: 3.8
 
-    # - name: Use Cache
-    #   id: cache-venv
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: ./.venv/
-    #     key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-venv-
+    - name: Use Cache
+      id: cache-venv
+      uses: actions/cache@v2
+      with:
+        path: ./.venv/
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-venv-
 
-    # - name: Create venv
-    #   run: |
-    #     python -m venv ./.venv
-    #     ./.venv/Scripts/activate
-    #     pip install -r requirements.txt
-    #     pip install .
-    #   if: steps.cache-venv.outputs.cache-hit != 'true'
+    - name: Create venv
+      run: |
+        python -m venv ./.venv
+        ./.venv/Scripts/activate
+        pip install -r requirements.txt
+        pip install .
+      if: steps.cache-venv.outputs.cache-hit != 'true'
 
-    # - name: Run PyInstaller
-    #   run: |
-    #     ./.venv/Scripts/activate
-    #     pyinstaller pyGAPS-gui.spec
+    - name: Run PyInstaller
+      run: |
+        ./.venv/Scripts/activate
+        pyinstaller pyGAPS-gui.spec
 
     # - name: Run Executable
     #   run: |
