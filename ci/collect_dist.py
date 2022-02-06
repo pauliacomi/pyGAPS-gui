@@ -144,6 +144,8 @@ def msi(dist_dir, work_dir):
     print("Constructing WiX Components XML")
     print("Distribution dir:", dist_dir)
     print("Target dir:", work_dir)
+    _, distdirname = os.path.split(dist_dir)
+    print("Distribution dir name:", distdirname)
     files, refs = construct_msi_strings(dist_dir, work_dir)
 
     # Read in the WiX template
@@ -161,6 +163,7 @@ def msi(dist_dir, work_dir):
                 major=sys.version_info.major,
                 minor=sys.version_info.minor,
                 micro=sys.version_info.micro,
+                distdir=distdirname,
                 distfiles=files,
                 distcomponents=refs
             )

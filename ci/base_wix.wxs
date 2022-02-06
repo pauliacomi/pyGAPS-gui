@@ -50,7 +50,7 @@
         <!-- Detailing the components of the main app directory -->
         <DirectoryRef Id="INSTALLDIR">
             <Component Id='MainExecutable' Guid='e1d55783-1707-485f-a9e8-a27ffb12c114'>
-                <File Name="pyGAPS-gui.exe" Source="pyGAPS-gui v0.1.dev132+dirty (with pyGAPS v0.1.dev132+dirty)\pyGAPS-gui.exe" Id="MainExecutableExe" />
+                <File Name="pyGAPS-gui.exe" Source="{distdir}\pyGAPS-gui.exe" Id="MainExecutableExe" />
             </Component>
             {distfiles}
         </DirectoryRef>
@@ -104,7 +104,7 @@
         <UIRef Id="WixUI_ErrorProgressText" />
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
 
-        <Icon Id="pyGAPSgui.exe" SourceFile="pyGAPS-gui v0.1.dev132+dirty (with pyGAPS v0.1.dev132+dirty)/pyGAPS-gui.exe" />
+        <Icon Id="pyGAPSgui.exe" SourceFile="{distdir}/pyGAPS-gui.exe" />
 
     </Product>
 </Wix>
