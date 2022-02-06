@@ -42,10 +42,10 @@ jobs:
 
     - name: Compress Executable
       run: |
-        export DIST_FOLDER=$(ls ./dist | grep pyGAPS)
+        export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui ")
         echo $DIST_FOLDER
-        tar -zcvf $DIST_FOLDER.tar.gz $DIST_FOLDER
-        du -sh $DIST_FOLDER.tar.gz
+        tar -zcvf "$DIST_FOLDER.tar.gz" "$DIST_FOLDER"
+        du -sh "$DIST_FOLDER.tar.gz"
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2

@@ -25,10 +25,13 @@ jobs:
     - name: Install Apt Dependencies
       run: |
         sudo apt-get update
+
+        sudo apt-get install libglib2.0-0
+        sudo apt-get install build-essential libdbus-1-dev libgl1-mesa-dev libegl-mesa0
+
         # x-system
         sudo apt-get install libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
           libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev
-        sudo apt-get install build-essential libgl1-mesa-dev
 
     - name: Create venv
       run: |
@@ -52,8 +55,8 @@ jobs:
       run: |
         export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui ")
         echo $DIST_FOLDER
-        tar -zcvf $DIST_FOLDER.tar.gz $DIST_FOLDER
-        du -sh $DIST_FOLDER.tar.gz
+        tar -zcvf "$DIST_FOLDER.tar.gz" "$DIST_FOLDER"
+        du -sh "$DIST_FOLDER.tar.gz"
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
