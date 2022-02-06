@@ -5,7 +5,6 @@ import pathlib
 folder = pathlib.Path.cwd()
 
 import pygaps
-import pygapsgui
 
 pgversion = pygaps.__version__
 from importlib.metadata import version, PackageNotFoundError
@@ -13,8 +12,8 @@ from importlib.metadata import version, PackageNotFoundError
 try:
     pggversion = version("pygapsgui")
 except PackageNotFoundError:
+    import pygapsgui
     pggversion = pygapsgui.__version__
-    pass
 
 pygaps_dir = pathlib.Path(pygaps.__file__).parent
 
