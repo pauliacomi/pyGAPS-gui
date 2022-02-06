@@ -29,11 +29,13 @@ import xml.dom.minidom
 import uuid
 from io import StringIO
 
-dest = "ldist"
-dist = "pyGAPS-gui v0.1.dev132+dirty (with pyGAPS v0.1.dev132+dirty)"
-# dist = 'LPython-{0}.{1}.{2}'.format(
-#     sys.version_info.major, sys.version_info.minor, sys.version_info.micro
-# )
+import pygapsgui
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    pggversion = version("pygapsgui")
+except PackageNotFoundError:
+    pggversion = pygapsgui.__version__
 
 
 def zipit(fullpath):
@@ -157,15 +159,18 @@ def msi(dist_dir, work_dir):
     # Write out the WiX file to the parent directory of the distro
     print("Generating WiX Input File")
     out_wix_path = os.path.join(work_dir, 'pyGAPS-gui.wxs')
+    major, minor, micro = pggversion.split(".")
+    if not micro.isnumeric():
+        micro = 1
     with open(out_wix_path, "w", encoding="utf8") as f:
         f.write(
             template.format(
-                major=sys.version_info.major,
-                minor=sys.version_info.minor,
-                micro=sys.version_info.micro,
+                major=major,
+                minor=minor,
+                micro=micro,
                 distdir=distdirname,
                 distfiles=files,
-                distcomponents=refs
+                distcomponents=refs,
             )
         )
 

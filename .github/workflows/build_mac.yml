@@ -1,10 +1,10 @@
-name: CD-WINDOWS
+name: CD-MAC
 
 on: [push]
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build-mac:
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -30,33 +30,28 @@ jobs:
         pip install .
       if: steps.cache-venv.outputs.cache-hit != 'true'
 
-    # - name: Run PyInstaller
+    - name: Run PyInstaller
+      run: |
+        ./.venv/Scripts/activate
+        pyinstaller pyGAPS-gui.spec
+
+    # - name: Run Executable
     #   run: |
-    #     ./.venv/Scripts/activate
-    #     pyinstaller pyGAPS-gui.spec
+    #      cd ./dist/pyGAPS-gui*
+    #      ./pyGAPS-gui.exe
 
-    - name: Run Executable
+    - name: Compress Executable
       run: |
-         cd ./dist/pyGAPS-gui*
-         pyGAPS-gui.exe
-
-    - name: Set path for candle and light
-      run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
-      shell: bash
-
-    - name: Make MSI
-      run: |
-        cd dist\pyGAPS-gui*
-        $folderName = pwd
-        cd ..\..
-        python .\ci\collect_dist.py msi zip $folderName
-        candle.exe .\dist\pyGAPS-gui.wxs -o .\dist\pyGAPS-gui.wixobj
-        light.exe .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui.msi -ext WixUIExtension.dll
+        export DIST_FOLDER=$(ls ./dist | grep pyGAPS)
+        echo $DIST_FOLDER
+        tar -zcvf $DIST_FOLDER.tar.gz $DIST_FOLDER
+        du -sh $DIST_FOLDER.tar.gz
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
-          name: wininstaller
-          path: dist/*.msi
+          name: mac
+          path: dist/*.tar.gz
           if-no-files-found: error
           retention-days: 1
+

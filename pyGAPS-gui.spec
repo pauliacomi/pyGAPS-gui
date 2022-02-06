@@ -19,6 +19,8 @@ except PackageNotFoundError:
 pygaps_dir = pathlib.Path(pygaps.__file__).parent
 
 extra_datas = [
+    ("LICENSE", "."),
+    ("LICENSE.rtf", "."),
     ("pygapsgui/resources", "pygapsgui/resources"),
     (str(pygaps_dir / "data"), "pygaps/data"),
 ]

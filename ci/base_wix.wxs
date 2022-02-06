@@ -37,7 +37,7 @@
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <!-- Main app directory in Program Files -->
             <Directory Id="ProgramFilesFolder">
-                <Directory Id="INSTALLDIR" Name="pyGAPS-gui" />
+                <Directory Id="APPLICATIONFOLDER" Name="pyGAPS-gui" />
             </Directory>
             <!-- Shortcut in the Start Menu -->
             <Directory Id="ProgramMenuFolder" Name="PFiles">
@@ -48,7 +48,7 @@
         </Directory>
 
         <!-- Detailing the components of the main app directory -->
-        <DirectoryRef Id="INSTALLDIR">
+        <DirectoryRef Id="APPLICATIONFOLDER">
             <Component Id='MainExecutable' Guid='e1d55783-1707-485f-a9e8-a27ffb12c114'>
                 <File Name="pyGAPS-gui.exe" Source="{distdir}\pyGAPS-gui.exe" Id="MainExecutableExe" />
             </Component>
@@ -61,8 +61,8 @@
                 <Shortcut Id="ApplicationStartMenuShortcut"
                           Name="pyGAPS-gui"
                           Description="A framework for adsorption data processing."
-                          Target="[INSTALLDIR]pyGAPS-gui.exe"
-                          WorkingDirectory="INSTALLDIR"
+                          Target="[APPLICATIONFOLDER]pyGAPS-gui.exe"
+                          WorkingDirectory="APPLICATIONFOLDER"
                           Icon="pyGAPSgui.exe"
                           IconIndex="0"/>
                 <RemoveFolder Id="StartMenuShortcutDir" On="uninstall"/>
@@ -76,8 +76,8 @@
                 <Shortcut Id="ApplicationDesktopShortcut"
                           Name="pyGAPS-gui"
                           Description="A framework for adsorption data processing."
-                          Target="[INSTALLDIR]pyGAPS-gui.exe"
-                          WorkingDirectory="INSTALLDIR"
+                          Target="[APPLICATIONFOLDER]pyGAPS-gui.exe"
+                          WorkingDirectory="APPLICATIONFOLDER"
                           Icon="pyGAPSgui.exe"
                           IconIndex="0"/>
                 <RemoveFolder Id="DesktopFolder" On="uninstall"/>
@@ -87,7 +87,7 @@
 
         <!-- Install features: product install, shortcut etc. -->
         <Feature Id='Complete' Title="pyGAPS-gui" Description='The complete package.'
-            Display='expand' ConfigurableDirectory="INSTALLDIR" Level='1'>
+            Display='expand' ConfigurableDirectory="APPLICATIONFOLDER" Level='1'>
 
             <Feature Id="MainProgram" Title="pyGAPS-gui" Description="Install pyGAPS-gui" Level='1'>
                 <ComponentRef Id="MainExecutable" />
@@ -100,11 +100,14 @@
         </Feature>
 
         <!-- This is to display a GUI for the installer -->
-        <UIRef Id="WixUI_Mondo" />
+        <UIRef Id="WixUI_Advanced" />
         <UIRef Id="WixUI_ErrorProgressText" />
-        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+        <Property Id="ApplicationFolderName" Value="pyGAPS-gui" />
+        <Property Id="WixAppFolder" Value="WixPerUserFolder" />
+        <WixVariable Id="WixUILicenseRtf" Value="{distdir}/LICENSE.rtf" />
+        <!-- <WixVariable Id="WixUIBannerBmp" Value="{distdir}/pygapsgui/resources/main_icon.bmp" /> -->
 
-        <Icon Id="pyGAPSgui.exe" SourceFile="{distdir}/pyGAPS-gui.exe" />
+        <Icon Id="pyGAPSgui.exe" SourceFile="{distdir}/pygapsgui/resources/main_icon.ico" />
 
     </Product>
 </Wix>
