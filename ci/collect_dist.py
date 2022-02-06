@@ -167,11 +167,10 @@ def msi(dist_dir, work_dir):
         )
 
 
-def main(cmds, distpath):
+def main(cmds, dist_dir):
     """Main entrypoint."""
 
     # The working dir is where our file will be written
-    dist_dir = os.path.dirname(distpath)
     work_dir, _ = os.path.split(dist_dir)
 
     for cmd in cmds:
