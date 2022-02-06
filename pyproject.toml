@@ -9,4 +9,4 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "pygapsgui/_version.py"
 local_scheme = 'dirty-tag'
-fallback_version = '3.1.0'
+fallback_version = '0.2.0'
