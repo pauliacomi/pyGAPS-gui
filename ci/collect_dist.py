@@ -60,7 +60,6 @@ def gen_wix_id():
 
 def construct_msi_strings(dist_dir, work_dir):
     """Make strings for MSI."""
-    print(dist_dir)
 
     doc = xml.dom.minidom.Document()
 
@@ -143,6 +142,8 @@ def msi(dist_dir, work_dir):
 
     # First build the XML components
     print("Constructing WiX Components XML")
+    print("Distribution dir:", dist_dir)
+    print("Target dir:", work_dir)
     files, refs = construct_msi_strings(dist_dir, work_dir)
 
     # Read in the WiX template
