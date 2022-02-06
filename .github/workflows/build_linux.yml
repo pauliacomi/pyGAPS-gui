@@ -30,7 +30,7 @@ jobs:
     - name: Create venv
       run: |
         python -m venv ./.venv
-        source ./.venvlin/bin/activate
+        source ./.venv/bin/activate
         pip install -r requirements.txt
         pip install .
       if: steps.cache-venv.outputs.cache-hit != 'true'
