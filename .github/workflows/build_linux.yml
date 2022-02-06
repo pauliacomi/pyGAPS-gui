@@ -22,10 +22,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-venv-
 
+    - name: Install Apt Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install build-essential libgl1-mesa-dev
+
     - name: Create venv
       run: |
         python -m venv ./.venv
-        source ./.venv/bin/activate
+        source ./.venvlin/bin/activate
         pip install -r requirements.txt
         pip install .
       if: steps.cache-venv.outputs.cache-hit != 'true'
