@@ -48,8 +48,8 @@ jobs:
     - name: Make MSI
       run: |
         python .\ci\collect_dist.py msi '.\dist\pyGAPS-gui*'
-        candle .\dist\pyGAPS-gui.wxs
-        light .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui.msi -ext WixUIExtension.dll
+        candle.exe .\dist\pyGAPS-gui.wxs
+        light.exe .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui.msi -ext WixUIExtension.dll
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
