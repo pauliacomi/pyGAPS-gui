@@ -1,4 +1,4 @@
-name: CD-WINDOWS
+name: Deploy Win
 
 on: [push]
 
@@ -30,15 +30,15 @@ jobs:
         pip install .
       if: steps.cache-venv.outputs.cache-hit != 'true'
 
-    # - name: Run PyInstaller
-    #   run: |
-    #     ./.venv/Scripts/activate
-    #     pyinstaller pyGAPS-gui.spec
-
-    - name: Run Executable
+    - name: Run PyInstaller
       run: |
-         cd ./dist/pyGAPS-gui*
-         pyGAPS-gui.exe
+        ./.venv/Scripts/activate
+        pyinstaller pyGAPS-gui.spec
+
+    # - name: Run Executable
+    #   run: |
+    #      cd ./dist/pyGAPS-gui*
+    #      pyGAPS-gui.exe
 
     - name: Set path for candle and light
       run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH

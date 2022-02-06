@@ -1,4 +1,4 @@
-name: CD-LINUX
+name: Deploy Linux
 
 on: [push]
 
@@ -25,14 +25,14 @@ jobs:
     - name: Create venv
       run: |
         python -m venv ./.venv
-        ./.venv/Scripts/activate
+        source ./.venv/bin/activate
         pip install -r requirements.txt
         pip install .
       if: steps.cache-venv.outputs.cache-hit != 'true'
 
     - name: Run PyInstaller
       run: |
-        ./.venv/Scripts/activate
+        source ./.venv/bin/activate
         pyinstaller pyGAPS-gui.spec
 
     # - name: Run Executable
