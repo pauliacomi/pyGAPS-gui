@@ -40,6 +40,11 @@ jobs:
     #      cd ./dist/pyGAPS-gui
     #      pyGAPS-gui.exe
 
+    - name: Set path for candle and light
+      env:
+        WIX_PATH: ${{ env.wix }}
+      run: echo "$env:WIX_PATH\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: Make MSI
       run: |
         python .\ci\collect_dist.py msi '.\dist\pyGAPS-gui*'
