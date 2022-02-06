@@ -11,6 +11,7 @@ from pygapsgui.widgets.UtilityWidgets import error_dialog
 
 
 class IsoModelByModel():
+    """Model an isotherm by a specific model."""
 
     isotherm = None
     model_isotherm = None

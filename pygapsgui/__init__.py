@@ -25,9 +25,11 @@ def exception_hook(exctype, exc, trace):
 
 
 # Resources
-def get_resource(file):
+def get_res_path(file, ftype=None):
     """Convenience function to locate resources"""
-    return pathlib.Path(__file__).parent / 'resources' / file
+    if ftype:
+        return str(pathlib.Path(__file__).parent / 'resources' / ftype / file)
+    return str(pathlib.Path(__file__).parent / 'resources' / file)
 
 
 def process_cl_args():
@@ -86,8 +88,8 @@ def main():
     # app.paletteChanged.connect(sync_theme_with_system)
     # sync_theme_with_system()
     icon = QG.QIcon()
-    icon.addFile('./pygapsgui/resources/main_icon.png', QC.QSize(48, 48))
-    icon.addFile('./pygapsgui/resources/main_icon.png', QC.QSize(100, 100))
+    icon.addFile(get_res_path('main_icon.png'), QC.QSize(48, 48))
+    icon.addFile(get_res_path('main_icon.png'), QC.QSize(100, 100))
     app.setWindowIcon(icon)
 
     # Init pygaps

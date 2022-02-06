@@ -5,10 +5,11 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
-from .. import get_resource
+from pygapsgui import get_res_path
 
 
 class IsoGraphToolbar(NavigationToolbar):
+    """Subclass a MPL navigation toolbar to add extra buttons."""
 
     logx = QC.Signal(bool)
     logy = QC.Signal(bool)
@@ -34,7 +35,7 @@ class IsoGraphToolbar(NavigationToolbar):
         Otherwas pass it to the main function.
         """
         if name.startswith("pg"):
-            pm = QG.QPixmap(str(get_resource(name[3:])))
+            pm = QG.QPixmap(get_res_path(name[3:], "icons"))
             _setDevicePixelRatio(pm, _devicePixelRatioF(self))
             if self.palette().color(self.backgroundRole()).value() < 128:
                 icon_color = self.palette().color(self.foregroundRole())
@@ -46,6 +47,7 @@ class IsoGraphToolbar(NavigationToolbar):
             return super()._icon(name)
 
     def get_main_ax(self):
+        """Get the first ax in figure axes."""
         axes = self.canvas.figure.get_axes()
         if not axes:
             QW.QMessageBox.warning(self.canvas.parent(), "Error", "There are no axes to edit.")
@@ -55,6 +57,7 @@ class IsoGraphToolbar(NavigationToolbar):
         return ax
 
     def get_ax(self):
+        """Interactive popup for the user to select one ax."""
         axes = self.canvas.figure.get_axes()
         if not axes:
             QW.QMessageBox.warning(self.canvas.parent(), "Error", "There are no axes to edit.")
@@ -80,9 +83,11 @@ class IsoGraphToolbar(NavigationToolbar):
         return ax, len(axes)
 
     def axis_data(self):
+        """Functionality to select which data is plotted on an axes."""
         self.axis_data_sel.emit()
 
     def log_x(self):
+        """Functionality to log the x-axis."""
         # Get axis
         axes = self.get_main_ax()
 
@@ -108,6 +113,7 @@ class IsoGraphToolbar(NavigationToolbar):
         self.logx.emit(logx)
 
     def log_y(self):
+        """Functionality to log one of the y-axes."""
         # Get axis
         axes, naxes = self.get_ax()
         if not axes:

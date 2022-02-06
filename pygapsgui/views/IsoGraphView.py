@@ -151,6 +151,7 @@ class IsoListGraphView(IsoGraphView):
 
 
 class IsoModelGraphView(IsoGraphView):
+    """Subclass that plots an extra model isotherm."""
 
     model_isotherm = None
     branch: str = "ads"
@@ -168,6 +169,17 @@ class IsoModelGraphView(IsoGraphView):
                 lgd_pos=None,
             )
             if self.model_isotherm:
+                points_dict = {}
+                if self.model_isotherm.model.calculates == "loading":
+                    points_dict['x_points'] = self.isotherms[0].pressure(
+                        branch=self.branch,
+                        limits=self.model_isotherm.model.pressure_range,
+                    )
+                else:
+                    points_dict['y1_points'] = self.isotherms[0].loading(
+                        branch=self.branch,
+                        limits=self.model_isotherm.model.loading_range,
+                    )
                 pgg.plot_iso(
                     self.model_isotherm,
                     ax=self.ax,
@@ -176,11 +188,7 @@ class IsoModelGraphView(IsoGraphView):
                     logy1=self.logy,
                     lgd_pos=None,
                     color="r",
-                    # TODO does not work if model calculates pressure
-                    x_points=self.isotherms[0].pressure(
-                        branch=self.branch,
-                        limits=self.model_isotherm.model.pressure_range,
-                    )
+                    **points_dict,
                 )
             self.ax.autoscale()  # auto-scale
         self.canvas.draw_idle()
