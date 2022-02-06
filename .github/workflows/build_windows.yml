@@ -1,6 +1,7 @@
 name: Deploy Win
 
-on: [push]
+on:
+  [create, push, pull_request, workflow_dispatch]
 
 jobs:
   build-windows:
@@ -61,3 +62,9 @@ jobs:
           path: dist/*.msi
           if-no-files-found: error
           retention-days: 1
+
+    - name: GH 🐱🐙 Release
+      uses: softprops/action-gh-release@v1
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+      with:
+        files: .\dist\pyGAPS-gui.msi

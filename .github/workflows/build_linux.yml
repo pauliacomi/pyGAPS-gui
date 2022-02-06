@@ -58,10 +58,10 @@ jobs:
         tar -zcvf "./dist/${DIST_FOLDER}.tar.gz" "./dist/${DIST_FOLDER}"
         du -sh "./dist/${DIST_FOLDER}.tar.gz"
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-          name: mac
-          path: dist/*.tar.gz
-          if-no-files-found: error
-          retention-days: 1
+    # - name: Upload Artifacts
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #       name: linux
+    #       path: dist/*.tar.gz
+    #       if-no-files-found: error
+    #       retention-days: 1
