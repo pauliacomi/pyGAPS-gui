@@ -37,20 +37,20 @@ except PackageNotFoundError:
     pggversion = pygapsgui.__version__
 
 
-def zipit(fullpath):
+def zipit(dist_dir, work_dir):
     """Zip folder."""
     print("Zipping...")
-    if os.path.exists(fullpath + '.zip'):
-        os.remove(fullpath + '.zip')
+    if os.path.exists(dist_dir + '.zip'):
+        os.remove(dist_dir + '.zip')
 
-    with zipfile.ZipFile(fullpath + '.zip', 'w', compression=zipfile.ZIP_DEFLATED) as zf:
-        for root, dirs, files in os.walk(fullpath):
+    with zipfile.ZipFile(dist_dir + '.zip', 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+        for root, dirs, files in os.walk(dist_dir):
             for f in files:
                 diskname = os.path.join(root, f)
                 zipname = os.path.relpath(diskname)
                 zf.write(diskname, arcname=zipname)
 
-    print("Distribution is located at {0}".format(fullpath + '.zip'))
+    print("Distribution is located at {0}".format(dist_dir + '.zip'))
 
 
 def gen_wix_id():
@@ -182,7 +182,7 @@ def main(cmds, dist_dir):
 
     for cmd in cmds:
         if cmd == 'zip':
-            zipit(dist_dir)
+            zipit(dist_dir, work_dir)
         elif cmd == 'msi':
             msi(dist_dir, work_dir)
 
