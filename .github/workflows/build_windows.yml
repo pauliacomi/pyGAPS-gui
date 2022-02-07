@@ -67,4 +67,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       with:
-        files: .\dist\pyGAPS-gui-win-x86_64.msi
+        files: |
+          .\dist\pyGAPS-gui-win-x86_64.msi
+          .\dist\pyGAPS-gui-win-x86_64.zip

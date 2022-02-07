@@ -20,7 +20,6 @@
 # This script will deploy the python distribution to a folder, laid out just like
 # reference Python, and then zip up the result or create XML inputs for WiX.
 
-import sys
 import os
 import os.path
 import zipfile
@@ -29,12 +28,12 @@ import xml.dom.minidom
 import uuid
 from io import StringIO
 
-import pygapsgui
 from importlib.metadata import version, PackageNotFoundError
 
 try:
     pggversion = version("pygapsgui")
 except PackageNotFoundError:
+    import pygapsgui
     pggversion = pygapsgui.__version__
 
 
@@ -44,13 +43,12 @@ def zipit(fullpath):
     if os.path.exists(fullpath + '.zip'):
         os.remove(fullpath + '.zip')
 
-    zf = zipfile.ZipFile(fullpath + '.zip', 'w', compression=zipfile.ZIP_DEFLATED)
-    for root, dirs, files in os.walk(fullpath):
-        for f in files:
-            diskname = os.path.join(root, f)
-            zipname = os.path.relpath(diskname, dest)
-            zf.write(diskname, arcname=zipname)
-    zf.close()
+    with zipfile.ZipFile(fullpath + '.zip', 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+        for root, dirs, files in os.walk(fullpath):
+            for f in files:
+                diskname = os.path.join(root, f)
+                zipname = os.path.relpath(diskname)
+                zf.write(diskname, arcname=zipname)
 
     print("Distribution is located at {0}".format(fullpath + '.zip'))
 
