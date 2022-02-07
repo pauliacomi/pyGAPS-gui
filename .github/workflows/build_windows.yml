@@ -28,12 +28,12 @@ jobs:
         python -m venv ./.venv
         ./.venv/Scripts/activate
         pip install -r requirements.txt
-        pip install .
       if: steps.cache-venv.outputs.cache-hit != 'true'
 
     - name: Run PyInstaller
       run: |
         ./.venv/Scripts/activate
+        pip install .
         pyinstaller pyGAPS-gui.spec
 
     # - name: Run Executable
@@ -45,7 +45,7 @@ jobs:
       run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
       shell: bash
 
-    - name: Make MSI
+    - name: Make MSI + ZIP
       run: |
         ./.venv/Scripts/activate
         cd dist\pyGAPS-gui*
@@ -54,6 +54,7 @@ jobs:
         python .\ci\collect_dist.py msi zip $folderName
         candle.exe .\dist\pyGAPS-gui.wxs -o .\dist\pyGAPS-gui.wixobj
         light.exe .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui-win-x86_64.msi -ext WixUIExtension.dll
+        Rename-Item -Path $folderName -NewName "pyGAPS-gui-win-x86_64.zip"
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
