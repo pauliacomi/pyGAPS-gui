@@ -159,15 +159,16 @@ def msi(dist_dir, work_dir):
     # Write out the WiX file to the parent directory of the distro
     print("Generating WiX Input File")
     out_wix_path = os.path.join(work_dir, 'pyGAPS-gui.wxs')
-    major, minor, micro = pggversion.split(".")
-    if not micro.isnumeric():
-        micro = 1
+    version_tuple = pggversion.split(".")
+    print(
+        f"Generated WiX file for version: {version_tuple[0]}.{version_tuple[1]}.{version_tuple[2]}"
+    )
     with open(out_wix_path, "w", encoding="utf8") as f:
         f.write(
             template.format(
-                major=major,
-                minor=minor,
-                micro=micro,
+                major=version_tuple[0],
+                minor=version_tuple[1],
+                micro=version_tuple[2],
                 distdir=distdirname,
                 distfiles=files,
                 distcomponents=refs,

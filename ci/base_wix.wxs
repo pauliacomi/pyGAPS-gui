@@ -1,47 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<?define ProductName="pyGAPS-gui" ?>
+<?define ProductVersion="{major}.{minor}.{micro}" ?>
+<?define UpgradeCode="3b4bdb09-19b1-4155-8799-d97fd49f6c05" ?>
+<?define Manufacturer="Paul Iacomi" ?>
+
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
+    <?if $(sys.BUILDARCH)="x86"?>
+        <?define Program_Files="ProgramFilesFolder"?>
+    <?elseif $(sys.BUILDARCH)="x64"?>
+        <?define Program_Files="ProgramFiles64Folder"?>
+    <?else?>
+        <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
+    <?endif?>
+
     <Product Id="*"
-             Name="pyGAPS-gui" Version="{major}.{minor}.{micro}"
-             Manufacturer="Paul Iacomi" Language="1033"
+             Name="$(var.ProductName)" Version="$(var.ProductVersion)"
+             Manufacturer="$(var.Manufacturer)" Language="1033"
              Codepage="1252"
-             UpgradeCode="d1e78d89-d5fd-4f41-8c84-05d8fa0f2f1d">
+             UpgradeCode="$(var.UpgradeCode)">
 
         <Package Id="*" Keywords="Scientific, Adsorption"
-                 Description="pyGAPS-gui {major}.{minor}.{micro} Installer"
-                 InstallerVersion="200"
+                 Description="Windows Installer for $(var.ProductName) $(var.ProductVersion)"
+                 InstallerVersion="500"
                  Compressed="yes"
                  Languages="1033"
                  SummaryCodepage="1252"
-                 Platform='x86'
-                 Manufacturer="Paul Iacomi" />
+                 AdminImage="no"
+                 ReadOnly="yes"
+                 Manufacturer="$(var.Manufacturer)" />
 
-        <!-- Useless media tag -->
-        <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
+        <!-- Package archive properties -->
+        <Media Id="1" Cabinet="product.cab" EmbedCab="yes" CompressionLevel="high"/>
 
         <!-- Path to upgrade pygaps -->
-        <Upgrade Id='3b4bdb09-19b1-4155-8799-d97fd49f6c05'>
-            <UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND'
-                            Minimum='{major}.{minor}.0' IncludeMinimum='yes'
-                            Maximum='{major}.{minor}.{micro}' IncludeMaximum='no' />
+        <Upgrade Id='$(var.UpgradeCode)'>
+            <UpgradeVersion OnlyDetect="yes"
+                            Minimum="$(var.ProductVersion)"
+                            IncludeMinimum="no"
+                            Property="NEWER_VERSION_FOUND" />
+            <UpgradeVersion Minimum="0.0.0.0"
+                            IncludeMinimum="yes"
+                            Maximum="$(var.ProductVersion)"
+                            IncludeMaximum="no"
+                            Property="OLDER_VERSION_FOUND" />
         </Upgrade>
 
         <!-- when to uninstall existing installation -->
+        <CustomAction Id="NewerVersionFound" Error="A newer version of $(var.ProductName) is already installed!" />
         <InstallExecuteSequence>
+            <Custom Action="NewerVersionFound" After="FindRelatedProducts">   <![CDATA[NEWER_VERSION_FOUND]]> </Custom>
             <RemoveExistingProducts After="InstallInitialize"/>
         </InstallExecuteSequence>
 
         <!-- Where to install on the target machine -->
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <!-- Main app directory in Program Files -->
-            <Directory Id="ProgramFilesFolder">
-                <Directory Id="APPLICATIONFOLDER" Name="pyGAPS-gui" />
+            <Directory Id="LocalAppData">
+                <Directory Id="APPLICATIONFOLDER" Name="$(var.ProductName)" />
             </Directory>
             <!-- Shortcut in the Start Menu -->
-            <Directory Id="ProgramMenuFolder" Name="PFiles">
-                <Directory Id="StartMenuShortcutDir" Name="pyGAPS-gui"/>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="StartMenuShortcutDir" Name="$(var.ProductName)"/>
             </Directory>
             <!-- Shortcut in the Desktop -->
             <Directory Id="DesktopFolder" Name="Desktop" />
@@ -59,7 +81,7 @@
         <DirectoryRef Id="StartMenuShortcutDir">
             <Component Id="ApplicationStartMenuShortcut" Guid="dd573908-bc26-4f88-9626-c15b87344df5">
                 <Shortcut Id="ApplicationStartMenuShortcut"
-                          Name="pyGAPS-gui"
+                          Name="$(var.ProductName)"
                           Description="A framework for adsorption data processing."
                           Target="[APPLICATIONFOLDER]pyGAPS-gui.exe"
                           WorkingDirectory="APPLICATIONFOLDER"
@@ -74,7 +96,7 @@
         <DirectoryRef Id="DesktopFolder">
             <Component Id="ApplicationDesktopShortcut" Guid="8c149b23-237a-4c41-83ec-c169f600c632">
                 <Shortcut Id="ApplicationDesktopShortcut"
-                          Name="pyGAPS-gui"
+                          Name="$(var.ProductName)"
                           Description="A framework for adsorption data processing."
                           Target="[APPLICATIONFOLDER]pyGAPS-gui.exe"
                           WorkingDirectory="APPLICATIONFOLDER"
@@ -86,10 +108,10 @@
         </DirectoryRef>
 
         <!-- Install features: product install, shortcut etc. -->
-        <Feature Id='Complete' Title="pyGAPS-gui" Description='The complete package.'
+        <Feature Id='Complete' Title="$(var.ProductName)" Description='The complete package.'
             Display='expand' ConfigurableDirectory="APPLICATIONFOLDER" Level='1'>
 
-            <Feature Id="MainProgram" Title="pyGAPS-gui" Description="Install pyGAPS-gui" Level='1'>
+            <Feature Id="MainProgram" Title="$(var.ProductName)" Description="Install pyGAPS-gui" Level='1'>
                 <ComponentRef Id="MainExecutable" />
                 {distcomponents}
                 <!-- Install the shortcuts -->
@@ -99,15 +121,25 @@
 
         </Feature>
 
+        <Property Id="MSIINSTALLPERUSER" Value="1" />
+        <Property Id="ALLUSERS" Value="2" />
         <!-- This is to display a GUI for the installer -->
-        <UIRef Id="WixUI_Advanced" />
+        <UI>
+            <UIRef Id="WixUI_Advanced" />
+            <!-- https://stackoverflow.com/questions/56400973/why-does-my-msi-prompt-for-administrator-rights -->
+            <Publish Dialog="InstallScopeDlg" Control="Next" Property="MSIINSTALLPERUSER" Value="1" Order="3">WixAppFolder = "WixPerUserFolder"</Publish>
+            <Publish Dialog="InstallScopeDlg" Control="Next" Property="MSIINSTALLPERUSER" Value="{{}}" Order="2">WixAppFolder = "WixPerMachineFolder"</Publish>
+            <Publish Dialog="InstallScopeDlg" Control="Next" Event="DoAction" Value="WixSetDefaultPerMachineFolder" Order="3">WixAppFolder = "WixPerMachineFolder"</Publish>
+            <Publish Dialog="InstallScopeDlg" Control="Next" Event="DoAction" Value="WixSetDefaultPerUserFolder" Order="3">WixAppFolder = "WixPerUserFolder"</Publish>
+        </UI>
         <UIRef Id="WixUI_ErrorProgressText" />
-        <Property Id="ApplicationFolderName" Value="pyGAPS-gui" />
+        <Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
         <Property Id="WixAppFolder" Value="WixPerUserFolder" />
         <WixVariable Id="WixUILicenseRtf" Value="{distdir}/LICENSE.rtf" />
         <!-- <WixVariable Id="WixUIBannerBmp" Value="{distdir}/pygapsgui/resources/main_icon.bmp" /> -->
 
         <Icon Id="pyGAPSgui.exe" SourceFile="{distdir}/pygapsgui/resources/main_icon.ico" />
+        <Property Id="ARPPRODUCTICON" Value="pyGAPSgui.exe" />
 
     </Product>
 </Wix>
