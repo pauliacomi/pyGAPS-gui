@@ -19,6 +19,7 @@ class DADRDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("DADRDialog")
 
         _layout = QW.QGridLayout(self)
@@ -104,6 +105,7 @@ class DADRDialog(QW.QDialog):
         return QC.QSize(1000, 800)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         pass
 
     def translate_UI(self):

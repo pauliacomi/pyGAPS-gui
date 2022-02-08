@@ -60,6 +60,7 @@ class IsoController():
         self.connect_signals()
 
     def connect_signals(self):
+        """Connect permanent signals."""
 
         # Connect signals for iso explorer
         selection_model = self.list_view.selectionModel()

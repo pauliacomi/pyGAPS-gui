@@ -15,6 +15,7 @@ class PlotTDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("PlotTDialog")
 
         _layout = QW.QVBoxLayout(self)
@@ -67,6 +68,7 @@ class PlotTDialog(QW.QDialog):
         return QC.QSize(500, 800)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         pass
 
     def translate_UI(self):

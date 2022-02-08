@@ -16,6 +16,7 @@ class PSDKernelDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("PSDKernelDialog")
 
         _layout = QW.QGridLayout(self)
@@ -82,6 +83,7 @@ class PSDKernelDialog(QW.QDialog):
         return QC.QSize(800, 900)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         pass
 
     def translate_UI(self):

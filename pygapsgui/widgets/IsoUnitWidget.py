@@ -22,6 +22,7 @@ class IsoUnitWidget(QW.QWidget):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
 
         _layout = QW.QHBoxLayout(self)
         self.pressure_box = QW.QGroupBox()
@@ -61,6 +62,7 @@ class IsoUnitWidget(QW.QWidget):
         self.material_box_layout.addWidget(self.material_unit)
 
     def connect_signals(self):
+        """Connect permanent signals."""
 
         self.pressure_mode.currentIndexChanged.connect(self.handle_pressure_change)
         self.pressure_unit.currentIndexChanged.connect(self.emit_pressure)

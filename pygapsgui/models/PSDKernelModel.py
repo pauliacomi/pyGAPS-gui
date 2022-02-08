@@ -87,10 +87,12 @@ class PSDKernelModel():
             self.plot_clear()
 
     def prepare_values(self):
+        """Preliminary calculation of values that rarely change."""
         # Pressure
         self.pressure = self.isotherm.pressure(branch=self.branch)
 
     def calculate(self):
+        """Call pyGAPS to perform main calculation."""
         with log_hook:
             self.branch = self.view.branch_dropdown.currentText()
             self.kernel = self.view.kernel_dropdown.currentText()
@@ -108,18 +110,21 @@ class PSDKernelModel():
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
                 return False
-            self.output += log_hook.getLogs()
+            self.output += log_hook.get_logs()
             return True
 
     def output_results(self):
+        """Fill in any GUI text output with results"""
         pass
 
     def output_log(self):
+        """Output text or dialog error/warning/info."""
         if self.output:
             error_dialog(self.output)
             self.output = ""
 
     def plot_results(self):
+        """Fill in any GUI plots with results."""
         # PSD plot
         self.view.res_graph.clear()
         psd_plot(
@@ -143,21 +148,25 @@ class PSDKernelModel():
         )
 
     def plot_clear(self):
+        """Reset plots to default values."""
         self.view.iso_graph.draw_isotherms()
         self.view.res_graph.clear()
         self.view.res_graph.canvas.draw_idle()
 
     def slider_reset(self):
+        """Resets the GUI selection sliders."""
         self.view.x_select.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def select_branch(self):
+        """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.set_branch(self.branch)
         self.plot_clear()
         self.prepare_values()
 
     def export_results(self):
+        """Save results as a file."""
         if not self.results:
             error_dialog("No results to export.")
             return

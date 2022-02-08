@@ -85,6 +85,7 @@ class PlotTModel():
         self.calc_auto()
 
     def prepare_values(self):
+        """Preliminary calculation of values that rarely change."""
         # Loading and pressure
         self.loading = self.isotherm.loading(
             branch=self.branch,
@@ -124,6 +125,7 @@ class PlotTModel():
             self.plot_clear()
 
     def calculate(self):
+        """Call pyGAPS to perform main calculation."""
         with log_hook:
             try:
                 self.results, self.t_curve = t_plot_raw(
@@ -138,10 +140,11 @@ class PlotTModel():
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
                 return False
-            self.output += log_hook.getLogs()
+            self.output += log_hook.get_logs()
             return True
 
     def output_results(self):
+        """Fill in any GUI text output with results"""
         self.view.res_table.setRowCount(0)
         self.view.res_table.setRowCount(len(self.results))
         for index, result in enumerate(self.results):
@@ -158,10 +161,12 @@ class PlotTModel():
             )
 
     def output_log(self):
+        """Output text or dialog error/warning/info."""
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
+        """Fill in any GUI plots with results."""
         # Generate tplot
         self.view.res_graph.clear()
         tp_plot(
@@ -174,10 +179,12 @@ class PlotTModel():
         self.view.res_graph.canvas.draw_idle()
 
     def plot_clear(self):
+        """Reset plots to default values."""
         self.view.res_graph.clear()
         self.view.res_graph.canvas.draw_idle()
 
     def slider_reset(self):
+        """Resets the GUI selection sliders."""
         self.view.x_select.setRange(self.limits)
         self.view.x_select.setValues((self.t_curve[0], self.t_curve[-1]), emit=False)
         self.view.res_graph.draw_xlimits(self.t_curve[0], self.t_curve[-1])
@@ -188,11 +195,13 @@ class PlotTModel():
         self.calc_auto()
 
     def select_branch(self):
+        """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
         self.prepare_values()
         self.calc_auto()
 
     def export_results(self):
+        """Save results as a file."""
         if not self.results:
             error_dialog("No results to export.")
             return

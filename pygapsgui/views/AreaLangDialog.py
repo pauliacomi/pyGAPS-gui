@@ -16,6 +16,7 @@ class AreaLangDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("AreaLangDialog")
 
         _layout = QW.QGridLayout(self)
@@ -106,6 +107,7 @@ class AreaLangDialog(QW.QDialog):
         return QC.QSize(1000, 700)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         pass
 
     def translate_UI(self):

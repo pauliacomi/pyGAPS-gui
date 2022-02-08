@@ -89,6 +89,7 @@ class AreaBETModel():
         self.calc_auto()
 
     def prepare_values(self):
+        """Preliminary calculation of values that rarely change."""
         # Loading and pressure
         self.loading = self.isotherm.loading(
             branch=self.branch,
@@ -128,6 +129,7 @@ class AreaBETModel():
             self.plot_clear()
 
     def calculate(self):
+        """Call pyGAPS to perform main calculation."""
         with log_hook:
             # TODO Should put all these into a dictionary
             try:
@@ -151,10 +153,11 @@ class AreaBETModel():
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
                 return False
-            self.output += log_hook.getLogs()
+            self.output += log_hook.get_logs()
             return True
 
     def output_results(self):
+        """Fill in any GUI text output with results"""
         self.view.result_bet.setText(f'{self.bet_area:g}')
         self.view.result_c.setText(f'{self.c_const:.4}')
         self.view.result_mono_n.setText(f'{self.n_monolayer * 1000:.4}')
@@ -164,10 +167,12 @@ class AreaBETModel():
         self.view.result_r.setText(f'{self.corr_coef:.4}')
 
     def output_log(self):
+        """Output text or dialog error/warning/info."""
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
+        """Fill in any GUI plots with results."""
 
         # Isotherm plot update
         self.view.iso_graph.draw_isotherms()
@@ -201,6 +206,7 @@ class AreaBETModel():
         self.view.rouq_graph.canvas.draw_idle()
 
     def plot_clear(self):
+        """Reset plots to default values."""
         self.view.iso_graph.draw_isotherms()
         self.view.bet_graph.clear()
         self.view.bet_graph.canvas.draw_idle()
@@ -208,16 +214,19 @@ class AreaBETModel():
         self.view.rouq_graph.canvas.draw_idle()
 
     def slider_reset(self):
+        """Resets the GUI selection sliders."""
         self.view.x_select.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def select_branch(self):
+        """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.set_branch(self.branch)
         self.prepare_values()
         self.calc_auto()
 
     def export_results(self):
+        """Save results as a file."""
         if not self.bet_area:
             error_dialog("No results to export.")
             return

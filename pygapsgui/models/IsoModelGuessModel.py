@@ -10,6 +10,7 @@ from pygapsgui.widgets.UtilityWidgets import error_dialog
 
 
 class IsoModelGuessModel():
+    """Automatic isotherm model fit: MV model."""
 
     isotherm = None
     model_isotherm = None
@@ -72,6 +73,7 @@ class IsoModelGuessModel():
         self.view.iso_graph.draw_isotherms()
 
     def prepare_values(self):
+        """Preliminary calculation of values that rarely change."""
         self.iso_params = self.isotherm.to_dict()
         pressure = self.isotherm.pressure(
             branch=self.branch,
@@ -103,6 +105,7 @@ class IsoModelGuessModel():
         self.prepare_values()
 
     def calculate(self):
+        """Call pyGAPS to perform main calculation."""
         self.model_attempts = []
         checked_models = [
             self.view.model_list.item(row).data(QC.Qt.DisplayRole)
@@ -131,7 +134,7 @@ class IsoModelGuessModel():
             except Exception as err:
                 self.output += f'<font color="red">Model fitting failed! <br> {err}</font>'
                 return False
-            self.output += log_hook.getLogs()
+            self.output += log_hook.get_logs()
 
             if not self.model_attempts:
                 self.output += '<font color="red">No model could be reliably fit on the isotherm.</font><br>'
@@ -139,27 +142,34 @@ class IsoModelGuessModel():
 
             errors = [x.model.rmse for x in self.model_attempts]
             self.model_isotherm = self.model_attempts[errors.index(min(errors))]
+            self.output += f'<font color="green">Best model fit is {self.model_isotherm.model.name}.</font>'
             return True
 
     def plot_results(self):
+        """Fill in any GUI plots with results."""
         self.view.iso_graph.model_isotherm = self.model_isotherm
         self.view.iso_graph.draw_isotherms()
 
     def plot_clear(self):
+        """Reset plots to default values."""
         self.view.iso_graph.draw_isotherms()
 
     def output_results(self):
+        """Fill in any GUI text output with results"""
         pass
 
     def output_log(self):
+        """Output text or dialog error/warning/info."""
         self.view.output.setText(self.output)
         self.output = ""
 
     def slider_reset(self):
+        """Resets the GUI selection sliders."""
         self.view.x_select.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])
 
     def select_branch(self):
+        """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.model_isotherm = None
