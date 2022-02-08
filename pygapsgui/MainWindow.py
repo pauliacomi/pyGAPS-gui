@@ -146,7 +146,7 @@ class MainWindow(QW.QMainWindow):
             return
 
         suggested_name = str(self.last_dir) if self.last_dir else '.'
-        suggested_name += "/" + self.iso_model.itemFromIndex(index).text()
+        suggested_name += "/" + index.data()
 
         if not filepath:
             filepath = save_file_dialog(
