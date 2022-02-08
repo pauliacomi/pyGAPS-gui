@@ -30,7 +30,8 @@ class IsoDataTableModel(dfTableModel):
         return super().setData(index, value, role)
 
     def insertColumns(self, column: int, count: int, parent=...) -> bool:
-        return super().insertColumns(2, count, parent)
+        """Ensure only insert at the end."""
+        return super().insertColumns(max(column, 2), count, parent)
 
     def removeColumns(self, column: int, count: int, parent=...) -> bool:
         if any(
