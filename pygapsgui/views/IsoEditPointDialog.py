@@ -2,11 +2,15 @@ from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
 from pygapsgui.models.IsoDataTableModel import IsoDataTableModel
+from pygapsgui.utilities.table_to_clipboard import clipboard_to_table
+from pygapsgui.utilities.table_to_clipboard import table_to_clipboard
 from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
+from pygapsgui.widgets.SciDoubleSpinbox import SciFloatSpinDelegate
 from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 
 
 class IsoEditPointDialog(QW.QDialog):
+    """A dialog that allows editing of individual isotherm points."""
     def __init__(self, isotherm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
@@ -18,6 +22,7 @@ class IsoEditPointDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("IsoEditPointDialog")
 
         # Create/set layout
@@ -25,9 +30,12 @@ class IsoEditPointDialog(QW.QDialog):
 
         # Table View
         self.table_view = QW.QTableView()
-        delegate = SciFloatDelegate()
-        self.table_view.setItemDelegateForColumn(0, delegate)
-        self.table_view.setItemDelegateForColumn(1, delegate)
+        sci_delegate = SciFloatSpinDelegate()
+        str_delegate = SciFloatDelegate()
+        self.table_view.setItemDelegate(str_delegate)
+        self.table_view.setItemDelegateForColumn(0, sci_delegate)
+        self.table_view.setItemDelegateForColumn(1, sci_delegate)
+        self.table_view.setSelectionMode(QW.QAbstractItemView.ContiguousSelection)
         _layout.addWidget(self.table_view)
 
         # table view Headers
@@ -58,7 +66,7 @@ class IsoEditPointDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
-        # Button box connections
+        """Connect permanent signals."""
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
         self.edit_add_row.pressed.connect(self.add_row)
@@ -75,6 +83,7 @@ class IsoEditPointDialog(QW.QDialog):
         self.table_view.selectRow(row)
 
     def add_col(self):
+        """Add a data column to the end of the table."""
         dialog = QW.QDialog()
         layout = QW.QVBoxLayout(dialog)
         layout.addWidget(QW.QLabel("Set Data Name:"))
@@ -87,13 +96,25 @@ class IsoEditPointDialog(QW.QDialog):
         if ret != QW.QDialog.Accepted:
             return
 
-        self.model.insertColumn(2)
-        self.model.setHeaderData(2, QC.Qt.Horizontal, input.text())
+        ncols = self.model.columnCount()
+        self.model.insertColumn(ncols)
+        self.model.setHeaderData(ncols, QC.Qt.Horizontal, input.text())
 
     def del_col(self):
         col = self.table_view.currentIndex().column()
         self.model.removeColumn(col)
         self.table_view.selectColumn(col)
+
+    def keyPressEvent(self, event):
+        if self.table_view.hasFocus():
+            if event.key() == QC.Qt.Key_C and (event.modifiers() & QC.Qt.ControlModifier):
+                table_to_clipboard(self.table_view)
+                event.accept()
+            if event.key() == QC.Qt.Key_V and (event.modifiers() & QC.Qt.ControlModifier):
+                clipboard_to_table(self.table_view)
+                event.accept()
+            else:
+                super().keyPressEvent(event)
 
     def accept(self) -> None:
         self.isotherm.data_raw = self.model._data

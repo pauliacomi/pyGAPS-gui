@@ -62,17 +62,28 @@ class ScientificDoubleSpinBox(QW.QDoubleSpinBox):
         self.lineEdit().setText(new_string)
 
 
-class SciFloatDelegate(QW.QStyledItemDelegate):
+class SciFloatSpinDelegate(QW.QStyledItemDelegate):
     def createEditor(self, parent, option, index):
-        widget = ScientificDoubleSpinBox(parent)
-        return widget
+        """Give an instance of the SciDoubleSpinbox"""
+        return ScientificDoubleSpinBox(parent)
 
+    def setEditorData(self, editor: QW.QWidget, index: QC.QModelIndex) -> None:
+        """Ensure that the SciDoubleSpinbox data is set correctly."""
+        editor.setValue(index.data())
+
+    def displayText(self, value, locale):
+        return format_float(value)
+
+
+class SciFloatDelegate(QW.QStyledItemDelegate):
     def displayText(self, value, locale):
         return format_float(value)
 
 
 def format_float(value):
     """Modified form of the 'g' format specifier."""
+    if type(value) == str:
+        return value
     string = f"{value:.5g}".replace("e+", "e")
     string = re.sub("e(-?)0*(\d+)", r"e\1\2", string)
     return string
