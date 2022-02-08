@@ -94,6 +94,7 @@ class IsoModelByModel():
             self.plot_clear()
 
     def calculate(self):
+        """Call pyGAPS to perform main calculation."""
         self.model_isotherm = None
         with log_hook:
             try:
@@ -128,25 +129,30 @@ class IsoModelByModel():
             except Exception as e:
                 self.output += f'<font color="red">Model fitting failed! <br> {e}</font>'
                 return False
-            self.output += log_hook.getLogs()
+            self.output += log_hook.get_logs()
             return True
 
     def output_results(self):
+        """Fill in any GUI text output with results"""
         pass
 
     def output_log(self):
+        """Output text or dialog error/warning/info."""
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
+        """Fill in any GUI plots with results."""
         self.view.iso_graph.model_isotherm = self.model_isotherm
         self.view.iso_graph.draw_isotherms()
 
     def plot_clear(self):
+        """Reset plots to default values."""
         self.view.iso_graph.model_isotherm = self.model_isotherm
         self.view.iso_graph.draw_isotherms()
 
     def select_model(self):
+        """What to do when the user selects a model."""
         self.model_isotherm = None
         self.current_model_name = self.view.model_dropdown.currentText()
         self.current_model = get_isotherm_model(self.current_model_name)
@@ -204,11 +210,13 @@ class IsoModelByModel():
         self.current_model.loading_range = [min(loading), max(loading)]
 
     def select_branch(self):
+        """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.model_isotherm = None
         self.plot_clear()
 
     def slider_reset(self):
+        """Resets the GUI selection sliders."""
         self.view.p_selector.setValues(self.limits, emit=False)
         self.view.iso_graph.draw_xlimits(self.limits[0], self.limits[1])

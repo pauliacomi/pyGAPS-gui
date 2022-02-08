@@ -4,7 +4,7 @@ from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
 from pygapsgui.models.dfTableModel import dfTableModel
-from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
+from pygapsgui.widgets.SciDoubleSpinbox import SciFloatSpinDelegate
 from pygapsgui.widgets.UtilityWidgets import HeightHeaderView
 
 
@@ -22,6 +22,7 @@ class RangeGenWidget(QW.QWidget):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("RangeGenWidget")
 
         # Create/set layout
@@ -70,7 +71,7 @@ class RangeGenWidget(QW.QWidget):
         self.range_table = QW.QTableView(self)
         self.range_model = dfTableModel(self.data)
         self.range_table.setModel(self.range_model)
-        delegate = SciFloatDelegate()
+        delegate = SciFloatSpinDelegate()
         self.range_table.setItemDelegate(delegate)
         h_header = HeightHeaderView()
         self.range_table.setHorizontalHeader(h_header)
@@ -80,6 +81,7 @@ class RangeGenWidget(QW.QWidget):
         _layout.addWidget(self.range_table)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.prop_value.currentIndexChanged.connect(self.handle_propchange)
         self.generate_btn.clicked.connect(self.generate)
         self.erase_btn.clicked.connect(self.erase)
@@ -174,6 +176,7 @@ class RangeGenDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 

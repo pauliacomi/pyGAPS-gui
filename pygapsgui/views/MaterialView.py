@@ -21,6 +21,7 @@ class MaterialView(QW.QWidget):
         self.material = material
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("MaterialView")
         self.resize(400, 500)
 
@@ -83,6 +84,7 @@ class MaterialView(QW.QWidget):
         self.table_view.setModel(self.table_model)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.table_view.selectionModel().selectionChanged.connect(self.metadata_select)
         self.meta_edit_widget.save_button.clicked.connect(self.metadata_save)
         self.meta_edit_widget.delete_button.clicked.connect(self.metadata_delete)
@@ -157,6 +159,7 @@ class MaterialDialog(QW.QDialog):
         self.view.material = material
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
 
         _layout = QW.QVBoxLayout(self)
 
@@ -171,6 +174,7 @@ class MaterialDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.view.material_changed.connect(self.material_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
@@ -197,6 +201,7 @@ class MaterialListDialog(QW.QDialog):
         self.setup_model()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
 
         _layout = QW.QVBoxLayout(self)
         layout_top = QW.QHBoxLayout()
@@ -217,6 +222,7 @@ class MaterialListDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.material_details.material_changed.connect(self.material_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)

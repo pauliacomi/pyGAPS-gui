@@ -1,9 +1,7 @@
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
-from pygapsgui.models.IsoDataTableModel import IsoDataTableModel
 from pygapsgui.widgets.SciDoubleSpinbox import ScientificDoubleSpinBox
-from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
 from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 
 
@@ -17,6 +15,7 @@ class IsoEditModelDialog(QW.QDialog):
         self.populate_table()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("IsoEditModelDialog")
 
         # Create/set layout
@@ -42,6 +41,7 @@ class IsoEditModelDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         # Button box connections
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)

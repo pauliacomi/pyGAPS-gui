@@ -24,6 +24,7 @@ class IsoGraphDataSel(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.dataLayout = QW.QFormLayout(self)
 
         self.xCombo = QW.QComboBox()
@@ -62,6 +63,7 @@ class IsoGraphDataSel(QW.QDialog):
             self.y2Combo.setDisabled(True)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
         self.xCombo.currentIndexChanged.connect(self.handleChanged)

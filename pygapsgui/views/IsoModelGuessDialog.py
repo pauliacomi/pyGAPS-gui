@@ -26,6 +26,7 @@ class IsoModelGuessDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("IsoModelByDialog")
 
         _layout = QW.QGridLayout(self)
@@ -71,6 +72,7 @@ class IsoModelGuessDialog(QW.QDialog):
         return QC.QSize(1000, 800)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 

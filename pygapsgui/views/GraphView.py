@@ -35,6 +35,7 @@ class GraphView(QW.QWidget):
         self.setup_UI()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.figure = Figure(figsize=(5, 5), tight_layout=True)
         self.canvas = FigureCanvas(self.figure)
         self.ax = self.figure.subplots()

@@ -29,6 +29,7 @@ class AdsorbateView(QW.QWidget):
         self.adsorbate = adsorbate
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("AdsorbateView")
         self.resize(500, 500)
 
@@ -105,6 +106,7 @@ class AdsorbateView(QW.QWidget):
         self.table_view.setModel(self.table_model)
 
     def connect_signals(self):
+        """Connect permanent signals."""
 
         self.table_view.selectionModel().selectionChanged.connect(self.metadata_select)
         self.meta_edit_widget.save_button.clicked.connect(self.metadata_save)
@@ -168,6 +170,7 @@ class AdsorbateDialog(QW.QDialog):
         self.view.adsorbate = adsorbate
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
 
         _layout = QW.QVBoxLayout(self)
 
@@ -182,6 +185,7 @@ class AdsorbateDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.view.adsorbate_changed.connect(self.adsorbate_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
@@ -204,6 +208,7 @@ class AdsorbateListDialog(QW.QDialog):
         self.setup_model()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
 
         _layout = QW.QVBoxLayout(self)
         layout_top = QW.QHBoxLayout()
@@ -224,6 +229,7 @@ class AdsorbateListDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
+        """Connect permanent signals."""
         self.adsorbate_details.adsorbate_changed.connect(self.adsorbate_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)

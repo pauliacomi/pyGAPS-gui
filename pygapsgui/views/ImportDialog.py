@@ -44,6 +44,7 @@ IMPORT_FILES = [
 
 
 class ImportDialog(QW.QDialog):
+    """Pop-up dialog prompting allowing for selection of manufacturer import type."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.filepaths = None
@@ -55,6 +56,7 @@ class ImportDialog(QW.QDialog):
         self.translate_UI()
 
     def setup_UI(self):
+        """Creates and sets-up static UI elements"""
         self.setObjectName("ImportDialog")
 
         # Create/set layout
