@@ -2,8 +2,6 @@ import numpy as np
 import pandas as pd
 from qtpy import QtCore as QC
 
-from pygapsgui.widgets.UtilityWidgets import error_dialog
-
 
 class dfTableModel(QC.QAbstractTableModel):
     """Table model to display/edit a Pandas dataframe."""
@@ -12,12 +10,15 @@ class dfTableModel(QC.QAbstractTableModel):
         self._data = data
 
     def rowCount(self, index=QC.QModelIndex()):
+        """Rows are df rows."""
         return self._data.shape[0]
 
     def columnCount(self, index=QC.QModelIndex()):
+        """Columns are df columns."""
         return self._data.shape[1]
 
     def setRowCount(self, nrows):
+        """Slice existing rows or insert new ones by appending a new df."""
         if nrows == self.rowCount():
             return
         if nrows < self.rowCount():
@@ -25,7 +26,7 @@ class dfTableModel(QC.QAbstractTableModel):
         if nrows > self.rowCount():
             newrows = pd.DataFrame(
                 columns=self._data.columns,
-                data=np.zeros((nrows - self.rowCount(), self.columnCount())),
+                data=np.empty((nrows - self.rowCount(), self.columnCount())),
             )
             self._data = self._data.append(newrows, ignore_index=True)
         self.dataChanged.emit(QC.QModelIndex(), QC.QModelIndex())
@@ -85,7 +86,7 @@ class dfTableModel(QC.QAbstractTableModel):
 
     def insertRows(self, row: int, count: int, parent=QC.QModelIndex()) -> bool:
         self.beginInsertRows(parent, row, row + count - 1)
-        line = pd.DataFrame(0, index=np.arange(count), columns=self._data.columns)
+        line = pd.DataFrame(None, index=np.arange(count), columns=self._data.columns)
         line['branch'] = self._data.iloc[row]['branch']
         self._data = pd.concat([self._data.iloc[:row], line,
                                 self._data.iloc[row:]]).reset_index(drop=True)
@@ -100,8 +101,9 @@ class dfTableModel(QC.QAbstractTableModel):
         return True
 
     def insertColumns(self, column: int, count: int, parent=QC.QModelIndex()) -> bool:
+        """Add new column to df."""
         self.beginInsertColumns(parent, column, column + count - 1)
-        self._data.insert(column, "newcol", 0)
+        self._data.insert(column, "newcol", None)
         self.endInsertColumns()
         return True
 
