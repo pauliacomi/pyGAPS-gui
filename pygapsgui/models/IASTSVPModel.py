@@ -65,6 +65,7 @@ class IASTSVPModel():
             self.plot_clear()
 
     def calculate(self):
+        """Call pyGAPS to perform main calculation."""
         self.pressure_points = self.view.data_table.data["Pressure"].to_numpy()
         if self.pressure_points is None:
             error_dialog("First specify pressure points.")
@@ -91,17 +92,20 @@ class IASTSVPModel():
             except Exception as e:
                 self.output += f'<font color="red">Model failed! <br> {e}</font>'
                 return False
-            self.output += log_hook.getLogs()
+            self.output += log_hook.get_logs()
             return True
 
     def output_results(self):
+        """Fill in any GUI text output with results"""
         pass
 
     def output_log(self):
+        """Output text or dialog error/warning/info."""
         self.view.output.setText(self.output)
         self.output = ""
 
     def plot_results(self):
+        """Fill in any GUI plots with results."""
         self.view.res_graph.clear()
         plot_iast_svp(
             self.results['pressure'],
@@ -115,14 +119,17 @@ class IASTSVPModel():
         self.view.res_graph.canvas.draw()
 
     def plot_clear(self):
+        """Reset plots to default values."""
         self.view.res_graph.clear()
         self.view.res_graph.canvas.draw()
 
     def select_branch(self):
+        """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
         self.plot_clear()
 
     def export_results(self):
+        """Save results as a file."""
         if not self.results:
             error_dialog("No results to export.")
             return
