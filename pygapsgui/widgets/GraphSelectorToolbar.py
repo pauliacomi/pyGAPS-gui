@@ -5,6 +5,7 @@ from pygapsgui.widgets.RangeSlider import QVSpinBoxRangeSlider
 
 
 class SelectorToolbar(QW.QToolBar):
+    """A base class that allows selection of ranges on a graph."""
     def __init__(
         self,
         title: str,
@@ -32,7 +33,9 @@ class SelectorToolbar(QW.QToolBar):
 
 
 class HSelectorToolbar(SelectorToolbar):
+    """Horizontal implementation of graph data selector."""
     def setup_UI(self, slider_range):
+        """Setup the UI horizontally."""
         self.slider = QHSpinBoxRangeSlider(
             slider_range=slider_range,
             values=slider_range[:-1],
@@ -44,7 +47,9 @@ class HSelectorToolbar(SelectorToolbar):
 
 
 class VSelectorToolbar(SelectorToolbar):
+    """Vertical implementation of graph data selector."""
     def setup_UI(self, slider_range):
+        """Setup the UI vertically."""
         self.slider = QVSpinBoxRangeSlider(
             slider_range=slider_range,
             values=slider_range[:-1],

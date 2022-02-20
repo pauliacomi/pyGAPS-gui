@@ -2,7 +2,7 @@ from functools import partial
 
 from qtpy import QtWidgets as QW
 
-from pygapsgui.widgets.UtilityWidgets import open_files_dialog
+from pygapsgui.widgets.UtilityDialogs import open_files_dialog
 
 IMPORT_FILES = [
     {
@@ -95,6 +95,7 @@ class ImportDialog(QW.QDialog):
             self.close()
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("ImportDialog", "Import from manufacturer file", None, -1))

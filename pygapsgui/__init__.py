@@ -17,7 +17,7 @@ def exception_hook(exctype, exc, trace):
 
     trace_s = "".join(traceback.format_tb(trace))
 
-    from pygapsgui.widgets.UtilityWidgets import error_detail_dialog
+    from pygapsgui.widgets.UtilityDialogs import error_detail_dialog
     error_detail_dialog(str(exc), trace_s)
 
     # Call the normal Exception hook after

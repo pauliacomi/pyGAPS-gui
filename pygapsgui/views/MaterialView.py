@@ -3,10 +3,10 @@ from qtpy import QtWidgets as QW
 
 from pygaps import MATERIAL_LIST
 from pygaps import Material
-from pygapsgui.models.MatPropTableModel import MatPropTableModel
+from pygapsgui.models.MetadataTableModel import MetadataTableModel
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
-from pygapsgui.widgets.MetadataTableView import MetadataTableWidget
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.views.MetadataTableView import MetadataTableView
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class MaterialView(QW.QWidget):
@@ -55,7 +55,7 @@ class MaterialView(QW.QWidget):
         self.metadata_layout.addWidget(self.meta_edit_widget)
 
         # Table view
-        self.table_view = MetadataTableWidget()
+        self.table_view = MetadataTableView()
         self.metadata_layout.addWidget(self.table_view)
 
     @property
@@ -80,7 +80,7 @@ class MaterialView(QW.QWidget):
         mmass = str(mmass) if mmass else mmass
         self.mm_value.setText(mmass)
 
-        self.table_model = MatPropTableModel(self.material)
+        self.table_model = MetadataTableModel(self.material)
         self.table_view.setModel(self.table_model)
 
     def connect_signals(self):
@@ -137,6 +137,7 @@ class MaterialView(QW.QWidget):
         self.material_changed.emit(str(self.material))
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.properties_box.setTitle(QW.QApplication.translate("AdsorbateView", "Main properties", None, -1))
@@ -184,6 +185,7 @@ class MaterialDialog(QW.QDialog):
         return super().accept()
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("MaterialDialog", "Material details", None, -1))
@@ -239,6 +241,7 @@ class MaterialListDialog(QW.QDialog):
         return super().accept()
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("MaterialListDialog", "pyGAPS Material explorer", None, -1))

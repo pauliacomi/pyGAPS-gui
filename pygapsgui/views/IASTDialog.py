@@ -66,6 +66,7 @@ class IASTDialog(QW.QDialog):
         pass
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("IASTDialog", "IAST: multicomponent uptake calculations", None, -1))

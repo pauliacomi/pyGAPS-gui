@@ -6,7 +6,7 @@ from pygaps.modelling import _GUESS_MODELS
 from pygaps.modelling import _MODELS
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoModelGuessModel():

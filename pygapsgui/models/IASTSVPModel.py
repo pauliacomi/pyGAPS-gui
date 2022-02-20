@@ -5,7 +5,7 @@ from pygaps.graphing.iast_graphs import plot_iast_svp
 from pygaps.graphing.labels import label_units_iso
 from pygaps.iast import iast_binary_svp
 from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IASTSVPModel():

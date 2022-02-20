@@ -124,6 +124,7 @@ class IsoEditPointDialog(QW.QDialog):
         return QC.QSize(self.table_view.model().columnCount() * 120, 600)
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("IsoEditPointDialog", "Isotherm Data", None, -1))

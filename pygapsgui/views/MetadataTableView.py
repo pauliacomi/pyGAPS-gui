@@ -1,9 +1,9 @@
 from qtpy import QtCore as QC
-from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
 
-class MetadataTableWidget(QW.QTableView):
+class MetadataTableView(QW.QTableView):
+    """A TableView optimised to display core class (Isotherm, Adsorbate, Material) metadata."""
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setSelectionMode(QW.QTableView.SingleSelection)

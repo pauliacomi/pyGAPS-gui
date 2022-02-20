@@ -3,7 +3,7 @@ from pygaps.graphing.iast_graphs import plot_iast_vle
 from pygaps.iast import iast_binary_vle
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IASTVLEModel():

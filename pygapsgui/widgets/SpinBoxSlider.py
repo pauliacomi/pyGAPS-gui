@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 
 
 class QSpinBoxSlider(QW.QWidget):
+    """Slider connected to a SpinBox acting as a whole. A label is included."""
 
     changed = QC.Signal(float)
     minv = 0

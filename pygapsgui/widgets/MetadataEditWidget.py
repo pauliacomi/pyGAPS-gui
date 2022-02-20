@@ -1,9 +1,12 @@
-from qtpy import QtCore as QC
-from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
 
 class MetadataEditWidget(QW.QWidget):
+    """
+    A collection of widgets that set/change/delete metadata from pyGAPS classes.
+
+    Designed to be connected to a MetadataTableView/MetadataTableModel.
+    """
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.meta_types = ["text", "number"]
@@ -56,6 +59,7 @@ class MetadataEditWidget(QW.QWidget):
         self.type_input.setCurrentIndex(0)
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.name_label.setText(QW.QApplication.translate("MetaEditWidget", "Name", None, -1))

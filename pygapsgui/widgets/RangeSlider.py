@@ -1,11 +1,11 @@
 #
-# The MIT License
+# Under MIT License
 #
 # Copyright (c) 2009 Zhuang Lab, Harvard University
 # Copyright (c) 2016 Sean Yeh
 #   (Porting to qtpy, Python3 compatibility, and some trivial modifications)
 # Copyright (c) 2020 Paul Iacomi
-#   (trivial modifications)
+#   (log/transform functionality, updated for modern python)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

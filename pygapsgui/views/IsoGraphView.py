@@ -4,7 +4,7 @@ import pygaps.graphing as pgg
 import pygaps.utilities.exceptions as pge
 from pygapsgui.views.GraphView import GraphView
 from pygapsgui.widgets.IsoGraphToolbar import IsoGraphToolbar
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoGraphView(GraphView):

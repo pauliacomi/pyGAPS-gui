@@ -7,8 +7,8 @@ from pygaps.utilities.converter_mode import _MATERIAL_MODE
 from pygaps.utilities.converter_mode import _PRESSURE_MODE
 from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
 from pygapsgui.models.IsoModel import IsoModel
-from pygapsgui.models.IsoPropTableModel import IsoPropTableModel
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.models.MetadataTableModel import MetadataTableModel
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoController():
@@ -115,7 +115,7 @@ class IsoController():
         self.unit_widget.init_units(self.iso_current)
 
         # Other isotherm metadata
-        self.metadata_table_model = IsoPropTableModel(self.iso_current)
+        self.metadata_table_model = MetadataTableModel(self.iso_current)
         self.mw_widget.metadata_table_view.setModel(self.metadata_table_model)
         self.mw_widget.metadata_table_view.selectionModel().selectionChanged.connect(
             self.metadata_select
@@ -342,7 +342,7 @@ class IsoController():
     ########################################################
 
     def load(self, path, name, ext):
-        """Load isotherm from disk."""
+        """Use pygaps parsing to load an isotherm and add it to the model."""
 
         isotherm = None
 
@@ -364,6 +364,7 @@ class IsoController():
         self.add_isotherm(name, isotherm)
 
     def load_import(self, path, name, iso_type):
+        """Use pygaps parsing to import an isotherm and add it to the model."""
         isotherm = None
 
         import pygaps.parsing as pgp

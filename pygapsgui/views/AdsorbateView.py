@@ -9,12 +9,12 @@ else:
 
 from pygaps import ADSORBATE_LIST
 from pygaps import Adsorbate
-from pygapsgui.models.AdsPropTableModel import AdsPropTableModel
+from pygapsgui.models.MetadataTableModel import MetadataTableModel
 from pygapsgui.utilities.tex2svg import tex2svg
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
-from pygapsgui.widgets.MetadataTableView import MetadataTableWidget
+from pygapsgui.views.MetadataTableView import MetadataTableView
 from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class AdsorbateView(QW.QWidget):
@@ -71,7 +71,7 @@ class AdsorbateView(QW.QWidget):
         self.metadata_layout.addWidget(self.meta_edit_widget)
 
         # Table view
-        self.table_view = MetadataTableWidget()
+        self.table_view = MetadataTableView()
         self.metadata_layout.addWidget(self.table_view)
 
     @property
@@ -102,7 +102,7 @@ class AdsorbateView(QW.QWidget):
             backend = "No"
         self.backend_value.setText(backend)
 
-        self.table_model = AdsPropTableModel(self.adsorbate)
+        self.table_model = MetadataTableModel(self.adsorbate)
         self.table_view.setModel(self.table_model)
 
     def connect_signals(self):
@@ -147,6 +147,7 @@ class AdsorbateView(QW.QWidget):
         self.adsorbate_changed.emit(self.adsorbate.name)
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.properties_box.setTitle(QW.QApplication.translate("AdsorbateView", "Main properties", None, -1))
@@ -191,6 +192,7 @@ class AdsorbateDialog(QW.QDialog):
         self.button_box.rejected.connect(self.reject)
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("AdsorbateDialog", "Adsorbate details", None, -1))
@@ -242,6 +244,7 @@ class AdsorbateListDialog(QW.QDialog):
         self.adsorbate_details.adsorbate = Adsorbate.find(item.text())
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("AdsorbateListDialog", "pyGAPS Adsorbate explorer", None, -1))

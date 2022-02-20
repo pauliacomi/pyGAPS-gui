@@ -5,7 +5,7 @@ from pygaps.characterisation.psd_micro import psd_microporous
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class PSDMicroModel():

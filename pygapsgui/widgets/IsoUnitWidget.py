@@ -5,6 +5,7 @@ from pygaps.core.pointisotherm import PointIsotherm
 
 
 class IsoUnitWidget(QW.QWidget):
+    """A collection of widgets that show/change isotherm bases/units."""
 
     pressure_changed = QC.Signal(str, str)
     loading_changed = QC.Signal(str, str)
@@ -234,6 +235,7 @@ class IsoUnitWidget(QW.QWidget):
         self.temperature_changed.emit(unit_to)
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.pressure_box.setTitle(QW.QApplication.translate("IsoUnitWidget", "pressure units", None, -1))
