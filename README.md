@@ -1,18 +1,22 @@
-# PyGAPS-GUI - adsorption data processing
+# pyGAPS-gui - adsorption data processing
 
-PyGAPS-GUI is a Graphical User Interface (GUI) for
+## Overview
+
+pyGAPS-GUI is a Graphical User Interface (GUI) for
 [pyGAPS](https://github.com/pauliacomi/pyGAPS). It can be used to import,
 process and fit adsorption isotherms in various formats.
 
-****
-
-Currently, PyGAPS-GUI is a work in progress and can **only run using the command line**.
-
-**An installer will be available shortly**.
+Download the latest version for your system in the
+[releases](https://github.com/pauliacomi/pyGAPS-gui/releases) section.
 
 ****
 
-# Features
+pyGAPS-gui is currently **alpha** software. Things may break and change without
+warning. You have been warned.
+
+****
+
+## Features
 
 - Advanced adsorption data import and manipulation.
 - Routine analysis such as BET/Langmuir surface area, t-plot, alpha-s, Dubinin plots etc.
@@ -26,7 +30,7 @@ Currently, PyGAPS-GUI is a work in progress and can **only run using the command
 - An sqlite database backend for storing and retrieving data.
 - Simple methods for isotherm graphing and comparison.
 
-# Installation for development
+## Installation for development
 
 To install the development version of pyGAPS-GUI, pull this GitHub repo
 
@@ -37,6 +41,3 @@ of qtpy with PyQt5/PyQt4/PySide2/PySide6. Then run the main app:
 
     python pyGAPS-gui.py
 
-
----
-## Credits
