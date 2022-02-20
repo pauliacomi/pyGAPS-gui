@@ -1,6 +1,7 @@
 name: Deploy Linux
 
-on: [push]
+on:
+  [push, pull_request, workflow_dispatch]
 
 jobs:
   build-linux:
