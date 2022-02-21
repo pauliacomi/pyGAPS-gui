@@ -7,7 +7,7 @@ from pygapsgui.views.IsoGraphView import IsoListGraphView
 from pygapsgui.views.IsoListView import IsoListView
 from pygapsgui.widgets.IsoUnitWidget import IsoUnitWidget
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
-from pygapsgui.widgets.MetadataTableView import MetadataTableWidget
+from pygapsgui.views.MetadataTableView import MetadataTableView
 
 
 class MainWindowUI():
@@ -155,7 +155,7 @@ class MainWindowUI():
         self.prop_extra_layout.addWidget(self.prop_extra_edit_widget)
 
         # metadata table
-        self.metadata_table_view = MetadataTableWidget()
+        self.metadata_table_view = MetadataTableView()
         self.metadata_table_view.setObjectName("metadata_table_view")
         self.prop_extra_layout.addWidget(self.metadata_table_view)
 

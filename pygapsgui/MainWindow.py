@@ -6,9 +6,9 @@ from qtpy import QtWidgets as QW
 from pygapsgui.controllers.IsoController import IsoController
 from pygapsgui.MainWindowUI import MainWindowUI
 from pygapsgui.models.IsoListModel import IsoListModel
-from pygapsgui.widgets.UtilityWidgets import error_dialog
-from pygapsgui.widgets.UtilityWidgets import open_files_dialog
-from pygapsgui.widgets.UtilityWidgets import save_file_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
+from pygapsgui.widgets.UtilityDialogs import open_files_dialog
+from pygapsgui.widgets.UtilityDialogs import save_file_dialog
 
 
 class MainWindow(QW.QMainWindow):
@@ -92,6 +92,7 @@ class MainWindow(QW.QMainWindow):
     ########################################################
 
     def new_iso(self):
+        """Create an empty isotherm."""
         # TODO dialog for new isotherm
         from pygaps import PointIsotherm
         isotherm = PointIsotherm(
@@ -171,6 +172,7 @@ class MainWindow(QW.QMainWindow):
     ########################################################
 
     def area_bet(self):
+        """Start BET area dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -182,6 +184,7 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def area_langmuir(self):
+        """Start Langmuir area dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -193,6 +196,7 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def t_plot(self):
+        """Start t-plot dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -204,6 +208,7 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def alpha_s_plot(self):
+        """Start alpha-s plot dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -225,12 +230,15 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def dr_plot(self):
+        """Start DR dialog. Calls a generic function."""
         self.dadr_plot(ptype="DR")
 
     def da_plot(self):
+        """Start DA dialog. Calls a generic function."""
         self.dadr_plot(ptype="DA")
 
     def dadr_plot(self, ptype):
+        """Start DA dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -242,6 +250,7 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def psd_micro(self):
+        """Start microporous PSD dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -253,6 +262,7 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def psd_meso(self):
+        """Start mesoporous PSD dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -264,6 +274,7 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def psd_kernel(self):
+        """Start kernel fitting PSD dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -275,6 +286,7 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def isosteric(self):
+        """Start isosteric enthalpy dialog."""
         isotherms = self.iso_model.get_checked()
         if len(isotherms) < 2:
             error_dialog("Select two or more isotherms")
@@ -288,6 +300,7 @@ class MainWindow(QW.QMainWindow):
             dialog.exec()
 
     def model_by(self):
+        """Start modellling by a specific model dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -305,6 +318,7 @@ class MainWindow(QW.QMainWindow):
             self.iso_controller.select_last_iso()
 
     def model_guess(self):
+        """Start guess fit model dialog."""
         isotherm = self.iso_controller.iso_current
         if not isotherm:
             return
@@ -322,6 +336,7 @@ class MainWindow(QW.QMainWindow):
             self.iso_controller.select_last_iso()
 
     def model_manual(self):
+        """Start a manual manual creation dialog."""
         from pygapsgui.models.IsoModelManualModel import IsoModelManualModel
         from pygapsgui.views.IsoModelManualDialog import IsoModelManualDialog
         dialog = IsoModelManualDialog(parent=self)
@@ -336,10 +351,13 @@ class MainWindow(QW.QMainWindow):
             self.iso_controller.select_last_iso()
 
     def iast_binary_vle(self):
-        """Start IAST procedures."""
+        """Start binary vapour-liquid equilibrium IAST procedure."""
         isotherms = self.iso_model.get_checked()
         if len(isotherms) != 2:
             error_dialog("Select two isotherms.")
+            return
+        if isotherms[0].adsorbate == isotherms[1].adsorbate:
+            error_dialog("IAST predicts multicomponent adsorption, select different adsorbates.")
             return
 
         from pygapsgui.models.IASTVLEModel import IASTVLEModel
@@ -351,10 +369,13 @@ class MainWindow(QW.QMainWindow):
         dialog.exec()
 
     def iast_binary_svp(self):
-        """Start IAST procedures."""
+        """Start selectivity-pressure IAST procedure."""
         isotherms = self.iso_model.get_checked()
         if len(isotherms) != 2:
             error_dialog("Select two isotherms.")
+            return
+        if isotherms[0].adsorbate == isotherms[1].adsorbate:
+            error_dialog("IAST predicts multicomponent adsorption, select different adsorbates.")
             return
 
         from pygapsgui.models.IASTSVPModel import IASTSVPModel
@@ -366,7 +387,7 @@ class MainWindow(QW.QMainWindow):
         dialog.exec()
 
     def iast_multi_lvp(self):
-        """Start IAST procedures."""
+        """Start generic IAST procedures."""
         isotherms = self.iso_model.get_checked()
         if len(isotherms) < 2:
             error_dialog("Select at least two isotherms.")

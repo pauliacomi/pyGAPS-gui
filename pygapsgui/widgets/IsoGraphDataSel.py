@@ -3,6 +3,7 @@ from qtpy import QtWidgets as QW
 
 
 class IsoGraphDataSel(QW.QDialog):
+    """Dialog that allows a selection of what isotherm data will be plotted on the x/y1/y2 axes."""
 
     datas = None
     x_data = None

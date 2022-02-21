@@ -4,7 +4,7 @@ from pygaps.characterisation.isosteric_enth import isosteric_enthalpy
 from pygaps.characterisation.isosteric_enth import isosteric_enthalpy_raw
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsostericModel():

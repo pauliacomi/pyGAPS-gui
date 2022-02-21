@@ -91,6 +91,7 @@ class IsoModelByDialog(QW.QDialog):
         self.button_box.rejected.connect(self.reject)
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("IsoModelByDialog", "Isotherm model fitting", None, -1))

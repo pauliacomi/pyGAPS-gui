@@ -5,7 +5,7 @@ from pygaps.graphing.calc_graphs import bet_plot
 from pygaps.graphing.calc_graphs import roq_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class AreaBETModel():

@@ -1,5 +1,6 @@
-# Scientific spin box
-# Adapted from https://gist.github.com/jdreaver/0be2e44981159d0854f5
+"""Scientific spin box
+Adapted from https://gist.github.com/jdreaver/0be2e44981159d0854f5
+"""
 
 import re
 

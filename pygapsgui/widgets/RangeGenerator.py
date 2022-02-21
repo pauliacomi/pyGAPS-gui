@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityWidgets import HeightHeaderView
 
 
 class RangeGenWidget(QW.QWidget):
+    """Collection of widgets that allow a defined range of data to be created."""
     data = None
 
     def __init__(self, props=None, data=None, *args, **kwargs):
@@ -140,6 +141,7 @@ class RangeGenWidget(QW.QWidget):
         self.data = self.range_model._data
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.prop_label.setText(QW.QApplication.translate("RangeGenWidget", "Column", None, -1))
@@ -154,6 +156,7 @@ class RangeGenWidget(QW.QWidget):
 
 
 class RangeGenDialog(QW.QDialog):
+    """A basic dialog containing a RangeGenWidget."""
     def __init__(self, props=None, data=None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -181,6 +184,7 @@ class RangeGenDialog(QW.QDialog):
         self.button_box.rejected.connect(self.reject)
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("RangeGenDialog", "Range generator", None, -1))

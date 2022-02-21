@@ -2,7 +2,7 @@ from qtpy import QtCore as QC
 from qtpy import QtCore as QW
 
 from pygapsgui.models.dfTableModel import dfTableModel
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoDataTableModel(dfTableModel):

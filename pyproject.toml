@@ -6,7 +6,52 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+# versioning: setuptools_scm
 [tool.setuptools_scm]
 write_to = "pygapsgui/_version.py"
 local_scheme = 'dirty-tag'
 fallback_version = '0.2.0'
+
+
+# linting: pylint
+[tool.pylint.basic]
+extension-pkg-whitelist = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "qtpy",
+    "pyside6",
+]
+[tool.pylint.messages_control]
+disable = [
+    "invalid-name", # pyside methods #TODO: remove when switching to true_property pyside option
+    "logging-fstring-interpolation", # fstrings are fast
+    "import-outside-toplevel", # required for optimisations
+    "wrong-import-position", # often done through code for optimisations
+    "too-many-instance-attributes", # we don't need these
+    "too-many-branches", # we don't need these
+    "too-many-locals", # we don't need these
+    "too-many-arguments", # we don't need these
+]
+
+# linting: pydocstyle
+[tool.pydocstyle]
+convention = "numpy"
+match-dir = "src\\/.*"
+
+# formatting: yapf
+[tool.yapf]
+based_on_style = "pep8"
+dedent_closing_brackets = true
+coalesce_brackets = true
+split_complex_comprehension = true
+split_before_dot = true
+
+# formatting: isort
+[tool.isort]
+force_single_line = true
+line_length = 120
+known_first_party = "pygaps"
+default_section = "THIRDPARTY"
+forced_separate = "test_pygaps"
+skip = [".tox",".eggs","ci/templates","build","dist"]

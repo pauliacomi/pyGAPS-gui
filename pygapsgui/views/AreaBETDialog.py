@@ -116,6 +116,7 @@ class AreaBETDialog(QW.QDialog):
         pass
 
     def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("AreaBETDialog", "Calculate BET area", None, -1))

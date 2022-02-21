@@ -2,8 +2,8 @@ import os
 
 import pandas
 
-from pygapsgui.widgets.UtilityWidgets import error_dialog
-from pygapsgui.widgets.UtilityWidgets import save_file_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
+from pygapsgui.widgets.UtilityDialogs import save_file_dialog
 
 
 def serialize(obj: dict, how: str = "H", parent=None):

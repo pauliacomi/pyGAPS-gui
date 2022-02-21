@@ -12,7 +12,7 @@ from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.utilities.tex2svg import tex2svg
 from pygapsgui.widgets.SpinBoxSlider import QHSpinBoxSlider
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoModelManualModel():

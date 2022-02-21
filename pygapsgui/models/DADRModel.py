@@ -4,7 +4,7 @@ from pygaps.characterisation.dr_da_plots import log_v_adj
 from pygaps.graphing.calc_graphs import dra_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.widgets.UtilityWidgets import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class DADRModel():
