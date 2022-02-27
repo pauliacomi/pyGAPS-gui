@@ -8,6 +8,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoGraphView(GraphView):
+    """A canvas specifically designed to display isotherms."""
 
     isotherms = None
     branch: str = "all"
@@ -23,6 +24,8 @@ class IsoGraphView(GraphView):
 
     pressure_mode = None
     pressure_unit = None
+    loading_basis = None
+    loading_unit = None
 
     lgd_keys = None
 
@@ -73,6 +76,8 @@ class IsoGraphView(GraphView):
                     y2_data=self.y2_data,
                     pressure_mode=self.pressure_mode,
                     pressure_unit=self.pressure_unit,
+                    loading_basis=self.loading_basis,
+                    loading_unit=self.loading_unit,
                     lgd_keys=self.lgd_keys,
                 )
                 self.ax.autoscale()  # auto-scale

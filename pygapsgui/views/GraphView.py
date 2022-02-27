@@ -8,6 +8,7 @@ from pygapsgui.widgets.GraphSelectorToolbar import VSelectorToolbar
 
 
 class GraphView(QW.QWidget):
+    """A widget that extends the matplotlib canvas with some useful functionality."""
 
     canvas = None
     figure = None

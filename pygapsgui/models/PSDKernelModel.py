@@ -7,6 +7,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class PSDKernelModel():
+    """Pore size distribution calculations with kernel fitting: QT MVC Model."""
 
     # Refs
     isotherm = None
@@ -37,13 +38,16 @@ class PSDKernelModel():
         )
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
-        self.view.kernel_dropdown.addItems(_KERNELS),
+        self.view.kernel_dropdown.addItems(_KERNELS)
         self.view.smooth_input.setValue(self.bspline_order)
 
         # plot setup
         self.view.iso_graph.branch = self.branch
         self.view.iso_graph.lgd_keys = ["material"]
+        # TODO: this should be derived from the individual kernel units
         self.view.iso_graph.pressure_mode = "relative"
+        self.view.iso_graph.loading_basis = "molar"
+        self.view.iso_graph.loading_unit = "mmol"
         self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
@@ -115,7 +119,6 @@ class PSDKernelModel():
 
     def output_results(self):
         """Fill in any GUI text output with results"""
-        pass
 
     def output_log(self):
         """Output text or dialog error/warning/info."""
