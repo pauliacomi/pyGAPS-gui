@@ -11,7 +11,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoModelByModel():
-    """Model an isotherm by a specific model."""
+    """Fit an isotherm by a specific isotherm model: QT MVC Model."""
 
     isotherm = None
     model_isotherm = None

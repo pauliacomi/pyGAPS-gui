@@ -10,6 +10,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class PSDMesoModel():
+    """Pore size distribution calculations with Kelvin-based theory: QT MVC Model."""
 
     # Refs
     isotherm = None

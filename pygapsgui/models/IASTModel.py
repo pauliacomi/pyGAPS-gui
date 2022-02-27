@@ -10,6 +10,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IASTModel():
+    """IAST general multicomponent prediction: QT MVC Model."""
 
     isotherms = None
     view = None

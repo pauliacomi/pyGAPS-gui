@@ -16,6 +16,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoModelManualModel():
+    """Manually create an isotherm model: QT MVC Model."""
 
     model_isotherm = None
     view = None

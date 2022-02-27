@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class AreaBETModel():
+    """BET specific area calculations: QT MVC Model."""
 
     isotherm = None
     view = None

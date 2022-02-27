@@ -10,6 +10,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class PlotAlphaSModel():
+    """Alpha-s plot calculations: QT MVC Model."""
 
     isotherm = None
     ref_isotherm = None

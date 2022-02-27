@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IASTSVPModel():
+    """IAST selectivity versus pressure prediction: QT MVC Model."""
 
     isotherms = None
     view = None

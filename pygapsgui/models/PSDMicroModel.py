@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class PSDMicroModel():
+    """Pore size distribution calculations with mean potential theory: QT MVC Model."""
 
     # Refs
     isotherm = None

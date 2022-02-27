@@ -7,6 +7,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IASTVLEModel():
+    """IAST vapour-liquid equilibrium prediction: QT MVC Model."""
 
     isotherms = None
     view = None

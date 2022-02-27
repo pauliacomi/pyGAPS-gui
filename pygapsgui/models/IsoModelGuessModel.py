@@ -10,7 +10,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoModelGuessModel():
-    """Automatic isotherm model fit: MV model."""
+    """Automatic isotherm fit by several models: QT MVC Model."""
 
     isotherm = None
     model_isotherm = None

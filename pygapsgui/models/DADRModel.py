@@ -8,6 +8,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class DADRModel():
+    """Dubinin-Astakov and Dubinin-Radushkevich calculations: QT MVC Model."""
 
     isotherm = None
     view = None

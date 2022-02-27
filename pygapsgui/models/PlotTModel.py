@@ -10,6 +10,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class PlotTModel():
+    """T-plot calculations: QT MVC Model."""
 
     isotherm = None
     view = None
