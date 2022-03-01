@@ -1,5 +1,6 @@
 from pygaps.characterisation.area_lang import area_langmuir_raw
 from pygaps.characterisation.area_lang import langmuir_transform
+from pygaps.characterisation.area_lang import simple_lang
 from pygaps.graphing.calc_graphs import langmuir_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
@@ -176,6 +177,13 @@ class AreaLangModel():
 
         # Isotherm plot update
         self.view.iso_graph.draw_isotherms()
+        self.view.iso_graph.ax.autoscale(enable=False)
+        self.view.iso_graph.ax.plot(
+            self.pressure,
+            simple_lang(self.pressure, self.n_monolayer * 1000, self.k_const),
+            c='yellow',
+            label="fit",
+        )
 
         # Generate plot of the points chosen
         self.view.lang_graph.clear()
