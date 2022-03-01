@@ -1,6 +1,7 @@
 from pygaps.characterisation.area_bet import area_BET_raw
 from pygaps.characterisation.area_bet import bet_transform
 from pygaps.characterisation.area_bet import roq_transform
+from pygaps.characterisation.area_bet import simple_bet
 from pygaps.graphing.calc_graphs import bet_plot
 from pygaps.graphing.calc_graphs import roq_plot
 from pygaps.utilities.exceptions import CalculationError
@@ -177,6 +178,13 @@ class AreaBETModel():
 
         # Isotherm plot update
         self.view.iso_graph.draw_isotherms()
+        self.view.iso_graph.ax.autoscale(enable=False)
+        self.view.iso_graph.ax.plot(
+            self.pressure,
+            simple_bet(self.pressure, self.n_monolayer * 1000, self.c_const),
+            c='yellow',
+            label="fit",
+        )
 
         # Generate plot of the BET points chosen
         self.view.bet_graph.clear()
