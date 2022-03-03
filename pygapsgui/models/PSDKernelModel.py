@@ -1,4 +1,4 @@
-from pygaps.characterisation.psd_kernel import _KERNELS
+from pygaps.data import KERNELS
 from pygaps.characterisation.psd_kernel import psd_dft
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
@@ -38,7 +38,7 @@ class PSDKernelModel():
         )
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
-        self.view.kernel_dropdown.addItems(_KERNELS)
+        self.view.kernel_dropdown.addItems(KERNELS)
         self.view.smooth_input.setValue(self.bspline_order)
 
         # plot setup
@@ -146,7 +146,7 @@ class PSDKernelModel():
         self.view.iso_graph.ax.plot(
             self.pressure[self.limit_indices[0]:self.limit_indices[1] + 1],
             self.results['kernel_loading'],
-            'r-',
+            c='yellow',
             label="fit",
         )
 

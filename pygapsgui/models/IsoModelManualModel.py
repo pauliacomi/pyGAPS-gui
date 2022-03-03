@@ -5,10 +5,10 @@ import pygaps
 from pygaps import ModelIsotherm
 from pygaps.modelling import _MODELS
 from pygaps.modelling import get_isotherm_model
-from pygaps.utilities.converter_mode import _LOADING_MODE
-from pygaps.utilities.converter_mode import _MATERIAL_MODE
-from pygaps.utilities.converter_mode import _PRESSURE_MODE
-from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
+from pygaps.units.converter_mode import _LOADING_MODE
+from pygaps.units.converter_mode import _MATERIAL_MODE
+from pygaps.units.converter_mode import _PRESSURE_MODE
+from pygaps.units.converter_unit import _TEMPERATURE_UNITS
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.utilities.tex2svg import tex2svg
 from pygapsgui.widgets.SpinBoxSlider import QHSpinBoxSlider
