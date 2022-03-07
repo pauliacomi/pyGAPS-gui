@@ -79,11 +79,13 @@ class ImportDialog(QW.QDialog):
         _layout.addWidget(self.import_button)
 
     def set_ftype(self, act: bool, tp: int):
+        """Handle file type setting."""
         if act:
             self.ftype = IMPORT_FILES[tp]['ind']
             self.import_button.setVisible(True)
 
     def import_form(self):
+        """Pop-up to select files."""
         sel = next(v for v in IMPORT_FILES if v['ind'] == self.ftype)
         self.filepaths = open_files_dialog(
             parent=self,
