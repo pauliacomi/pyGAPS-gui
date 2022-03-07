@@ -1,3 +1,4 @@
+from configparser import ParsingError
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
@@ -369,23 +370,28 @@ class IsoController():
 
         import pygaps.parsing as pgp
         if iso_type == 'bel_dat':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='dat')
+            settings = dict(manufacturer='bel', fmt='dat')
         elif iso_type == 'bel_xl':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='xl')
+            settings = dict(manufacturer='bel', fmt='xl')
         elif iso_type == 'bel_csv':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='csv')
+            settings = dict(manufacturer='bel', fmt='csv')
         elif iso_type == 'bel_csv_jis':
-            isotherm = pgp.isotherm_from_commercial(
-                path=path, manufacturer='bel', fmt='csv', lang="JPN"
-            )
+            settings = dict(manufacturer='bel', fmt='csv', lang="JPN")
         elif iso_type == 'mic_xl':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='mic', fmt='xl')
+            settings = dict(manufacturer='mic', fmt='xl')
         elif iso_type == '3p_xl':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='3p', fmt='xl')
+            settings = dict(manufacturer='3p', fmt='xl')
         elif iso_type == 'qnt_txt':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='qnt', fmt='txt')
+            settings = dict(manufacturer='qnt', fmt='txt')
         else:
             raise Exception(f"Could not determine import type '{iso_type}'.")
+
+        try:
+            isotherm = pgp.isotherm_from_commercial(path=path, **settings)
+        except ParsingError as exc:
+            error_dialog(str(exc))
+        except BaseException as exc:
+            error_dialog(str(exc))
 
         if not isotherm:
             return
