@@ -4,6 +4,8 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
+from pygapsgui.widgets.UtilityWidgets import CollapsibleBox
+
 
 def open_files_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
     """Abstract dialog for file opening."""
