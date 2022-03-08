@@ -99,7 +99,9 @@ class DADRDialog(QW.QDialog):
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
+        self.button_box.setStandardButtons(
+            QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close | QW.QDialogButtonBox.Help
+        )
         _layout.addWidget(self.button_box, 2, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:

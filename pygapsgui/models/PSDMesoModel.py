@@ -74,6 +74,7 @@ class PSDMesoModel():
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # run calculation
@@ -192,3 +193,10 @@ class PSDMesoModel():
             self.results.get("pore_volume_cumulative"),
         }
         serialize(results, how="V", parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(
+            "https://pygaps.readthedocs.io/en/master/reference/characterisation/psd_meso.html"
+        )

@@ -74,6 +74,7 @@ class PlotTModel():
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # static parameters
@@ -218,3 +219,10 @@ class PlotTModel():
             for e, result in enumerate(self.results)
         }
         serialize(results, parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(
+            "https://pygaps.readthedocs.io/en/master/reference/characterisation/t_plot.html"
+        )

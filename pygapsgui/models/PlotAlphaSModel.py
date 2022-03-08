@@ -80,6 +80,7 @@ class PlotAlphaSModel():
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # static parameters
@@ -280,3 +281,10 @@ class PlotAlphaSModel():
         }
         if serialize(results, parent=self.view):
             self.view.accept()
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(
+            "https://pygaps.readthedocs.io/en/master/reference/characterisation/alphas_plot.html"
+        )

@@ -77,6 +77,7 @@ class DADRModel():
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # static parameters
@@ -242,3 +243,10 @@ class DADRModel():
             results['DR Exponent'] = self.exp
 
         serialize(results, parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(
+            "https://pygaps.readthedocs.io/en/master/reference/characterisation/dubinin.html"
+        )

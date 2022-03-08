@@ -62,7 +62,9 @@ class PlotTDialog(QW.QDialog):
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
+        self.button_box.setStandardButtons(
+            QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close | QW.QDialogButtonBox.Help
+        )
         _layout.addWidget(self.button_box)
 
     def sizeHint(self) -> QC.QSize:

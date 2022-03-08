@@ -1,3 +1,5 @@
+"""BET area QT model."""
+
 from pygaps.characterisation.area_bet import area_BET_raw
 from pygaps.characterisation.area_bet import bet_transform
 from pygaps.characterisation.area_bet import roq_transform
@@ -83,6 +85,7 @@ class AreaBETModel():
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # static parameters
@@ -254,3 +257,10 @@ class AreaBETModel():
             'Pressure limits': self.limits
         }
         serialize(results, parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(
+            "https://pygaps.readthedocs.io/en/master/reference/characterisation/area_bet.html"
+        )

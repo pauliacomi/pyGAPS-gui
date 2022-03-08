@@ -89,3 +89,24 @@ class ErrorMessageBox(QW.QDialog):
         if trace:
             _layout.addWidget(self.details_box)
         _layout.addWidget(self.button_box)
+
+
+def help_dialog(url: str):
+    """Display a dialog with online help."""
+    help = HelpDialog(url)
+    help.exec_()
+
+
+class HelpDialog(QW.QDialog):
+    """General help dialog, actually just a browser window."""
+    def __init__(self, url: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setWindowTitle("Help Dialog")
+
+        from qtpy import QtWebEngineWidgets as QWW
+        self.browser = QWW.QWebEngineView()
+        self.browser.setUrl(QC.QUrl(url))
+
+        _layout = QW.QVBoxLayout(self)
+        _layout.addWidget(self.browser)

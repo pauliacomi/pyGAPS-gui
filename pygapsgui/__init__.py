@@ -4,6 +4,7 @@ import sys
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
+from qtpy import QtWebEngineWidgets as QWW  # MUST be initialized here
 
 # Scaling for high dpi screens # TODO deprecated in pyside6
 QW.QApplication.setAttribute(QC.Qt.AA_EnableHighDpiScaling, True)
