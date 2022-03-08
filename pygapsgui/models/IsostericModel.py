@@ -140,7 +140,7 @@ class IsostericModel():
 
     def select_branch(self, branch):
         self.branch = self.view.branch_dropdown.currentText()
-        self.view.iso_graph.set_branch(self.branch)
+        self.view.iso_graph.branch = self.branch
         self.calc_auto()
 
     def select_points(self, npoints):

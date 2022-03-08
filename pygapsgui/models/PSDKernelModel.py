@@ -164,7 +164,7 @@ class PSDKernelModel():
     def select_branch(self):
         """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
-        self.view.iso_graph.set_branch(self.branch)
+        self.view.iso_graph.branch = self.branch
         self.plot_clear()
         self.prepare_values()
 

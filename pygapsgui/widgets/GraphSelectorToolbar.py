@@ -20,15 +20,19 @@ class SelectorToolbar(QW.QToolBar):
         self.setup_UI(slider_range)
 
     def setRange(self, slider_range):
+        """Set the underlying range for the slider."""
         self.slider.setRange([slider_range[0], slider_range[1], None])
 
     def setValues(self, slider_values, emit=True):
+        """Set the underlying range for the slider."""
         self.slider.setValues(slider_values, emit=emit)
 
     def getValues(self):
+        """Pass-through to slider function."""
         return self.slider.getValues()
 
     def setLogScale(self, is_set: bool):
+        """Pass-through to slider function."""
         self.slider.setLogScale(is_set)
 
 

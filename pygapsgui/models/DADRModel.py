@@ -219,7 +219,7 @@ class DADRModel():
     def select_branch(self):
         """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
-        self.view.iso_graph.set_branch(self.branch)
+        self.view.iso_graph.branch = self.branch
         self.prepare_values()
         self.calc_auto()
 
