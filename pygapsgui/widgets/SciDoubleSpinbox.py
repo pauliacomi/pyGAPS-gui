@@ -21,6 +21,7 @@ def valid_float_string(string):
 
 
 class FloatValidator(QG.QValidator):
+    """QValidator for float numbers"""
     def validate(self, string, position):
         if valid_float_string(string):
             return self.State.Acceptable
@@ -34,6 +35,7 @@ class FloatValidator(QG.QValidator):
 
 
 class ScientificDoubleSpinBox(QW.QDoubleSpinBox):
+    """A QDoubleSpinbox which shows numbers in scientific format."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setMinimum(-np.inf)
@@ -64,6 +66,7 @@ class ScientificDoubleSpinBox(QW.QDoubleSpinBox):
 
 
 class SciFloatSpinDelegate(QW.QStyledItemDelegate):
+    """A StyledItemDelegate that displays a ScientificDoubleSpinBox"""
     def createEditor(self, parent, option, index):
         """Give an instance of the SciDoubleSpinbox"""
         return ScientificDoubleSpinBox(parent)
@@ -77,14 +80,16 @@ class SciFloatSpinDelegate(QW.QStyledItemDelegate):
 
 
 class SciFloatDelegate(QW.QStyledItemDelegate):
+    """A StyledItemDelegate that displays scientific formatted floats."""
     def displayText(self, value, locale):
+        """Called when the underlying text is displayed."""
         return format_float(value)
 
 
 def format_float(value):
     """Modified form of the 'g' format specifier."""
-    if type(value) == str:
-        return value
+    if not isinstance(value, float):
+        return str(value)
     string = f"{value:.5g}".replace("e+", "e")
     string = re.sub("e(-?)0*(\d+)", r"e\1\2", string)
     return string

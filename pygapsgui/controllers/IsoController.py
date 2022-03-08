@@ -1,4 +1,3 @@
-from configparser import ParsingError
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
@@ -7,6 +6,7 @@ from pygaps.units.converter_mode import _LOADING_MODE
 from pygaps.units.converter_mode import _MATERIAL_MODE
 from pygaps.units.converter_mode import _PRESSURE_MODE
 from pygaps.units.converter_unit import _TEMPERATURE_UNITS
+from pygaps.utilities import exceptions as pge
 from pygapsgui.models.IsoModel import IsoModel
 from pygapsgui.models.MetadataTableModel import MetadataTableModel
 from pygapsgui.widgets.UtilityDialogs import error_dialog
@@ -314,6 +314,19 @@ class IsoController():
         self.mw_widget.statusbar.showMessage(f"Added property named '{meta_name}")
         self.mw_widget.metadata_table_view.resizeColumns()
 
+    def metadata_save_bulk(self, results: dict):
+        """Save multiple metadatas from a dictionary."""
+        for meta_name, meta_value in results.items():
+            if isinstance(meta_value, (int, float)):
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "number"])
+            elif isinstance(meta_value, (list, tuple)):
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "list"])
+            else:
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "text"])
+
+        self.mw_widget.metadata_table_view.resizeColumns()
+        self.mw_widget.statusbar.showMessage(f"Saved results as metadata.")
+
     def metadata_delete(self):
         """Delete a metadata point."""
         index = self.mw_widget.metadata_table_view.currentIndex()
@@ -388,7 +401,7 @@ class IsoController():
 
         try:
             isotherm = pgp.isotherm_from_commercial(path=path, **settings)
-        except ParsingError as exc:
+        except pge.ParsingError as exc:
             error_dialog(str(exc))
         except BaseException as exc:
             error_dialog(str(exc))
@@ -399,6 +412,7 @@ class IsoController():
         self.add_isotherm(name, isotherm)
 
     def add_isotherm(self, name, isotherm):
+        """Wrap an isotherm in an IsoModel and add to the IsothermListModel."""
 
         # Add adsorbates to the list
         if isotherm.material not in pygaps.MATERIAL_LIST:

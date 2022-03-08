@@ -43,12 +43,14 @@ class MainWindow(QW.QMainWindow):
     ########################################################
 
     def dragEnterEvent(self, event):
+        """Happens when a file is dragged on top of the window."""
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
         else:
             event.ignore()
 
     def dropEvent(self, event):
+        """We try to parse the dropped file as an isotherm."""
         filepaths = [pathlib.Path(u.toLocalFile()) for u in event.mimeData().urls()]
         self.open_iso(filepaths)
 
@@ -181,7 +183,11 @@ class MainWindow(QW.QMainWindow):
         dialog = AreaBETDialog(parent=self)
         model = AreaBETModel(isotherm, dialog)
         if model.success:
-            dialog.exec()
+            ret = dialog.exec()
+            if ret == QW.QDialog.Accepted:
+                # TODO There may be no results!!!
+                results = model.result_dict()
+                self.iso_controller.metadata_save_bulk(results)
 
     def area_langmuir(self):
         """Start Langmuir area dialog."""
@@ -193,7 +199,10 @@ class MainWindow(QW.QMainWindow):
         dialog = AreaLangDialog(parent=self)
         model = AreaLangModel(isotherm, dialog)
         if model.success:
-            dialog.exec()
+            ret = dialog.exec()
+            if ret == QW.QDialog.Accepted:
+                results = model.result_dict()
+                self.iso_controller.metadata_save_bulk(results)
 
     def t_plot(self):
         """Start t-plot dialog."""
@@ -205,7 +214,10 @@ class MainWindow(QW.QMainWindow):
         dialog = PlotTDialog(parent=self)
         model = PlotTModel(isotherm, dialog)
         if model.success:
-            dialog.exec()
+            ret = dialog.exec()
+            if ret == QW.QDialog.Accepted:
+                results = model.result_dict()
+                self.iso_controller.metadata_save_bulk(results)
 
     def alpha_s_plot(self):
         """Start alpha-s plot dialog."""
@@ -227,7 +239,10 @@ class MainWindow(QW.QMainWindow):
         dialog = PlotAlphaSDialog(parent=self)
         model = PlotAlphaSModel(isotherm, ref_isotherm, dialog)
         if model.success:
-            dialog.exec()
+            ret = dialog.exec()
+            if ret == QW.QDialog.Accepted:
+                results = model.result_dict()
+                self.iso_controller.metadata_save_bulk(results)
 
     def dr_plot(self):
         """Start DR dialog. Calls a generic function."""
@@ -247,7 +262,10 @@ class MainWindow(QW.QMainWindow):
         dialog = DADRDialog(ptype=ptype, parent=self)
         model = DADRModel(isotherm, dialog, ptype=ptype)
         if model.success:
-            dialog.exec()
+            ret = dialog.exec()
+            if ret == QW.QDialog.Accepted:
+                results = model.result_dict()
+                self.iso_controller.metadata_save_bulk(results)
 
     def psd_micro(self):
         """Start microporous PSD dialog."""
@@ -259,7 +277,10 @@ class MainWindow(QW.QMainWindow):
         dialog = PSDMicroDialog(parent=self)
         model = PSDMicroModel(isotherm, dialog)
         if model.success:
-            dialog.exec()
+            ret = dialog.exec()
+            if ret == QW.QDialog.Accepted:
+                results = model.result_dict()
+                self.iso_controller.metadata_save_bulk(results)
 
     def psd_meso(self):
         """Start mesoporous PSD dialog."""
@@ -271,7 +292,10 @@ class MainWindow(QW.QMainWindow):
         dialog = PSDMesoDialog(parent=self)
         model = PSDMesoModel(isotherm, dialog)
         if model.success:
-            dialog.exec()
+            ret = dialog.exec()
+            if ret == QW.QDialog.Accepted:
+                results = model.result_dict()
+                self.iso_controller.metadata_save_bulk(results)
 
     def psd_kernel(self):
         """Start kernel fitting PSD dialog."""
@@ -283,7 +307,10 @@ class MainWindow(QW.QMainWindow):
         dialog = PSDKernelDialog(parent=self)
         model = PSDKernelModel(isotherm, dialog)
         if model.success:
-            dialog.exec()
+            ret = dialog.exec()
+            if ret == QW.QDialog.Accepted:
+                results = model.result_dict()
+                self.iso_controller.metadata_save_bulk(results)
 
     def isosteric(self):
         """Start isosteric enthalpy dialog."""

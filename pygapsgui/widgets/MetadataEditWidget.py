@@ -9,7 +9,7 @@ class MetadataEditWidget(QW.QWidget):
     """
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.meta_types = ["text", "number"]
+        self.meta_types = ["text", "number", "list"]
         self.setup_UI()
         self.translate_UI()
 

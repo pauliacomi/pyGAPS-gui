@@ -78,7 +78,8 @@ class AreaLangModel():
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
-        self.view.button_box.accepted.connect(self.export_results)
+        self.view.export_btn.clicked.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.view.accept)
         self.view.button_box.rejected.connect(self.view.reject)
         self.view.button_box.helpRequested.connect(self.help_dialog)
 
@@ -214,6 +215,20 @@ class AreaLangModel():
         self.prepare_values()
         self.calc_auto()
 
+    def result_dict(self):
+        """Return a dictionary of results."""
+        return {
+            f"Langmuir area [m2/{self.isotherm.material_unit}]": self.lang_area,
+            "Langmuir R^2": self.corr_coef,
+            "Langmuir K constant": self.k_const,
+            f"Langmuir monolayer uptake [mmol/{self.isotherm.material_unit}]":
+            self.n_monolayer * 1000,
+            "Langmuir monolayer pressure [p/p0]": self.p_monolayer,
+            "Langmuir slope": self.slope,
+            "Langmuir intercept": self.intercept,
+            "Langmuir pressure limits": self.limits
+        }
+
     def export_results(self):
         """Save results as a file."""
         if not self.lang_area:
@@ -221,16 +236,7 @@ class AreaLangModel():
             return
         from pygapsgui.utilities.result_export import serialize
 
-        results = {
-            f"Langmuir area [m2/{self.isotherm.material_unit}]": self.lang_area,
-            'R^2': self.corr_coef,
-            'K constant': self.k_const,
-            f"Monolayer uptake [mmol/{self.isotherm.material_unit}]": self.n_monolayer * 1000,
-            'p_monolayer [p/p0]': self.p_monolayer,
-            'Langmuir slope': self.slope,
-            'Langmuir intercept': self.intercept,
-            'Pressure limits': self.limits
-        }
+        results = self.result_dict()
         serialize(results, parent=self.view)
 
     def help_dialog(self):

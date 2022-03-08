@@ -75,7 +75,8 @@ class DADRModel():
         if self.ptype == "DA":
             self.view.dr_exp_input.valueChanged.connect(self.select_exp)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.button_box.accepted.connect(self.export_results)
+        self.view.export_btn.clicked.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.view.accept)
         self.view.button_box.rejected.connect(self.view.reject)
         self.view.button_box.helpRequested.connect(self.help_dialog)
 
@@ -202,6 +203,7 @@ class DADRModel():
         self.view.res_graph.canvas.draw_idle()
 
     def select_exp(self):
+        """Handle exponent selection."""
         exp = self.view.dr_exp_input.cleanText()
         # Check consistency of exponent
         if exp:
@@ -224,6 +226,22 @@ class DADRModel():
         self.prepare_values()
         self.calc_auto()
 
+    def result_dict(self):
+        """Return a dictionary of results."""
+        results = {
+            f"{self.ptype} mircropore Volume [cm3/{self.isotherm.material_unit}]":
+            self.microp_volume * 1000,
+            f"{self.ptype} effective potential [kJ/mol]": self.potential,
+            f"{self.ptype} R^2": self.corr_coef,
+            f"{self.ptype} slope": self.slope,
+            f"{self.ptype} intercept": self.intercept,
+            f"{self.ptype} pressure limits": self.limits
+        }
+
+        if self.ptype != "DR":
+            results["DR Exponent"] = self.exp
+        return results
+
     def export_results(self):
         """Save results as a file."""
         if not self.microp_volume:
@@ -231,17 +249,7 @@ class DADRModel():
             return
         from pygapsgui.utilities.result_export import serialize
 
-        results = {
-            f'Mircropore Volume [cm3/{self.isotherm.material_unit}]': self.microp_volume * 1000,
-            'Effective potential [kJ/mol]': self.potential,
-            'R^2': self.corr_coef,
-            'Slope': self.slope,
-            'Intercept': self.intercept,
-            'Pressure limits': self.limits
-        }
-        if self.ptype != "DR":
-            results['DR Exponent'] = self.exp
-
+        results = self.result_dict()
         serialize(results, parent=self.view)
 
     def help_dialog(self):

@@ -72,7 +72,8 @@ class PSDMesoModel():
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.button_box.accepted.connect(self.export_results)
+        self.view.export_btn.clicked.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.view.accept)
         self.view.button_box.rejected.connect(self.view.reject)
         self.view.button_box.helpRequested.connect(self.help_dialog)
 
@@ -178,13 +179,9 @@ class PSDMesoModel():
         self.view.iso_graph.branch = self.branch
         self.plot_clear()
 
-    def export_results(self):
-        """Save results as a file."""
-        if not self.results:
-            error_dialog("No results to export.")
-            return
-        from pygapsgui.utilities.result_export import serialize
-        results = {
+    def result_dict(self):
+        """Return a dictionary of results."""
+        return {
             "Pore widths [nm]":
             self.results.get("pore_widths"),
             "Pore distribution [dV/dW]":
@@ -192,6 +189,14 @@ class PSDMesoModel():
             "Pore cumulative volume [cm3/{self.isotherm.material_unit}]":
             self.results.get("pore_volume_cumulative"),
         }
+
+    def export_results(self):
+        """Save results as a file."""
+        if not self.results:
+            error_dialog("No results to export.")
+            return
+        from pygapsgui.utilities.result_export import serialize
+        results = self.result_dict()
         serialize(results, how="V", parent=self.view)
 
     def help_dialog(self):

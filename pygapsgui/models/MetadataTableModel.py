@@ -35,7 +35,7 @@ class MetadataTableModel(QC.QAbstractTableModel):
             return
 
         if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
-            return str(self.params[index.row()][index.column()])
+            return self.params[index.row()][index.column()]
 
         if role == QC.Qt.TextAlignmentRole:
             return QC.Qt.AlignCenter

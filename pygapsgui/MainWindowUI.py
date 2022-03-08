@@ -1,6 +1,7 @@
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
+from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
 
 import pygapsgui.widgets.resources_rc
 from pygapsgui.views.IsoGraphView import IsoListGraphView
@@ -156,6 +157,8 @@ class MainWindowUI():
 
         # metadata table
         self.metadata_table_view = MetadataTableView()
+        delegate = SciFloatDelegate()
+        self.metadata_table_view.setItemDelegate(delegate)
         self.metadata_table_view.setObjectName("metadata_table_view")
         self.prop_extra_layout.addWidget(self.metadata_table_view)
 

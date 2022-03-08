@@ -78,7 +78,8 @@ class PlotAlphaSModel():
         self.view.pressure_input.editingFinished.connect(self.select_redpressure)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
-        self.view.button_box.accepted.connect(self.export_results)
+        self.view.export_btn.clicked.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.view.accept)
         self.view.button_box.rejected.connect(self.view.reject)
         self.view.button_box.helpRequested.connect(self.help_dialog)
 
@@ -228,6 +229,7 @@ class PlotAlphaSModel():
         self.view.res_graph.draw_xlimits(self.alphas_curve[0], self.alphas_curve[-1])
 
     def select_area(self):
+        """Handle reference area selection."""
         area_type = self.view.refarea_dropdown.currentText().lower()
         with log_hook:
             if area_type == "bet":
@@ -254,14 +256,34 @@ class PlotAlphaSModel():
             self.calc_auto()
 
     def select_refbranch(self):
+        """Handle reference isotherm branch selection."""
         self.ref_branch = self.view.refbranch_dropdown.currentText()
         if self.prepare_values():
             self.calc_auto()
 
     def select_redpressure(self):
+        """Handle reducing pressure selection."""
         self.reducing_pressure = float(self.view.pressure_input.text())
         if self.prepare_values():
             self.calc_auto()
+
+    def result_dict(self):
+        """Return a dictionary of results."""
+        return {
+            e: {
+                f"Alpha S pore volume [cm3/{self.isotherm.material_unit}]":
+                result.get("adsorbed_volume"),
+                f"Alpha S area [m2/{self.isotherm.material_unit}]":
+                result.get("area"),
+                "Alpha S R^2":
+                result.get("corr_coef"),
+                "Alpha S slope":
+                result.get("slope"),
+                "Alpha S intercept":
+                result.get("intercept"),
+            }
+            for e, result in enumerate(self.results)
+        }
 
     def export_results(self):
         """Save results as a file."""
@@ -269,18 +291,8 @@ class PlotAlphaSModel():
             error_dialog("No results to export.")
             return
         from pygapsgui.utilities.result_export import serialize
-        results = {
-            e: {
-                f"Pore volume [cm3/{self.isotherm.material_unit}]": result.get("adsorbed_volume"),
-                f"Area [m2/{self.isotherm.material_unit}]": result.get("area"),
-                "R^2": result.get("corr_coef"),
-                "Slope": result.get("slope"),
-                "Intercept": result.get("intercept"),
-            }
-            for e, result in enumerate(self.results)
-        }
-        if serialize(results, parent=self.view):
-            self.view.accept()
+        results = self.result_dict()
+        serialize(results, parent=self.view)
 
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
