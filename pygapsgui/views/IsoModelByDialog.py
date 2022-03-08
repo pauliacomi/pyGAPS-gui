@@ -15,6 +15,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class IsoModelByDialog(QW.QDialog):
+    """Fit an isotherm by a specific isotherm model: QT MVC Dialog."""
 
     paramWidgets = {}
 

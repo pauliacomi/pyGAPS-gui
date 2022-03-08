@@ -6,6 +6,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 
 
 class IsoEditModelDialog(QW.QDialog):
+    """Dialog allowing the editing of ModelIsotherm parameters."""
     def __init__(self, isotherm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.isotherm = isotherm

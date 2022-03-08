@@ -17,6 +17,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class IsoModelManualDialog(QW.QDialog):
+    """Manually create an isotherm model: QT MVC Dialog."""
 
     paramWidgets = {}
 

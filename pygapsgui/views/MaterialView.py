@@ -10,6 +10,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class MaterialView(QW.QWidget):
+    """QT MVC View for displaying and editing Material properties/metadata."""
 
     _material = None
     material_changed = QC.Signal(str)
@@ -68,10 +69,11 @@ class MaterialView(QW.QWidget):
             return
 
         self._material = material
-        self.setup_model()
+        self.setup_view()
         self.connect_signals()
 
-    def setup_model(self):
+    def setup_view(self):
+        """Sets up the display of various properties/metadata."""
         self.name_value.setText(self.material.name)
         density = self.material.density
         density = str(density) if density else density
@@ -90,6 +92,7 @@ class MaterialView(QW.QWidget):
         self.meta_edit_widget.delete_button.clicked.connect(self.metadata_delete)
 
     def accept(self) -> None:
+        """See if any changes were made and emit signal."""
         changed = False
         if self.name_value.text() != self.material.name:
             self.material.name = self.name_value.text()
@@ -104,6 +107,7 @@ class MaterialView(QW.QWidget):
             self.material_changed.emit(str(self.material))
 
     def metadata_select(self):
+        """Handle selection of a metadata in the TableView."""
         index = self.table_view.currentIndex()
         if index:
             data = self.table_model.rowData(index)
@@ -113,7 +117,7 @@ class MaterialView(QW.QWidget):
                 self.meta_edit_widget.clear()
 
     def metadata_save(self):
-
+        """Handle saving of a metadata in the TableView."""
         meta_name = self.meta_edit_widget.name_input.text()
         meta_value = self.meta_edit_widget.value_input.text()
         meta_type = self.meta_edit_widget.type_input.currentText()
@@ -132,6 +136,7 @@ class MaterialView(QW.QWidget):
         self.table_view.resizeColumns()
 
     def metadata_delete(self):
+        """Handle deletion of a metadata in the TableView."""
         index = self.table_view.currentIndex()
         self.table_model.removeRow(index.row())
         self.material_changed.emit(str(self.material))
@@ -149,6 +154,7 @@ class MaterialView(QW.QWidget):
 
 
 class MaterialDialog(QW.QDialog):
+    """Dialog with a MaterialView."""
     material_changed = QC.Signal(str)
 
     def __init__(self, material, *args, **kwargs) -> None:
@@ -193,6 +199,7 @@ class MaterialDialog(QW.QDialog):
 
 
 class MaterialListDialog(QW.QDialog):
+    """Dialog with a list of Materials and a MaterialView."""
     material_changed = QC.Signal(str)
 
     def __init__(self, *args, **kwargs):
@@ -200,7 +207,7 @@ class MaterialListDialog(QW.QDialog):
         self.setup_UI()
         self.translate_UI()
         self.connect_signals()
-        self.setup_model()
+        self.setup_view()
 
     def setup_UI(self):
         """Creates and sets-up static UI elements"""
@@ -229,7 +236,8 @@ class MaterialListDialog(QW.QDialog):
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
-    def setup_model(self):
+    def setup_view(self):
+        """Sets up the display of various properties/metadata."""
         self.materialList.addItems([mat.name for mat in MATERIAL_LIST])
         self.materialList.currentItemChanged.connect(self.selectMaterial)
 

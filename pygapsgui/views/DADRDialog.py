@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class DADRDialog(QW.QDialog):
+    """Dubinin-Astakov and Dubinin-Radushkevich calculations: QT MVC Dialog."""
     def __init__(self, ptype="DR", *args, **kwargs):
         super().__init__(*args, **kwargs)
 

@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class IsostericDialog(QW.QDialog):
+    """Isosteric enthalpy calculations: QT MVC Dialog."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()

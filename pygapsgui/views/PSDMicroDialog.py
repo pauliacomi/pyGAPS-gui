@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class PSDMicroDialog(QW.QDialog):
+    """Pore size distribution calculations with mean potential theory: QT MVC Dialog."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()

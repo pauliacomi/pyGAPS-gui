@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class AreaBETDialog(QW.QDialog):
+    """BET specific area calculations: QT MVC Dialog."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()

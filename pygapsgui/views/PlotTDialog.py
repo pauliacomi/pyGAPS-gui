@@ -8,6 +8,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class PlotTDialog(QW.QDialog):
+    """T-plot calculations: QT MVC Dialog."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()

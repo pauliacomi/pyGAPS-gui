@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class PSDMesoDialog(QW.QDialog):
+    """Pore size distribution calculations with Kelvin-based theory: QT MVC Dialog."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()

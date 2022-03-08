@@ -10,7 +10,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 
 
 class IsoEditPointDialog(QW.QDialog):
-    """A dialog that allows editing of individual isotherm points."""
+    """A dialog that allows editing of PointIsotherm points."""
     def __init__(self, isotherm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
