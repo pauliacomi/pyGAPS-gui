@@ -325,7 +325,7 @@ class IsoController():
                 self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "text"])
 
         self.mw_widget.metadata_table_view.resizeColumns()
-        self.mw_widget.statusbar.showMessage(f"Saved results as metadata.")
+        self.mw_widget.statusbar.showMessage("Saved results as metadata.")
 
     def metadata_delete(self):
         """Delete a metadata point."""

@@ -6,7 +6,7 @@ from pygaps.modelling import _MODELS
 from pygaps.modelling import get_isotherm_model
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.utilities.tex2svg import tex2svg
-from pygapsgui.widgets.SpinBoxSlider import QHSpinBoxSlider
+from pygapsgui.widgets.SpinBoxLimitSlider import QHSpinBoxLimitSlider
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -21,6 +21,7 @@ class IsoModelByModel():
     branch = "ads"
     limits = None
     auto = True
+    bounds = False
     current_model = None
     current_model_name = None
 
@@ -44,7 +45,7 @@ class IsoModelByModel():
         self.view.setWindowTitle(
             self.view.windowTitle() + f" '{isotherm.material} - {isotherm.adsorbate}'"
         )
-        self.view.model_dropdown.addItems(_MODELS),
+        self.view.model_dropdown.addItems(_MODELS)
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
 
@@ -59,6 +60,7 @@ class IsoModelByModel():
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.x_select.slider.rangeChanged.connect(self.calculate_with_limits)
         self.view.calc_auto_button.clicked.connect(self.calculate_auto)
+        self.view.calc_autolim_button.clicked.connect(self.calculate_with_bounds)
         self.view.calc_manual_button.clicked.connect(self.calculate_manual)
 
         # populate initial
@@ -80,6 +82,12 @@ class IsoModelByModel():
         """Set limits on calculation."""
         self.limits = [left, right]
         self.calculate_auto()
+
+    def calculate_with_bounds(self):
+        """Use the selected parameter bounds for fitting."""
+        self.bounds = True
+        self.calculate_auto()
+        self.bounds = False
 
     def calculate_manual(self):
         """Use model parameters."""
@@ -111,11 +119,17 @@ class IsoModelByModel():
                     )
                     loading = loading[pressure.index]
 
+                    if self.bounds:
+                        param_bounds = self.get_model_bounds()
+                    else:
+                        param_bounds = None
+
                     self.model_isotherm = ModelIsotherm(
                         pressure=pressure.values,
                         loading=loading.values,
                         branch=self.branch,
                         model=self.current_model_name,
+                        param_bounds=param_bounds,
                         **iso_params
                     )
                     self.current_model = self.model_isotherm.model
@@ -130,6 +144,7 @@ class IsoModelByModel():
                 self.output += f'<font color="red">Model fitting failed! <br> {e}</font>'
                 return False
             self.output += log_hook.get_logs()
+            self.output += self.current_model.__str__().replace("\n", "<br>")
             return True
 
     def output_results(self):
@@ -172,7 +187,8 @@ class IsoModelByModel():
         self.view.paramWidgets = {}
 
         for param in self.current_model.param_names:
-            widget = QHSpinBoxSlider()
+            # TODO: creation/deletion of widgets is expensive... can they be reused?
+            widget = QHSpinBoxLimitSlider()
             widget.setText(param)
             minv, maxv = self.current_model.param_bounds[param]
             if not minv or minv == -numpy.inf:
@@ -180,13 +196,14 @@ class IsoModelByModel():
             if not maxv or maxv == numpy.inf:
                 maxv = 100
             widget.setRange(minv=minv, maxv=maxv)
-            self.view.param_layout.addWidget(widget)
+            self.view.param_layout.insertWidget(self.view.param_layout.count() - 1, widget)
             self.view.paramWidgets[param] = widget
 
         # Update plot
         self.plot_clear()
 
     def set_model_params(self):
+        """Populates the view with parameters from the current model."""
         for param in self.current_model.param_names:
             pval = self.current_model.params[param]
             minv, maxv = self.current_model.param_bounds[param]
@@ -198,6 +215,7 @@ class IsoModelByModel():
             self.view.paramWidgets[param].setValue(pval)
 
     def get_model_params(self):
+        """Takes the parameters from the sliders and stores a model in memory."""
         for param in self.current_model.params:
             pval = self.view.paramWidgets[param].getValue()
             self.current_model.params[param] = float(pval)
@@ -208,6 +226,16 @@ class IsoModelByModel():
         # The loading range on which the model was built.
         loading = self.isotherm.loading(branch=self.branch)
         self.current_model.loading_range = [min(loading), max(loading)]
+
+    def get_model_bounds(self) -> dict:
+        """Reads user-defined parameter bounds."""
+        param_bounds = {}
+        for param in self.current_model.params:
+            param_bounds[param] = (
+                self.view.paramWidgets[param].minv,
+                self.view.paramWidgets[param].maxv,
+            )
+        return param_bounds
 
     def select_branch(self):
         """Handle isotherm branch selection."""

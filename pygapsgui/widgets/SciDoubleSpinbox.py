@@ -16,13 +16,24 @@ _float_re = re.compile(r'(([+-]?\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)')
 
 
 def valid_float_string(string):
+    """Check if a string contains a valid sci-format float."""
     match = _float_re.search(string)
     return match.groups()[0] == string if match else False
 
 
+def format_float(value):
+    """Format float as sci-float, modified form of the 'g' format specifier."""
+    if not isinstance(value, float):
+        return str(value)
+    string = f"{value:.5g}".replace("e+", "e")
+    string = re.sub(r"e(-?)0*(\d+)", r"e\1\2", string)
+    return string
+
+
 class FloatValidator(QG.QValidator):
-    """QValidator for float numbers"""
+    """QValidator for float numbers."""
     def validate(self, string, position):
+        """Called to check if input is valid."""
         if valid_float_string(string):
             return self.State.Acceptable
         if string == "" or string[position - 1] in 'e.-+':
@@ -30,6 +41,7 @@ class FloatValidator(QG.QValidator):
         return self.State.Invalid
 
     def fixup(self, text):
+        """Can repair some basic errors."""
         match = _float_re.search(text)
         return match.groups()[0] if match else ""
 
@@ -45,24 +57,20 @@ class ScientificDoubleSpinBox(QW.QDoubleSpinBox):
         self.setAlignment(QC.Qt.AlignCenter)
 
     def validate(self, text, position):
+        """Passthrough to validator."""
         return self.validator.validate(text, position)
 
     def fixup(self, text):
+        """Passthrough to validator."""
         return self.validator.fixup(text)
 
     def valueFromText(self, text):
+        """Convert the text to the real value."""
         return float(text)
 
     def textFromValue(self, value):
+        """Nicely display a scientific float."""
         return format_float(value)
-
-    def stepBy(self, steps):
-        text = self.cleanText()
-        groups = _float_re.search(text).groups()
-        decimal = float(groups[1])
-        decimal += steps
-        new_string = f"{decimal:g}" + (groups[3] if groups[3] else "")
-        self.lineEdit().setText(new_string)
 
 
 class SciFloatSpinDelegate(QW.QStyledItemDelegate):
@@ -76,6 +84,7 @@ class SciFloatSpinDelegate(QW.QStyledItemDelegate):
         editor.setValue(index.data())
 
     def displayText(self, value, locale):
+        """Called when the underlying text is displayed."""
         return format_float(value)
 
 
@@ -84,12 +93,3 @@ class SciFloatDelegate(QW.QStyledItemDelegate):
     def displayText(self, value, locale):
         """Called when the underlying text is displayed."""
         return format_float(value)
-
-
-def format_float(value):
-    """Modified form of the 'g' format specifier."""
-    if not isinstance(value, float):
-        return str(value)
-    string = f"{value:.5g}".replace("e+", "e")
-    string = re.sub("e(-?)0*(\d+)", r"e\1\2", string)
-    return string

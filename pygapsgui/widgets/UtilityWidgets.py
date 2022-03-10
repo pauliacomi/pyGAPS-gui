@@ -90,6 +90,7 @@ class CollapsibleBox(QW.QWidget):
         )
 
     def on_pressed(self):
+        """Animate and toggle open/closed."""
         checked = self.toggle_button.isChecked()
         self.toggle_button.setArrowType(QC.Qt.DownArrow if checked else QC.Qt.RightArrow)
         self.toggle_animation.setDirection(
@@ -98,6 +99,7 @@ class CollapsibleBox(QW.QWidget):
         self.toggle_animation.start()
 
     def setContentLayout(self, layout):
+        """Populate the box layout."""
         self.content_area.setLayout(layout)
         collapsed_height = (self.sizeHint().height() - self.content_area.maximumHeight())
         collapsed_width = self.sizeHint().width()
@@ -138,6 +140,7 @@ class CollapsibleBox(QW.QWidget):
 
 
 class HeightHeaderView(QW.QHeaderView):
+    """A table QHeaderView which wraps and adapts to text height."""
     def __init__(self, parent=None):
         super().__init__(QC.Qt.Horizontal, parent=parent)
         self.setSectionResizeMode(QW.QHeaderView.Stretch)
@@ -145,6 +148,7 @@ class HeightHeaderView(QW.QHeaderView):
         self.setDefaultAlignment(QC.Qt.AlignCenter | QC.Qt.Alignment(QC.Qt.TextWordWrap))
 
     def sectionSizeFromContents(self, logicalIndex):
+        """Tweak bounding rectangle based on data."""
         text = self.model().headerData(logicalIndex, self.orientation(), QC.Qt.DisplayRole)
         alignment = self.defaultAlignment()
         metrics = QG.QFontMetrics(self.fontMetrics())

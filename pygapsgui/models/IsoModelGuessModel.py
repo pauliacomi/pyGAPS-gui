@@ -142,7 +142,8 @@ class IsoModelGuessModel():
 
             errors = [x.model.rmse for x in self.model_attempts]
             self.model_isotherm = self.model_attempts[errors.index(min(errors))]
-            self.output += f'<font color="green">Best model fit is {self.model_isotherm.model.name}.</font>'
+            self.output += f'<font color="green">Best model fit is {self.model_isotherm.model.name}.</font><br>'
+            self.output += self.model_isotherm.model.__str__().replace("\n", "<br>")
             return True
 
     def plot_results(self):
