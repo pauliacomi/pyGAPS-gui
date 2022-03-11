@@ -80,7 +80,7 @@ class SciFloatSpinDelegate(QW.QStyledItemDelegate):
         return ScientificDoubleSpinBox(parent)
 
     def setEditorData(self, editor: QW.QWidget, index: QC.QModelIndex) -> None:
-        """Ensure that the SciDoubleSpinbox data is set correctly."""
+        """Transfer the item value to the editor."""
         editor.setValue(index.data())
 
     def displayText(self, value, locale):
