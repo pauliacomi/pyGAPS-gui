@@ -32,6 +32,7 @@ disable = [
     "too-many-branches", # we don't need these
     "too-many-locals", # we don't need these
     "too-many-arguments", # we don't need these
+    "keyword-arg-before-vararg", # we don't need these
 ]
 
 # linting: pydocstyle
