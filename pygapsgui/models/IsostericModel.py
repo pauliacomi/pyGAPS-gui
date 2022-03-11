@@ -140,11 +140,14 @@ class IsostericModel():
             self.view.iso_graph.draw_ylimits(self.limits[0], self.limits[1])
 
     def select_branch(self, branch):
+        """Handle branch selection signal."""
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.calc_auto()
 
+    # TODO: Point number/exact selection
     def select_points(self, npoints):
+        """Handle point number selection signal."""
         self.loading_point_no = self.view.points_input.value()
         self.calc_auto()
 

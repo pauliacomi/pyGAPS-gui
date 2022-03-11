@@ -409,7 +409,7 @@ class MainWindowUI():
         self.action_dr_plot.setText(QW.QApplication.translate("MainWindow", "Dubinin-Radushkevich plot", None, -1))
         self.action_psd_micro.setText(QW.QApplication.translate("MainWindow", "Microporous PSD", None, -1))
         self.action_psd_meso.setText(QW.QApplication.translate("MainWindow", "Mesoporous PSD", None, -1))
-        self.action_psd_kernel.setText(QW.QApplication.translate("MainWindow", "DFT Kernel PSD", None, -1))
+        self.action_psd_kernel.setText(QW.QApplication.translate("MainWindow", "Kernel Fit PSD", None, -1))
         self.action_isosteric.setText(QW.QApplication.translate("MainWindow", "Isosteric enthalpy", None, -1))
         self.action_model_by.setText(QW.QApplication.translate("MainWindow", "Fit a model", None, -1))
         self.action_model_guess.setText(QW.QApplication.translate("MainWindow", "Guess best model", None, -1))

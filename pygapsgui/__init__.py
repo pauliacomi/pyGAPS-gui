@@ -56,6 +56,7 @@ def process_cl_args():
 
 @QC.Slot()
 def sync_theme_with_system() -> None:
+    """Applies and syncs a custom theme."""
     import darkdetect
     import qdarktheme
     theme = darkdetect.theme().lower()
