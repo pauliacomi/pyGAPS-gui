@@ -38,7 +38,7 @@ jobs:
 
     - name: Check bundled executable
       run: |
-        cd dist/pyGAPS-gui*
+        cd dist/pyGAPS-gui*.app
         cd Contents/MacOS
         ./pyGAPS-gui --version
 
