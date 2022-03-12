@@ -37,17 +37,17 @@ jobs:
         zip -r "./dist/pyGAPS-gui-macos.zip" "./dist/${DIST_FOLDER}"
         du -sh "./dist/pyGAPS-gui-macos.zip"
 
-    # - name: Upload Artifacts
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #       name: mac
-    #       path: dist/*.tar.gz
-    #       if-no-files-found: error
-    #       retention-days: 1
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+          name: mac
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 1
 
     - name: GH 🐱🐙 Release
       uses: softprops/action-gh-release@v1
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       with:
         files: |
-          ./dist/pyGAPS-gui-macos.tar.gz
+          ./dist/pyGAPS-gui-macos.zip
