@@ -36,9 +36,8 @@ jobs:
 
     - name: Install
       run: |
-        pip list
-        pip install PySide2
         pip install .[build]
+        pip list
 
     - name: Check install from cli
       run: |
