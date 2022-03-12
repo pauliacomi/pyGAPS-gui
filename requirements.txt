@@ -16,7 +16,7 @@ openpyxl==3.0.9
 packaging==21.3
 pandas==1.4.0
 pefile==2021.9.3
-Pillow==9.0.0
+Pillow==9.0.1
 pygaps @ git+https://github.com/pauliacomi/pyGAPS@develop
 pyinstaller==4.8
 pyinstaller-hooks-contrib==2022.0
