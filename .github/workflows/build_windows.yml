@@ -25,16 +25,14 @@ jobs:
     #     restore-keys: |
     #       ${{ runner.os }}-venv-
 
-    - name: Create venv and install
+    - name: Install
       run: |
-        python -m venv ./.venv
-        ./.venv/Scripts/activate
+        pip list
         pip install .[build]
       # if: steps.cache-venv.outputs.cache-hit != 'true'
 
     - name: Run PyInstaller
       run: |
-        ./.venv/Scripts/activate
         pyinstaller pyGAPS-gui.spec
 
     # - name: Run Executable

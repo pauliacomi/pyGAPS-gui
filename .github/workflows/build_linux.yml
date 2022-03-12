@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
@@ -28,25 +28,13 @@ jobs:
         cache: 'pip'
         cache-dependency-path: '**/setup.cfg'
 
-    # - name: Use Cache
-    #   id: cache-venv
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: ./.venv/
-    #     key: ${{ runner.os }}-venv-${{ hashFiles('**/setup.cfg') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-venv-
-
-    - name: Create venv and install
+    - name: Install
       run: |
-        python -m venv ./.venv
-        source ./.venv/bin/activate
+        pip list
         pip install .[build]
-      # if: steps.cache-venv.outputs.cache-hit != 'true'
 
     - name: Run PyInstaller
       run: |
-        source ./.venv/bin/activate
         pyinstaller pyGAPS-gui.spec
 
     # - name: Run Executable
