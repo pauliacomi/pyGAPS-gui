@@ -23,9 +23,9 @@ jobs:
         sudo apt-get install build-essential libdbus-1-dev libgl1-mesa-dev libegl-mesa0
 
         # x-system
-        sudo apt-get install libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
+        sudo apt-get install libxcb1-dev libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
           libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev \
-          libxcb-xinerama0
+          libxcb-xinerama0 libxcb-shape0-dev libxcb-xfixes0-dev libxcb-sync0-dev libxcb-glx0-dev
 
     - name: Setup Python 3.8
       uses: actions/setup-python@v2
@@ -42,6 +42,7 @@ jobs:
 
     - name: Check install from cli
       run: |
+        export QT_DEBUG_PLUGINS=1 # extra debug info
         pygapsgui --test
         pygapsgui --version
 
