@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import pathlib
+from sys import platform
 
 folder = pathlib.Path.cwd()
 
@@ -109,3 +110,10 @@ coll = COLLECT(
     upx_exclude=[],
     name=f'pyGAPS-gui v{pggversion} (with pyGAPS v{pgversion})',
 )
+
+if platform == "darwin":
+    app = BUNDLE(
+        coll,
+        name=f'pyGAPS-gui v{pggversion}',
+        icon="pygapsgui/resources/main_icon.ico",
+    )
