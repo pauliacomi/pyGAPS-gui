@@ -9,6 +9,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Manually fetch tags for semver
       run: git fetch --tags
@@ -25,7 +27,7 @@ jobs:
         pip list
         pip install .[build]
 
-    - name: Run to check
+    - name: Check install from cli
       run: |
          pygapsgui --test
          pygapsgui --version
@@ -33,6 +35,11 @@ jobs:
     - name: Run PyInstaller
       run: |
         pyinstaller pyGAPS-gui.spec
+
+    - name: Check executable
+      run: |
+         cd ./dist/pyGAPS-gui*
+         pyGAPS-gui.exe --version
 
     - name: Set path for candle and light
       run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
