@@ -7,7 +7,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-18.04
     env:
-      QT_API: pyside6 # make sure QT does not link something else
+      QT_API: PySide6 # make sure QT does not link something else
       FORCE_QT_API: true
 
     steps:
