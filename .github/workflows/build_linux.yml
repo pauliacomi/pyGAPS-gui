@@ -51,8 +51,9 @@ jobs:
 
     - name: Check bundled executable
       run: |
-         cd ./dist/pyGAPS-gui*
-         xvfb-run pyGAPS-gui --version
+        ls dist
+        cd dist/pyGAPS-gui *
+        xvfb-run pyGAPS-gui --version
 
     - name: Compress executable
       run: |
