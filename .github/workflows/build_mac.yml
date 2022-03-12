@@ -44,7 +44,7 @@ jobs:
 
     - name: Compress executable
       run: |
-        export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui*.app ")
+        export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui*.app")
         echo $DIST_FOLDER
         cd ./dist
         zip -r "pyGAPS-gui-macos.zip" "${DIST_FOLDER}"
