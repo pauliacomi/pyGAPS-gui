@@ -49,6 +49,16 @@ def process_cl_args():
         action='store',
         help="Open a folder of isotherms.",
     )
+    parser.add_argument(
+        '--test',
+        action="store_true",
+        help="Attempt startup then exit.",
+    )
+    parser.add_argument(
+        '--version',
+        action="store_true",
+        help="Print current version.",
+    )
 
     parsed_args, unparsed_args = parser.parse_known_args()
     return parsed_args, unparsed_args
@@ -75,6 +85,11 @@ def main():
     # Process cli arguments
     parsed_args, unparsed_args = process_cl_args()
     qt_args = sys.argv[:1] + unparsed_args
+
+    if parsed_args.version:
+        from importlib.metadata import version
+        print(version("pygapsgui"))
+        sys.exit()
 
     # Create application
     app = QW.QApplication(qt_args)
@@ -117,5 +132,9 @@ def main():
     # Show and finish
     mainwnd.show()
     splash.finish(mainwnd)
+
+    if parsed_args.test:
+        sys.exit()
+
     # Execute
     sys.exit(app.exec_())
