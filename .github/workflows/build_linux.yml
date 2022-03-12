@@ -15,7 +15,7 @@ jobs:
     - name: Manually fetch tags for semver
       run: git fetch --prune --unshallow
 
-    - name: Install Apt Dependencies
+    - name: Install apt dependencies
       run: |
         sudo apt-get update
 
@@ -42,7 +42,6 @@ jobs:
 
     - name: Check install from cli
       run: |
-        export QT_DEBUG_PLUGINS=1 # extra debug info
         xvfb-run pygapsgui --test
         xvfb-run pygapsgui --version
 
@@ -50,12 +49,12 @@ jobs:
       run: |
         pyinstaller pyGAPS-gui.spec
 
-    - name: Run Executable
+    - name: Check bundled executable
       run: |
          cd ./dist/pyGAPS-gui*
-         xvfb-run pyGAPS-gui.exe --version
+         xvfb-run pyGAPS-gui --version
 
-    - name: Compress Executable
+    - name: Compress executable
       run: |
         export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui ")
         echo $DIST_FOLDER
@@ -63,7 +62,7 @@ jobs:
         tar -zcvf "pyGAPS-gui-linux-x86_64.tar.gz" "${DIST_FOLDER}"
         du -sh "pyGAPS-gui-linux-x86_64.tar.gz"
 
-    - name: Upload Artifacts
+    - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
           name: linux

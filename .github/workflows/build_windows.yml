@@ -36,7 +36,7 @@ jobs:
       run: |
         pyinstaller pyGAPS-gui.spec
 
-    - name: Check executable
+    - name: Check bundled executable
       run: |
          cd dist/pyGAPS-gui*
          ./pyGAPS-gui.exe --version
@@ -55,7 +55,7 @@ jobs:
         light.exe ./dist/pyGAPS-gui.wixobj -o ./dist/pyGAPS-gui-win-x86_64.msi -ext WixUIExtension.dll
         Rename-Item -Path $folderName -NewName "pyGAPS-gui-win-x86_64.zip"
 
-    - name: Upload Artifacts
+    - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
           name: wininstaller

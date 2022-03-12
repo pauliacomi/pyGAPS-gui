@@ -36,12 +36,13 @@ jobs:
       run: |
         pyinstaller pyGAPS-gui.spec
 
-    # - name: Run Executable
-    #   run: |
-    #      cd ./dist/pyGAPS-gui*
-    #      ./pyGAPS-gui.exe
+    - name: Check bundled executable
+      run: |
+         cd ./dist/pyGAPS-gui*
+         cd Contents/MacOS
+         ./pyGAPS-gui
 
-    - name: Compress Executable
+    - name: Compress executable
       run: |
         export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui*.app ")
         echo $DIST_FOLDER
@@ -49,7 +50,7 @@ jobs:
         zip -r "pyGAPS-gui-macos.zip" "${DIST_FOLDER}"
         du -sh "pyGAPS-gui-macos.zip"
 
-    - name: Upload Artifacts
+    - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
           name: mac
