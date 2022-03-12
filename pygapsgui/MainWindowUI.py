@@ -1,14 +1,15 @@
+import qtpy
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
-from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
 
 import pygapsgui.widgets.resources_rc
 from pygapsgui.views.IsoGraphView import IsoListGraphView
 from pygapsgui.views.IsoListView import IsoListView
+from pygapsgui.views.MetadataTableView import MetadataTableView
 from pygapsgui.widgets.IsoUnitWidget import IsoUnitWidget
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
-from pygapsgui.views.MetadataTableView import MetadataTableView
+from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
 
 
 class MainWindowUI():
@@ -45,7 +46,11 @@ class MainWindowUI():
         QC.QMetaObject.connectSlotsByName(main_window)
 
         # Move on screen to reasonable location with 2:1 aspect ratio
-        geometry = main_window.screen().availableGeometry()
+        if qtpy.API in qtpy.PYQT6_API:
+            screen = self.screen()
+        else:
+            screen = QG.QGuiApplication.primaryScreen()
+        geometry = screen.availableGeometry()
         height = geometry.height() * 0.75
         width = geometry.width() * 0.8
         width = min(width, height * 2)

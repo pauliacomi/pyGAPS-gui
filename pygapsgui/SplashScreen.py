@@ -8,6 +8,7 @@
 ##
 ################################################################################
 
+import qtpy
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
@@ -18,7 +19,10 @@ class SplashScreen(QW.QSplashScreen):
         super().__init__(*args, **kwargs)
         self.setGeometry(0, 0, 680, 400)
         self.setupUi()
-        screen = self.screen()
+        if qtpy.API in qtpy.PYQT6_API:
+            screen = self.screen()
+        else:
+            screen = QG.QGuiApplication.primaryScreen()
         self.move(screen.availableGeometry().center() - self.frameGeometry().center())
 
     def drawContents(self, painter: QG.QPainter) -> None:

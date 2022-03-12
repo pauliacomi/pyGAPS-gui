@@ -1,14 +1,16 @@
 import pathlib
 import sys
 
+import qtpy
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 from qtpy import QtWebEngineWidgets as QWW  # MUST be initialized here
 
-# Scaling for high dpi screens # TODO deprecated in pyside6
-QW.QApplication.setAttribute(QC.Qt.AA_EnableHighDpiScaling, True)
-QW.QApplication.setAttribute(QC.Qt.AA_UseHighDpiPixmaps, True)
+# Scaling for high dpi screens # TODO deprecated in QT6
+if qtpy.API in (qtpy.PYQT5_API + qtpy.PYSIDE2_API):
+    QW.QApplication.setAttribute(QC.Qt.AA_EnableHighDpiScaling, True)
+    QW.QApplication.setAttribute(QC.Qt.AA_UseHighDpiPixmaps, True)
 
 
 def exception_hook(exctype, exc, trace):
