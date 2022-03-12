@@ -9,11 +9,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+      # with:
+      #   fetch-depth: 0
 
     - name: Manually fetch tags for semver
-      run: git fetch --tags
+      run: git fetch --prune --unshallow
 
     - name: Setup Python 3.8
       uses: actions/setup-python@v2
@@ -38,8 +38,8 @@ jobs:
 
     - name: Check executable
       run: |
-         cd ./dist/pyGAPS-gui*
-         pyGAPS-gui.exe --version
+         cd dist/pyGAPS-gui*
+         ./pyGAPS-gui.exe --version
 
     - name: Set path for candle and light
       run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
@@ -47,12 +47,12 @@ jobs:
 
     - name: Make MSI + ZIP
       run: |
-        cd dist\pyGAPS-gui*
+        cd dist/pyGAPS-gui*
         $folderName = pwd
-        cd ..\..
-        python .\ci\collect_dist.py msi zip $folderName
-        candle.exe .\dist\pyGAPS-gui.wxs -o .\dist\pyGAPS-gui.wixobj
-        light.exe .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui-win-x86_64.msi -ext WixUIExtension.dll
+        cd ../..
+        python ./ci/collect_dist.py msi zip $folderName
+        candle.exe ./dist/pyGAPS-gui.wxs -o ./dist/pyGAPS-gui.wixobj
+        light.exe ./dist/pyGAPS-gui.wixobj -o ./dist/pyGAPS-gui-win-x86_64.msi -ext WixUIExtension.dll
         Rename-Item -Path $folderName -NewName "pyGAPS-gui-win-x86_64.zip"
 
     - name: Upload Artifacts
@@ -68,5 +68,5 @@ jobs:
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       with:
         files: |
-          .\dist\pyGAPS-gui-win-x86_64.msi
-          .\dist\pyGAPS-gui-win-x86_64.zip
+          ./dist/pyGAPS-gui-win-x86_64.msi
+          ./dist/pyGAPS-gui-win-x86_64.zip

@@ -10,6 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Manually fetch tags for semver
+      run: git fetch --prune --unshallow
+
     - name: Install Apt Dependencies
       run: |
         sudo apt-get update
@@ -33,14 +36,19 @@ jobs:
         pip list
         pip install .[build]
 
+    - name: Check install from cli
+      run: |
+         pygapsgui --test
+         pygapsgui --version
+
     - name: Run PyInstaller
       run: |
         pyinstaller pyGAPS-gui.spec
 
-    # - name: Run Executable
-    #   run: |
-    #      cd ./dist/pyGAPS-gui*
-    #      xvfb-run pyGAPS-gui.exe
+    - name: Run Executable
+      run: |
+         cd ./dist/pyGAPS-gui*
+         xvfb-run pyGAPS-gui.exe --version
 
     - name: Compress Executable
       run: |
