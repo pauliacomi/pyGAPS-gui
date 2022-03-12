@@ -22,7 +22,6 @@ extra_datas = [
     ("LICENSE.rtf", "."),
     ("pygapsgui/resources", "pygapsgui/resources"),
     (str(pygaps_dir / "data"), "pygaps/data"),
-    (str(pygaps_dir / "characterisation/kernels"), "pygaps/characterisation/kernels"),
 ]
 
 # Modules that should not be in the distribution
