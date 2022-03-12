@@ -7,8 +7,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-18.04
     env:
-      QT_API: PySide6 # make sure QT does not link something else
-      FORCE_QT_API: true
+      QT_API: pyqt6 # make sure QT does not link something else
 
     steps:
     - uses: actions/checkout@v2
@@ -37,12 +36,11 @@ jobs:
     - name: Install
       run: |
         pip list
+        pip install PyQt6 PyQt6-WebEngine
         pip install .[build]
 
     - name: Check install from cli
       run: |
-        python -c "import PySide6"
-        python -c "from PySide6 import __version__ as PYSIDE_VERSION; print(PYSIDE_VERSION);"
         pygapsgui --test
         pygapsgui --version
 
