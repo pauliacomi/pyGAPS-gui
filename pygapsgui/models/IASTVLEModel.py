@@ -66,8 +66,8 @@ class IASTVLEModel():
 
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
-        self.total_pressure = float(self.view.pressure_input.text())
-        self.number_points = int(self.view.point_input.text())
+        self.total_pressure = self.view.pressure_input.value()
+        self.number_points = self.view.point_input.value()
         self.main_adsorbate = self.view.adsorbate_input.currentText()
         self.isotherms = sorted(
             self.isotherms,

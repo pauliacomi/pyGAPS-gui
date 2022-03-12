@@ -86,7 +86,7 @@ class IsoModelManualModel():
                     branch=self.branch,
                     material="Model",
                     adsorbate=self.view.adsorbate_input.lineEdit().text(),
-                    temperature=float(self.view.temperature_input.text()),
+                    temperature=self.view.temperature_input.value(),
                     temperature_unit=self.view.temperature_unit.currentText(),
                     pressure_mode=self.view.unit_widget.pressure_mode.currentText(),
                     pressure_unit=self.view.unit_widget.pressure_unit.currentText(),

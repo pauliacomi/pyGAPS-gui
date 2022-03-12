@@ -10,6 +10,7 @@ from pygapsgui.views.MetadataTableView import MetadataTableView
 from pygapsgui.widgets.IsoUnitWidget import IsoUnitWidget
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
 from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
+from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 
 
 class MainWindowUI():
@@ -112,7 +113,7 @@ class MainWindowUI():
         self.prop_base_layout = QW.QGridLayout()
         self.properties_layout.addLayout(self.prop_base_layout, 0, 0, 1, 1)
 
-        self.material_label = QW.QLabel()
+        self.material_label = LabelAlignRight()
         self.material_label.setObjectName("material_label")
         self.material_input = QW.QComboBox()
         self.material_input.setInsertPolicy(QW.QComboBox.NoInsert)
@@ -124,7 +125,7 @@ class MainWindowUI():
         self.prop_base_layout.addWidget(self.material_input, 0, 1, 1, 1)
         self.prop_base_layout.addWidget(self.material_details, 0, 2, 1, 1)
 
-        self.adsorbate_label = QW.QLabel()
+        self.adsorbate_label = LabelAlignRight()
         self.adsorbate_label.setObjectName("adsorbate_label")
         self.adsorbate_input = QW.QComboBox()
         self.adsorbate_input.setInsertPolicy(QW.QComboBox.NoInsert)
@@ -136,9 +137,11 @@ class MainWindowUI():
         self.prop_base_layout.addWidget(self.adsorbate_input, 1, 1, 1, 1)
         self.prop_base_layout.addWidget(self.adsorbate_details, 1, 2, 1, 1)
 
-        self.temperature_label = QW.QLabel()
+        self.temperature_label = LabelAlignRight()
         self.temperature_label.setObjectName("temperature_label")
-        self.temperature_input = QW.QLineEdit()
+        self.temperature_input = QW.QDoubleSpinBox()
+        self.temperature_input.setMinimum(-999)
+        self.temperature_input.setMaximum(9999)
         self.temperature_input.setObjectName("temperature_input")
         self.prop_base_layout.addWidget(self.temperature_label, 2, 0, 1, 1)
         self.prop_base_layout.addWidget(self.temperature_input, 2, 1, 1, 1)
@@ -153,7 +156,7 @@ class MainWindowUI():
 
         # then, isotherm metadata
         self.prop_extra_group = QW.QGroupBox()
-        self.properties_layout.addWidget(self.prop_extra_group, 2, 0, 1, 2)
+        self.properties_layout.addWidget(self.prop_extra_group, 2, 0, 1, 1)
         self.prop_extra_layout = QW.QVBoxLayout(self.prop_extra_group)
 
         # metadata edit widget

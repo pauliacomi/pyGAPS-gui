@@ -110,7 +110,7 @@ class IsoController():
         # Essential metadata
         self.mw_widget.material_input.setCurrentText(str(self.iso_current.material))
         self.mw_widget.adsorbate_input.setCurrentText(str(self.iso_current.adsorbate))
-        self.mw_widget.temperature_input.setText(f"{self.iso_current._temperature:g}")
+        self.mw_widget.temperature_input.setValue(self.iso_current._temperature)
 
         # Units setup
         self.unit_widget.init_units(self.iso_current)
@@ -233,8 +233,8 @@ class IsoController():
             )
             modified = True
 
-        if isotherm.temperature != float(self.mw_widget.temperature_input.text()):
-            isotherm.temperature = float(self.mw_widget.temperature_input.text())
+        if isotherm.temperature != self.mw_widget.temperature_input.value():
+            isotherm.temperature = self.mw_widget.temperature_input.value()
             self.mw_widget.statusbar.showMessage(
                 f'Temperature modified to {isotherm.temperature}', 2000
             )

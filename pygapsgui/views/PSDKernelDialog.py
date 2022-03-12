@@ -72,8 +72,6 @@ class PSDKernelDialog(QW.QDialog):
         self.res_graph = GraphView()
         self.res_graphs_layout.addWidget(self.res_graph)
 
-        # TODO Add a second graph that shows the fit of the kernel
-
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
