@@ -23,8 +23,9 @@ jobs:
         sudo apt-get install build-essential libdbus-1-dev libgl1-mesa-dev libegl-mesa0
 
         # x-system
-        sudo apt-get install libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
-          libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev
+        sudo apt-get install libxcb libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
+          libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev \
+          libxcb-xinerama0
 
     - name: Setup Python 3.8
       uses: actions/setup-python@v2
@@ -36,7 +37,7 @@ jobs:
     - name: Install
       run: |
         pip list
-        pip install pyside2
+        pip install PySide2
         pip install .[build]
 
     - name: Check install from cli
