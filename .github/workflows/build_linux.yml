@@ -9,19 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Use Cache
-      id: cache-venv
-      uses: actions/cache@v2
-      with:
-        path: ./.venv/
-        key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-venv-
 
     - name: Install Apt Dependencies
       run: |
@@ -34,17 +21,32 @@ jobs:
         sudo apt-get install libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
           libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev
 
-    - name: Create venv
+    - name: Setup Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+        cache: 'pip'
+        cache-dependency-path: **/setup.cfg
+
+    # - name: Use Cache
+    #   id: cache-venv
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: ./.venv/
+    #     key: ${{ runner.os }}-venv-${{ hashFiles('**/setup.cfg') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-venv-
+
+    - name: Create venv and install
       run: |
         python -m venv ./.venv
         source ./.venv/bin/activate
-        pip install -r requirements.txt
-      if: steps.cache-venv.outputs.cache-hit != 'true'
+        pip install .
+      # if: steps.cache-venv.outputs.cache-hit != 'true'
 
     - name: Run PyInstaller
       run: |
         source ./.venv/bin/activate
-        pip install .
         pyinstaller pyGAPS-gui.spec
 
     # - name: Run Executable
