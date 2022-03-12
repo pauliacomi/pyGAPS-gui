@@ -23,7 +23,7 @@ jobs:
         sudo apt-get install build-essential libdbus-1-dev libgl1-mesa-dev libegl-mesa0
 
         # x-system
-        sudo apt-get install libxcb1-dev libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
+        sudo apt-get install libxcb1 libxcb1-dev libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-image0-dev \
           libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev \
           libxcb-xinerama0 libxcb-shape0-dev libxcb-xfixes0-dev libxcb-sync0-dev libxcb-glx0-dev
 
@@ -43,8 +43,8 @@ jobs:
     - name: Check install from cli
       run: |
         export QT_DEBUG_PLUGINS=1 # extra debug info
-        pygapsgui --test
-        pygapsgui --version
+        xvfb-run pygapsgui --test
+        xvfb-run pygapsgui --version
 
     - name: Run PyInstaller
       run: |
