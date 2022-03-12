@@ -114,6 +114,6 @@ coll = COLLECT(
 if platform == "darwin":
     app = BUNDLE(
         coll,
-        name=f'pyGAPS-gui v{pggversion}',
+        name=f'pyGAPS-gui v{pggversion}.app',
         icon="pygapsgui/resources/main_icon.ico",
     )
