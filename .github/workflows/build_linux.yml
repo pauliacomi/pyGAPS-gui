@@ -41,7 +41,7 @@ jobs:
       run: |
         python -m venv ./.venv
         source ./.venv/bin/activate
-        pip install .
+        pip install .[build]
       # if: steps.cache-venv.outputs.cache-hit != 'true'
 
     - name: Run PyInstaller
