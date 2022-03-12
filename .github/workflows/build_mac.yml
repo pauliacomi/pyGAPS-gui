@@ -6,6 +6,8 @@ on:
 jobs:
   build-mac:
     runs-on: macos-latest
+    env:
+      QT_API: pyside6 # make sure QT does not link something else
 
     steps:
     - uses: actions/checkout@v2

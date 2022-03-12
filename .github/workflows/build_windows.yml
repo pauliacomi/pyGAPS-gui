@@ -6,11 +6,11 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    env:
+      QT_API: pyside6 # make sure QT does not link something else
 
     steps:
     - uses: actions/checkout@v2
-      # with:
-      #   fetch-depth: 0
 
     - name: Manually fetch tags for semver
       run: git fetch --prune --unshallow
