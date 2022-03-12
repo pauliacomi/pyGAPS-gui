@@ -46,8 +46,9 @@ jobs:
       run: |
         export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui ")
         echo $DIST_FOLDER
-        tar -zcvf "./dist/pyGAPS-gui-linux.tar.gz" "./dist/${DIST_FOLDER}"
-        du -sh "./dist/pyGAPS-gui-linux.tar.gz"
+        cd ./dist
+        tar -zcvf "pyGAPS-gui-linux-x86_64.tar.gz" "${DIST_FOLDER}"
+        du -sh "pyGAPS-gui-linux-x86_64.tar.gz"
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
@@ -62,4 +63,4 @@ jobs:
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       with:
         files: |
-          ./dist/pyGAPS-gui-linux.tar.gz
+          ./dist/pyGAPS-gui-linux-x86_64.tar.gz

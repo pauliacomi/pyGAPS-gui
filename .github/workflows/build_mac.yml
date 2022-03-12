@@ -34,8 +34,9 @@ jobs:
       run: |
         export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui*.app ")
         echo $DIST_FOLDER
-        zip -r "./dist/pyGAPS-gui-macos.zip" "./dist/${DIST_FOLDER}"
-        du -sh "./dist/pyGAPS-gui-macos.zip"
+        cd ./dist
+        zip -r "pyGAPS-gui-macos.zip" "${DIST_FOLDER}"
+        du -sh "pyGAPS-gui-macos.zip"
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2

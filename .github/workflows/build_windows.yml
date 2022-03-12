@@ -46,7 +46,6 @@ jobs:
 
     - name: Make MSI + ZIP
       run: |
-        ./.venv/Scripts/activate
         cd dist\pyGAPS-gui*
         $folderName = pwd
         cd ..\..
