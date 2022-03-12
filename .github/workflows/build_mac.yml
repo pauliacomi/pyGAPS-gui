@@ -29,8 +29,8 @@ jobs:
 
     - name: Check install from cli
       run: |
-         pygapsgui --test
-         pygapsgui --version
+        pygapsgui --test
+        pygapsgui --version
 
     - name: Run PyInstaller
       run: |
@@ -38,12 +38,13 @@ jobs:
 
     - name: Check bundled executable
       run: |
-         cd ./dist/pyGAPS-gui*
-         cd Contents/MacOS
-         ./pyGAPS-gui --version
+        cd dist/pyGAPS-gui*
+        cd Contents/MacOS
+        ./pyGAPS-gui --version
 
     - name: Compress executable
       run: |
+        ls dist
         export DIST_FOLDER=$(ls ./dist | grep "pyGAPS-gui*.app")
         echo $DIST_FOLDER
         cd ./dist
@@ -53,10 +54,10 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-          name: mac
-          path: dist/*.zip
-          if-no-files-found: error
-          retention-days: 1
+        name: mac
+        path: dist/*.zip
+        if-no-files-found: error
+        retention-days: 1
 
     - name: GH 🐱🐙 Release
       uses: softprops/action-gh-release@v1

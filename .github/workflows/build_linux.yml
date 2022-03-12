@@ -65,10 +65,10 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-          name: linux
-          path: dist/*.tar.gz
-          if-no-files-found: error
-          retention-days: 1
+        name: linux
+        path: dist/*.tar.gz
+        if-no-files-found: error
+        retention-days: 1
 
     - name: GH 🐱🐙 Release
       uses: softprops/action-gh-release@v1

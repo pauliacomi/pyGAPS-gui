@@ -29,8 +29,8 @@ jobs:
 
     - name: Check install from cli
       run: |
-         pygapsgui --test
-         pygapsgui --version
+        pygapsgui --test
+        pygapsgui --version
 
     - name: Run PyInstaller
       run: |
@@ -38,8 +38,8 @@ jobs:
 
     - name: Check bundled executable
       run: |
-         cd dist/pyGAPS-gui*
-         ./pyGAPS-gui.exe --version
+        cd dist/pyGAPS-gui*
+        ./pyGAPS-gui.exe --version
 
     - name: Set path for candle and light
       run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
@@ -58,10 +58,10 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-          name: wininstaller
-          path: dist/*.msi
-          if-no-files-found: error
-          retention-days: 1
+        name: wininstaller
+        path: dist/*.msi
+        if-no-files-found: error
+        retention-days: 1
 
     - name: GH 🐱🐙 Release
       uses: softprops/action-gh-release@v1
