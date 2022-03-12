@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       QT_API: pyside6 # make sure QT does not link something else
+      FORCE_QT_API: true
 
     steps:
     - uses: actions/checkout@v2
@@ -40,8 +41,10 @@ jobs:
 
     - name: Check install from cli
       run: |
-         pygapsgui --test
-         pygapsgui --version
+        python -c "import PySide6"
+        python -c "from PySide6 import __version__ as PYSIDE_VERSION; print(PYSIDE_VERSION);"
+        pygapsgui --test
+        pygapsgui --version
 
     - name: Run PyInstaller
       run: |
