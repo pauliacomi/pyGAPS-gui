@@ -123,3 +123,6 @@ dmypy.json
 Dockerfile
 entrypoint-*
 pygapsgui/_version.py
+
+# local tools
+toolchain
