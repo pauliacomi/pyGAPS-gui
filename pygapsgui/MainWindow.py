@@ -1,6 +1,7 @@
 import pathlib
 
 from qtpy import QtCore as QC
+from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
 from pygapsgui.controllers.IsoController import IsoController
@@ -65,6 +66,7 @@ class MainWindow(QW.QMainWindow):
         self.ui.action_import.triggered.connect(self.import_iso)
         self.ui.action_save.triggered.connect(self.save_iso)
         self.ui.action_quit.triggered.connect(self.close)
+        self.ui.action_examples.triggered.connect(self.examples)
         self.ui.action_about.triggered.connect(self.about)
 
         self.ui.action_area_bet.triggered.connect(self.area_bet)
@@ -443,15 +445,35 @@ class MainWindow(QW.QMainWindow):
         dialog.exec()
 
     ########################################################
-    # About
+    # About / examples
     ########################################################
+
+    def examples(self):
+        """Load example data."""
+        qm = QW.QMessageBox()
+        ret = qm.question(
+            self,
+            'Question',
+            "Do you want to load some example data?",
+            qm.Yes | qm.No,
+        )
+        if ret == qm.Yes:
+            import pygapsgui.resources.sample_data as sd
+            folder = pathlib.Path(sd.__file__).parent
+            filepaths = folder.glob("*.json")
+            self.open_iso(filepaths)
 
     def about(self):
         """Show Help/About message box."""
+        from importlib.metadata import version
+        pgv = version("pygaps")
+        pggv = version("pygapsgui")
         QW.QMessageBox.about(
-            self, "About pyGAPS-GUI", "Main author <i>Paul Iacomi</i><br>"
-            "<a href='mailto:iacomi.paul@gmail.com'>iacomi.paul@gmail.com</a><br>"
+            self, f"About pyGAPS-GUI v{pggv}", f"Built with pyGAPS v{pgv}<br>"
+            "<a href='https://github.com/pauliacomi/pyGAPS'>github.com/pauliacomi/pyGAPS</a><br>"
             "Open source at<br>"
             "<a href='https://github.com/pauliacomi/pyGAPS-gui'>github.com/pauliacomi/pyGAPS-gui</a><br>"
+            "Main author <i>Paul Iacomi</i><br>"
+            "<a href='mailto:iacomi.paul@gmail.com'>iacomi.paul@gmail.com</a><br>"
             "Under AGPL License<br>"
         )
