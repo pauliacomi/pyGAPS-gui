@@ -1,5 +1,6 @@
 from qtpy import QtWidgets as QW
 
+from pygaps.characterisation.alphas_plots import alpha_s
 from pygaps.characterisation.alphas_plots import alpha_s_raw
 from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
@@ -297,6 +298,4 @@ class PlotAlphaSModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(
-            "https://pygaps.readthedocs.io/en/master/reference/characterisation/alphas_plot.html"
-        )
+        help_dialog(alpha_s)

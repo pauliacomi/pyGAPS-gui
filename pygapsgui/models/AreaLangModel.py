@@ -1,3 +1,4 @@
+from pygaps.characterisation.area_lang import area_langmuir
 from pygaps.characterisation.area_lang import area_langmuir_raw
 from pygaps.characterisation.area_lang import langmuir_transform
 from pygaps.characterisation.area_lang import simple_lang
@@ -242,6 +243,4 @@ class AreaLangModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(
-            "https://pygaps.readthedocs.io/en/master/reference/characterisation/area_lang.html"
-        )
+        help_dialog(area_langmuir)

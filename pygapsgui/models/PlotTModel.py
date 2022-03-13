@@ -2,6 +2,7 @@ from qtpy import QtWidgets as QW
 
 from pygaps.characterisation.models_thickness import _THICKNESS_MODELS
 from pygaps.characterisation.models_thickness import get_thickness_model
+from pygaps.characterisation.t_plots import t_plot
 from pygaps.characterisation.t_plots import t_plot_raw
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
@@ -229,6 +230,4 @@ class PlotTModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(
-            "https://pygaps.readthedocs.io/en/master/reference/characterisation/t_plot.html"
-        )
+        help_dialog(t_plot)

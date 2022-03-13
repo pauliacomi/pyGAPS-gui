@@ -170,6 +170,4 @@ class IsostericModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(
-            "https://pygaps.readthedocs.io/en/master/reference/characterisation/isosteric_enth.html"
-        )
+        help_dialog(isosteric_enthalpy)

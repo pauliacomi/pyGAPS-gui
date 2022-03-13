@@ -193,6 +193,4 @@ class PSDKernelModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(
-            "https://pygaps.readthedocs.io/en/master/reference/characterisation/psd_kernel.html"
-        )
+        help_dialog(psd_dft)

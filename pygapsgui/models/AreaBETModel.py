@@ -1,5 +1,6 @@
 """BET area QT model."""
 
+from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_bet import area_BET_raw
 from pygaps.characterisation.area_bet import bet_transform
 from pygaps.characterisation.area_bet import roq_transform
@@ -266,6 +267,4 @@ class AreaBETModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(
-            "https://pygaps.readthedocs.io/en/master/reference/characterisation/area_bet.html"
-        )
+        help_dialog(area_BET)

@@ -91,22 +91,36 @@ class ErrorMessageBox(QW.QDialog):
         _layout.addWidget(self.button_box)
 
 
-def help_dialog(url: str):
+def help_dialog(function):
     """Display a dialog with online help."""
-    help = HelpDialog(url)
+    help = HelpDialog(function)
     help.exec_()
 
 
 class HelpDialog(QW.QDialog):
-    """General help dialog, actually just a browser window."""
-    def __init__(self, url: str, *args, **kwargs):
+    """General help dialog, prints the function docstring."""
+    def __init__(self, function, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.setWindowTitle("Help Dialog")
 
-        from qtpy import QtWebEngineWidgets as QWW
-        self.browser = QWW.QWebEngineView()
-        self.browser.setUrl(QC.QUrl(url))
+        from docutils.core import publish_string
+        import textwrap
+
+        doc = textwrap.dedent(function.__doc__)
+        notes = doc.find("Notes\n")
+
+        text = publish_string(
+            doc[notes:],
+            writer_name='html',
+            settings_overrides={'output_encoding': 'unicode'},
+        )
+
+        self.text_view = QW.QTextBrowser()
+        self.text_view.setHtml(text)
 
         _layout = QW.QVBoxLayout(self)
-        _layout.addWidget(self.browser)
+        _layout.addWidget(self.text_view)
+
+    def sizeHint(self) -> QC.QSize:
+        return QC.QSize(400, 400)

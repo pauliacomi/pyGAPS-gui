@@ -1,4 +1,6 @@
+from pygaps.characterisation.dr_da_plots import da_plot
 from pygaps.characterisation.dr_da_plots import da_plot_raw
+from pygaps.characterisation.dr_da_plots import dr_plot
 from pygaps.characterisation.dr_da_plots import log_p_exp
 from pygaps.characterisation.dr_da_plots import log_v_adj
 from pygaps.graphing.calc_graphs import dra_plot
@@ -255,6 +257,7 @@ class DADRModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(
-            "https://pygaps.readthedocs.io/en/master/reference/characterisation/dubinin.html"
-        )
+        if self.ptype == "DA":
+            help_dialog(da_plot)
+        else:
+            help_dialog(dr_plot)

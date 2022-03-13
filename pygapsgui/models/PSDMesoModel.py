@@ -202,6 +202,4 @@ class PSDMesoModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(
-            "https://pygaps.readthedocs.io/en/master/reference/characterisation/psd_meso.html"
-        )
+        help_dialog(psd_mesoporous)
