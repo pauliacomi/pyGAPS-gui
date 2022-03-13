@@ -72,5 +72,7 @@ pip install .
 Then run the app:
 
 ```bash
+pygapsgui
+# or
 python pyGAPS-gui.py
 ```
