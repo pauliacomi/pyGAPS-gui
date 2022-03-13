@@ -126,6 +126,7 @@ class IsoEditPointDialog(QW.QDialog):
         return super().accept()
 
     def sizeHint(self) -> QC.QSize:
+        """Suggest ideal dimensions."""
         return QC.QSize(self.table_view.model().columnCount() * 120, 600)
 
     def translate_UI(self):

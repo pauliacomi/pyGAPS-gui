@@ -73,6 +73,7 @@ class IASTVLEDialog(QW.QDialog):
         _layout.addWidget(self.button_box, 1, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:
+        """Suggest ideal dimensions."""
         return QC.QSize(800, 800)
 
     def connect_signals(self):

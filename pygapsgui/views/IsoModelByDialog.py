@@ -94,6 +94,7 @@ class IsoModelByDialog(QW.QDialog):
         _layout.addWidget(self.button_box, 3, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:
+        """Suggest ideal dimensions."""
         return QC.QSize(1000, 800)
 
     def connect_signals(self):

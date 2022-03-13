@@ -71,6 +71,7 @@ class PlotTDialog(QW.QDialog):
         _layout.addWidget(self.button_box)
 
     def sizeHint(self) -> QC.QSize:
+        """Suggest ideal dimensions."""
         return QC.QSize(500, 800)
 
     def connect_signals(self):
