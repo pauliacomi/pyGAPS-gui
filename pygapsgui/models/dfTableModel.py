@@ -70,6 +70,12 @@ class dfTableModel(QC.QAbstractTableModel):
 
         return False
 
+    def setColumnDtype(self, col, dtype) -> bool:
+        """Set the dtype of a column"""
+        colname = self._data.columns[col]
+        self._data = self._data.astype({colname: dtype})
+        return True
+
     def headerData(self, section, orientation, role=QC.Qt.DisplayRole):
         """Get data from the header."""
         if role != QC.Qt.DisplayRole:
@@ -110,7 +116,7 @@ class dfTableModel(QC.QAbstractTableModel):
     def insertColumns(self, column: int, count: int, parent=QC.QModelIndex()) -> bool:
         """Convenience/fast function for column insertion."""
         self.beginInsertColumns(parent, column, column + count - 1)
-        self._data.insert(column, "newcol", None)
+        self._data.insert(column, "newcol", np.nan)
         self.endInsertColumns()
         return True
 

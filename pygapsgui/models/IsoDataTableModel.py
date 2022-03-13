@@ -29,11 +29,12 @@ class IsoDataTableModel(dfTableModel):
                     return False
         return super().setData(index, value, role)
 
-    def insertColumns(self, column: int, count: int, parent=...) -> bool:
+    def insertColumns(self, column: int, count: int, parent=None) -> bool:
         """Ensure only insert at the end."""
         return super().insertColumns(max(column, 2), count, parent)
 
-    def removeColumns(self, column: int, count: int, parent=...) -> bool:
+    def removeColumns(self, column: int, count: int, parent=None) -> bool:
+        """Ensure base parameters cant be deleted."""
         if any(
             self._data.columns[column + c] in ["pressure", "loading", "branch"]
             for c in range(count)
