@@ -1,6 +1,10 @@
+"""BET area QT model."""
+
+from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_bet import area_BET_raw
 from pygaps.characterisation.area_bet import bet_transform
 from pygaps.characterisation.area_bet import roq_transform
+from pygaps.characterisation.area_bet import simple_bet
 from pygaps.graphing.calc_graphs import bet_plot
 from pygaps.graphing.calc_graphs import roq_plot
 from pygaps.utilities.exceptions import CalculationError
@@ -9,6 +13,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class AreaBETModel():
+    """BET specific area calculations: QT MVC Model."""
 
     isotherm = None
     view = None
@@ -70,6 +75,8 @@ class AreaBETModel():
         self.view.iso_graph.branch = self.branch
         self.view.iso_graph.lgd_keys = ["adsorbate", "key"]
         self.view.iso_graph.pressure_mode = "relative"
+        self.view.iso_graph.loading_mode = "molar"
+        self.view.iso_graph.loading_unit = "mmol"
         self.view.iso_graph.y2_data = None
         self.view.iso_graph.set_isotherms([self.isotherm])  # always last
 
@@ -77,8 +84,10 @@ class AreaBETModel():
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
-        self.view.button_box.accepted.connect(self.export_results)
+        self.view.export_btn.clicked.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.view.accept)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # static parameters
@@ -176,6 +185,13 @@ class AreaBETModel():
 
         # Isotherm plot update
         self.view.iso_graph.draw_isotherms()
+        self.view.iso_graph.ax.autoscale(enable=False)
+        self.view.iso_graph.ax.plot(
+            self.pressure,
+            simple_bet(self.pressure, self.n_monolayer * 1000, self.c_const),
+            c='yellow',
+            label="fit",
+        )
 
         # Generate plot of the BET points chosen
         self.view.bet_graph.clear()
@@ -221,9 +237,22 @@ class AreaBETModel():
     def select_branch(self):
         """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
-        self.view.iso_graph.set_branch(self.branch)
+        self.view.iso_graph.branch = self.branch
         self.prepare_values()
         self.calc_auto()
+
+    def result_dict(self):
+        """Return a dictionary of results."""
+        return {
+            f"BET area [m2/{self.isotherm.material_unit}]": self.bet_area,
+            "BET R^2": self.corr_coef,
+            "BET C constant": self.c_const,
+            f"BET monolayer uptake [mmol/{self.isotherm.material_unit}]": self.n_monolayer * 1000,
+            "BET monolayer pressure [p/p0]": self.p_monolayer,
+            "BET slope": self.slope,
+            "BET intercept": self.intercept,
+            "BET pressure limits": self.limits
+        }
 
     def export_results(self):
         """Save results as a file."""
@@ -232,14 +261,10 @@ class AreaBETModel():
             return
         from pygapsgui.utilities.result_export import serialize
 
-        results = {
-            f"BET area [m2/{self.isotherm.material_unit}]": self.bet_area,
-            'R^2': self.corr_coef,
-            'C constant': self.c_const,
-            f"Monolayer uptake [mmol/{self.isotherm.material_unit}]": self.n_monolayer * 1000,
-            'p_monolayer [p/p0]': self.p_monolayer,
-            'BET slope': self.slope,
-            'BET intercept': self.intercept,
-            'Pressure limits': self.limits
-        }
+        results = self.result_dict()
         serialize(results, parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(area_BET)

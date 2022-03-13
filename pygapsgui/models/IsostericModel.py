@@ -1,13 +1,14 @@
 import numpy
 
 from pygaps.characterisation.isosteric_enth import isosteric_enthalpy
-from pygaps.characterisation.isosteric_enth import isosteric_enthalpy_raw
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsostericModel():
+    """Isosteric enthalpy calculations: QT MVC Model."""
+
     # Refs
     isotherms = None
     view = None
@@ -51,6 +52,7 @@ class IsostericModel():
         self.view.y_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # run calculation
@@ -138,11 +140,14 @@ class IsostericModel():
             self.view.iso_graph.draw_ylimits(self.limits[0], self.limits[1])
 
     def select_branch(self, branch):
+        """Handle branch selection signal."""
         self.branch = self.view.branch_dropdown.currentText()
-        self.view.iso_graph.set_branch(self.branch)
+        self.view.iso_graph.branch = self.branch
         self.calc_auto()
 
+    # TODO: Point number/exact selection
     def select_points(self, npoints):
+        """Handle point number selection signal."""
         self.loading_point_no = self.view.points_input.value()
         self.calc_auto()
 
@@ -161,3 +166,8 @@ class IsostericModel():
             self.results.get("std_errs"),
         }
         serialize(results, how="V", parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(isosteric_enthalpy)

@@ -2,6 +2,7 @@ from qtpy import QtWidgets as QW
 
 from pygaps.characterisation.models_thickness import _THICKNESS_MODELS
 from pygaps.characterisation.models_thickness import get_thickness_model
+from pygaps.characterisation.t_plots import t_plot
 from pygaps.characterisation.t_plots import t_plot_raw
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
@@ -10,6 +11,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class PlotTModel():
+    """T-plot calculations: QT MVC Model."""
 
     isotherm = None
     view = None
@@ -71,8 +73,10 @@ class PlotTModel():
         self.view.thickness_dropdown.currentIndexChanged.connect(self.select_tmodel)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
-        self.view.button_box.accepted.connect(self.export_results)
+        self.view.export_btn.clicked.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.view.accept)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # static parameters
@@ -200,20 +204,30 @@ class PlotTModel():
         self.prepare_values()
         self.calc_auto()
 
+    def result_dict(self):
+        """Return a dictionary of results."""
+        return {
+            e: {
+                f"t-plot pore volume [cm3/{self.isotherm.material_unit}]":
+                result.get("adsorbed_volume"),
+                f"t-plot area [m2/{self.isotherm.material_unit}]": result.get("area"),
+                "t-plot R^2": result.get("corr_coef"),
+                "t-plot slope": result.get("slope"),
+                "t-plot intercept": result.get("intercept"),
+            }
+            for e, result in enumerate(self.results)
+        }
+
     def export_results(self):
         """Save results as a file."""
         if not self.results:
             error_dialog("No results to export.")
             return
         from pygapsgui.utilities.result_export import serialize
-        results = {
-            e: {
-                f"Pore volume [cm3/{self.isotherm.material_unit}]": result.get("adsorbed_volume"),
-                f"Area [m2/{self.isotherm.material_unit}]": result.get("area"),
-                "R^2": result.get("corr_coef"),
-                "Slope": result.get("slope"),
-                "Intercept": result.get("intercept"),
-            }
-            for e, result in enumerate(self.results)
-        }
+        results = self.result_dict()
         serialize(results, parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(t_plot)

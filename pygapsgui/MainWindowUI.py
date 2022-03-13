@@ -1,3 +1,4 @@
+import qtpy
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
@@ -5,9 +6,11 @@ from qtpy import QtWidgets as QW
 import pygapsgui.widgets.resources_rc
 from pygapsgui.views.IsoGraphView import IsoListGraphView
 from pygapsgui.views.IsoListView import IsoListView
+from pygapsgui.views.MetadataTableView import MetadataTableView
 from pygapsgui.widgets.IsoUnitWidget import IsoUnitWidget
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
-from pygapsgui.views.MetadataTableView import MetadataTableView
+from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
+from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 
 
 class MainWindowUI():
@@ -44,7 +47,11 @@ class MainWindowUI():
         QC.QMetaObject.connectSlotsByName(main_window)
 
         # Move on screen to reasonable location with 2:1 aspect ratio
-        geometry = main_window.screen().availableGeometry()
+        if qtpy.API in qtpy.PYQT6_API:
+            screen = self.screen()
+        else:
+            screen = QG.QGuiApplication.primaryScreen()
+        geometry = screen.availableGeometry()
         height = geometry.height() * 0.75
         width = geometry.width() * 0.8
         width = min(width, height * 2)
@@ -106,7 +113,7 @@ class MainWindowUI():
         self.prop_base_layout = QW.QGridLayout()
         self.properties_layout.addLayout(self.prop_base_layout, 0, 0, 1, 1)
 
-        self.material_label = QW.QLabel()
+        self.material_label = LabelAlignRight()
         self.material_label.setObjectName("material_label")
         self.material_input = QW.QComboBox()
         self.material_input.setInsertPolicy(QW.QComboBox.NoInsert)
@@ -118,7 +125,7 @@ class MainWindowUI():
         self.prop_base_layout.addWidget(self.material_input, 0, 1, 1, 1)
         self.prop_base_layout.addWidget(self.material_details, 0, 2, 1, 1)
 
-        self.adsorbate_label = QW.QLabel()
+        self.adsorbate_label = LabelAlignRight()
         self.adsorbate_label.setObjectName("adsorbate_label")
         self.adsorbate_input = QW.QComboBox()
         self.adsorbate_input.setInsertPolicy(QW.QComboBox.NoInsert)
@@ -130,9 +137,11 @@ class MainWindowUI():
         self.prop_base_layout.addWidget(self.adsorbate_input, 1, 1, 1, 1)
         self.prop_base_layout.addWidget(self.adsorbate_details, 1, 2, 1, 1)
 
-        self.temperature_label = QW.QLabel()
+        self.temperature_label = LabelAlignRight()
         self.temperature_label.setObjectName("temperature_label")
-        self.temperature_input = QW.QLineEdit()
+        self.temperature_input = QW.QDoubleSpinBox()
+        self.temperature_input.setMinimum(-999)
+        self.temperature_input.setMaximum(9999)
         self.temperature_input.setObjectName("temperature_input")
         self.prop_base_layout.addWidget(self.temperature_label, 2, 0, 1, 1)
         self.prop_base_layout.addWidget(self.temperature_input, 2, 1, 1, 1)
@@ -147,7 +156,7 @@ class MainWindowUI():
 
         # then, isotherm metadata
         self.prop_extra_group = QW.QGroupBox()
-        self.properties_layout.addWidget(self.prop_extra_group, 2, 0, 1, 2)
+        self.properties_layout.addWidget(self.prop_extra_group, 2, 0, 1, 1)
         self.prop_extra_layout = QW.QVBoxLayout(self.prop_extra_group)
 
         # metadata edit widget
@@ -156,6 +165,8 @@ class MainWindowUI():
 
         # metadata table
         self.metadata_table_view = MetadataTableView()
+        delegate = SciFloatDelegate()
+        self.metadata_table_view.setItemDelegate(delegate)
         self.metadata_table_view.setObjectName("metadata_table_view")
         self.prop_extra_layout.addWidget(self.metadata_table_view)
 
@@ -406,7 +417,7 @@ class MainWindowUI():
         self.action_dr_plot.setText(QW.QApplication.translate("MainWindow", "Dubinin-Radushkevich plot", None, -1))
         self.action_psd_micro.setText(QW.QApplication.translate("MainWindow", "Microporous PSD", None, -1))
         self.action_psd_meso.setText(QW.QApplication.translate("MainWindow", "Mesoporous PSD", None, -1))
-        self.action_psd_kernel.setText(QW.QApplication.translate("MainWindow", "DFT Kernel PSD", None, -1))
+        self.action_psd_kernel.setText(QW.QApplication.translate("MainWindow", "Kernel Fit PSD", None, -1))
         self.action_isosteric.setText(QW.QApplication.translate("MainWindow", "Isosteric enthalpy", None, -1))
         self.action_model_by.setText(QW.QApplication.translate("MainWindow", "Fit a model", None, -1))
         self.action_model_guess.setText(QW.QApplication.translate("MainWindow", "Guess best model", None, -1))

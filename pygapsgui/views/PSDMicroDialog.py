@@ -9,6 +9,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class PSDMicroDialog(QW.QDialog):
+    """Pore size distribution calculations with mean potential theory: QT MVC Dialog."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
@@ -79,7 +80,12 @@ class PSDMicroDialog(QW.QDialog):
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Close)
+        self.button_box.addButton("Save as metadata", QW.QDialogButtonBox.AcceptRole)
+        self.export_btn = self.button_box.addButton(
+            "Export results", QW.QDialogButtonBox.ActionRole
+        )
+        self.button_box.addButton("Help", QW.QDialogButtonBox.HelpRole)
+        self.button_box.addButton("Cancel", QW.QDialogButtonBox.RejectRole)
         _layout.addWidget(self.button_box, 2, 0, 1, 1)
 
     def sizeHint(self) -> QC.QSize:

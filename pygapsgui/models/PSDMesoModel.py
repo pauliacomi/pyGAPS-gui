@@ -10,6 +10,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class PSDMesoModel():
+    """Pore size distribution calculations with Kelvin-based theory: QT MVC Model."""
 
     # Refs
     isotherm = None
@@ -71,8 +72,10 @@ class PSDMesoModel():
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.button_box.accepted.connect(self.export_results)
+        self.view.export_btn.clicked.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.view.accept)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # run calculation
@@ -173,16 +176,12 @@ class PSDMesoModel():
     def select_branch(self):
         """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
-        self.view.iso_graph.set_branch(self.branch)
+        self.view.iso_graph.branch = self.branch
         self.plot_clear()
 
-    def export_results(self):
-        """Save results as a file."""
-        if not self.results:
-            error_dialog("No results to export.")
-            return
-        from pygapsgui.utilities.result_export import serialize
-        results = {
+    def result_dict(self):
+        """Return a dictionary of results."""
+        return {
             "Pore widths [nm]":
             self.results.get("pore_widths"),
             "Pore distribution [dV/dW]":
@@ -190,4 +189,17 @@ class PSDMesoModel():
             "Pore cumulative volume [cm3/{self.isotherm.material_unit}]":
             self.results.get("pore_volume_cumulative"),
         }
+
+    def export_results(self):
+        """Save results as a file."""
+        if not self.results:
+            error_dialog("No results to export.")
+            return
+        from pygapsgui.utilities.result_export import serialize
+        results = self.result_dict()
         serialize(results, how="V", parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        help_dialog(psd_mesoporous)

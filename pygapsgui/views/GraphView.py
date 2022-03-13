@@ -8,6 +8,7 @@ from pygapsgui.widgets.GraphSelectorToolbar import VSelectorToolbar
 
 
 class GraphView(QW.QWidget):
+    """A widget that extends the matplotlib canvas with some useful functionality."""
 
     canvas = None
     figure = None
@@ -17,8 +18,10 @@ class GraphView(QW.QWidget):
     # for range_select
     x_range_select = None  # can be selector
     y_range_select = None  # can be selector
-    low = None  # can be plt.ax
-    high = None  # can be plt.ax
+    xlow = None  # can be plt.ax
+    xhigh = None  # can be plt.ax
+    ylow = None  # can be plt.ax
+    yhigh = None  # can be plt.ax
 
     def __init__(
         self,
@@ -38,7 +41,7 @@ class GraphView(QW.QWidget):
         """Creates and sets-up static UI elements"""
         self.figure = Figure(figsize=(5, 5), tight_layout=True)
         self.canvas = FigureCanvas(self.figure)
-        self.ax = self.figure.subplots()
+        self.ax = self.figure.add_subplot()
 
         _layout = QW.QGridLayout(self)
         row = 0
@@ -60,36 +63,42 @@ class GraphView(QW.QWidget):
         _layout.addWidget(self.navbar, row + 1, col, 1, 1)
 
     def setupNav(self):
+        """Creates the navbar."""
         self.navbar = NavigationToolbar(self.canvas, self)
 
     def setupXRangeSelect(self):
+        """Creates and connects a selector for the x-axis."""
         self.x_range_select = HSelectorToolbar("HRangeSelect", ax=self.ax)
         self.x_range_select.slider.rangeChanged.connect(self.draw_xlimits)
-        self.low = self.ax.axvline(0, c="r", ls="--")
-        self.high = self.ax.axvline(1, c="r", ls="--")
+        self.xlow = self.ax.axvline(0, c="r", ls="--")
+        self.xhigh = self.ax.axvline(1, c="r", ls="--")
 
     def setupYRangeSelect(self):
+        """Creates and connects a selector for the y-axis."""
         self.y_range_select = VSelectorToolbar("VRangeSelect", ax=self.ax)
         self.y_range_select.slider.rangeChanged.connect(self.draw_ylimits)
-        self.low = self.ax.axhline(0, c="r", ls="--")
-        self.high = self.ax.axhline(1, c="r", ls="--")
+        self.ylow = self.ax.axhline(0, c="r", ls="--")
+        self.yhigh = self.ax.axhline(1, c="r", ls="--")
 
     def draw_xlimits(self, low, high):
-        self.low.set_xdata([low, low])
-        self.high.set_xdata([high, high])
+        """Sets the selector limits for the x axis."""
+        self.xlow.set_xdata([low, low])
+        self.xhigh.set_xdata([high, high])
         self.canvas.draw_idle()
 
     def draw_ylimits(self, low, high):
-        self.low.set_ydata([low, low])
-        self.high.set_ydata([high, high])
+        """Sets the selector limits for the y axis."""
+        self.ylow.set_ydata([low, low])
+        self.yhigh.set_ydata([high, high])
         self.canvas.draw_idle()
 
     def clear(self):
+        """Custom clear function that only removes what's needed."""
         for ax in self.figure.axes:
             if ax == self.ax:
                 ax.set_prop_cycle(None)
                 for line in ax.get_lines():
-                    if line not in [self.low, self.high]:
+                    if line not in [self.xlow, self.xhigh, self.ylow, self.yhigh]:
                         line.remove()
                 lgd = ax.get_legend()
                 if lgd:

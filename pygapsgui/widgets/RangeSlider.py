@@ -266,9 +266,14 @@ class QRangeSlider(QW.QWidget):
         self.update()
 
     def setLogScale(self, log_scale=False):
+        """
+        Converts between a linear and a log scale.
+
+        If log, all display values will be scaled by a log function.
+        """
         self.log_scale = log_scale
         if log_scale:
-            self.scale_fun = lambda x: math.log10(x)
+            self.scale_fun = math.log10
             self.unscale_fun = lambda x: 10**x
             self.min_val = max(self.min_val, self.start)
             self.min_val = math.log10(self.min_val)
@@ -276,6 +281,7 @@ class QRangeSlider(QW.QWidget):
             self.start = math.log10(self.start)
             self.end = math.log10(self.end)
             self.scale = self.end - self.start
+            self.single_step = self.scale / 100
         else:
             self.scale_fun = lambda x: x
             self.unscale_fun = lambda x: x
@@ -284,6 +290,7 @@ class QRangeSlider(QW.QWidget):
             self.start = 10**self.start
             self.end = 10**self.end
             self.scale = self.end - self.start
+            self.single_step = self.scale / 100
 
         self.updateDisplayValues()
         self.update()
@@ -500,6 +507,7 @@ class QSpinBoxRangeSlider(QW.QWidget):
         self.rangeChanged = self.range_slider.rangeChanged
 
     def setupSpinboxes(self):
+        """Turn off signals and setup spinboxes."""
         self.min_spin_box.blockSignals(True)
         self.max_spin_box.blockSignals(True)
         self.min_spin_box.setMinimum(self.range_slider.start)

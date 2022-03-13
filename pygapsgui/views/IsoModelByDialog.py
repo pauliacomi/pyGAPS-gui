@@ -15,6 +15,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class IsoModelByDialog(QW.QDialog):
+    """Fit an isotherm by a specific isotherm model: QT MVC Dialog."""
 
     paramWidgets = {}
 
@@ -50,26 +51,36 @@ class IsoModelByDialog(QW.QDialog):
         opt_button_layout = QW.QHBoxLayout()
         self.options_layout.addLayout(opt_button_layout)
         self.calc_auto_button = QW.QPushButton()
+        self.calc_autolim_button = QW.QPushButton()
         self.calc_manual_button = QW.QPushButton()
         opt_button_layout.addWidget(self.calc_auto_button)
+        opt_button_layout.addWidget(self.calc_autolim_button)
         opt_button_layout.addWidget(self.calc_manual_button)
 
         # Parameter box
         self.param_box = QW.QGroupBox()
+        self.param_box_layout = QW.QVBoxLayout(self.param_box)
         self.options_layout.addWidget(self.param_box)
-        self.param_layout = QW.QVBoxLayout(self.param_box)
+
+        param_box_widget = QW.QWidget()
+        self.param_layout = QW.QVBoxLayout(param_box_widget)
+        self.scroll_area = QW.QScrollArea()
+        self.scroll_area.setFrameStyle(QW.QFrame.NoFrame)
+        self.scroll_area.setWidget(param_box_widget)
+        self.scroll_area.setWidgetResizable(True)
+        self.param_box_layout.addWidget(self.scroll_area)
 
         self.model_formula = QS.QSvgWidget(self.param_box)
-        self.model_formula.setMinimumSize(10, 50)
+        self.model_formula.setFixedHeight(30)
         self.param_layout.addWidget(self.model_formula)
-
-        self.options_layout.addStretch()
+        self.param_layout.addStretch()
 
         # Output log
         self.output_label = QW.QLabel("Output log:")
-        _layout.addWidget(self.output_label, 1, 0)
+        self.options_layout.addWidget(self.output_label)
         self.output = LabelOutput()
-        _layout.addWidget(self.output, 2, 0)
+        self.output.setMaximumHeight(130)
+        self.options_layout.addWidget(self.output)
 
         # Isotherm display
         self.iso_graph = IsoModelGraphView(x_range_select=True)
@@ -97,5 +108,6 @@ class IsoModelByDialog(QW.QDialog):
         self.setWindowTitle(QW.QApplication.translate("IsoModelByDialog", "Isotherm model fitting", None, -1))
         self.param_box.setTitle(QW.QApplication.translate("IsoModelByDialog", "Parameters", None, -1))
         self.calc_auto_button.setText(QW.QApplication.translate("IsoModelByDialog", "Autofit", None, -1))
+        self.calc_autolim_button.setText(QW.QApplication.translate("IsoModelByDialog", "Autofit with bounds", None, -1))
         self.calc_manual_button.setText(QW.QApplication.translate("IsoModelByDialog", "Use selected parameters", None, -1))
         # yapf: enable

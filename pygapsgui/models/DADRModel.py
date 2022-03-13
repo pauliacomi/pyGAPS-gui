@@ -1,4 +1,6 @@
+from pygaps.characterisation.dr_da_plots import da_plot
 from pygaps.characterisation.dr_da_plots import da_plot_raw
+from pygaps.characterisation.dr_da_plots import dr_plot
 from pygaps.characterisation.dr_da_plots import log_p_exp
 from pygaps.characterisation.dr_da_plots import log_v_adj
 from pygaps.graphing.calc_graphs import dra_plot
@@ -8,6 +10,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class DADRModel():
+    """Dubinin-Astakov and Dubinin-Radushkevich calculations: QT MVC Model."""
 
     isotherm = None
     view = None
@@ -74,8 +77,10 @@ class DADRModel():
         if self.ptype == "DA":
             self.view.dr_exp_input.valueChanged.connect(self.select_exp)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.button_box.accepted.connect(self.export_results)
+        self.view.export_btn.clicked.connect(self.export_results)
+        self.view.button_box.accepted.connect(self.view.accept)
         self.view.button_box.rejected.connect(self.view.reject)
+        self.view.button_box.helpRequested.connect(self.help_dialog)
 
         # Calculation
         # static parameters
@@ -200,6 +205,7 @@ class DADRModel():
         self.view.res_graph.canvas.draw_idle()
 
     def select_exp(self):
+        """Handle exponent selection."""
         exp = self.view.dr_exp_input.cleanText()
         # Check consistency of exponent
         if exp:
@@ -218,9 +224,25 @@ class DADRModel():
     def select_branch(self):
         """Handle isotherm branch selection."""
         self.branch = self.view.branch_dropdown.currentText()
-        self.view.iso_graph.set_branch(self.branch)
+        self.view.iso_graph.branch = self.branch
         self.prepare_values()
         self.calc_auto()
+
+    def result_dict(self):
+        """Return a dictionary of results."""
+        results = {
+            f"{self.ptype} mircropore Volume [cm3/{self.isotherm.material_unit}]":
+            self.microp_volume * 1000,
+            f"{self.ptype} effective potential [kJ/mol]": self.potential,
+            f"{self.ptype} R^2": self.corr_coef,
+            f"{self.ptype} slope": self.slope,
+            f"{self.ptype} intercept": self.intercept,
+            f"{self.ptype} pressure limits": self.limits
+        }
+
+        if self.ptype != "DR":
+            results["DR Exponent"] = self.exp
+        return results
 
     def export_results(self):
         """Save results as a file."""
@@ -229,15 +251,13 @@ class DADRModel():
             return
         from pygapsgui.utilities.result_export import serialize
 
-        results = {
-            f'Mircropore Volume [cm3/{self.isotherm.material_unit}]': self.microp_volume * 1000,
-            'Effective potential [kJ/mol]': self.potential,
-            'R^2': self.corr_coef,
-            'Slope': self.slope,
-            'Intercept': self.intercept,
-            'Pressure limits': self.limits
-        }
-        if self.ptype != "DR":
-            results['DR Exponent'] = self.exp
-
+        results = self.result_dict()
         serialize(results, parent=self.view)
+
+    def help_dialog(self):
+        """Display a dialog with the pyGAPS help."""
+        from pygapsgui.widgets.UtilityDialogs import help_dialog
+        if self.ptype == "DA":
+            help_dialog(da_plot)
+        else:
+            help_dialog(dr_plot)

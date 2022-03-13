@@ -2,10 +2,11 @@ from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
 import pygaps
-from pygaps.utilities.converter_mode import _LOADING_MODE
-from pygaps.utilities.converter_mode import _MATERIAL_MODE
-from pygaps.utilities.converter_mode import _PRESSURE_MODE
-from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
+from pygaps.units.converter_mode import _LOADING_MODE
+from pygaps.units.converter_mode import _MATERIAL_MODE
+from pygaps.units.converter_mode import _PRESSURE_MODE
+from pygaps.units.converter_unit import _TEMPERATURE_UNITS
+from pygaps.utilities import exceptions as pge
 from pygapsgui.models.IsoModel import IsoModel
 from pygapsgui.models.MetadataTableModel import MetadataTableModel
 from pygapsgui.widgets.UtilityDialogs import error_dialog
@@ -109,7 +110,7 @@ class IsoController():
         # Essential metadata
         self.mw_widget.material_input.setCurrentText(str(self.iso_current.material))
         self.mw_widget.adsorbate_input.setCurrentText(str(self.iso_current.adsorbate))
-        self.mw_widget.temperature_input.setText(f"{self.iso_current._temperature:g}")
+        self.mw_widget.temperature_input.setValue(self.iso_current._temperature)
 
         # Units setup
         self.unit_widget.init_units(self.iso_current)
@@ -232,8 +233,8 @@ class IsoController():
             )
             modified = True
 
-        if isotherm.temperature != float(self.mw_widget.temperature_input.text()):
-            isotherm.temperature = float(self.mw_widget.temperature_input.text())
+        if isotherm.temperature != self.mw_widget.temperature_input.value():
+            isotherm.temperature = self.mw_widget.temperature_input.value()
             self.mw_widget.statusbar.showMessage(
                 f'Temperature modified to {isotherm.temperature}', 2000
             )
@@ -313,6 +314,19 @@ class IsoController():
         self.mw_widget.statusbar.showMessage(f"Added property named '{meta_name}")
         self.mw_widget.metadata_table_view.resizeColumns()
 
+    def metadata_save_bulk(self, results: dict):
+        """Save multiple metadatas from a dictionary."""
+        for meta_name, meta_value in results.items():
+            if isinstance(meta_value, (int, float)):
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "number"])
+            elif isinstance(meta_value, (list, tuple)):
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "list"])
+            else:
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "text"])
+
+        self.mw_widget.metadata_table_view.resizeColumns()
+        self.mw_widget.statusbar.showMessage("Saved results as metadata.")
+
     def metadata_delete(self):
         """Delete a metadata point."""
         index = self.mw_widget.metadata_table_view.currentIndex()
@@ -369,23 +383,28 @@ class IsoController():
 
         import pygaps.parsing as pgp
         if iso_type == 'bel_dat':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='dat')
+            settings = dict(manufacturer='bel', fmt='dat')
         elif iso_type == 'bel_xl':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='xl')
+            settings = dict(manufacturer='bel', fmt='xl')
         elif iso_type == 'bel_csv':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='csv')
+            settings = dict(manufacturer='bel', fmt='csv')
         elif iso_type == 'bel_csv_jis':
-            isotherm = pgp.isotherm_from_commercial(
-                path=path, manufacturer='bel', fmt='csv', lang="JPN"
-            )
+            settings = dict(manufacturer='bel', fmt='csv', lang="JPN")
         elif iso_type == 'mic_xl':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='mic', fmt='xl')
+            settings = dict(manufacturer='mic', fmt='xl')
         elif iso_type == '3p_xl':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='3p', fmt='xl')
+            settings = dict(manufacturer='3p', fmt='xl')
         elif iso_type == 'qnt_txt':
-            isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='qnt', fmt='txt')
+            settings = dict(manufacturer='qnt', fmt='txt')
         else:
             raise Exception(f"Could not determine import type '{iso_type}'.")
+
+        try:
+            isotherm = pgp.isotherm_from_commercial(path=path, **settings)
+        except pge.ParsingError as exc:
+            error_dialog(str(exc))
+        except BaseException as exc:
+            error_dialog(str(exc))
 
         if not isotherm:
             return
@@ -393,6 +412,7 @@ class IsoController():
         self.add_isotherm(name, isotherm)
 
     def add_isotherm(self, name, isotherm):
+        """Wrap an isotherm in an IsoModel and add to the IsothermListModel."""
 
         # Add adsorbates to the list
         if isotherm.material not in pygaps.MATERIAL_LIST:

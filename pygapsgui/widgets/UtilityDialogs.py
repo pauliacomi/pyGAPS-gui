@@ -4,6 +4,8 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
+from pygapsgui.widgets.UtilityWidgets import CollapsibleBox
+
 
 def open_files_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
     """Abstract dialog for file opening."""
@@ -87,3 +89,38 @@ class ErrorMessageBox(QW.QDialog):
         if trace:
             _layout.addWidget(self.details_box)
         _layout.addWidget(self.button_box)
+
+
+def help_dialog(function):
+    """Display a dialog with online help."""
+    help = HelpDialog(function)
+    help.exec_()
+
+
+class HelpDialog(QW.QDialog):
+    """General help dialog, prints the function docstring."""
+    def __init__(self, function, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setWindowTitle("Help Dialog")
+
+        from docutils.core import publish_string
+        import textwrap
+
+        doc = textwrap.dedent(function.__doc__)
+        notes = doc.find("Notes\n")
+
+        text = publish_string(
+            doc[notes:],
+            writer_name='html',
+            settings_overrides={'output_encoding': 'unicode'},
+        )
+
+        self.text_view = QW.QTextBrowser()
+        self.text_view.setHtml(text)
+
+        _layout = QW.QVBoxLayout(self)
+        _layout.addWidget(self.text_view)
+
+    def sizeHint(self) -> QC.QSize:
+        return QC.QSize(400, 400)

@@ -6,40 +6,40 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    env:
+      QT_API: pyside6 # make sure QT does not link something else
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Manually fetch tags for semver
+      run: git fetch --prune --unshallow
+
     - name: Setup Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+        cache: 'pip'
+        cache-dependency-path: '**/setup.cfg'
 
-    - name: Use Cache
-      id: cache-venv
-      uses: actions/cache@v2
-      with:
-        path: ./.venv/
-        key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-venv-
-
-    - name: Create venv
+    - name: Install
       run: |
-        python -m venv ./.venv
-        ./.venv/Scripts/activate
-        pip install -r requirements.txt
-      if: steps.cache-venv.outputs.cache-hit != 'true'
+        pip install .[build]
+        pip list
+
+    - name: Check install from cli
+      run: |
+        pygapsgui --test
+        pygapsgui --version
 
     - name: Run PyInstaller
       run: |
-        ./.venv/Scripts/activate
-        pip install .
         pyinstaller pyGAPS-gui.spec
 
-    # - name: Run Executable
-    #   run: |
-    #      cd ./dist/pyGAPS-gui*
-    #      pyGAPS-gui.exe
+    - name: Check bundled executable
+      run: |
+        cd dist/pyGAPS-gui*
+        ./pyGAPS-gui.exe --version
 
     - name: Set path for candle and light
       run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
@@ -47,27 +47,26 @@ jobs:
 
     - name: Make MSI + ZIP
       run: |
-        ./.venv/Scripts/activate
-        cd dist\pyGAPS-gui*
+        cd dist/pyGAPS-gui*
         $folderName = pwd
-        cd ..\..
-        python .\ci\collect_dist.py msi zip $folderName
-        candle.exe .\dist\pyGAPS-gui.wxs -o .\dist\pyGAPS-gui.wixobj
-        light.exe .\dist\pyGAPS-gui.wixobj -o .\dist\pyGAPS-gui-win-x86_64.msi -ext WixUIExtension.dll
+        cd ../..
+        python ./ci/collect_dist.py msi zip $folderName
+        candle.exe ./dist/pyGAPS-gui.wxs -o ./dist/pyGAPS-gui.wixobj
+        light.exe ./dist/pyGAPS-gui.wixobj -o ./dist/pyGAPS-gui-win-x86_64.msi -ext WixUIExtension.dll
         Rename-Item -Path $folderName -NewName "pyGAPS-gui-win-x86_64.zip"
 
-    - name: Upload Artifacts
+    - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-          name: wininstaller
-          path: dist/*.msi
-          if-no-files-found: error
-          retention-days: 1
+        name: wininstaller
+        path: dist/*.msi
+        if-no-files-found: error
+        retention-days: 1
 
     - name: GH 🐱🐙 Release
       uses: softprops/action-gh-release@v1
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       with:
         files: |
-          .\dist\pyGAPS-gui-win-x86_64.msi
-          .\dist\pyGAPS-gui-win-x86_64.zip
+          ./dist/pyGAPS-gui-win-x86_64.msi
+          ./dist/pyGAPS-gui-win-x86_64.zip

@@ -10,7 +10,7 @@ from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 
 
 class IsoEditPointDialog(QW.QDialog):
-    """A dialog that allows editing of individual isotherm points."""
+    """A dialog that allows editing of PointIsotherm points."""
     def __init__(self, isotherm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup_UI()
@@ -75,9 +75,11 @@ class IsoEditPointDialog(QW.QDialog):
         self.edit_del_col.pressed.connect(self.del_col)
 
     def add_row(self):
+        """Insert a row at current location."""
         self.model.insertRow(self.table_view.currentIndex().row())
 
     def del_row(self):
+        """Delete current highlighted row."""
         row = self.table_view.currentIndex().row()
         self.model.removeRow(row)
         self.table_view.selectRow(row)
@@ -101,11 +103,13 @@ class IsoEditPointDialog(QW.QDialog):
         self.model.setHeaderData(ncols, QC.Qt.Horizontal, input.text())
 
     def del_col(self):
+        """Delete current highlighted column."""
         col = self.table_view.currentIndex().column()
         self.model.removeColumn(col)
         self.table_view.selectColumn(col)
 
     def keyPressEvent(self, event):
+        """Handle copy/paste."""
         if self.table_view.hasFocus():
             if event.key() == QC.Qt.Key_C and (event.modifiers() & QC.Qt.ControlModifier):
                 table_to_clipboard(self.table_view)
@@ -117,6 +121,7 @@ class IsoEditPointDialog(QW.QDialog):
                 super().keyPressEvent(event)
 
     def accept(self) -> None:
+        """If accepted we commit the data."""
         self.isotherm.data_raw = self.model._data
         return super().accept()
 

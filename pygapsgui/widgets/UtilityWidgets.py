@@ -2,6 +2,8 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
+from pygapsgui.widgets.SciDoubleSpinbox import ScientificDoubleSpinBox
+
 
 class EditAlignRight(QW.QLineEdit):
     """Right-aligned LineEdit."""
@@ -46,8 +48,51 @@ class LabelOutput(QW.QTextEdit):
 
 
 class FreeSpinBox(QW.QSpinBox):
-    #TODO implement
-    pass
+    """A QSpinbox with a large upper bound."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setMaximum(999999999)
+
+
+class FloatStandardItem(QG.QStandardItem):
+    """A basic item which can store floats."""
+    val = None
+
+    def type(self) -> int:
+        """Expects custom type."""
+        return QG.QStandardItem.UserType + 1
+
+    def setData(self, value, role: int = QC.Qt.DisplayRole) -> None:
+        """Just store data as float."""
+        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+            self.val = value
+        self.emitDataChanged()
+
+    def data(self, role: int = QC.Qt.DisplayRole):
+        """Get back same float."""
+        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+            return self.val
+
+
+class LimitEdit(QW.QWidget):
+    """Allows two numbers intended as limits to be set/read."""
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.lower_edit = ScientificDoubleSpinBox()
+        self.upper_edit = ScientificDoubleSpinBox()
+        _layout = QW.QHBoxLayout(self)
+        _layout.addWidget(self.lower_edit)
+        _layout.addWidget(self.upper_edit)
+
+    def set_values(self, values):
+        """Individually set upper/lower values."""
+        self.lower_edit.setValue(values[0])
+        self.upper_edit.setValue(values[1])
+
+    def values(self):
+        """Get tuple of the upper/lower values."""
+        return self.lower_edit.value(), self.upper_edit.value()
 
 
 class CollapsibleBox(QW.QWidget):
@@ -90,6 +135,7 @@ class CollapsibleBox(QW.QWidget):
         )
 
     def on_pressed(self):
+        """Animate and toggle open/closed."""
         checked = self.toggle_button.isChecked()
         self.toggle_button.setArrowType(QC.Qt.DownArrow if checked else QC.Qt.RightArrow)
         self.toggle_animation.setDirection(
@@ -98,6 +144,7 @@ class CollapsibleBox(QW.QWidget):
         self.toggle_animation.start()
 
     def setContentLayout(self, layout):
+        """Populate the box layout."""
         self.content_area.setLayout(layout)
         collapsed_height = (self.sizeHint().height() - self.content_area.maximumHeight())
         collapsed_width = self.sizeHint().width()
@@ -138,6 +185,7 @@ class CollapsibleBox(QW.QWidget):
 
 
 class HeightHeaderView(QW.QHeaderView):
+    """A table QHeaderView which wraps and adapts to text height."""
     def __init__(self, parent=None):
         super().__init__(QC.Qt.Horizontal, parent=parent)
         self.setSectionResizeMode(QW.QHeaderView.Stretch)
@@ -145,6 +193,7 @@ class HeightHeaderView(QW.QHeaderView):
         self.setDefaultAlignment(QC.Qt.AlignCenter | QC.Qt.Alignment(QC.Qt.TextWordWrap))
 
     def sectionSizeFromContents(self, logicalIndex):
+        """Tweak bounding rectangle based on data."""
         text = self.model().headerData(logicalIndex, self.orientation(), QC.Qt.DisplayRole)
         alignment = self.defaultAlignment()
         metrics = QG.QFontMetrics(self.fontMetrics())

@@ -18,6 +18,7 @@ from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class AdsorbateView(QW.QWidget):
+    """QT MVC View for displaying and editing Adsorbate properties/metadata."""
 
     _adsorbate = None
     adsorbate_changed = QC.Signal(str)
@@ -84,10 +85,11 @@ class AdsorbateView(QW.QWidget):
             return
 
         self._adsorbate = adsorbate
-        self.setup_model()
+        self.setup_view()
         self.connect_signals()
 
-    def setup_model(self):
+    def setup_view(self):
+        """Sets up the display of various properties/metadata."""
         self.name_value.setText(self.adsorbate.name)
         self.alias_value.addItems(self.adsorbate.alias)
         self.alias_value.setFixedHeight(
@@ -107,12 +109,12 @@ class AdsorbateView(QW.QWidget):
 
     def connect_signals(self):
         """Connect permanent signals."""
-
         self.table_view.selectionModel().selectionChanged.connect(self.metadata_select)
         self.meta_edit_widget.save_button.clicked.connect(self.metadata_save)
         self.meta_edit_widget.delete_button.clicked.connect(self.metadata_delete)
 
     def metadata_select(self):
+        """Handle selection of a metadata in the TableView."""
         index = self.table_view.currentIndex()
         if index:
             data = self.table_model.rowData(index)
@@ -122,7 +124,7 @@ class AdsorbateView(QW.QWidget):
                 self.meta_edit_widget.clear()
 
     def metadata_save(self):
-
+        """Handle saving of a metadata in the TableView."""
         meta_name = self.meta_edit_widget.name_input.text()
         meta_value = self.meta_edit_widget.value_input.text()
         meta_type = self.meta_edit_widget.type_input.currentText()
@@ -141,7 +143,7 @@ class AdsorbateView(QW.QWidget):
         self.table_view.resizeColumns()
 
     def metadata_delete(self):
-
+        """Handle deletion of a metadata in the TableView."""
         index = self.table_view.currentIndex()
         self.table_model.removeRow(index.row())
         self.adsorbate_changed.emit(self.adsorbate.name)
@@ -160,6 +162,7 @@ class AdsorbateView(QW.QWidget):
 
 
 class AdsorbateDialog(QW.QDialog):
+    """Dialog with an AdsorbateView."""
     adsorbate_changed = QC.Signal(str)
 
     def __init__(self, adsorbate, *args, **kwargs) -> None:
@@ -200,6 +203,7 @@ class AdsorbateDialog(QW.QDialog):
 
 
 class AdsorbateListDialog(QW.QDialog):
+    """Dialog with a list of Adsorbates and an AdsorbateView."""
     adsorbate_changed = QC.Signal(str)
 
     def __init__(self, *args, **kwargs):
@@ -207,7 +211,7 @@ class AdsorbateListDialog(QW.QDialog):
         self.setup_UI()
         self.translate_UI()
         self.connect_signals()
-        self.setup_model()
+        self.setup_view()
 
     def setup_UI(self):
         """Creates and sets-up static UI elements"""
@@ -236,7 +240,7 @@ class AdsorbateListDialog(QW.QDialog):
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
-    def setup_model(self):
+    def setup_view(self):
         self.adsorbate_list.addItems([ads.name for ads in ADSORBATE_LIST])
         self.adsorbate_list.currentItemChanged.connect(self.selectAdsorbate)
 

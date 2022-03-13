@@ -1,6 +1,7 @@
-# pyGAPS-gui - adsorption data processing
-
-## Overview
+<p align="center">
+  <img alt="pyGAPS Logo" src="pygapsgui/resources/main_icon.png" width="150px" />
+  <h1 align="center">pyGAPS-gui</h1>
+</p>
 
 pyGAPS-GUI is a Graphical User Interface (GUI) for
 [pyGAPS](https://github.com/pauliacomi/pyGAPS). It can be used to import,
@@ -8,6 +9,16 @@ process and fit adsorption isotherms in various formats.
 
 Download the latest version for your system in the
 [releases](https://github.com/pauliacomi/pyGAPS-gui/releases) section.
+
+<a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest">
+    <img src="https://img.shields.io/badge/download-windows-blue.svg" alt="Win link" />
+</a>
+<a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest">
+    <img src="https://img.shields.io/badge/download-mac-lightgrey" alt="Mac link" />
+</a>
+<a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest">
+    <img src="https://img.shields.io/badge/download-linux-orange" alt="Linux link" />
+</a>
 
 ****
 
@@ -30,14 +41,38 @@ warning. You have been warned.
 - An sqlite database backend for storing and retrieving data.
 - Simple methods for isotherm graphing and comparison.
 
+![Files](screenshot.png)
+
 ## Installation for development
 
-To install the development version of pyGAPS-GUI, pull this GitHub repo
+To install the development version of pyGAPS-gui, pull this GitHub repo.
 
-    git clone https://github.com/pauliacomi/pyGAPS-gui
+```bash
+git clone https://github.com/pauliacomi/pyGAPS-gui
+```
 
-Setup a virtual environment in which pyGAPS is installed. Also install a version
-of qtpy with PyQt5/PyQt4/PySide2/PySide6. Then run the main app:
+Setup a virtual environment and install pyGAPS. For example using `venv` on
+linux: Due to some dependency hell, **pyGAPS-gui requires Python 3.8**.
 
-    python pyGAPS-gui.py
+```bash
+cd pyGAPS-gui
+python -m venv ./.venv
+source ./.venv/bin/activate
+pip install .
+```
 
+Or using `conda` on Windows:
+
+```ps
+cd pyGAPS-gui
+conda create -p ./.venv python=3.8
+conda activate ./.venv
+pip install .
+```
+Then run the app:
+
+```bash
+pygapsgui
+# or
+python pyGAPS-gui.py
+```

@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import pathlib
+from sys import platform
 
 folder = pathlib.Path.cwd()
 
@@ -22,7 +23,6 @@ extra_datas = [
     ("LICENSE.rtf", "."),
     ("pygapsgui/resources", "pygapsgui/resources"),
     (str(pygaps_dir / "data"), "pygaps/data"),
-    (str(pygaps_dir / "characterisation/kernels"), "pygaps/characterisation/kernels"),
 ]
 
 # Modules that should not be in the distribution
@@ -110,3 +110,10 @@ coll = COLLECT(
     upx_exclude=[],
     name=f'pyGAPS-gui v{pggversion} (with pyGAPS v{pgversion})',
 )
+
+if platform == "darwin":
+    app = BUNDLE(
+        coll,
+        name=f'pyGAPS-gui v{pggversion}.app',
+        icon="pygapsgui/resources/main_icon.ico",
+    )

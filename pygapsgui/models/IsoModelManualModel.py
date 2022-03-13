@@ -5,17 +5,18 @@ import pygaps
 from pygaps import ModelIsotherm
 from pygaps.modelling import _MODELS
 from pygaps.modelling import get_isotherm_model
-from pygaps.utilities.converter_mode import _LOADING_MODE
-from pygaps.utilities.converter_mode import _MATERIAL_MODE
-from pygaps.utilities.converter_mode import _PRESSURE_MODE
-from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
+from pygaps.units.converter_mode import _LOADING_MODE
+from pygaps.units.converter_mode import _MATERIAL_MODE
+from pygaps.units.converter_mode import _PRESSURE_MODE
+from pygaps.units.converter_unit import _TEMPERATURE_UNITS
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.utilities.tex2svg import tex2svg
-from pygapsgui.widgets.SpinBoxSlider import QHSpinBoxSlider
+from pygapsgui.widgets.SpinBoxLimitSlider import QHSpinBoxLimitSlider
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoModelManualModel():
+    """Manually create an isotherm model: QT MVC Model."""
 
     model_isotherm = None
     view = None
@@ -60,16 +61,10 @@ class IsoModelManualModel():
         # connect signals
         self.view.model_dropdown.currentIndexChanged.connect(self.select_model)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.x_select.slider.rangeChanged.connect(self.calculate_with_limits)
         self.view.calc_manual_button.clicked.connect(self.calculate_manual)
 
         # populate initial
         self.select_model()
-
-    def calculate_with_limits(self, left, right):
-        """Set limits on calculation."""
-        self.limits = [left, right]
-        self.calculate_manual()
 
     def calculate_manual(self):
         """Use model parameters."""
@@ -91,7 +86,7 @@ class IsoModelManualModel():
                     branch=self.branch,
                     material="Model",
                     adsorbate=self.view.adsorbate_input.lineEdit().text(),
-                    temperature=float(self.view.temperature_input.text()),
+                    temperature=self.view.temperature_input.value(),
                     temperature_unit=self.view.temperature_unit.currentText(),
                     pressure_mode=self.view.unit_widget.pressure_mode.currentText(),
                     pressure_unit=self.view.unit_widget.pressure_unit.currentText(),
@@ -109,6 +104,7 @@ class IsoModelManualModel():
             return True
 
     def select_model(self):
+        """What to do when the user selects a model."""
         self.model_isotherm = None
         self.current_model_name = self.view.model_dropdown.currentText()
         self.current_model = get_isotherm_model(self.current_model_name)
@@ -128,7 +124,8 @@ class IsoModelManualModel():
         self.view.paramWidgets = {}
 
         for param in self.current_model.param_names:
-            widget = QHSpinBoxSlider()
+            # TODO: creation/deletion of widgets is expensive... can they be reused?
+            widget = QHSpinBoxLimitSlider()
             widget.setText(param)
             minv, maxv = self.current_model.param_bounds[param]
             if not minv or minv == -numpy.inf:
@@ -136,9 +133,10 @@ class IsoModelManualModel():
             if not maxv or maxv == numpy.inf:
                 maxv = 100
             widget.setRange(minv=minv, maxv=maxv)
-            self.view.param_layout.addWidget(widget)
+            self.view.param_layout.insertWidget(self.view.param_layout.count() - 1, widget)
             self.view.paramWidgets[param] = widget
 
+        # Update plot
         self.plot_clear()
 
     def output_results(self):
@@ -161,17 +159,24 @@ class IsoModelManualModel():
         self.view.iso_graph.draw_isotherms()
 
     def get_model_params(self):
+        """Takes the parameters from the sliders and stores a model in memory."""
         for param in self.current_model.params:
             pval = self.view.paramWidgets[param].getValue()
             self.current_model.params[param] = float(pval)
 
+        # TODO automatically convert limits on units change
+
         # The pressure range on which the model was built.
-        # TODO user-selectable limits for model
-        self.current_model.pressure_range = self.limits
+        self.current_model.pressure_range = (
+            self.view.p_min.value(),
+            self.view.p_max.value(),
+        )
 
         # The loading range on which the model was built.
-        # loading = self.isotherm.loading(branch=self.branch)
-        # self.current_model.loading_range = [min(loading), max(loading)]
+        self.current_model.loading_range = (
+            self.view.l_min.value(),
+            self.view.l_max.value(),
+        )
 
     def select_branch(self):
         """Handle isotherm branch selection."""
