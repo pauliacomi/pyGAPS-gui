@@ -123,6 +123,7 @@ class IsoEditModelDialog(QW.QDialog):
         return super().accept()
 
     def sizeHint(self) -> QC.QSize:
+        """Suggest ideal dimensions."""
         return QC.QSize(300, 500)
 
     def translate_UI(self):

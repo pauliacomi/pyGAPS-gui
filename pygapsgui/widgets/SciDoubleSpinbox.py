@@ -90,6 +90,18 @@ class SciFloatSpinDelegate(QW.QStyledItemDelegate):
 
 class SciFloatDelegate(QW.QStyledItemDelegate):
     """A StyledItemDelegate that displays scientific formatted floats."""
+    def createEditor(self, parent, option, index):
+        """Give an instance of the SciDoubleSpinbox"""
+        if isinstance(index.data(), float):
+            return ScientificDoubleSpinBox(parent)
+        return super().createEditor(parent, option, index)
+
+    def setEditorData(self, editor: QW.QWidget, index: QC.QModelIndex) -> None:
+        """Transfer the item value to the editor."""
+        if isinstance(index.data(), float):
+            editor.setValue(index.data())
+        return super().setEditorData(editor, index)
+
     def displayText(self, value, locale):
         """Called when the underlying text is displayed."""
         return format_float(value)

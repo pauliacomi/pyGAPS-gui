@@ -123,4 +123,5 @@ class HelpDialog(QW.QDialog):
         _layout.addWidget(self.text_view)
 
     def sizeHint(self) -> QC.QSize:
+        """Suggest ideal dimensions."""
         return QC.QSize(400, 400)

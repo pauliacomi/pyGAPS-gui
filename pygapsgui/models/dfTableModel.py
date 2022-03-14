@@ -70,6 +70,12 @@ class dfTableModel(QC.QAbstractTableModel):
 
         return False
 
+    def setColumnDtype(self, col, dtype) -> bool:
+        """Set the dtype of a column"""
+        colname = self._data.columns[col]
+        self._data = self._data.astype({colname: dtype})
+        return True
+
     def headerData(self, section, orientation, role=QC.Qt.DisplayRole):
         """Get data from the header."""
         if role != QC.Qt.DisplayRole:
@@ -90,15 +96,17 @@ class dfTableModel(QC.QAbstractTableModel):
     def insertRows(self, row: int, count: int, parent=QC.QModelIndex()) -> bool:
         """Convenience/fast function for row insertion"""
         self.beginInsertRows(parent, row, row + count - 1)
-        line = pd.DataFrame(None, index=np.arange(count), columns=self._data.columns)
-        line['branch'] = self._data.iloc[row]['branch']
+        # line = pd.DataFrame(self._data.iloc[row])
+        line = pd.DataFrame([self._data.iloc[row].values],
+                            index=range(count),
+                            columns=self._data.columns)
         self._data = pd.concat([self._data.iloc[:row], line,
                                 self._data.iloc[row:]]).reset_index(drop=True)
         self.endInsertRows()
         return True
 
     def removeRows(self, row: int, count: int, parent=QC.QModelIndex()) -> bool:
-        """Convenience/fast function for row deletion"""
+        """Convenience/fast function for row deletion."""
         self.beginRemoveRows(parent, row, row + count - 1)
         self._data.drop(self._data.index[row:row + count], inplace=True)
         self._data.reset_index(drop=True, inplace=True)
@@ -106,14 +114,14 @@ class dfTableModel(QC.QAbstractTableModel):
         return True
 
     def insertColumns(self, column: int, count: int, parent=QC.QModelIndex()) -> bool:
-        """Convenience/fast function for column insertion"""
+        """Convenience/fast function for column insertion."""
         self.beginInsertColumns(parent, column, column + count - 1)
-        self._data.insert(column, "newcol", None)
+        self._data.insert(column, "newcol", np.nan)
         self.endInsertColumns()
         return True
 
     def removeColumns(self, column: int, count: int, parent=QC.QModelIndex()) -> bool:
-        """Convenience/fast function for column delection"""
+        """Convenience/fast function for column deletion."""
         self.beginRemoveColumns(parent, column, column + count - 1)
         self._data.drop(self._data.columns[column:column + count], axis=1, inplace=True)
         self.endRemoveColumns()

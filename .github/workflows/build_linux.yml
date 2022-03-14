@@ -34,10 +34,22 @@ jobs:
         cache: 'pip'
         cache-dependency-path: '**/setup.cfg'
 
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: build
+        python-version: 3.8
+        channels: conda-forge
+
+    - name: Conda install
+      run: |
+        conda list
+        conda install nomkl numpy scipy pandas
+        conda list
+
     - name: Install
       run: |
         pip install .[build]
-        pip list
+        conda list
 
     - name: Check install from cli
       run: |

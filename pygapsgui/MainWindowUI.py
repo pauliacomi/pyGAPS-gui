@@ -315,7 +315,8 @@ class MainWindowUI():
         self.action_materials = QW.QAction(main_window)
         self.action_materials.setObjectName("action_materials")
 
-        # about
+        # about and example
+        self.action_examples = QW.QAction(main_window)
         self.action_about = QW.QAction(main_window)
         icon = QG.QIcon()
         icon.addPixmap(QG.QPixmap(":/res/icons/15_Tick_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
@@ -368,6 +369,7 @@ class MainWindowUI():
             self.action_adsorbates,
             self.action_materials,
         ])
+        self.menu_help.addAction(self.action_examples)
         self.menu_help.addAction(self.action_about)
 
         # Create status bar
@@ -408,6 +410,7 @@ class MainWindowUI():
         self.action_import.setText(QW.QApplication.translate("MainWindow", "Import", None, -1))
         self.action_save.setText(QW.QApplication.translate("MainWindow", "Save", None, -1))
         self.action_quit.setText(QW.QApplication.translate("MainWindow", "Quit", None, -1))
+        self.action_examples.setText(QW.QApplication.translate("MainWindow", "Load example data", None, -1))
         self.action_about.setText(QW.QApplication.translate("MainWindow", "About", None, -1))
         self.action_area_bet.setText(QW.QApplication.translate("MainWindow", "BET surface area", None, -1))
         self.action_area_lang.setText(QW.QApplication.translate("MainWindow", "Langmuir surface area", None, -1))

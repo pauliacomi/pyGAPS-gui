@@ -89,6 +89,7 @@ class PSDMicroDialog(QW.QDialog):
         _layout.addWidget(self.button_box, 2, 0, 1, 1)
 
     def sizeHint(self) -> QC.QSize:
+        """Suggest ideal dimensions."""
         return QC.QSize(800, 900)
 
     def connect_signals(self):

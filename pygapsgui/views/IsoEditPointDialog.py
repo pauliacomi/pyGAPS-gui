@@ -91,15 +91,25 @@ class IsoEditPointDialog(QW.QDialog):
         layout.addWidget(QW.QLabel("Set Data Name:"))
         input = QW.QLineEdit()
         layout.addWidget(input)
+        layout.addWidget(QW.QLabel("Set Data Type:"))
+        type_input = QW.QComboBox()
+        type_input.addItems(("numeric", "text"))
+        layout.addWidget(type_input)
         btn = QW.QPushButton("Ok")
         layout.addWidget(btn)
         btn.pressed.connect(dialog.accept)
         ret = dialog.exec()
         if ret != QW.QDialog.Accepted:
             return
+        if not input.text():
+            return
 
         ncols = self.model.columnCount()
+        dtype = type_input.currentText()
+
         self.model.insertColumn(ncols)
+        if dtype == "text":
+            self.model.setColumnDtype(ncols, "object")
         self.model.setHeaderData(ncols, QC.Qt.Horizontal, input.text())
 
     def del_col(self):
@@ -126,6 +136,7 @@ class IsoEditPointDialog(QW.QDialog):
         return super().accept()
 
     def sizeHint(self) -> QC.QSize:
+        """Suggest ideal dimensions."""
         return QC.QSize(self.table_view.model().columnCount() * 120, 600)
 
     def translate_UI(self):
