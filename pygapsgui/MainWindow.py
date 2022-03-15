@@ -1,4 +1,5 @@
 import pathlib
+from functools import partial
 
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
@@ -35,6 +36,11 @@ class MainWindow(QW.QMainWindow):
 
         # last directory
         self.last_dir = None
+
+        # Recent file actions
+        self.recent_files_no = 8
+        self.recent_file_actions = []
+        self.load_recent_files()
 
         # Display state
         self.ui.statusbar.showMessage('Ready', 5000)
@@ -91,6 +97,49 @@ class MainWindow(QW.QMainWindow):
         self.ui.action_adsorbates.triggered.connect(self.adsorbate_explorer)
         self.ui.action_materials.triggered.connect(self.material_explorer)
 
+    def load_recent_files(self):
+        """Get recent files from the settings, and place them in the menu."""
+        settings = QC.QSettings()
+        recent_paths = settings.value("recentFiles")
+
+        for ind in range(self.recent_files_no):
+            recent_file_action = QW.QAction()
+            recent_file_action.setVisible(False)
+            recent_file_action.triggered.connect(partial(self.open_recent, ind))
+            self.recent_file_actions.append(recent_file_action)
+
+        for recent_file_action in self.recent_file_actions:
+            self.ui.menu_recent.addAction(recent_file_action)
+
+        cutoff = min(self.recent_files_no, len(recent_paths))
+
+        for ind in range(cutoff):
+            self.recent_file_actions[ind].setText(recent_paths[ind].name)
+            self.recent_file_actions[ind].setData(recent_paths[ind])
+            self.recent_file_actions[ind].setVisible(True)
+
+        for ind in range(cutoff, self.recent_files_no):
+            self.recent_file_actions[ind].setVisible(True)
+
+    def update_recent_files(self, filepaths):
+        """Update the recent files with the argument filepaths."""
+        settings = QC.QSettings()
+        recent_paths = settings.value("recentFiles")
+
+        if not recent_paths:
+            recent_paths = []
+
+        for filepath in filepaths:
+            if filepath in recent_paths:
+                recent_paths.remove(filepath)
+            recent_paths.insert(0, filepath)
+
+        recent_paths = recent_paths[:self.recent_files_no]
+
+        settings.setValue("recentFiles", recent_paths)
+
+        self.load_recent_files()
+
     ########################################################
     # Isotherm creation / load / import / save
     ########################################################
@@ -125,6 +174,14 @@ class MainWindow(QW.QMainWindow):
             self.last_dir = fp.parent
             self.iso_controller.load(fp, fp.stem, fp.suffix)
         self.iso_controller.select_last_iso()
+
+        # Update in recent files
+        self.update_recent_files(filepaths)
+
+    def open_recent(self, index=None):
+        """Open the recent file in memory."""
+        if index is not None:
+            self.open_iso([self.recent_file_actions[index].data()])
 
     def import_iso(self, filepaths=None, ftype=None):
         """Import isotherm from manufacturer files."""

@@ -210,19 +210,25 @@ class MainWindowUI():
         self.menu_file = QW.QMenu(self.menubar)
         self.menu_file.setObjectName("menu_file")
         self.menubar.addAction(self.menu_file.menuAction())
+        self.menu_recent = QW.QMenu(self.menubar)
+        self.menu_recent.setObjectName("menu_openrecent")
+
         self.menu_charact = QW.QMenu(self.menubar)
         self.menu_charact.setObjectName("menu_charact")
         self.menubar.addAction(self.menu_charact.menuAction())
+
         self.menu_model = QW.QMenu(self.menubar)
         self.menu_model.setObjectName("menu_model")
         self.menubar.addAction(self.menu_model.menuAction())
+
         self.menu_predict = QW.QMenu(self.menubar)
         self.menu_predict.setObjectName("menu_predict")
         self.menubar.addAction(self.menu_predict.menuAction())
         # Submenu
         self.menu_iast = QW.QMenu(self.menubar)
-        self.menu_iast.setObjectName("menu_predict")
+        self.menu_iast.setObjectName("menu_iast")
         self.menu_predict.addAction(self.menu_iast.menuAction())
+
         self.menu_options = QW.QMenu(self.menubar)
         self.menu_options.setObjectName("menu_options")
         self.menubar.addAction(self.menu_options.menuAction())
@@ -327,6 +333,7 @@ class MainWindowUI():
         self.menu_file.addActions([
             self.action_new,
             self.action_open,
+            self.menu_recent.menuAction(),
             self.action_import,
             self.action_save,
         ])
@@ -400,6 +407,7 @@ class MainWindowUI():
         self.graph_group.setTitle(QW.QApplication.translate("MainWindow", "Isotherm Display", None, -1))
         #
         self.menu_file.setTitle(QW.QApplication.translate("MainWindow", "File", None, -1))
+        self.menu_recent.setTitle(QW.QApplication.translate("MainWindow", "Open recent", None, -1))
         self.menu_charact.setTitle(QW.QApplication.translate("MainWindow", "Characterization", None, -1))
         self.menu_help.setTitle(QW.QApplication.translate("MainWindow", "Help", None, -1))
         self.menu_model.setTitle(QW.QApplication.translate("MainWindow", "Model Fitting", None, -1))
