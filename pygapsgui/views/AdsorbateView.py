@@ -10,11 +10,12 @@ else:
 from pygaps import ADSORBATE_LIST
 from pygaps import Adsorbate
 from pygapsgui.models.MetadataTableModel import MetadataTableModel
+from pygapsgui.utilities.string_match import fuzzy_match_list
 from pygapsgui.utilities.tex2svg import tex2svg
-from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
 from pygapsgui.views.MetadataTableView import MetadataTableView
-from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
+from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
 from pygapsgui.widgets.UtilityDialogs import error_dialog
+from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 
 
 class AdsorbateView(QW.QWidget):
@@ -91,6 +92,7 @@ class AdsorbateView(QW.QWidget):
     def setup_view(self):
         """Sets up the display of various properties/metadata."""
         self.name_value.setText(self.adsorbate.name)
+        self.alias_value.clear()
         self.alias_value.addItems(self.adsorbate.alias)
         self.alias_value.setFixedHeight(
             self.alias_value.sizeHintForRow(0) * 4 + 2 * self.alias_value.frameWidth()
@@ -204,6 +206,8 @@ class AdsorbateDialog(QW.QDialog):
 
 class AdsorbateListDialog(QW.QDialog):
     """Dialog with a list of Adsorbates and an AdsorbateView."""
+
+    adsorbates: dict = None  # all aliases of adsorbates
     adsorbate_changed = QC.Signal(str)
 
     def __init__(self, *args, **kwargs):
@@ -218,11 +222,16 @@ class AdsorbateListDialog(QW.QDialog):
 
         _layout = QW.QVBoxLayout(self)
         layout_top = QW.QHBoxLayout()
+        layout_top_left = QW.QVBoxLayout()
         _layout.addLayout(layout_top)
+        layout_top.addLayout(layout_top_left)
 
-        # list
+        # search + list
+        self.search_bar = QW.QLineEdit()
         self.adsorbate_list = QW.QListWidget()
-        layout_top.addWidget(self.adsorbate_list)
+        layout_top_left.addWidget(QW.QLabel("Search:"))
+        layout_top_left.addWidget(self.search_bar)
+        layout_top_left.addWidget(self.adsorbate_list)
 
         # details
         self.adsorbate_details = AdsorbateView()
@@ -231,21 +240,36 @@ class AdsorbateListDialog(QW.QDialog):
         # Button box
         self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Close)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
         """Connect permanent signals."""
+        self.search_bar.textChanged.connect(self.search_filter)
         self.adsorbate_details.adsorbate_changed.connect(self.adsorbate_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
     def setup_view(self):
-        self.adsorbate_list.addItems([ads.name for ads in ADSORBATE_LIST])
-        self.adsorbate_list.currentItemChanged.connect(self.selectAdsorbate)
+        """Add all adsorbates to the view list."""
+        self.adsorbates = {ads.name: ads.alias for ads in ADSORBATE_LIST}
+        self.adsorbate_list.addItems(self.adsorbates.keys())
+        self.adsorbate_list.currentItemChanged.connect(self.select_adsorbate)
 
-    def selectAdsorbate(self, item):
-        self.adsorbate_details.adsorbate = Adsorbate.find(item.text())
+    def select_adsorbate(self, item):
+        """Select an adsorbate for the view."""
+        if item:
+            self.adsorbate_details.adsorbate = Adsorbate.find(item.text())
+
+    def search_filter(self, text):
+        """Filter the adsorbate list based on a text."""
+        self.adsorbate_list.clear()
+        if text == "":
+            self.adsorbate_list.addItems(self.adsorbates.keys())
+        else:
+            self.adsorbate_list.addItems([
+                k for (k, v) in self.adsorbates.items() if fuzzy_match_list(text, v)
+            ])
 
     def translate_UI(self):
         """Set static UI text through QT translation."""

@@ -4,8 +4,9 @@ from qtpy import QtWidgets as QW
 from pygaps import MATERIAL_LIST
 from pygaps import Material
 from pygapsgui.models.MetadataTableModel import MetadataTableModel
-from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
+from pygapsgui.utilities.string_match import fuzzy_match_list_choice
 from pygapsgui.views.MetadataTableView import MetadataTableView
+from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -93,6 +94,8 @@ class MaterialView(QW.QWidget):
 
     def accept(self) -> None:
         """See if any changes were made and emit signal."""
+        if not self._material:
+            return
         changed = False
         if self.name_value.text() != self.material.name:
             self.material.name = self.name_value.text()
@@ -200,6 +203,7 @@ class MaterialDialog(QW.QDialog):
 
 class MaterialListDialog(QW.QDialog):
     """Dialog with a list of Materials and a MaterialView."""
+    materials = None
     material_changed = QC.Signal(str)
 
     def __init__(self, *args, **kwargs):
@@ -214,11 +218,16 @@ class MaterialListDialog(QW.QDialog):
 
         _layout = QW.QVBoxLayout(self)
         layout_top = QW.QHBoxLayout()
+        layout_top_left = QW.QVBoxLayout()
         _layout.addLayout(layout_top)
+        layout_top.addLayout(layout_top_left)
 
-        # list
-        self.materialList = QW.QListWidget()
-        layout_top.addWidget(self.materialList)
+        # search + list
+        self.search_bar = QW.QLineEdit()
+        self.material_list = QW.QListWidget()
+        layout_top_left.addWidget(QW.QLabel("Search:"))
+        layout_top_left.addWidget(self.search_bar)
+        layout_top_left.addWidget(self.material_list)
 
         # details
         self.material_details = MaterialView()
@@ -227,24 +236,37 @@ class MaterialListDialog(QW.QDialog):
         # Button box
         self.button_box = QW.QDialogButtonBox()
         self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
         """Connect permanent signals."""
+        self.search_bar.textChanged.connect(self.search_filter)
         self.material_details.material_changed.connect(self.material_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
     def setup_view(self):
-        """Sets up the display of various properties/metadata."""
-        self.materialList.addItems([mat.name for mat in MATERIAL_LIST])
-        self.materialList.currentItemChanged.connect(self.selectMaterial)
+        """Set up the display of various properties/metadata."""
+        self.materials = [mat.name for mat in MATERIAL_LIST]
+        self.material_list.addItems(self.materials)
+        self.material_list.currentItemChanged.connect(self.select_material)
 
-    def selectMaterial(self, item):
-        self.material_details.material = Material.find(item.text())
+    def select_material(self, item):
+        """Select the material for the view."""
+        if item:
+            self.material_details.material = Material.find(item.text())
+
+    def search_filter(self, text):
+        """Filter the material list based on a text."""
+        self.material_list.clear()
+        if text == "":
+            self.material_list.addItems(self.materials)
+        else:
+            self.material_list.addItems(fuzzy_match_list_choice(text, self.materials))
 
     def accept(self) -> None:
+        """Select a material."""
         self.material_details.accept()
         return super().accept()
 
