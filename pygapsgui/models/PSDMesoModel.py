@@ -2,6 +2,7 @@ from pygaps.characterisation.models_kelvin import _KELVIN_MODELS
 from pygaps.characterisation.models_thickness import _THICKNESS_MODELS
 from pygaps.characterisation.psd_meso import _MESO_PSD_MODELS
 from pygaps.characterisation.psd_meso import _PORE_GEOMETRIES
+from pygaps.characterisation.psd_meso import _MENISCUS_GEOMETRIES
 from pygaps.characterisation.psd_meso import psd_mesoporous
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
@@ -20,6 +21,7 @@ class PSDMesoModel():
     branch = "des"
     psd_model = None
     pore_geometry = None
+    meniscus_geometry = None
     thickness_model = None
     kelvin_model = None
     limit_indices = None
@@ -59,6 +61,7 @@ class PSDMesoModel():
         self.view.branch_dropdown.setCurrentText(self.branch)
         self.view.tmodel_dropdown.addItems(_MESO_PSD_MODELS)
         self.view.geometry_dropdown.addItems(_PORE_GEOMETRIES)
+        self.view.mgeometry_dropdown.addItems(["auto"] + _MENISCUS_GEOMETRIES)
         self.view.thickness_dropdown.addItems(_THICKNESS_MODELS)
         self.view.kmodel_dropdown.addItems(_KELVIN_MODELS)
 
@@ -113,6 +116,9 @@ class PSDMesoModel():
         with log_hook:
             self.psd_model = self.view.tmodel_dropdown.currentText()
             self.pore_geometry = self.view.geometry_dropdown.currentText()
+            self.meniscus_geometry = self.view.mgeometry_dropdown.currentText()
+            if self.meniscus_geometry == "auto":
+                self.meniscus_geometry = None
             self.thickness_model = self.view.thickness_dropdown.currentText()
             self.kelvin_model = self.view.kmodel_dropdown.currentText()
             try:
@@ -121,6 +127,7 @@ class PSDMesoModel():
                     branch=self.branch,
                     psd_model=self.psd_model,
                     pore_geometry=self.pore_geometry,
+                    meniscus_geometry=self.meniscus_geometry,
                     thickness_model=self.thickness_model,
                     kelvin_model=self.kelvin_model,
                     p_limits=self.limits,
@@ -149,6 +156,33 @@ class PSDMesoModel():
 
         # Isotherm plot update
         self.view.iso_graph.draw_isotherms()
+        self.view.iso_graph.ax.autoscale(enable=False)
+
+        from pygaps.units.converter_mode import c_loading
+        model_pressure = self.isotherm.pressure(
+            pressure_mode="relative",
+            branch=self.branch,
+        )
+        if self.branch == "des":
+            model_pressure = model_pressure[::-1]
+        model_pressure = model_pressure[self.results["limits"][0]:self.results["limits"][1] + 1]
+        model_pressure = (model_pressure[:-1] + model_pressure[1:]) / 2
+        model_loading = c_loading(
+            self.results["pore_volume_cumulative"],
+            basis_from="volume_liquid",
+            unit_from="cm3",
+            basis_to=self.isotherm.loading_basis,
+            unit_to=self.isotherm.loading_unit,
+            adsorbate=self.isotherm.adsorbate,
+            temp=self.isotherm.temperature,
+        )
+
+        self.view.iso_graph.ax.plot(
+            model_pressure,
+            model_loading,
+            c='yellow',
+            label="fit",
+        )
 
         # PSD plot
         self.view.res_graph.clear()

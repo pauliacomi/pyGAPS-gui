@@ -66,15 +66,21 @@ class PSDMesoDialog(QW.QDialog):
         self.options_sub_layout.addWidget(self.geometry_label, 3, 0, 1, 1)
         self.options_sub_layout.addWidget(self.geometry_dropdown, 3, 1, 1, 1)
 
+        ## Meniscus geometry
+        self.mgeometry_label = LabelAlignRight("Meniscus geometry:")
+        self.mgeometry_dropdown = QW.QComboBox()
+        self.options_sub_layout.addWidget(self.mgeometry_label, 4, 0, 1, 1)
+        self.options_sub_layout.addWidget(self.mgeometry_dropdown, 4, 1, 1, 1)
+
         ## Kelvin model
         self.kmodel_label = LabelAlignRight("Kelvin model:")
         self.kmodel_dropdown = QW.QComboBox()
-        self.options_sub_layout.addWidget(self.kmodel_label, 4, 0, 1, 1)
-        self.options_sub_layout.addWidget(self.kmodel_dropdown, 4, 1, 1, 1)
+        self.options_sub_layout.addWidget(self.kmodel_label, 5, 0, 1, 1)
+        self.options_sub_layout.addWidget(self.kmodel_dropdown, 5, 1, 1, 1)
 
         # Autodetermine
         self.calc_auto_button = QW.QPushButton()
-        self.options_sub_layout.addWidget(self.calc_auto_button, 5, 0, 1, 2)
+        self.options_sub_layout.addWidget(self.calc_auto_button, 6, 0, 1, 2)
 
         # Results graph box
         self.res_graphs_layout = QW.QVBoxLayout(self.res_graphs_box)
