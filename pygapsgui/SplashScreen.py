@@ -15,10 +15,11 @@ from qtpy import QtWidgets as QW
 
 
 class SplashScreen(QW.QSplashScreen):
+    """A general purpose splashscreen."""
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setGeometry(0, 0, 680, 400)
-        self.setupUi()
+        self.setup_UI()
         if qtpy.API in qtpy.PYQT6_API:
             screen = self.screen()
         else:
@@ -26,14 +27,16 @@ class SplashScreen(QW.QSplashScreen):
         self.move(screen.availableGeometry().center() - self.frameGeometry().center())
 
     def drawContents(self, painter: QG.QPainter) -> None:
-        pass
+        """Do nothing on draw."""
 
     def showMessage(self, text: str, progress: int):
+        """Message to show on paint."""
         self.label_loading.setText(text)
         self.progressbar.setValue(progress)
         self.repaint()
 
-    def setupUi(self):
+    def setup_UI(self):
+        """Create all UI components."""
         if self.objectName():
             self.setObjectName("SplashScreen")
 
@@ -126,13 +129,14 @@ class SplashScreen(QW.QSplashScreen):
         self._layout.setContentsMargins(10, 10, 10, 10)
         self._layout.addWidget(self.dropShadowFrame)
 
-        self.retranslateUi()
+        self.translate_UI()
 
         QC.QMetaObject.connectSlotsByName(self)
 
     # setupUi
 
-    def retranslateUi(self):
+    def translate_UI(self):
+        """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QC.QCoreApplication.translate("SplashScreen", "MainWindow", None))

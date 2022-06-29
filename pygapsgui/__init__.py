@@ -94,6 +94,8 @@ def main():
 
     # Create application
     app = QW.QApplication(qt_args)
+    app.setOrganizationName("pyGAPS")
+    app.setApplicationName("pyGAPS-gui")
 
     # Splashscreen
     from pygapsgui.SplashScreen import SplashScreen
