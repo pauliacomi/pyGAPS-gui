@@ -51,10 +51,10 @@ jobs:
         pip install .[build]
         conda list
 
-    - name: Check install from cli
-      run: |
-        xvfb-run pygapsgui --test
-        xvfb-run pygapsgui --version
+    # - name: Check install from cli
+    #   run: |
+    #     xvfb-run pygapsgui --test
+    #     xvfb-run pygapsgui --version
 
     - name: Run PyInstaller
       run: |
