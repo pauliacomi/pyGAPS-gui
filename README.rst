@@ -21,13 +21,13 @@ section.
 
 .. raw:: html
 
-    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest">
+    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-win-x86_64.msi">
         <img src="https://img.shields.io/badge/download-windows-blue.svg" alt="Win link" />
     </a>
-    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest">
+    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-macos.zip">
         <img src="https://img.shields.io/badge/download-mac-lightgrey" alt="Mac link" />
     </a>
-    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest">
+    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-linux-x86_64.tar.gz">
         <img src="https://img.shields.io/badge/download-linux-orange" alt="Linux link" />
     </a>
 
