@@ -243,7 +243,7 @@ class MainWindowUI():
         icon.addPixmap(QG.QPixmap(":/res/icons/05_Edit_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.action_new.setIcon(icon)
         self.action_new.setObjectName("action_new")
-        self.action_new.setShortcut("Ctrl+O")
+        self.action_new.setShortcut("Ctrl+N")
 
         # open
         self.action_open = QW.QAction(main_window)
