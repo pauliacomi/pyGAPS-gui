@@ -25,9 +25,7 @@ class IsoListView(QW.QListView):
         """Show the context menu."""
 
         index = self.indexAt(point)
-        if index.isValid():
-            item = self.model().data(index)
-        else:
+        if not index.isValid():
             return
 
         _menu = QW.QMenu(self)
