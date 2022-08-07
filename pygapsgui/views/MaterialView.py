@@ -150,8 +150,8 @@ class MaterialView(QW.QWidget):
         # pylint: disable=line-too-long
         self.properties_box.setTitle(QW.QApplication.translate("AdsorbateView", "Main properties", None, -1))
         self.name_label.setText(QW.QApplication.translate("MaterialView", "Name", None, -1))
-        self.density_label.setText(QW.QApplication.translate("MaterialView", "Density", None, -1))
-        self.mm_label.setText(QW.QApplication.translate("MaterialView", "Molar Mass", None, -1))
+        self.density_label.setText(QW.QApplication.translate("MaterialView", "Density [cm3/g]", None, -1))
+        self.mm_label.setText(QW.QApplication.translate("MaterialView", "Molar Mass [mol/g]", None, -1))
         self.metadata_box.setTitle(QW.QApplication.translate("MaterialView", "Other Metadata", None, -1))
         # yapf: enable
 
