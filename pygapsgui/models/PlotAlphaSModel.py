@@ -6,6 +6,7 @@ from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
@@ -98,18 +99,12 @@ class PlotAlphaSModel():
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
         # Loading and pressure
-        self.loading = self.isotherm.loading(
-            branch=self.branch,
-            loading_basis='molar',
-            loading_unit='mmol',
+        self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
+            self.isotherm, self.branch, {
+                "loading_basis": "molar",
+                "loading_unit": "mmol"
+            }, {"pressure_mode": "relative"}
         )
-        self.pressure = self.isotherm.pressure(
-            branch=self.branch,
-            pressure_mode="relative",
-        )
-        if self.branch == 'des':
-            self.loading = self.loading[::-1]
-            self.pressure = self.pressure[::-1]
 
         with log_hook:
             try:
