@@ -64,7 +64,7 @@ class PlotTModel():
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
         models = list(_THICKNESS_MODELS.keys())
-        models.remove("Zero thickness")  # Not an option
+        models.remove("zero thickness")  # Not an option
         self.view.thickness_dropdown.addItems(models)
 
         # connect signals
@@ -94,7 +94,7 @@ class PlotTModel():
         self.loading = self.isotherm.loading(
             branch=self.branch,
             loading_basis='molar',
-            loading_unit='mol',
+            loading_unit='mmol',
         )
         self.pressure = self.isotherm.pressure(
             branch=self.branch,
@@ -173,10 +173,13 @@ class PlotTModel():
         """Fill in any GUI plots with results."""
         # Generate tplot
         self.view.res_graph.clear()
+        units = self.isotherm.units
+        units.update({"loading_basis": "molar", "loading_unit": "mmol"})
         tp_plot(
             self.t_curve,
             self.loading,
             self.results,
+            units,
             ax=self.view.res_graph.ax,
         )
         self.view.res_graph.ax.set_title("")
@@ -194,6 +197,7 @@ class PlotTModel():
         self.view.res_graph.draw_xlimits(self.t_curve[0], self.t_curve[-1])
 
     def select_tmodel(self):
+        """Handle t-model selection."""
         tmodel_text = self.view.thickness_dropdown.currentText()
         self.thickness_model = get_thickness_model(tmodel_text)
         self.calc_auto()

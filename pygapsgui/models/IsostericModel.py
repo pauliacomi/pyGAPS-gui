@@ -121,7 +121,7 @@ class IsostericModel():
             self.results["loading"],
             self.results["isosteric_enthalpy"],
             self.results["std_errs"],
-            isotherm=self.isotherms[0],
+            units=self.isotherms[0].units,
             ax=self.view.res_graph.ax,
         )
         self.view.res_graph.canvas.draw_idle()

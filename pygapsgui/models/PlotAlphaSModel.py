@@ -101,7 +101,7 @@ class PlotAlphaSModel():
         self.loading = self.isotherm.loading(
             branch=self.branch,
             loading_basis='molar',
-            loading_unit='mol',
+            loading_unit='mmol',
         )
         self.pressure = self.isotherm.pressure(
             branch=self.branch,
@@ -116,7 +116,7 @@ class PlotAlphaSModel():
                 self.alpha_s_point = self.ref_isotherm.loading_at(
                     self.reducing_pressure,
                     branch=self.ref_branch,
-                    loading_unit='mol',
+                    loading_unit='mmol',
                     loading_basis='molar',
                     pressure_mode='relative',
                 )
@@ -124,7 +124,7 @@ class PlotAlphaSModel():
                     self.pressure,
                     branch=self.ref_branch,
                     pressure_unit=self.isotherm.pressure_unit,
-                    loading_unit='mol',
+                    loading_unit='mmol',
                 )
                 if self.ref_branch == 'des':
                     self.reference_loading = self.reference_loading[::-1]
@@ -207,10 +207,13 @@ class PlotAlphaSModel():
         """Fill in any GUI plots with results."""
         # Generate alphas plot
         self.view.res_graph.clear()
+        units = self.isotherm.units
+        units.update({"loading_basis": "molar", "loading_unit": "mmol"})
         tp_plot(
             self.alphas_curve,
             self.loading,
             self.results,
+            units,
             ax=self.view.res_graph.ax,
             alpha_s=True,
             alpha_reducing_p=self.reducing_pressure
