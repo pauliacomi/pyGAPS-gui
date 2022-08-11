@@ -2713,5 +2713,6 @@ def qCleanupResources():
 
 
 import qtpy
+
 if qtpy.API not in qtpy.PYQT6_API:
     qInitResources()

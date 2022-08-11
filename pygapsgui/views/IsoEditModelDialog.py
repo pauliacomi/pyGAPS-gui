@@ -12,8 +12,9 @@ else:
 
 from pygapsgui.widgets.SciDoubleSpinbox import ScientificDoubleSpinBox
 from pygapsgui.widgets.SciDoubleSpinbox import SciFloatSpinDelegate
-from pygapsgui.widgets.UtilityWidgets import FloatStandardItem, LimitEdit
+from pygapsgui.widgets.UtilityWidgets import FloatStandardItem
 from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
+from pygapsgui.widgets.UtilityWidgets import LimitEdit
 
 
 class IsoEditModelDialog(QW.QDialog):

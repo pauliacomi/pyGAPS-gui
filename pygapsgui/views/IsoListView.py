@@ -1,7 +1,7 @@
+from functools import partial
+
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
-
-from functools import partial
 
 
 class IsoListView(QW.QListView):

@@ -1,9 +1,9 @@
 import pathlib
 
+from qtpy import QT5
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
-from qtpy import QT5
 
 from pygapsgui.widgets.UtilityWidgets import CollapsibleBox
 
@@ -116,8 +116,9 @@ class HelpDialog(QW.QDialog):
 
         self.setWindowTitle("Help Dialog")
 
-        from docutils.core import publish_string
         import textwrap
+
+        from docutils.core import publish_string
 
         doc = textwrap.dedent(function.__doc__)
         notes = doc.find("Notes\n")
