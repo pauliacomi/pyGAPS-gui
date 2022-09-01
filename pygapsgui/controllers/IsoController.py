@@ -377,28 +377,11 @@ class IsoController():
 
         self.add_isotherm(name, isotherm)
 
-    def load_import(self, path, name, iso_type):
+    def load_import(self, path, name, settings):
         """Use pygaps parsing to import an isotherm and add it to the model."""
         isotherm = None
 
         import pygaps.parsing as pgp
-        if iso_type == 'bel_dat':
-            settings = dict(manufacturer='bel', fmt='dat')
-        elif iso_type == 'bel_xl':
-            settings = dict(manufacturer='bel', fmt='xl')
-        elif iso_type == 'bel_csv':
-            settings = dict(manufacturer='bel', fmt='csv')
-        elif iso_type == 'bel_csv_jis':
-            settings = dict(manufacturer='bel', fmt='csv', lang="JPN")
-        elif iso_type == 'mic_xl':
-            settings = dict(manufacturer='mic', fmt='xl')
-        elif iso_type == '3p_xl':
-            settings = dict(manufacturer='3p', fmt='xl')
-        elif iso_type == 'qnt_txt':
-            settings = dict(manufacturer='qnt', fmt='txt')
-        else:
-            raise Exception(f"Could not determine import type '{iso_type}'.")
-
         try:
             isotherm = pgp.isotherm_from_commercial(path=path, **settings)
         except pge.ParsingError as exc:
