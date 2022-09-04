@@ -5,10 +5,10 @@ from sys import platform
 
 folder = pathlib.Path.cwd()
 
-import pygaps
-
-pgversion = pygaps.__version__
 from importlib.metadata import version, PackageNotFoundError
+
+import pygaps
+pgversion = version("pygaps")
 
 try:
     pggversion = version("pygapsgui")
