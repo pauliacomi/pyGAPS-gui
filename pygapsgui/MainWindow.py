@@ -100,7 +100,7 @@ class MainWindow(QW.QMainWindow):
     def load_recent_files(self):
         """Get recent files from the settings, and place them in the menu."""
         settings = QC.QSettings()
-        recent_paths = settings.value("recentFiles")
+        recent_paths = settings.value("recentFiles", [])
 
         for ind in range(self.recent_files_no):
             recent_file_action = QW.QAction()
@@ -118,16 +118,10 @@ class MainWindow(QW.QMainWindow):
             self.recent_file_actions[ind].setData(recent_paths[ind])
             self.recent_file_actions[ind].setVisible(True)
 
-        for ind in range(cutoff, self.recent_files_no):
-            self.recent_file_actions[ind].setVisible(True)
-
     def update_recent_files(self, filepaths):
         """Update the recent files with the argument filepaths."""
         settings = QC.QSettings()
-        recent_paths = settings.value("recentFiles")
-
-        if not recent_paths:
-            recent_paths = []
+        recent_paths = settings.value("recentFiles", [])
 
         for filepath in filepaths:
             if filepath in recent_paths:
@@ -517,7 +511,7 @@ class MainWindow(QW.QMainWindow):
         if ret == qm.Yes:
             import pygapsgui.resources.sample_data as sd
             folder = pathlib.Path(sd.__file__).parent
-            filepaths = folder.glob("*.json")
+            filepaths = tuple(folder.glob("*.json"))
             self.open_iso(filepaths)
 
     def about(self):
