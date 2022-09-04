@@ -41,6 +41,8 @@ class AreaBETDialog(QW.QDialog):
         self.branch_label = LabelAlignRight("Branch used:")
         self.branch_dropdown = QW.QComboBox()
         self.calc_auto_button = QW.QPushButton()
+        self.calc_auto_button.setDefault(True)
+        self.calc_auto_button.setAutoDefault(True)
 
         ## Layout them
         self.options_layout.addWidget(self.iso_graph, 0, 0, 1, 4)

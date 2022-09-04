@@ -58,6 +58,8 @@ class PlotAlphaSDialog(QW.QDialog):
         self.options_layout.addWidget(self.pressure_input, 4, 1, 1, 2)
 
         self.calc_auto_button = QW.QPushButton()
+        self.calc_auto_button.setDefault(True)
+        self.calc_auto_button.setAutoDefault(True)
         self.options_layout.addWidget(self.calc_auto_button, 4, 3, 1, 1)
 
         # Results box

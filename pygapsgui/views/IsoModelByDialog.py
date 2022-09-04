@@ -51,6 +51,8 @@ class IsoModelByDialog(QW.QDialog):
         opt_button_layout = QW.QHBoxLayout()
         self.options_layout.addLayout(opt_button_layout)
         self.calc_auto_button = QW.QPushButton()
+        self.calc_auto_button.setDefault(True)
+        self.calc_auto_button.setAutoDefault(True)
         self.calc_autolim_button = QW.QPushButton()
         self.calc_manual_button = QW.QPushButton()
         opt_button_layout.addWidget(self.calc_auto_button)

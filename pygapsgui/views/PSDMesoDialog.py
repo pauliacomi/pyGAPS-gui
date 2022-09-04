@@ -80,6 +80,8 @@ class PSDMesoDialog(QW.QDialog):
 
         # Autodetermine
         self.calc_auto_button = QW.QPushButton()
+        self.calc_auto_button.setDefault(True)
+        self.calc_auto_button.setAutoDefault(True)
         self.options_sub_layout.addWidget(self.calc_auto_button, 6, 0, 1, 2)
 
         # Results graph box
