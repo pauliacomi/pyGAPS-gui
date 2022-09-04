@@ -54,10 +54,8 @@ class IsoModelByDialog(QW.QDialog):
         self.calc_auto_button.setDefault(True)
         self.calc_auto_button.setAutoDefault(True)
         self.calc_autolim_button = QW.QPushButton()
-        self.calc_manual_button = QW.QPushButton()
         opt_button_layout.addWidget(self.calc_auto_button)
         opt_button_layout.addWidget(self.calc_autolim_button)
-        opt_button_layout.addWidget(self.calc_manual_button)
 
         # Parameter box
         self.param_box = QW.QGroupBox()
@@ -112,5 +110,4 @@ class IsoModelByDialog(QW.QDialog):
         self.param_box.setTitle(QW.QApplication.translate("IsoModelByDialog", "Parameters", None, -1))
         self.calc_auto_button.setText(QW.QApplication.translate("IsoModelByDialog", "Autofit", None, -1))
         self.calc_autolim_button.setText(QW.QApplication.translate("IsoModelByDialog", "Autofit with bounds", None, -1))
-        self.calc_manual_button.setText(QW.QApplication.translate("IsoModelByDialog", "Use selected parameters", None, -1))
         # yapf: enable
