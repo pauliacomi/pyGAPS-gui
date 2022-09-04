@@ -8,10 +8,8 @@ else:
     from qtpy import QtSvg as QS
 
 from pygapsgui.views.IsoGraphView import IsoModelGraphView
-from pygapsgui.widgets.UtilityWidgets import EditAlignRight
 from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 from pygapsgui.widgets.UtilityWidgets import LabelOutput
-from pygapsgui.widgets.UtilityWidgets import LabelResult
 
 
 class IsoModelByDialog(QW.QDialog):
