@@ -40,6 +40,8 @@ class IASTDialog(QW.QDialog):
 
         ## Button to calculate
         self.calc_button = QW.QPushButton()
+        self.calc_button.setDefault(True)
+        self.calc_button.setAutoDefault(True)
         self.options_layout.addWidget(self.calc_button, 3, 0, 1, 3)
 
         ## Output log

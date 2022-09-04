@@ -58,6 +58,8 @@ class DADRDialog(QW.QDialog):
         row = row + 1
 
         self.calc_auto_button = QW.QPushButton()
+        self.calc_auto_button.setDefault(True)
+        self.calc_auto_button.setAutoDefault(True)
         self.options_layout.addWidget(self.calc_auto_button, row, 0, 1, 4)
 
         # Results graph box

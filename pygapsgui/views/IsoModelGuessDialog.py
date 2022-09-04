@@ -50,6 +50,8 @@ class IsoModelGuessDialog(QW.QDialog):
         model_layout.addRow(self.branch_label, self.branch_dropdown)
 
         self.calc_auto_button = QW.QPushButton()
+        self.calc_auto_button.setDefault(True)
+        self.calc_auto_button.setAutoDefault(True)
         self.options_layout.addWidget(self.calc_auto_button)
 
         # Output log

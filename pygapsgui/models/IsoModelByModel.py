@@ -61,7 +61,6 @@ class IsoModelByModel():
         self.view.x_select.slider.rangeChanged.connect(self.calculate_with_limits)
         self.view.calc_auto_button.clicked.connect(self.calculate_auto)
         self.view.calc_autolim_button.clicked.connect(self.calculate_with_bounds)
-        self.view.calc_manual_button.clicked.connect(self.calculate_manual)
 
         # populate initial
         self.select_model()
@@ -69,6 +68,8 @@ class IsoModelByModel():
     def calculate_auto(self):
         """Automatic calculation."""
         self.auto = True
+        for param in self.view.paramWidgets:
+            self.view.paramWidgets[param].blockSignals(True)
         if self.calculate():
             self.set_model_params()
             self.output_log()
@@ -77,6 +78,8 @@ class IsoModelByModel():
         else:
             self.output_log()
             self.plot_clear()
+        for param in self.view.paramWidgets:
+            self.view.paramWidgets[param].blockSignals(False)
 
     def calculate_with_limits(self, left, right):
         """Set limits on calculation."""
@@ -196,6 +199,7 @@ class IsoModelByModel():
             if not maxv or maxv == numpy.inf:
                 maxv = 100
             widget.setRange(minv=minv, maxv=maxv)
+            widget.changed.connect(self.calculate_manual)
             self.view.param_layout.insertWidget(self.view.param_layout.count() - 1, widget)
             self.view.paramWidgets[param] = widget
 
