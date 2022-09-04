@@ -6,38 +6,68 @@ from pygapsgui.widgets.UtilityDialogs import open_files_dialog
 
 IMPORT_FILES = [
     {
-        "ind": "bel_dat",
+        "ind": {
+            "manufacturer": 'smsdvs',
+            "fmt": 'xlsx'
+        },
+        "name": "SMS DVS Excel workbook",
+        "ext": ("xlsx", )
+    },
+    {
+        "ind": {
+            "manufacturer": "bel",
+            "fmt": "dat"
+        },
         "name": "BEL japan",
         "ext": ("DAT", )
     },
     {
-        "ind": "bel_xl",
+        "ind": {
+            "manufacturer": "bel",
+            "fmt": "xl"
+        },
         "name": "BEL japan report",
         "ext": ("xls", )
     },
     {
-        "ind": "bel_csv",
+        "ind": {
+            "manufacturer": "bel",
+            "fmt": "csv"
+        },
         "name": "BEL japan CSV",
         "ext": ("csv", )
     },
     {
-        "ind": "bel_csv_jis",
+        "ind": {
+            "manufacturer": "bel",
+            "fmt": "csv",
+            "lang": "JPN"
+        },
         "name": "BEL japan JIS CSV",
         "ext": ("csv", )
     },
     {
-        "ind": "mic_xl",
+        "ind": {
+            "manufacturer": "mic",
+            "fmt": "xl"
+        },
         "name": "Micromeritics report",
         "ext": ("xls", )
     },
     {
-        "ind": "3p_xl",
+        "ind": {
+            "manufacturer": "3p",
+            "fmt": "xl"
+        },
         "name": "3P report",
         "ext": ("xlsx", )
     },
     {
-        "ind": "qnt_txt",
-        "name": "Quantachrome report",
+        "ind": {
+            "manufacturer": 'qnt',
+            "fmt": 'txt-raw'
+        },
+        "name": "Quantachrome (Raw Analysis Data)",
         "ext": ("txt", )
     },
 ]

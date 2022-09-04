@@ -1,9 +1,9 @@
-import io
 import csv
+import io
 
 from qtpy import QtCore as QC
-from qtpy import QtWidgets as QW
 from qtpy import QtGui as QG
+from qtpy import QtWidgets as QW
 
 
 def clipboard_to_table(table):

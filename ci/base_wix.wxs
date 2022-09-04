@@ -16,14 +16,19 @@
         <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
     <?endif?>
 
+    <!-- Section defined for entire product line -->
     <Product Id="*"
-             Name="$(var.ProductName)" Version="$(var.ProductVersion)"
-             Manufacturer="$(var.Manufacturer)" Language="1033"
+             Name="$(var.ProductName)"
+             Version="$(var.ProductVersion)"
+             Manufacturer="$(var.Manufacturer)"
+             Language="1033"
              Codepage="1252"
              UpgradeCode="$(var.UpgradeCode)">
 
-        <Package Id="*" Keywords="Scientific, Adsorption"
+        <!-- Package general properties -->
+        <Package Id="*"
                  Description="Windows Installer for $(var.ProductName) $(var.ProductVersion)"
+                 Keywords="Scientific, Adsorption"
                  InstallerVersion="500"
                  Compressed="yes"
                  Languages="1033"
@@ -36,7 +41,9 @@
         <Media Id="1" Cabinet="product.cab" EmbedCab="yes" CompressionLevel="high"/>
 
         <!-- Path to upgrade pygaps -->
-        <Upgrade Id='$(var.UpgradeCode)'>
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+        <!-- <Upgrade Id='$(var.UpgradeCode)'>
             <UpgradeVersion OnlyDetect="yes"
                             Minimum="$(var.ProductVersion)"
                             IncludeMinimum="no"
@@ -46,14 +53,14 @@
                             Maximum="$(var.ProductVersion)"
                             IncludeMaximum="no"
                             Property="OLDER_VERSION_FOUND" />
-        </Upgrade>
+        </Upgrade> -->
 
         <!-- when to uninstall existing installation -->
-        <CustomAction Id="NewerVersionFound" Error="A newer version of $(var.ProductName) is already installed!" />
+        <!-- <CustomAction Id="NewerVersionFound" Error="A newer version of $(var.ProductName) is already installed!" />
         <InstallExecuteSequence>
             <Custom Action="NewerVersionFound" After="FindRelatedProducts">   <![CDATA[NEWER_VERSION_FOUND]]> </Custom>
             <RemoveExistingProducts After="InstallInitialize"/>
-        </InstallExecuteSequence>
+        </InstallExecuteSequence> -->
 
         <!-- Where to install on the target machine -->
         <Directory Id='TARGETDIR' Name='SourceDir'>
@@ -108,21 +115,30 @@
         </DirectoryRef>
 
         <!-- Install features: product install, shortcut etc. -->
-        <Feature Id='Complete' Title="$(var.ProductName)" Description='The complete package.'
-            Display='expand' ConfigurableDirectory="APPLICATIONFOLDER" Level='1'>
-
-            <Feature Id="MainProgram" Title="$(var.ProductName)" Description="Install pyGAPS-gui" Level='1'>
+        <Feature Id='Complete'
+                 Title="$(var.ProductName)"
+                 Description='The complete package.'
+                 Display='expand'
+                 ConfigurableDirectory="APPLICATIONFOLDER"
+                 Level='1'>
+            <!-- There's a single "feature": pygaps -->
+            <Feature Id="MainProgram"
+                     Title="$(var.ProductName)"
+                     Description="Install pyGAPS-gui"
+                     Level='1'>
+                <!-- Main executable and components -->
                 <ComponentRef Id="MainExecutable" />
                 {distcomponents}
                 <!-- Install the shortcuts -->
                 <ComponentRef Id="ApplicationStartMenuShortcut" />
                 <ComponentRef Id="ApplicationDesktopShortcut" />
             </Feature>
-
         </Feature>
 
+        <!-- This is install on a per-user basis -->
         <Property Id="MSIINSTALLPERUSER" Value="1" />
         <Property Id="ALLUSERS" Value="2" />
+
         <!-- This is to display a GUI for the installer -->
         <UI>
             <UIRef Id="WixUI_Advanced" />

@@ -1,3 +1,5 @@
+from functools import partial
+
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
@@ -16,14 +18,38 @@ class IsoListView(QW.QListView):
         self.setSelectionBehavior(QW.QAbstractItemView.SelectItems)
         self.setSelectionMode(QW.QAbstractItemView.SingleSelection)
         self.setDragDropMode(QW.QAbstractItemView.NoDragDrop)
+        self.setContextMenuPolicy(QC.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_context_menu)
+
+    def show_context_menu(self, point):
+        """Show the context menu."""
+
+        index = self.indexAt(point)
+        if not index.isValid():
+            return
+
+        _menu = QW.QMenu(self)
+        action = _menu.addAction("Rename")
+        method = partial(self.edit, index)
+        action.triggered.connect(method)
+
+        action = _menu.addAction("Delete")
+        method = partial(self.model().removeRow, index.row())
+        action.triggered.connect(method)
+
+        _menu.popup(self.viewport().mapToGlobal(point))
 
     def keyPressEvent(self, event):
+        """Override to add custom handler for keypresses."""
         if event.key() == QC.Qt.Key_Delete:
             self.model().removeRow(self.currentIndex().row())
             return
+        if event.key() == QC.Qt.Key_F2:
+            self.edit(self.currentIndex())
+            return
         super().keyPressEvent(event)
 
-    # If we want to move isotherms by drag and drop QT messes up the selection
+    # TODO If we want to move isotherms by drag and drop QT messes up the selection
     # This results in the item check / plot errors
     # So we just say it's impossible (for now)
     #

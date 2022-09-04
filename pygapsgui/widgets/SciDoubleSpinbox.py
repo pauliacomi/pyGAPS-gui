@@ -35,10 +35,10 @@ class FloatValidator(QG.QValidator):
     def validate(self, string, position):
         """Called to check if input is valid."""
         if valid_float_string(string):
-            return self.State.Acceptable
+            return self.State.Acceptable, string, position
         if string == "" or string[position - 1] in 'e.-+':
-            return self.State.Intermediate
-        return self.State.Invalid
+            return self.State.Intermediate, string, position
+        return self.State.Invalid, string, position
 
     def fixup(self, text):
         """Can repair some basic errors."""

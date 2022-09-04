@@ -47,7 +47,7 @@ class PlotAlphaSDialog(QW.QDialog):
         self.refarea_dropdown = QW.QComboBox()
         self.refarea_dropdown.addItems(["BET", "Langmuir", "specify"]),
         self.refarea_input = QW.QLineEdit(self)
-        self.refarea_input.setEnabled(False)
+        self.refarea_input.setReadOnly(True)
         self.options_layout.addWidget(self.refarea_label, 3, 0, 1, 1)
         self.options_layout.addWidget(self.refarea_dropdown, 3, 1, 1, 2)
         self.options_layout.addWidget(self.refarea_input, 3, 3, 1, 1)
