@@ -1,5 +1,5 @@
-from pygaps.data import KERNELS
 from pygaps.characterisation.psd_kernel import psd_dft
+from pygaps.data import KERNELS
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook

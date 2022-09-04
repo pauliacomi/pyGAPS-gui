@@ -1,19 +1,29 @@
 import pathlib
 
+from qtpy import QT5
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
 from pygapsgui.widgets.UtilityWidgets import CollapsibleBox
 
+# the arguments to these functions are differently named
+# depending on whether we are on QT5 or QT6
+if QT5:
+    dirvar = "directory"
+else:
+    dirvar = "dir"
+
 
 def open_files_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
     """Abstract dialog for file opening."""
     filenames = QW.QFileDialog.getOpenFileNames(
-        parent=parent,
-        caption=caption,
-        dir=directory,
-        filter=filter,
+        **{
+            "parent": parent,
+            "caption": caption,
+            dirvar: directory,
+            "filter": filter,
+        }
     )
     if isinstance(filenames, tuple):  # PyQt5 returns a tuple...
         filenames = filenames[0]
@@ -23,10 +33,12 @@ def open_files_dialog(parent, caption, directory, filter=None) -> "list[pathlib.
 def save_file_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
     """Abstract dialog for file saving."""
     filename = QW.QFileDialog.getSaveFileName(
-        parent=parent,
-        caption=caption,
-        dir=directory,
-        filter=filter,
+        **{
+            "parent": parent,
+            "caption": caption,
+            dirvar: directory,
+            "filter": filter,
+        }
     )
     if isinstance(filename, tuple):  # PyQt5 returns a tuple...
         filename = filename[0]
@@ -104,8 +116,9 @@ class HelpDialog(QW.QDialog):
 
         self.setWindowTitle("Help Dialog")
 
-        from docutils.core import publish_string
         import textwrap
+
+        from docutils.core import publish_string
 
         doc = textwrap.dedent(function.__doc__)
         notes = doc.find("Notes\n")

@@ -6,6 +6,7 @@ from pygaps.characterisation.t_plots import t_plot
 from pygaps.characterisation.t_plots import t_plot_raw
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
@@ -64,7 +65,7 @@ class PlotTModel():
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
         models = list(_THICKNESS_MODELS.keys())
-        models.remove("Zero thickness")  # Not an option
+        models.remove("zero thickness")  # Not an option
         self.view.thickness_dropdown.addItems(models)
 
         # connect signals
@@ -91,18 +92,12 @@ class PlotTModel():
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
         # Loading and pressure
-        self.loading = self.isotherm.loading(
-            branch=self.branch,
-            loading_basis='molar',
-            loading_unit='mol',
+        self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
+            self.isotherm, self.branch, {
+                "loading_basis": "molar",
+                "loading_unit": "mmol"
+            }, {"pressure_mode": "relative"}
         )
-        self.pressure = self.isotherm.pressure(
-            branch=self.branch,
-            pressure_mode="relative",
-        )
-        if self.branch == 'des':
-            self.loading = self.loading[::-1]
-            self.pressure = self.pressure[::-1]
 
     def calc_auto(self):
         """Automatic calculation."""
@@ -173,10 +168,13 @@ class PlotTModel():
         """Fill in any GUI plots with results."""
         # Generate tplot
         self.view.res_graph.clear()
+        units = self.isotherm.units
+        units.update({"loading_basis": "molar", "loading_unit": "mmol"})
         tp_plot(
             self.t_curve,
             self.loading,
             self.results,
+            units,
             ax=self.view.res_graph.ax,
         )
         self.view.res_graph.ax.set_title("")
@@ -194,6 +192,7 @@ class PlotTModel():
         self.view.res_graph.draw_xlimits(self.t_curve[0], self.t_curve[-1])
 
     def select_tmodel(self):
+        """Handle t-model selection."""
         tmodel_text = self.view.thickness_dropdown.currentText()
         self.thickness_model = get_thickness_model(tmodel_text)
         self.calc_auto()

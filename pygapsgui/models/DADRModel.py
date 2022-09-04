@@ -5,6 +5,7 @@ from pygaps.characterisation.dr_da_plots import log_p_exp
 from pygaps.characterisation.dr_da_plots import log_v_adj
 from pygaps.graphing.calc_graphs import dra_plot
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
@@ -95,18 +96,12 @@ class DADRModel():
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
         # Loading and pressure
-        self.loading = self.isotherm.loading(
-            branch=self.branch,
-            loading_basis='molar',
-            loading_unit='mol',
+        self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
+            self.isotherm, self.branch, {
+                "loading_basis": "molar",
+                "loading_unit": "mol"
+            }, {"pressure_mode": "relative"}
         )
-        self.pressure = self.isotherm.pressure(
-            branch=self.branch,
-            pressure_mode="relative",
-        )
-        if self.branch == 'des':
-            self.loading = self.loading[::-1]
-            self.pressure = self.pressure[::-1]
 
     def calc_auto(self):
         """Automatic calculation."""

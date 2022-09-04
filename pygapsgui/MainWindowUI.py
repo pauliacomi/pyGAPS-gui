@@ -243,7 +243,7 @@ class MainWindowUI():
         icon.addPixmap(QG.QPixmap(":/res/icons/05_Edit_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.action_new.setIcon(icon)
         self.action_new.setObjectName("action_new")
-        self.action_new.setShortcut("Ctrl+O")
+        self.action_new.setShortcut("Ctrl+N")
 
         # open
         self.action_open = QW.QAction(main_window)
@@ -393,7 +393,7 @@ class MainWindowUI():
         self.explorer_group.setTitle(QW.QApplication.translate("MainWindow", "Isotherm Explorer", None, -1))
         self.exp_select_button.setText(QW.QApplication.translate("MainWindow", "Select All", None, -1))
         self.exp_deselect_button.setText(QW.QApplication.translate("MainWindow", "Deselect All", None, -1))
-        self.exp_remove_button.setText(QW.QApplication.translate("MainWindow", "Remove", None, -1))
+        self.exp_remove_button.setText(QW.QApplication.translate("MainWindow", "Delete", None, -1))
         #
         self.properties_group.setTitle(QW.QApplication.translate("MainWindow", "Isotherm Properties", None, -1))
         self.material_label.setText(QW.QApplication.translate("MainWindow", "Material", None, -1))
@@ -422,7 +422,7 @@ class MainWindowUI():
         self.action_about.setText(QW.QApplication.translate("MainWindow", "About", None, -1))
         self.action_area_bet.setText(QW.QApplication.translate("MainWindow", "BET surface area", None, -1))
         self.action_area_lang.setText(QW.QApplication.translate("MainWindow", "Langmuir surface area", None, -1))
-        self.action_t_plot.setText(QW.QApplication.translate("MainWindow", "T-plot", None, -1))
+        self.action_t_plot.setText(QW.QApplication.translate("MainWindow", "t-plot", None, -1))
         self.action_alpha_s_plot.setText(QW.QApplication.translate("MainWindow", "Alpha-s plot", None, -1))
         self.action_da_plot.setText(QW.QApplication.translate("MainWindow", "Dubinin-Astakov plot", None, -1))
         self.action_dr_plot.setText(QW.QApplication.translate("MainWindow", "Dubinin-Radushkevich plot", None, -1))

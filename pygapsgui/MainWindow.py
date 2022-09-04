@@ -216,8 +216,8 @@ class MainWindow(QW.QMainWindow):
                 "Save an isotherm",
                 suggested_name,
                 filter=";;".join([
-                    'pyGAPS JSON Isotherm (*.json)',
                     'AIF Isotherm (*.aif)',
+                    'pyGAPS JSON Isotherm (*.json)',
                     'pyGAPS CSV Isotherm (*.csv)',
                     'pyGAPS Excel Isotherm (*.xls)',
                 ])

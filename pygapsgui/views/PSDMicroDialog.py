@@ -61,7 +61,7 @@ class PSDMicroDialog(QW.QDialog):
         self.options_sub_layout.addWidget(self.geometry_dropdown, 2, 1, 1, 1)
 
         ## material model
-        self.amodel_label = LabelAlignRight("Kelvin model:")
+        self.amodel_label = LabelAlignRight("Surface model:")
         self.amodel_dropdown = QW.QComboBox()
         self.options_sub_layout.addWidget(self.amodel_label, 3, 0, 1, 1)
         self.options_sub_layout.addWidget(self.amodel_dropdown, 3, 1, 1, 1)

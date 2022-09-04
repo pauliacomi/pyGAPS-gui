@@ -6,6 +6,7 @@ from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
@@ -72,10 +73,10 @@ class PlotAlphaSModel():
         self.view.refbranch_dropdown.setCurrentText(self.ref_branch)
 
         # connect signals
-        self.view.refarea_dropdown.currentIndexChanged.connect(self.select_area)
-        self.view.refarea_input.editingFinished.connect(self.select_area)
-        self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
-        self.view.refbranch_dropdown.currentIndexChanged.connect(self.select_refbranch)
+        self.view.refarea_dropdown.currentTextChanged.connect(self.select_area)
+        self.view.refarea_input.editingFinished.connect(self.select_area_specify)
+        self.view.branch_dropdown.currentTextChanged.connect(self.select_branch)
+        self.view.refbranch_dropdown.currentTextChanged.connect(self.select_refbranch)
         self.view.pressure_input.editingFinished.connect(self.select_redpressure)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
@@ -89,34 +90,29 @@ class PlotAlphaSModel():
         self.molar_mass = self.isotherm.adsorbate.molar_mass()
         self.liquid_density = self.isotherm.adsorbate.liquid_density(isotherm.temperature)
 
-        self.reference_area = area_BET(self.ref_isotherm).get('area')
         # dynamic parameters
         if self.prepare_values():
+            # calculate reference area
+            self.select_area("BET")
             # run calculation
             self.calc_auto()
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
         # Loading and pressure
-        self.loading = self.isotherm.loading(
-            branch=self.branch,
-            loading_basis='molar',
-            loading_unit='mol',
+        self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
+            self.isotherm, self.branch, {
+                "loading_basis": "molar",
+                "loading_unit": "mmol"
+            }, {"pressure_mode": "relative"}
         )
-        self.pressure = self.isotherm.pressure(
-            branch=self.branch,
-            pressure_mode="relative",
-        )
-        if self.branch == 'des':
-            self.loading = self.loading[::-1]
-            self.pressure = self.pressure[::-1]
 
         with log_hook:
             try:
                 self.alpha_s_point = self.ref_isotherm.loading_at(
                     self.reducing_pressure,
                     branch=self.ref_branch,
-                    loading_unit='mol',
+                    loading_unit='mmol',
                     loading_basis='molar',
                     pressure_mode='relative',
                 )
@@ -124,12 +120,12 @@ class PlotAlphaSModel():
                     self.pressure,
                     branch=self.ref_branch,
                     pressure_unit=self.isotherm.pressure_unit,
-                    loading_unit='mol',
+                    loading_unit='mmol',
                 )
                 if self.ref_branch == 'des':
                     self.reference_loading = self.reference_loading[::-1]
             except Exception as err:
-                self.output += f'<font color="red">Error: The reference isotherm does not cover the same pressure range! <br></font>'
+                self.output += '<font color="red">Error: The reference isotherm does not cover the same pressure range! <br></font>'
                 self.output_log()
                 return False
 
@@ -207,10 +203,13 @@ class PlotAlphaSModel():
         """Fill in any GUI plots with results."""
         # Generate alphas plot
         self.view.res_graph.clear()
+        units = self.isotherm.units
+        units.update({"loading_basis": "molar", "loading_unit": "mmol"})
         tp_plot(
             self.alphas_curve,
             self.loading,
             self.results,
+            units,
             ax=self.view.res_graph.ax,
             alpha_s=True,
             alpha_reducing_p=self.reducing_pressure
@@ -229,36 +228,42 @@ class PlotAlphaSModel():
         self.view.x_select.setValues((self.alphas_curve[0], self.alphas_curve[-1]), emit=False)
         self.view.res_graph.draw_xlimits(self.alphas_curve[0], self.alphas_curve[-1])
 
-    def select_area(self):
+    def select_area(self, area_type):
         """Handle reference area selection."""
-        area_type = self.view.refarea_dropdown.currentText().lower()
         with log_hook:
-            if area_type == "bet":
+            if area_type == "BET":
                 self.reference_area = area_BET(self.ref_isotherm).get('area')
-                self.view.refarea_input.setEnabled(False)
-            elif area_type == "langmuir":
+                self.view.refarea_input.setReadOnly(True)
+                self.view.refarea_input.setText(f"{self.reference_area:.4g}")
+            elif area_type == "Langmuir":
                 self.reference_area = area_langmuir(self.ref_isotherm).get('area')
-                self.view.refarea_input.setEnabled(False)
+                self.view.refarea_input.setReadOnly(True)
+                self.view.refarea_input.setText(f"{self.reference_area:.4g}")
             else:
-                self.view.refarea_input.setEnabled(True)
-                ref_area_str = self.view.refarea_input.text()
-                if not ref_area_str:
-                    return
-                self.reference_area = float(ref_area_str)
+                self.view.refarea_input.setReadOnly(False)
             self.output += log_hook.get_logs()
 
         if self.prepare_values():
             self.calc_auto()
 
-    def select_branch(self):
-        """Handle isotherm branch selection."""
-        self.branch = self.view.branch_dropdown.currentText()
+    def select_area_specify(self):
+        """Use area specified by user."""
+        ref_area_str = self.view.refarea_input.text()
+        if not ref_area_str:
+            return
+        self.reference_area = float(ref_area_str)
         if self.prepare_values():
             self.calc_auto()
 
-    def select_refbranch(self):
+    def select_branch(self, branch):
+        """Handle isotherm branch selection."""
+        self.branch = branch
+        if self.prepare_values():
+            self.calc_auto()
+
+    def select_refbranch(self, branch):
         """Handle reference isotherm branch selection."""
-        self.ref_branch = self.view.refbranch_dropdown.currentText()
+        self.ref_branch = branch
         if self.prepare_values():
             self.calc_auto()
 
