@@ -56,7 +56,10 @@ class IASTVLEDialog(QW.QDialog):
         self.calc_button = QW.QPushButton()
         self.calc_button.setDefault(True)
         self.calc_button.setAutoDefault(True)
-        self.options_layout.addWidget(self.calc_button, 4, 0, 1, 3)
+        self.options_layout.addWidget(self.calc_button, 4, 0, 1, 2)
+
+        self.calc_autobox = QW.QCheckBox()
+        self.options_layout.addWidget(self.calc_autobox, 4, 2, 1, 1)
 
         ## Output log
         self.output_label = QW.QLabel("Calculation log:")
@@ -88,4 +91,5 @@ class IASTVLEDialog(QW.QDialog):
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("IASTVLEDialog", "IAST: bulk-adsorbed equilibrium", None, -1))
         self.calc_button.setText(QW.QApplication.translate("IsoModelByDialog", "Calculate", None, -1))
+        self.calc_autobox.setText(QW.QApplication.translate("IsoModelByDialog", "Auto", None, -1))
         # yapf: enable

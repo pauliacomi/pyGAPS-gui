@@ -51,6 +51,8 @@ class IASTVLEModel():
         # connect signals
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.calc_button.clicked.connect(self.calc_auto)
+        self.view.pressure_input.valueChanged.connect(self.calc_autobox)
+        self.view.point_input.valueChanged.connect(self.calc_autobox)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
 
@@ -63,6 +65,10 @@ class IASTVLEModel():
         else:
             self.output_log()
             self.plot_clear()
+
+    def calc_autobox(self):
+        if self.view.calc_autobox.isChecked():
+            self.calc_auto()
 
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
