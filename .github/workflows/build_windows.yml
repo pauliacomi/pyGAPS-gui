@@ -64,7 +64,7 @@ jobs:
         cd ../..
         python ./ci/collect_dist.py msi zip $folderName
         candle.exe ./dist/pyGAPS-gui.wxs -o ./dist/pyGAPS-gui.wixobj
-        light.exe ./dist/pyGAPS-gui.wixobj -o ./dist/pyGAPS-gui-win-x86_64.msi -ext WixUIExtension.dll
+        light.exe ./dist/pyGAPS-gui.wixobj -o ./dist/pyGAPS-gui.msi -ext WixUIExtension.dll
         Rename-Item -Path $folderName -NewName "pyGAPS-gui-win-x86_64.zip"
 
     - name: Upload artifacts
@@ -80,5 +80,5 @@ jobs:
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       with:
         files: |
-          ./dist/pyGAPS-gui-win-x86_64.msi
+          ./dist/pyGAPS-gui.msi
           ./dist/pyGAPS-gui-win-x86_64.zip
