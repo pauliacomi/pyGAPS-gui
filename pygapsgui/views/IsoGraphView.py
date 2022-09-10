@@ -195,6 +195,7 @@ class IsoGraphView(GraphView):
     def handle_legend_sel(self):
         """Dialog to ask user which data to display on each axis."""
         from pygapsgui.widgets.IsoGraphLegendSel import IsoGraphLegendSel
+        # TODO correctly determine available components of the legend
         dialog = IsoGraphLegendSel(
             current=self.lgd_keys,
             available=["material", "adsorbate", "temperature", "branch", "key"],
