@@ -42,7 +42,7 @@ class IsoGraphView(GraphView):
     material_basis: str = None
     material_unit: str = None
 
-    lgd_keys: list = None
+    lgd_keys: list = ["material", "adsorbate", "temperature", "key"]
     lgd_pos: str = "best"
 
     def __init__(self, *args, **kwargs):
@@ -56,6 +56,7 @@ class IsoGraphView(GraphView):
         self.navbar.logx.connect(self.handle_logx)
         self.navbar.logy.connect(self.handle_logy)
         self.navbar.axis_data_sel.connect(self.handle_data_sel)
+        self.navbar.axis_legend_sel.connect(self.handle_legend_sel)
 
     def set_isotherms(self, isotherms):
         """Set one or more isotherms to be displayed by this graph."""
@@ -190,6 +191,18 @@ class IsoGraphView(GraphView):
                 self.y1_data = dialog.y1_data
                 self.y2_data = dialog.y2_data
                 self.draw_isotherms()
+
+    def handle_legend_sel(self):
+        """Dialog to ask user which data to display on each axis."""
+        from pygapsgui.widgets.IsoGraphLegendSel import IsoGraphLegendSel
+        dialog = IsoGraphLegendSel(
+            current=self.lgd_keys,
+            available=["material", "adsorbate", "temperature", "branch", "key"],
+            parent=self,
+        )
+        if dialog.exec():
+            self.lgd_keys = dialog.get_checked()
+            self.draw_isotherms()
 
 
 class IsoListGraphView(IsoGraphView):

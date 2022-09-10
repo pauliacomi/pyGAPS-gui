@@ -21,7 +21,7 @@ class IsoGraphDataSel(QW.QDialog):
         self.y2_data = y2_data
 
         self.setup_UI()
-        self.setupData()
+        self.setup_data(datas, x_data, y1_data, y2_data)
         self.connect_signals()
 
     def setup_UI(self):
@@ -51,15 +51,15 @@ class IsoGraphDataSel(QW.QDialog):
         self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
         self.dataLayout.addWidget(self.button_box)
 
-    def setupData(self):
-        self.xCombo.addItems(self.datas)
-        self.xCombo.setCurrentText(self.x_data)
-        self.y1Combo.addItems(self.datas)
-        self.y1Combo.setCurrentText(self.y1_data)
+    def setup_data(self, datas, x_data, y1_data, y2_data):
+        self.xCombo.addItems(datas)
+        self.xCombo.setCurrentText(x_data)
+        self.y1Combo.addItems(datas)
+        self.y1Combo.setCurrentText(y1_data)
 
-        if len(self.datas) > 2:
-            self.y2Combo.addItems(["None"] + self.datas)
-            self.y2Combo.setCurrentText(self.y2_data)
+        if len(datas) > 2:
+            self.y2Combo.addItems(["None"] + datas)
+            self.y2Combo.setCurrentText(y2_data)
         else:
             self.y2Combo.setDisabled(True)
 
@@ -67,11 +67,11 @@ class IsoGraphDataSel(QW.QDialog):
         """Connect permanent signals."""
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
-        self.xCombo.currentIndexChanged.connect(self.handleChanged)
-        self.y1Combo.currentIndexChanged.connect(self.handleChanged)
-        self.y2Combo.currentIndexChanged.connect(self.handleChanged)
+        self.xCombo.currentIndexChanged.connect(self.handle_changed)
+        self.y1Combo.currentIndexChanged.connect(self.handle_changed)
+        self.y2Combo.currentIndexChanged.connect(self.handle_changed)
 
-    def handleChanged(self):
+    def handle_changed(self):
         self.changed = True
 
         self.x_data = self.xCombo.currentText()

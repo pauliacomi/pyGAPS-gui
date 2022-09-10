@@ -14,14 +14,16 @@ class IsoGraphToolbar(NavigationToolbar):
     logx = QC.Signal(bool)
     logy = QC.Signal(bool)
     axis_data_sel = QC.Signal()
+    axis_legend_sel = QC.Signal()
 
     toolitems = [*NavigationToolbar.toolitems]
 
     pos = [name for name, *_ in toolitems].index("Subplots") + 2
 
     toolitems.insert(pos, ("Data X", "Data to plot on X/Y1/Y2 axis", "pg_btn_data", "axis_data"))
-    toolitems.insert(pos + 1, ("Log(x)", "Log the X axis", "pg_btn_logx", "log_x"))
-    toolitems.insert(pos + 2, ("Log(y)", "Log the Y axis", "pg_btn_logy", "log_y"))
+    toolitems.insert(pos + 1, ("Legend", "Legend components", "pg_btn_g_legend", "legend_comp"))
+    toolitems.insert(pos + 2, ("Log(x)", "Log the X axis", "pg_btn_logx", "log_x"))
+    toolitems.insert(pos + 3, ("Log(y)", "Log the Y axis", "pg_btn_logy", "log_y"))
 
     def __init__(self, canvas, parent, coordinates=True):
         super().__init__(canvas, parent, coordinates=coordinates)
@@ -141,3 +143,7 @@ class IsoGraphToolbar(NavigationToolbar):
 
         # Emit change
         self.logy.emit(logy)
+
+    def legend_comp(self):
+        """Functionality to select which data is plotted on an axes."""
+        self.axis_legend_sel.emit()
