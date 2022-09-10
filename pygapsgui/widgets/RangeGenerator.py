@@ -102,7 +102,7 @@ class RangeGenWidget(QW.QWidget):
         prop = self.prop_value.currentIndex()
         start = 0.1
         end = 1.0
-        points = 5
+        points = 10
         if self.data is not None and self.data.shape[0] > 0:
             start = self.data.iloc[0, prop]
             end = self.data.iloc[-1, prop]
