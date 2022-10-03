@@ -82,10 +82,10 @@ class IsoController():
         self.mw_widget.adsorbate_details.clicked.connect(self.adsorbate_detail)
 
         # Connect signals for iso graph
-        self.unit_widget.pressure_changed.connect(self.modify_iso_pressure)
-        self.unit_widget.loading_changed.connect(self.modify_iso_loading)
-        self.unit_widget.material_changed.connect(self.modify_iso_materialunit)
-        self.unit_widget.temperature_changed.connect(self.modify_iso_temperature)
+        self.unit_widget.pressure_changed.connect(self.modify_iso_p_units)
+        self.unit_widget.loading_changed.connect(self.modify_iso_l_units)
+        self.unit_widget.material_changed.connect(self.modify_iso_m_units)
+        self.unit_widget.temperature_changed.connect(self.modify_iso_t_units)
 
     ########################################################
     # Display functionality
@@ -150,13 +150,13 @@ class IsoController():
         # Graph
         self.graph_view.update()
 
-    def modify_iso_pressure(self, mode_to, unit_to):
+    def modify_iso_p_units(self, mode_to, unit_to):
         """Convert current isotherm pressure."""
         if not self.iso_current:
             return
         try:
             self.iso_current.convert_pressure(mode_to=mode_to, unit_to=unit_to)
-        except Exception as ex:
+        except Exception as err:
             error_dialog(
                 "Cannot convert relative pressure. Common causes are supercritical "
                 "adsorbates or those without a thermodynamic backend. If "
@@ -165,13 +165,13 @@ class IsoController():
             )
         self.iso_display_update()  # not efficient but guarantees a full refresh
 
-    def modify_iso_loading(self, basis_to, unit_to):
+    def modify_iso_l_units(self, basis_to, unit_to):
         """Convert current isotherm loading."""
         if not self.iso_current:
             return
         try:
             self.iso_current.convert_loading(basis_to=basis_to, unit_to=unit_to)
-        except Exception as ex:
+        except Exception as err:
             if basis_to == "volume":
                 error_dialog(
                     "Cannot convert loading. Common causes are supercritical "
@@ -187,26 +187,26 @@ class IsoController():
                     "add a metadata named 'molar_mass' with a known value."
                 )
             else:
-                raise Exception from ex
+                raise Exception from err
         self.iso_display_update()  # not efficient but guarantees a full refresh
 
-    def modify_iso_materialunit(self, basis_to, unit_to):
+    def modify_iso_m_units(self, basis_to, unit_to):
         """Convert current isotherm material basis/unit."""
         if not self.iso_current:
             return
         try:
             self.iso_current.convert_material(basis_to=basis_to, unit_to=unit_to)
-        except Exception as ex:
+        except Exception as err:
             if basis_to == "volume":
                 msg = "Could not convert material to a volume basis. Does it have a density set?"
             elif basis_to == "molar":
                 msg = "Could not convert material to a molar basis. Does it have a molar_mass set?"
             else:
-                raise Exception from ex
+                raise Exception from err
             error_dialog(msg)
         self.iso_display_update()  # not efficient but guarantees a full refresh
 
-    def modify_iso_temperature(self, unit_to):
+    def modify_iso_t_units(self, unit_to):
         """Convert current isotherm temperature."""
         if not self.iso_current:
             return
