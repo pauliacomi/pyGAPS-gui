@@ -5,8 +5,10 @@ from qtpy import QtCore as QC
 
 class dfTableModel(QC.QAbstractTableModel):
     """Table model to display/edit a Pandas dataframe."""
-    def __init__(self, data, parent=None):
+    def __init__(self, data=None, parent=None):
         super().__init__(parent)
+        if data is None:
+            data = pd.DataFrame({"pressure": [0], "loading": [0], "branch": [0]})
         self._data = data
 
     def rowCount(self, index=QC.QModelIndex()):
