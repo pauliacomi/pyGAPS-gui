@@ -11,7 +11,9 @@ from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 class QSpinBoxSlider(QW.QWidget):
     """Slider connected to a SpinBox acting as a whole. A label is included."""
 
+    name = None  # A name for the value it is tracing, useful for identification
     changed = QC.Signal(float)
+    changed_named = QC.Signal(str, float)
     minv = 0
     maxv = 100
     step = 1
@@ -125,6 +127,8 @@ class QSpinBoxSlider(QW.QWidget):
             self.slider.setValue(self.scaleTo(self.value))
             self.slider.blockSignals(False)
             self.changed.emit(self.value)
+            if self.name is not None:
+                self.changed_named.emit(self.name, self.value)
 
 
 class QHSpinBoxSlider(QSpinBoxSlider):
