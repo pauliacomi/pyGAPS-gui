@@ -17,7 +17,7 @@ class PSDKernelDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
         self.setObjectName("PSDKernelDialog")
 
         _layout = QW.QGridLayout(self)

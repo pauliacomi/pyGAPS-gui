@@ -23,7 +23,7 @@ class MaterialView(QW.QWidget):
         self.material = material
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
         self.setObjectName("MaterialView")
         self.resize(400, 500)
 
@@ -169,7 +169,7 @@ class MaterialDialog(QW.QDialog):
         self.view.material = material
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
 
         _layout = QW.QVBoxLayout(self)
 
@@ -214,7 +214,7 @@ class MaterialListDialog(QW.QDialog):
         self.setup_view()
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
 
         _layout = QW.QVBoxLayout(self)
         layout_top = QW.QHBoxLayout()

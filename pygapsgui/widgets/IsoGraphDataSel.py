@@ -25,7 +25,7 @@ class IsoGraphDataSel(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
         self.dataLayout = QW.QFormLayout(self)
 
         self.xCombo = QW.QComboBox()

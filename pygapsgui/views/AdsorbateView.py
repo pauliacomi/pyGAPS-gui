@@ -31,7 +31,7 @@ class AdsorbateView(QW.QWidget):
         self.adsorbate = adsorbate
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
         self.setObjectName("AdsorbateView")
         self.resize(500, 500)
 
@@ -176,7 +176,7 @@ class AdsorbateDialog(QW.QDialog):
         self.view.adsorbate = adsorbate
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
 
         _layout = QW.QVBoxLayout(self)
 
@@ -218,7 +218,7 @@ class AdsorbateListDialog(QW.QDialog):
         self.setup_view()
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
 
         _layout = QW.QVBoxLayout(self)
         layout_top = QW.QHBoxLayout()

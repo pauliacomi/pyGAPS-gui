@@ -18,7 +18,7 @@ class IsoGraphLegendSel(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
         self.data_layout = QW.QFormLayout(self)
         self.list_options = QW.QListWidget()
         # self.list_options.setDragDropMode(QW.QAbstractItemView.InternalMove) # TODO drag and drop to arrange?
