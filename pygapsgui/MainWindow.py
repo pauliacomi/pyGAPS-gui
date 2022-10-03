@@ -88,7 +88,6 @@ class MainWindow(QW.QMainWindow):
 
         self.ui.action_model_by.triggered.connect(self.model_by)
         self.ui.action_model_guess.triggered.connect(self.model_guess)
-        self.ui.action_model_manual.triggered.connect(self.model_manual)
 
         self.ui.action_iast_binary_vle.triggered.connect(self.iast_binary_vle)
         self.ui.action_iast_binary_svp.triggered.connect(self.iast_binary_svp)
@@ -140,17 +139,20 @@ class MainWindow(QW.QMainWindow):
 
     def new_iso(self):
         """Create an empty isotherm."""
-        # TODO dialog for new isotherm
-        from pygaps import PointIsotherm
-        isotherm = PointIsotherm(
-            pressure=[0, 1],
-            loading=[0, 1],
-            m="New material",
-            a="N2",
-            t=77,
-        )
-        self.iso_controller.add_isotherm("new isotherm", isotherm)
-        self.iso_controller.select_last_iso()
+        """Start a manual manual creation dialog."""
+        from pygapsgui.models.IsoCreateModel import IsoCreateModel
+        from pygapsgui.views.IsoCreateDialog import IsoCreateDialog
+        dialog = IsoCreateDialog(parent=self)
+        model = IsoCreateModel(dialog)
+        if not model.success:
+            return
+        ret = dialog.exec()
+
+        if ret == QW.QDialog.Accepted and model.full_isotherm:
+            iso = model.full_isotherm
+            name = f"{iso.material} {iso.adsorbate} {iso.temperature}"
+            self.iso_controller.add_isotherm(name, iso)
+            self.iso_controller.select_last_iso()
 
     def open_iso(self, filepaths=None):
         """Open isotherm from file."""
@@ -412,21 +414,6 @@ class MainWindow(QW.QMainWindow):
 
         if ret == QW.QDialog.Accepted and model.model_isotherm:
             name = f"{isotherm.material} {isotherm.adsorbate} {model.model_isotherm.model.name}"
-            self.iso_controller.add_isotherm(name, model.model_isotherm)
-            self.iso_controller.select_last_iso()
-
-    def model_manual(self):
-        """Start a manual manual creation dialog."""
-        from pygapsgui.models.IsoModelManualModel import IsoModelManualModel
-        from pygapsgui.views.IsoModelManualDialog import IsoModelManualDialog
-        dialog = IsoModelManualDialog(parent=self)
-        model = IsoModelManualModel(dialog)
-        if not model.success:
-            return
-        ret = dialog.exec()
-
-        if ret == QW.QDialog.Accepted and model.model_isotherm:
-            name = model.model_isotherm.model.name + " custom model"
             self.iso_controller.add_isotherm(name, model.model_isotherm)
             self.iso_controller.select_last_iso()
 

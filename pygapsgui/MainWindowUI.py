@@ -7,10 +7,10 @@ import pygapsgui.widgets.resources_rc
 from pygapsgui.views.IsoGraphView import IsoListGraphView
 from pygapsgui.views.IsoListView import IsoListView
 from pygapsgui.views.MetadataTableView import MetadataTableView
+from pygapsgui.widgets.IsoPropWidget import IsoPropWidget
 from pygapsgui.widgets.IsoUnitWidget import IsoUnitWidget
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
 from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
-from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 
 
 class MainWindowUI():
@@ -110,49 +110,22 @@ class MainWindowUI():
         self.properties_layout.setObjectName("properties_layout")
 
         # at the top, base properties
-        self.prop_base_layout = QW.QGridLayout()
-        self.properties_layout.addLayout(self.prop_base_layout, 0, 0, 1, 1)
+        self.prop_base_widget = IsoPropWidget()
+        self.properties_layout.addWidget(self.prop_base_widget, 0, 0, 1, 1)
 
-        self.material_label = LabelAlignRight()
-        self.material_label.setObjectName("material_label")
-        self.material_input = QW.QComboBox()
-        self.material_input.setInsertPolicy(QW.QComboBox.NoInsert)
-        self.material_input.setObjectName("material_input")
-        self.material_input.setEditable(True)
-        self.material_details = QW.QPushButton()
-        self.material_details.setObjectName("material_details")
-        self.prop_base_layout.addWidget(self.material_label, 0, 0, 1, 1)
-        self.prop_base_layout.addWidget(self.material_input, 0, 1, 1, 1)
-        self.prop_base_layout.addWidget(self.material_details, 0, 2, 1, 1)
+        self.material_input = self.prop_base_widget.m_input
+        self.material_details = self.prop_base_widget.m_button
 
-        self.adsorbate_label = LabelAlignRight()
-        self.adsorbate_label.setObjectName("adsorbate_label")
-        self.adsorbate_input = QW.QComboBox()
-        self.adsorbate_input.setInsertPolicy(QW.QComboBox.NoInsert)
-        self.adsorbate_input.setObjectName("adsorbate_input")
-        self.adsorbate_input.setEditable(True)
-        self.adsorbate_details = QW.QPushButton()
-        self.adsorbate_details.setObjectName("adsorbate_details")
-        self.prop_base_layout.addWidget(self.adsorbate_label, 1, 0, 1, 1)
-        self.prop_base_layout.addWidget(self.adsorbate_input, 1, 1, 1, 1)
-        self.prop_base_layout.addWidget(self.adsorbate_details, 1, 2, 1, 1)
+        self.adsorbate_input = self.prop_base_widget.a_input
+        self.adsorbate_details = self.prop_base_widget.a_button
 
-        self.temperature_label = LabelAlignRight()
-        self.temperature_label.setObjectName("temperature_label")
-        self.temperature_input = QW.QDoubleSpinBox()
-        self.temperature_input.setMinimum(-999)
-        self.temperature_input.setMaximum(9999)
-        self.temperature_input.setObjectName("temperature_input")
-        self.prop_base_layout.addWidget(self.temperature_label, 2, 0, 1, 1)
-        self.prop_base_layout.addWidget(self.temperature_input, 2, 1, 1, 1)
+        self.temperature_input = self.prop_base_widget.t_input
+        self.temperature_unit = self.prop_base_widget.t_unit
 
         # then, units for isotherm physical quantities
         # the temperature combo is "given" to the unitWidget
-        self.temperature_unit = QW.QComboBox()
-        self.temperature_unit.setObjectName("temperature_unit")
         self.prop_unit_widget = IsoUnitWidget(self.temperature_unit)
-        self.prop_base_layout.addWidget(self.temperature_unit, 2, 2, 1, 1)
-        self.properties_layout.addWidget(self.prop_unit_widget, 1, 0, 1, 2)
+        self.properties_layout.addWidget(self.prop_unit_widget, 1, 0, 1, 1)
 
         # then, isotherm metadata
         self.prop_extra_group = QW.QGroupBox()
@@ -304,8 +277,6 @@ class MainWindowUI():
         self.action_model_by.setObjectName("action_model_by")
         self.action_model_guess = QW.QAction(main_window)
         self.action_model_guess.setObjectName("action_model_guess")
-        self.action_model_manual = QW.QAction(main_window)
-        self.action_model_manual.setObjectName("action_model_manual")
 
         # prediction
         self.action_iast_binary_vle = QW.QAction(main_window)
@@ -364,8 +335,6 @@ class MainWindowUI():
             self.action_model_by,
             self.action_model_guess,
         ))
-        self.menu_model.addSeparator()
-        self.menu_model.addActions([self.action_model_manual])
         #
         self.menu_iast.addActions([
             self.action_iast_binary_vle,
@@ -396,11 +365,6 @@ class MainWindowUI():
         self.exp_remove_button.setText(QW.QApplication.translate("MainWindow", "Delete", None, -1))
         #
         self.properties_group.setTitle(QW.QApplication.translate("MainWindow", "Isotherm Properties", None, -1))
-        self.material_label.setText(QW.QApplication.translate("MainWindow", "Material", None, -1))
-        self.material_details.setText(QW.QApplication.translate("MainWindow", "Details", None, -1))
-        self.adsorbate_label.setText(QW.QApplication.translate("MainWindow", "Adsorbate", None, -1))
-        self.adsorbate_details.setText(QW.QApplication.translate("MainWindow", "Details", None, -1))
-        self.temperature_label.setText(QW.QApplication.translate("MainWindow", "Temperature", None, -1))
         self.prop_extra_group.setTitle(QW.QApplication.translate("MainWindow", "Metadata", None, -1))
         self.data_button.setText(QW.QApplication.translate("MainWindow", "Isotherm Points", None, -1))
         #
@@ -432,7 +396,6 @@ class MainWindowUI():
         self.action_isosteric.setText(QW.QApplication.translate("MainWindow", "Isosteric enthalpy", None, -1))
         self.action_model_by.setText(QW.QApplication.translate("MainWindow", "Fit a model", None, -1))
         self.action_model_guess.setText(QW.QApplication.translate("MainWindow", "Guess best model", None, -1))
-        self.action_model_manual.setText(QW.QApplication.translate("MainWindow", "Manually create a model", None, -1))
         self.menu_iast.setTitle(QW.QApplication.translate("MainWindow", "IAST", None, -1))
         self.action_iast_binary_vle.setText(QW.QApplication.translate("MainWindow", "Binary phase equilibrium", None, -1))
         self.action_iast_binary_svp.setText(QW.QApplication.translate("MainWindow", "Binary selectivity v. pressure", None, -1))

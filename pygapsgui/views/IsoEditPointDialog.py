@@ -9,21 +9,28 @@ from pygapsgui.widgets.SciDoubleSpinbox import SciFloatSpinDelegate
 from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 
 
-class IsoEditPointDialog(QW.QDialog):
-    """A dialog that allows editing of PointIsotherm points."""
-    def __init__(self, isotherm, *args, **kwargs):
+class IsoEditPointWidget(QW.QWidget):
+    """A widget that allows editing of PointIsotherm points."""
+
+    datatable_model = None
+
+    changed = QC.Signal()
+
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.setup_UI()
         self.translate_UI()
-
-        self.isotherm = isotherm
-        self.model = IsoDataTableModel(isotherm.data_raw.copy())
-        self.table_view.setModel(self.model)
         self.connect_signals()
 
+    def set_datatable_model(self, datatable_model=None):
+        """Create and link the datatable model."""
+        self.datatable_model = IsoDataTableModel(datatable_model)
+        self.datatable_model.dataChanged.connect(self.changed)
+        self.table_view.setModel(self.datatable_model)
+
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
-        self.setObjectName("IsoEditPointDialog")
+        """Create and set-up static UI elements."""
 
         # Create/set layout
         _layout = QW.QVBoxLayout(self)
@@ -59,16 +66,8 @@ class IsoEditPointDialog(QW.QDialog):
         edit_layout.addWidget(self.edit_add_col, 2, 0)
         edit_layout.addWidget(self.edit_del_col, 2, 1)
 
-        # Button box
-        self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Cancel)
-        _layout.addWidget(self.button_box)
-
     def connect_signals(self):
         """Connect permanent signals."""
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
         self.edit_add_row.pressed.connect(self.add_row)
         self.edit_del_row.pressed.connect(self.del_row)
         self.edit_add_col.pressed.connect(self.add_col)
@@ -76,13 +75,15 @@ class IsoEditPointDialog(QW.QDialog):
 
     def add_row(self):
         """Insert a row at current location."""
-        self.model.insertRow(self.table_view.currentIndex().row())
+        self.datatable_model.insertRow(self.table_view.currentIndex().row())
+        self.changed.emit()
 
     def del_row(self):
         """Delete current highlighted row."""
         row = self.table_view.currentIndex().row()
-        self.model.removeRow(row)
+        self.datatable_model.removeRow(row)
         self.table_view.selectRow(row)
+        self.changed.emit()
 
     def add_col(self):
         """Add a data column to the end of the table."""
@@ -105,19 +106,21 @@ class IsoEditPointDialog(QW.QDialog):
         if not input.text():
             return
 
-        ncols = self.model.columnCount()
+        ncols = self.datatable_model.columnCount()
         dtype = type_input.currentText()
 
-        self.model.insertColumn(ncols)
+        self.datatable_model.insertColumn(ncols)
         if dtype == "text":
-            self.model.setColumnDtype(ncols, "object")
-        self.model.setHeaderData(ncols, QC.Qt.Horizontal, input.text())
+            self.datatable_model.setColumnDtype(ncols, "object")
+        self.datatable_model.setHeaderData(ncols, QC.Qt.Horizontal, input.text())
+        self.changed.emit()
 
     def del_col(self):
         """Delete current highlighted column."""
         col = self.table_view.currentIndex().column()
-        self.model.removeColumn(col)
+        self.datatable_model.removeColumn(col)
         self.table_view.selectColumn(col)
+        self.changed.emit()
 
     def keyPressEvent(self, event):
         """Handle copy/paste."""
@@ -131,23 +134,66 @@ class IsoEditPointDialog(QW.QDialog):
             else:
                 super().keyPressEvent(event)
 
-    def accept(self) -> None:
-        """If accepted we commit the data."""
-        self.isotherm.data_raw = self.model._data
-        return super().accept()
-
     def sizeHint(self) -> QC.QSize:
         """Suggest ideal dimensions."""
-        return QC.QSize(self.table_view.model().columnCount() * 120, 600)
+        if self.table_view.model() is not None:
+            return QC.QSize(self.table_view.model().columnCount() * 120, 600)
+        return QC.QSize(240, 600)
 
     def translate_UI(self):
         """Set static UI text through QT translation."""
         # yapf: disable
         # pylint: disable=line-too-long
-        self.setWindowTitle(QW.QApplication.translate("IsoEditPointDialog", "Isotherm Data", None, -1))
         self.edit_label.setText(QW.QApplication.translate("IsoEditPointDialog", "Double click to edit individual points.", None, -1))
         self.edit_add_row.setText(QW.QApplication.translate("IsoEditPointDialog", "Insert Row", None, -1))
         self.edit_del_row.setText(QW.QApplication.translate("IsoEditPointDialog", "Delete Row", None, -1))
         self.edit_add_col.setText(QW.QApplication.translate("IsoEditPointDialog", "New data type", None, -1))
         self.edit_del_col.setText(QW.QApplication.translate("IsoEditPointDialog", "Delete data type", None, -1))
+        # yapf: enable
+
+
+class IsoEditPointDialog(QW.QDialog):
+    """A dialog to edit PointIsotherm points."""
+    def __init__(self, isotherm, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.isotherm = isotherm
+
+        self.setup_UI()
+        self.translate_UI()
+        self.connect_signals()
+
+        self.view.set_datatable_model(self.isotherm.data_raw.copy())
+
+    def setup_UI(self):
+        """Create and set-up static UI elements."""
+        self.setObjectName("IsoEditPointDialog")
+
+        _layout = QW.QVBoxLayout(self)
+
+        # View
+        self.view = IsoEditPointWidget()
+        _layout.addWidget(self.view)
+
+        # Button box
+        self.button_box = QW.QDialogButtonBox()
+        self.button_box.setOrientation(QC.Qt.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Cancel)
+        _layout.addWidget(self.button_box)
+
+    def connect_signals(self):
+        """Connect permanent signals."""
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+    def accept(self) -> None:
+        """If accepted we commit the data."""
+        self.isotherm.data_raw = self.view.datatable_model._data
+        return super().accept()
+
+    def translate_UI(self):
+        """Set static UI text through QT translation."""
+        # yapf: disable
+        # pylint: disable=line-too-long
+        self.setWindowTitle(QW.QApplication.translate("IsoEditPointDialog", "Isotherm Point Data", None, -1))
         # yapf: enable

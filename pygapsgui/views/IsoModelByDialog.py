@@ -1,14 +1,8 @@
-from qtpy import PYSIDE6
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
 
-if PYSIDE6:
-    import PySide6.QtSvgWidgets as QS
-else:
-    from qtpy import QtSvg as QS
-
+from pygapsgui.views.IsoEditModelDialog import IsoEditModelWidget
 from pygapsgui.views.IsoGraphView import IsoModelGraphView
-from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 from pygapsgui.widgets.UtilityWidgets import LabelOutput
 
 
@@ -24,7 +18,7 @@ class IsoModelByDialog(QW.QDialog):
         self.connect_signals()
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
         self.setObjectName("IsoModelByDialog")
 
         _layout = QW.QGridLayout(self)
@@ -36,16 +30,7 @@ class IsoModelByDialog(QW.QDialog):
         model_layout = QW.QFormLayout()
         self.options_layout.addLayout(model_layout)
 
-        # Model selection
-        self.model_label = LabelAlignRight("Model:")
-        self.model_dropdown = QW.QComboBox()
-        model_layout.addRow(self.model_label, self.model_dropdown)
-
-        # Branch selection
-        self.branch_label = LabelAlignRight("Branch:")
-        self.branch_dropdown = QW.QComboBox()
-        model_layout.addRow(self.branch_label, self.branch_dropdown)
-
+        # Fitting buttons
         opt_button_layout = QW.QHBoxLayout()
         self.options_layout.addLayout(opt_button_layout)
         self.calc_auto_button = QW.QPushButton()
@@ -55,23 +40,10 @@ class IsoModelByDialog(QW.QDialog):
         opt_button_layout.addWidget(self.calc_auto_button)
         opt_button_layout.addWidget(self.calc_autolim_button)
 
-        # Parameter box
-        self.param_box = QW.QGroupBox()
-        self.param_box_layout = QW.QVBoxLayout(self.param_box)
-        self.options_layout.addWidget(self.param_box)
-
-        param_box_widget = QW.QWidget()
-        self.param_layout = QW.QVBoxLayout(param_box_widget)
-        self.scroll_area = QW.QScrollArea()
-        self.scroll_area.setFrameStyle(QW.QFrame.NoFrame)
-        self.scroll_area.setWidget(param_box_widget)
-        self.scroll_area.setWidgetResizable(True)
-        self.param_box_layout.addWidget(self.scroll_area)
-
-        self.model_formula = QS.QSvgWidget(self.param_box)
-        self.model_formula.setFixedHeight(30)
-        self.param_layout.addWidget(self.model_formula)
-        self.param_layout.addStretch()
+        # Model edit widget
+        self.model_edit = IsoEditModelWidget()
+        self.options_layout.addWidget(self.model_edit)
+        self.branch_dropdown = self.model_edit.branch_dropdown
 
         # Output log
         self.output_label = QW.QLabel("Output log:")
@@ -105,7 +77,6 @@ class IsoModelByDialog(QW.QDialog):
         # yapf: disable
         # pylint: disable=line-too-long
         self.setWindowTitle(QW.QApplication.translate("IsoModelByDialog", "Isotherm model fitting", None, -1))
-        self.param_box.setTitle(QW.QApplication.translate("IsoModelByDialog", "Parameters", None, -1))
         self.calc_auto_button.setText(QW.QApplication.translate("IsoModelByDialog", "Autofit", None, -1))
         self.calc_autolim_button.setText(QW.QApplication.translate("IsoModelByDialog", "Autofit with bounds", None, -1))
         # yapf: enable

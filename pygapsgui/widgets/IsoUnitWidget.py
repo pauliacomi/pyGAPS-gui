@@ -23,7 +23,7 @@ class IsoUnitWidget(QW.QWidget):
         self.connect_signals()
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
 
         _layout = QW.QHBoxLayout(self)
         self.pressure_box = QW.QGroupBox()
@@ -118,10 +118,14 @@ class IsoUnitWidget(QW.QWidget):
 
         self.block_signals(False)
 
-    def init_units(self, isotherm):
+    def init_units(self, isotherm, active=None):
+        """Set correct units from an isotherm."""
 
         self.block_signals(True)
-        self.units_active = isinstance(isotherm, PointIsotherm)
+        if active is None:
+            self.units_active = isinstance(isotherm, PointIsotherm)
+        else:
+            self.units_active = active
         self.init_pressure(isotherm.pressure_mode, isotherm.pressure_unit)
         self.init_loading(isotherm.loading_basis, isotherm.loading_unit)
         self.init_material(isotherm.material_basis, isotherm.material_unit)
