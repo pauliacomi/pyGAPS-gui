@@ -55,7 +55,7 @@ class FreeSpinBox(QW.QSpinBox):
 
 
 class FloatStandardItem(QG.QStandardItem):
-    """A basic item which can store floats."""
+    """A QStandardItem which can store floats."""
     val = None
 
     def type(self) -> int:
@@ -76,11 +76,17 @@ class FloatStandardItem(QG.QStandardItem):
 
 class LimitEdit(QW.QWidget):
     """Allows two numbers intended as limits to be set/read."""
+
+    lower_changed = QC.Signal(float)
+    upper_changed = QC.Signal(float)
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.lower_edit = ScientificDoubleSpinBox()
         self.upper_edit = ScientificDoubleSpinBox()
+        self.lower_edit.valueChanged.connect(self.lower_changed)
+        self.upper_edit.valueChanged.connect(self.upper_changed)
         _layout = QW.QHBoxLayout(self)
         _layout.addWidget(self.lower_edit)
         _layout.addWidget(self.upper_edit)
@@ -89,6 +95,20 @@ class LimitEdit(QW.QWidget):
         """Individually set upper/lower values."""
         self.lower_edit.setValue(values[0])
         self.upper_edit.setValue(values[1])
+
+    def set_limits_lower(self, low, high):
+        """Set lower box limits."""
+        if low:
+            self.lower_edit.setMinimum(low)
+        if high:
+            self.lower_edit.setMaximum(high)
+
+    def set_limits_upper(self, low, high):
+        """Set lower box limits."""
+        if low:
+            self.upper_edit.setMinimum(low)
+        if high:
+            self.upper_edit.setMaximum(high)
 
     def values(self):
         """Get tuple of the upper/lower values."""
