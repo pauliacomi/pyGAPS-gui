@@ -27,7 +27,7 @@ class IsoGraphView(GraphView):
     _branch: str = "all"
     logx: bool = False
     logy: bool = False
-    data_types: list = ["pressure", "loading"]
+    data_types: list = None
     x_data: str = "pressure"
     y1_data: str = "loading"
     y2_data: str = None
@@ -42,11 +42,16 @@ class IsoGraphView(GraphView):
     material_basis: str = None
     material_unit: str = None
 
-    lgd_keys: list = ["material", "adsorbate", "temperature", "key"]
+    lgd_keys: list = None
     lgd_pos: str = "best"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # instantiate properties
+        self.data_types = ["pressure", "loading"]
+        self.lgd_keys = ["material", "adsorbate", "temperature", "key"]
+
         # anything less and it looks too cramped
         self.setMinimumSize(400, 400)
 
@@ -58,7 +63,7 @@ class IsoGraphView(GraphView):
         self.navbar.axis_data_sel.connect(self.handle_data_sel)
         self.navbar.axis_legend_sel.connect(self.handle_legend_sel)
 
-    def set_isotherms(self, isotherms):
+    def set_isotherms(self, isotherms, autorange=True):
         """Set one or more isotherms to be displayed by this graph."""
         self.isotherms = isotherms
         if not isotherms:
@@ -75,8 +80,9 @@ class IsoGraphView(GraphView):
         if self.x_data not in self.data_types:
             self.x_data = "pressure"
 
-        # range
-        self.find_xrange()
+        # range #TODO this is not optimal for draws and secondary effects, consider
+        if autorange:
+            self.find_xrange()
 
     def draw_isotherms(self, clear=True):
         """Redraws the current isotherms."""
@@ -136,8 +142,8 @@ class IsoGraphView(GraphView):
         if self.x_range_select:
             self.x_range_select.setRange(self.x_range)
             self.x_range_select.setValues(self.x_range, emit=False)
-            self.xlow.set_xdata([self.x_range[0], self.x_range[0]])
-            self.xhigh.set_xdata([self.x_range[1], self.x_range[1]])
+            self.x_lower.set_xdata([self.x_range[0], self.x_range[0]])
+            self.x_upper.set_xdata([self.x_range[1], self.x_range[1]])
 
     def state_pressure(self, iso):
         """Shortcut function to get isotherm pressure."""
@@ -169,7 +175,7 @@ class IsoGraphView(GraphView):
             self.x_range_select.setLogScale(is_set)
 
     def handle_logy(self, is_set: bool):
-        """Makes sure log state is propagated to other components."""
+        """Make sure log state is propagated to other components."""
         self.logy = is_set
         self.ax.autoscale(axis="y")
         if self.y_range_select:
@@ -195,6 +201,7 @@ class IsoGraphView(GraphView):
     def handle_legend_sel(self):
         """Dialog to ask user which data to display on each axis."""
         from pygapsgui.widgets.IsoGraphLegendSel import IsoGraphLegendSel
+
         # TODO correctly determine available components of the legend
         dialog = IsoGraphLegendSel(
             current=self.lgd_keys,
