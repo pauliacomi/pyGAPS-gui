@@ -18,8 +18,8 @@ class GraphView(QW.QWidget):
     # for range_select
     x_range_select = None  # can be selector
     y_range_select = None  # can be selector
-    xlow = None  # can be plt.ax
-    xhigh = None  # can be plt.ax
+    x_lower = None  # can be plt.ax
+    x_upper = None  # can be plt.ax
     ylow = None  # can be plt.ax
     yhigh = None  # can be plt.ax
 
@@ -38,7 +38,7 @@ class GraphView(QW.QWidget):
         self.setup_UI()
 
     def setup_UI(self):
-        """Creates and sets-up static UI elements"""
+        """Create and set-up static UI elements."""
         self.figure = Figure(figsize=(5, 5), tight_layout=True)
         self.canvas = FigureCanvas(self.figure)
         self.ax = self.figure.add_subplot()
@@ -70,8 +70,8 @@ class GraphView(QW.QWidget):
         """Creates and connects a selector for the x-axis."""
         self.x_range_select = HSelectorToolbar("HRangeSelect", ax=self.ax)
         self.x_range_select.slider.rangeChanged.connect(self.draw_xlimits)
-        self.xlow = self.ax.axvline(0, c="r", ls="--")
-        self.xhigh = self.ax.axvline(1, c="r", ls="--")
+        self.x_lower = self.ax.axvline(0, c="r", ls="--")
+        self.x_upper = self.ax.axvline(1, c="r", ls="--")
 
     def setupYRangeSelect(self):
         """Creates and connects a selector for the y-axis."""
@@ -82,8 +82,8 @@ class GraphView(QW.QWidget):
 
     def draw_xlimits(self, low, high):
         """Sets the selector limits for the x axis."""
-        self.xlow.set_xdata([low, low])
-        self.xhigh.set_xdata([high, high])
+        self.x_lower.set_xdata([low, low])
+        self.x_upper.set_xdata([high, high])
         self.canvas.draw_idle()
 
     def draw_ylimits(self, low, high):
@@ -98,7 +98,7 @@ class GraphView(QW.QWidget):
             if ax == self.ax:
                 ax.set_prop_cycle(None)
                 for line in ax.get_lines():
-                    if line not in [self.xlow, self.xhigh, self.ylow, self.yhigh]:
+                    if line not in [self.x_lower, self.x_upper, self.ylow, self.yhigh]:
                         line.remove()
                 lgd = ax.get_legend()
                 if lgd:
