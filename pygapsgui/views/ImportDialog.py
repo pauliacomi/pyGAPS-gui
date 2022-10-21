@@ -18,7 +18,16 @@ IMPORT_FILES = [
             "manufacturer": "bel",
             "fmt": "dat"
         },
-        "name": "BEL japan",
+        "name": "BEL",
+        "ext": ("DAT", )
+    },
+    {
+        "ind": {
+            "manufacturer": "bel",
+            "fmt": "dat",
+            "lang": "JPN",
+        },
+        "name": "BEL Japanese",
         "ext": ("DAT", )
     },
     {
@@ -26,7 +35,7 @@ IMPORT_FILES = [
             "manufacturer": "bel",
             "fmt": "xl"
         },
-        "name": "BEL japan report",
+        "name": "BEL report",
         "ext": ("xls", )
     },
     {
@@ -34,16 +43,16 @@ IMPORT_FILES = [
             "manufacturer": "bel",
             "fmt": "csv"
         },
-        "name": "BEL japan CSV",
+        "name": "BEL CSV",
         "ext": ("csv", )
     },
     {
         "ind": {
             "manufacturer": "bel",
             "fmt": "csv",
-            "lang": "JPN"
+            "lang": "JPN",
         },
-        "name": "BEL japan JIS CSV",
+        "name": "BEL Japanese CSV",
         "ext": ("csv", )
     },
     {
