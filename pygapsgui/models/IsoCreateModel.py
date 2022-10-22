@@ -7,7 +7,6 @@ from pygaps.units.converter_mode import _MATERIAL_MODE
 from pygaps.units.converter_mode import _PRESSURE_MODE
 from pygaps.units.converter_unit import _TEMPERATURE_UNITS
 from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class IsoCreateModel():
@@ -51,7 +50,9 @@ class IsoCreateModel():
             _TEMPERATURE_UNITS,
         )
         self.view.unit_widget.init_units(self.base_isotherm, active=True)
+        self.view.metadata_extra_edit_widget.set_model(self.base_isotherm)
 
+        # data
         self.view.model_edit.set_fitting_model("Langmuir", "ads")
         self.view.point_edit.set_datatable_model()
 
@@ -67,6 +68,7 @@ class IsoCreateModel():
         self.view.unit_widget.loading_changed.connect(self.handle_loading)
         self.view.unit_widget.material_changed.connect(self.handle_material)
         self.view.unit_widget.temperature_changed.connect(self.handle_temperature)
+        self.view.metadata_extra_edit_widget.changed.connect(self.update)
         self.view.isotype_tab.currentChanged.connect(self.handle_isotype)
         self.view.point_edit.changed.connect(self.update)
         self.view.model_edit.changed.connect(self.update)

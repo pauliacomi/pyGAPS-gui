@@ -8,7 +8,6 @@ from pygaps.units.converter_mode import _PRESSURE_MODE
 from pygaps.units.converter_unit import _TEMPERATURE_UNITS
 from pygaps.utilities import exceptions as pge
 from pygapsgui.models.IsoModel import IsoModel
-from pygapsgui.models.MetadataTableModel import MetadataTableModel
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -76,10 +75,9 @@ class IsoController():
         self.mw_widget.adsorbate_input.lineEdit().editingFinished.connect(self.modify_iso_baseprops)
         self.mw_widget.temperature_input.editingFinished.connect(self.modify_iso_baseprops)
         self.mw_widget.data_button.clicked.connect(self.iso_display_data)
-        self.mw_widget.prop_extra_edit_widget.save_button.clicked.connect(self.metadata_save)
-        self.mw_widget.prop_extra_edit_widget.delete_button.clicked.connect(self.metadata_delete)
         self.mw_widget.material_details.clicked.connect(self.material_detail)
         self.mw_widget.adsorbate_details.clicked.connect(self.adsorbate_detail)
+        self.mw_widget.prop_extra_edit_widget.changed.connect(self.handle_metadata_changed)
 
         # Connect signals for iso graph
         self.unit_widget.pressure_changed.connect(self.modify_iso_p_units)
@@ -116,11 +114,7 @@ class IsoController():
         self.unit_widget.init_units(self.iso_current)
 
         # Other isotherm metadata
-        self.metadata_table_model = MetadataTableModel(self.iso_current)
-        self.mw_widget.metadata_table_view.setModel(self.metadata_table_model)
-        self.mw_widget.metadata_table_view.selectionModel().selectionChanged.connect(
-            self.metadata_select
-        )
+        self.mw_widget.prop_extra_edit_widget.set_model(self.iso_current)
 
         # Model/Point specific
         if isinstance(self.iso_current, pygaps.ModelIsotherm):
@@ -259,10 +253,12 @@ class IsoController():
         dialog.exec()
 
     def handle_material_changed(self, material):
+        """Ensure refreshes when material changes."""
         self.iso_display_update()
         self.refresh_material_edit(material)
 
     def refresh_material_edit(self, material=None):
+        """Reload material list from database."""
         self.mw_widget.material_input.clear()
         self.mw_widget.material_input.insertItems(0, [mat.name for mat in pygaps.MATERIAL_LIST])
         if material:
@@ -281,60 +277,17 @@ class IsoController():
         dialog.exec()
 
     def handle_adsorbate_changed(self, adsorbate):
+        """Ensure refreshes when adsorbate changes."""
         self.iso_display_update()
 
-    def metadata_select(self):
-        """Update display when a metadata point is selected."""
-        index = self.mw_widget.metadata_table_view.currentIndex()
-        if not index.isValid():
-            return
-        data = self.metadata_table_model.rowData(index)
-        self.mw_widget.prop_extra_edit_widget.display(*data)
-
-    def metadata_save(self):
+    def handle_metadata_changed(self):
         """Save a metadata point."""
-        meta_name = self.mw_widget.prop_extra_edit_widget.name_input.text()
-        meta_value = self.mw_widget.prop_extra_edit_widget.value_input.text()
-        meta_type = self.mw_widget.prop_extra_edit_widget.type_input.currentText()
-        if not meta_name:
-            self.mw_widget.statusbar.showMessage("Fill property name!", 2000)
-            return
-        if not meta_value:
-            self.mw_widget.statusbar.showMessage("Fill property value!", 2000)
-            return
-
-        if meta_type == "number":
-            try:
-                meta_value = float(meta_value)
-            except ValueError:
-                error_dialog("Could not convert metadata value to number.")
-                return
-
-        self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, meta_type])
-        self.mw_widget.statusbar.showMessage(f"Added property named '{meta_name}")
-        self.mw_widget.metadata_table_view.resizeColumns()
+        self.mw_widget.statusbar.showMessage("Metadata changed successfully.", 2000)
 
     def metadata_save_bulk(self, results: dict):
         """Save multiple metadatas from a dictionary."""
-        for meta_name, meta_value in results.items():
-            if isinstance(meta_value, (int, float)):
-                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "number"])
-            elif isinstance(meta_value, (list, tuple)):
-                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "list"])
-            else:
-                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "text"])
-
-        self.mw_widget.metadata_table_view.resizeColumns()
+        self.mw_widget.prop_extra_edit_widget.metadata_save_bulk(results)
         self.mw_widget.statusbar.showMessage("Saved results as metadata.")
-
-    def metadata_delete(self):
-        """Delete a metadata point."""
-        index = self.mw_widget.metadata_table_view.currentIndex()
-        if not index.isValid():
-            return
-        name = self.metadata_table_model.rowData(index)[0]
-        self.metadata_table_model.removeRow(index.row())
-        self.mw_widget.statusbar.showMessage(f"Deleted property named '{name}'.")
 
     def iso_display_data(self):
         """Bring up widget with current isotherm data."""

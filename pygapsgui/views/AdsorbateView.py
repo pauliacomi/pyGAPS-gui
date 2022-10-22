@@ -9,12 +9,9 @@ else:
 
 from pygaps import ADSORBATE_LIST
 from pygaps import Adsorbate
-from pygapsgui.models.MetadataTableModel import MetadataTableModel
 from pygapsgui.utilities.string_match import fuzzy_match_list
 from pygapsgui.utilities.tex2svg import tex2svg
-from pygapsgui.views.MetadataTableView import MetadataTableView
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
-from pygapsgui.widgets.UtilityDialogs import error_dialog
 from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 
 
@@ -72,10 +69,6 @@ class AdsorbateView(QW.QWidget):
         self.meta_edit_widget = MetadataEditWidget()
         self.metadata_layout.addWidget(self.meta_edit_widget)
 
-        # Table view
-        self.table_view = MetadataTableView()
-        self.metadata_layout.addWidget(self.table_view)
-
     @property
     def adsorbate(self):
         return self._adsorbate
@@ -106,48 +99,14 @@ class AdsorbateView(QW.QWidget):
             backend = "No"
         self.backend_value.setText(backend)
 
-        self.table_model = MetadataTableModel(self.adsorbate)
-        self.table_view.setModel(self.table_model)
+        self.meta_edit_widget.set_model(self.adsorbate)
 
     def connect_signals(self):
         """Connect permanent signals."""
-        self.table_view.selectionModel().selectionChanged.connect(self.metadata_select)
-        self.meta_edit_widget.save_button.clicked.connect(self.metadata_save)
-        self.meta_edit_widget.delete_button.clicked.connect(self.metadata_delete)
+        self.meta_edit_widget.changed.connect(self.handle_changed)
 
-    def metadata_select(self):
-        """Handle selection of a metadata in the TableView."""
-        index = self.table_view.currentIndex()
-        if index:
-            data = self.table_model.rowData(index)
-            if data:
-                self.meta_edit_widget.display(*data)
-            else:
-                self.meta_edit_widget.clear()
-
-    def metadata_save(self):
-        """Handle saving of a metadata in the TableView."""
-        meta_name = self.meta_edit_widget.name_input.text()
-        meta_value = self.meta_edit_widget.value_input.text()
-        meta_type = self.meta_edit_widget.type_input.currentText()
-        if not meta_name:
-            return
-
-        if meta_type == "number":
-            try:
-                meta_value = float(meta_value)
-            except ValueError:
-                error_dialog("Could not convert metadata value to number.")
-                return
-
-        self.table_model.setOrInsertRow(data=[meta_name, meta_value, meta_type])
-        self.adsorbate_changed.emit(self.adsorbate.name)
-        self.table_view.resizeColumns()
-
-    def metadata_delete(self):
-        """Handle deletion of a metadata in the TableView."""
-        index = self.table_view.currentIndex()
-        self.table_model.removeRow(index.row())
+    def handle_changed(self):
+        """Handle changes in EditWidget."""
         self.adsorbate_changed.emit(self.adsorbate.name)
 
     def translate_UI(self):

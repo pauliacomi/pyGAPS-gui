@@ -1,16 +1,28 @@
+from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
+
+from pygapsgui.models.MetadataTableModel import MetadataTableModel
+from pygapsgui.views.MetadataTableView import MetadataTableView
+from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
 class MetadataEditWidget(QW.QWidget):
     """
-    A collection of widgets that set/change/delete metadata from pyGAPS classes.
+    A widget to set/change/delete metadata from pyGAPS classes.
 
-    Designed to be connected to a MetadataTableView/MetadataTableModel.
+    Implements both a MetadataTableView/MetadataTableModel pair.
     """
+
+    changed = QC.Signal()
+    metadata_table_model: MetadataTableModel = None
+    metadata_table_view: MetadataTableView = None
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.meta_types = ["text", "number", "list"]
         self.setup_UI()
+        self.connect_signals()
         self.translate_UI()
 
     def setup_UI(self):
@@ -46,6 +58,23 @@ class MetadataEditWidget(QW.QWidget):
         _layout.addWidget(self.save_button, 2, 0, 1, 2)
         _layout.addWidget(self.delete_button, 2, 2, 1, 2)
 
+        # table
+        self.metadata_table_view = MetadataTableView()
+        delegate = SciFloatDelegate()
+        self.metadata_table_view.setItemDelegate(delegate)
+        _layout.addWidget(self.metadata_table_view, 3, 0, 1, 4)
+
+    def connect_signals(self):
+        """Connect permanent signals."""
+        self.save_button.clicked.connect(self.metadata_save)
+        self.delete_button.clicked.connect(self.metadata_delete)
+
+    def set_model(self, coreclass):
+        """Connect a suitable model."""
+        self.metadata_table_model = MetadataTableModel(coreclass)
+        self.metadata_table_view.setModel(self.metadata_table_model)
+        self.metadata_table_view.selectionModel().selectionChanged.connect(self.metadata_select)
+
     def display(self, name, value, mtype):
         """Display one metadata."""
         self.name_input.setText(str(name))
@@ -57,6 +86,64 @@ class MetadataEditWidget(QW.QWidget):
         self.name_input.clear()
         self.value_input.clear()
         self.type_input.setCurrentIndex(0)
+
+    def metadata_select(self):
+        """Update display when a metadata point is selected."""
+        index = self.metadata_table_view.currentIndex()
+        if not index or not index.isValid():
+            return
+        data = self.metadata_table_model.rowData(index)
+        if data:
+            self.display(*data)
+        else:
+            self.clear()
+
+    def metadata_save(self):
+        """Save a metadata point."""
+        meta_name = self.name_input.text()
+        meta_value = self.value_input.text()
+        meta_type = self.type_input.currentText()
+        if not meta_name:
+            error_dialog("Fill property name!")
+            return
+        if not meta_value:
+            error_dialog("Fill property value!")
+            return
+
+        if meta_type == "number":
+            try:
+                meta_value = float(meta_value)
+            except ValueError:
+                error_dialog("Could not convert metadata value to number.")
+                return
+
+        self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, meta_type])
+        self.metadata_table_view.resizeColumns()
+        self.changed.emit()
+
+    def metadata_save_bulk(self, results: dict):
+        """Save multiple metadatas from a dictionary."""
+        if not results:
+            return
+
+        for meta_name, meta_value in results.items():
+            if isinstance(meta_value, (int, float)):
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "number"])
+            elif isinstance(meta_value, (list, tuple)):
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "list"])
+            else:
+                self.metadata_table_model.setOrInsertRow(data=[meta_name, meta_value, "text"])
+
+        self.metadata_table_view.resizeColumns()
+        self.changed.emit()
+
+    def metadata_delete(self):
+        """Delete a metadata point."""
+        index = self.metadata_table_view.currentIndex()
+        if not index.isValid():
+            return
+        self.metadata_table_model.removeRow(index.row())
+        self.changed.emit()
 
     def translate_UI(self):
         """Set static UI text through QT translation."""

@@ -6,7 +6,6 @@ from qtpy import QtWidgets as QW
 import pygapsgui.widgets.resources_rc
 from pygapsgui.views.IsoGraphView import IsoListGraphView
 from pygapsgui.views.IsoListView import IsoListView
-from pygapsgui.views.MetadataTableView import MetadataTableView
 from pygapsgui.widgets.IsoPropWidget import IsoPropWidget
 from pygapsgui.widgets.IsoUnitWidget import IsoUnitWidget
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
@@ -135,13 +134,6 @@ class MainWindowUI():
         # metadata edit widget
         self.prop_extra_edit_widget = MetadataEditWidget()
         self.prop_extra_layout.addWidget(self.prop_extra_edit_widget)
-
-        # metadata table
-        self.metadata_table_view = MetadataTableView()
-        delegate = SciFloatDelegate()
-        self.metadata_table_view.setItemDelegate(delegate)
-        self.metadata_table_view.setObjectName("metadata_table_view")
-        self.prop_extra_layout.addWidget(self.metadata_table_view)
 
         # bottom buttons
         self.details_button_layout = QW.QHBoxLayout()
