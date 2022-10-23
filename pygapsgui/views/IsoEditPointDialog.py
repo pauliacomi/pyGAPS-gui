@@ -75,12 +75,23 @@ class IsoEditPointWidget(QW.QWidget):
 
     def add_row(self):
         """Insert a row at current location."""
-        self.datatable_model.insertRow(self.table_view.currentIndex().row())
+        index = self.table_view.currentIndex()
+        if index.isValid():
+            row = index.row()
+        else:
+            row = self.datatable_model.rowCount()
+
+        self.datatable_model.insertRow(row)
         self.changed.emit()
 
     def del_row(self):
         """Delete current highlighted row."""
-        row = self.table_view.currentIndex().row()
+        index = self.table_view.currentIndex()
+        if index.isValid():
+            row = index.row()
+        else:
+            row = self.datatable_model.rowCount() - 1
+
         self.datatable_model.removeRow(row)
         self.table_view.selectRow(row)
         self.changed.emit()

@@ -96,19 +96,30 @@ class dfTableModel(QC.QAbstractTableModel):
                 self.headerDataChanged.emit(QC.Qt.Horizontal, section, section)
 
     def insertRows(self, row: int, count: int, parent=QC.QModelIndex()) -> bool:
-        """Convenience/fast function for row insertion"""
+        """Convenience/fast function for row insertion."""
+        if row == -1:
+            row = self.rowCount()
         self.beginInsertRows(parent, row, row + count - 1)
-        # line = pd.DataFrame(self._data.iloc[row])
-        line = pd.DataFrame([self._data.iloc[row].values],
-                            index=range(count),
-                            columns=self._data.columns)
-        self._data = pd.concat([self._data.iloc[:row], line,
-                                self._data.iloc[row:]]).reset_index(drop=True)
+        # if appending
+        if row == len(self._data):
+            line = pd.DataFrame([self._data.iloc[row - 1].values],
+                                index=range(count),
+                                columns=self._data.columns)
+            self._data = self._data.append(line, ignore_index=True)
+        # if anywhere else
+        else:
+            line = pd.DataFrame([self._data.iloc[row].values],
+                                index=range(count),
+                                columns=self._data.columns)
+            self._data = pd.concat([self._data.iloc[:row], line,
+                                    self._data.iloc[row:]]).reset_index(drop=True)
         self.endInsertRows()
         return True
 
     def removeRows(self, row: int, count: int, parent=QC.QModelIndex()) -> bool:
         """Convenience/fast function for row deletion."""
+        if self.rowCount() == 1:
+            return False
         self.beginRemoveRows(parent, row, row + count - 1)
         self._data.drop(self._data.index[row:row + count], inplace=True)
         self._data.reset_index(drop=True, inplace=True)
