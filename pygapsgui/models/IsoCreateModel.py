@@ -61,6 +61,8 @@ class IsoCreateModel():
         self.view.iso_graph.lgd_keys = ["material", "adsorbate", "temperature"]
 
         # connect signals
+        self.view.material_details.clicked.connect(self.material_detail)
+        self.view.adsorbate_details.clicked.connect(self.adsorbate_detail)
         self.view.material_input.currentTextChanged.connect(self.handle_iso_baseprops)
         self.view.adsorbate_input.editTextChanged.connect(self.handle_iso_baseprops)
         self.view.temperature_input.valueChanged.connect(self.handle_iso_baseprops)
@@ -95,6 +97,26 @@ class IsoCreateModel():
 
         if modified:
             self.update()
+
+    def material_detail(self):
+        """Bring up widget with current isotherm material details."""
+        from pygapsgui.views.MaterialView import MaterialDialog
+        dialog = MaterialDialog(
+            self.base_isotherm.material,
+            parent=self.view,
+        )
+        dialog.material_changed.connect(self.update)
+        dialog.exec()
+
+    def adsorbate_detail(self):
+        """Bring up widget with current isotherm adsorbate details."""
+        from pygapsgui.views.AdsorbateView import AdsorbateDialog
+        dialog = AdsorbateDialog(
+            self.base_isotherm.adsorbate,
+            parent=self.view,
+        )
+        dialog.adsorbate_changed.connect(self.update)
+        dialog.exec()
 
     def handle_pressure(self, mode_to, unit_to):
         """Change isotherm pressure."""

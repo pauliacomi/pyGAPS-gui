@@ -40,7 +40,9 @@ class IsoCreateDialog(QW.QDialog):
         # at the top, base properties and units
         self.prop_base_widget = IsoPropWidget()
         self.material_input = self.prop_base_widget.m_input
+        self.material_details = self.prop_base_widget.m_button
         self.adsorbate_input = self.prop_base_widget.a_input
+        self.adsorbate_details = self.prop_base_widget.a_button
         self.temperature_input = self.prop_base_widget.t_input
         self.temperature_unit = self.prop_base_widget.t_unit
         self.metadata_layout.addWidget(self.prop_base_widget)
