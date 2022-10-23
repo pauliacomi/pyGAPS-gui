@@ -13,10 +13,10 @@ if qtpy.API in (qtpy.PYQT5_API + qtpy.PYSIDE2_API):
 
 
 def exception_hook(exctype, exc, trace):
-    """Catch qtpy exceptions."""
-    # https://stackoverflow.com/questions/43039048/pyqt5-fails-with-cryptic-message
+    """Catch qtpy exceptions.
+    https://stackoverflow.com/questions/43039048/pyqt5-fails-with-cryptic-message
+    """
     import traceback
-
     trace_s = "".join(traceback.format_tb(trace))
 
     from pygapsgui.widgets.UtilityDialogs import error_detail_dialog
@@ -28,7 +28,7 @@ def exception_hook(exctype, exc, trace):
 
 # Resources
 def get_res_path(file, ftype=None):
-    """Convenience function to locate resources"""
+    """Convenience function to locate resources."""
     if ftype:
         return str(pathlib.Path(__file__).parent / 'resources' / ftype / file)
     return str(pathlib.Path(__file__).parent / 'resources' / file)
@@ -64,23 +64,11 @@ def process_cl_args():
     parsed_args, unparsed_args = parser.parse_known_args()
     return parsed_args, unparsed_args
 
-
-@QC.Slot()
-def sync_theme_with_system() -> None:
-    """Applies and syncs a custom theme."""
-    import darkdetect
-    import qdarktheme
-    theme = darkdetect.theme().lower()
-    stylesheet = qdarktheme.load_stylesheet(theme)
-    QW.QApplication.instance().setStyleSheet(stylesheet)
-
-
 def main():
     """Main app entrypoint."""
 
-    # Back up the reference to the exceptionhook
+    # Set custom exception hook
     sys._excepthook = sys.excepthook
-    # Set the exception hook to our wrapping function
     sys.excepthook = exception_hook
 
     # Process cli arguments
@@ -105,8 +93,8 @@ def main():
 
     # Resources
     splash.showMessage("Loading resources...", 40)
-    # app.paletteChanged.connect(sync_theme_with_system)
-    # sync_theme_with_system()
+    from pygapsgui.utilities.color_theme import set_theme
+    set_theme()
     icon = QG.QIcon()
     icon.addFile(get_res_path('main_icon.png'), QC.QSize(48, 48))
     icon.addFile(get_res_path('main_icon.png'), QC.QSize(100, 100))

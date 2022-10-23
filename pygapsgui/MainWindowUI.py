@@ -197,6 +197,11 @@ class MainWindowUI():
         self.menu_options = QW.QMenu(self.menubar)
         self.menu_options.setObjectName("menu_options")
         self.menubar.addAction(self.menu_options.menuAction())
+        # Submenu
+        self.menu_theme = QW.QMenu(self.menubar)
+        self.menu_theme.setObjectName("menu_theme")
+        self.menu_options.addAction(self.menu_theme.menuAction())
+
         self.menu_help = QW.QMenu(self.menubar)
         self.menu_help.setObjectName("menu_help")
         self.menubar.addAction(self.menu_help.menuAction())
@@ -283,6 +288,12 @@ class MainWindowUI():
         self.action_adsorbates.setObjectName("action_adsorbates")
         self.action_materials = QW.QAction(main_window)
         self.action_materials.setObjectName("action_materials")
+        self.action_theme_light = QW.QAction(main_window)
+        self.action_theme_light.setObjectName("action_theme_light")
+        self.action_theme_dark = QW.QAction(main_window)
+        self.action_theme_dark.setObjectName("action_theme_dark")
+        self.action_theme_auto = QW.QAction(main_window)
+        self.action_theme_auto.setObjectName("action_theme_auto")
 
         # about and example
         self.action_examples = QW.QAction(main_window)
@@ -337,6 +348,11 @@ class MainWindowUI():
             self.action_adsorbates,
             self.action_materials,
         ])
+        self.menu_theme.addActions([
+            self.action_theme_auto,
+            self.action_theme_dark,
+            self.action_theme_light,
+        ])
         self.menu_help.addAction(self.action_examples)
         self.menu_help.addAction(self.action_about)
 
@@ -365,10 +381,11 @@ class MainWindowUI():
         self.menu_file.setTitle(QW.QApplication.translate("MainWindow", "File", None, -1))
         self.menu_recent.setTitle(QW.QApplication.translate("MainWindow", "Open recent", None, -1))
         self.menu_charact.setTitle(QW.QApplication.translate("MainWindow", "Characterization", None, -1))
-        self.menu_help.setTitle(QW.QApplication.translate("MainWindow", "Help", None, -1))
         self.menu_model.setTitle(QW.QApplication.translate("MainWindow", "Model Fitting", None, -1))
         self.menu_predict.setTitle(QW.QApplication.translate("MainWindow", "Predict", None, -1))
         self.menu_options.setTitle(QW.QApplication.translate("MainWindow", "Options", None, -1))
+        self.menu_theme.setTitle(QW.QApplication.translate("MainWindow", "Colour Theme", None, -1))
+        self.menu_help.setTitle(QW.QApplication.translate("MainWindow", "Help", None, -1))
         self.action_new.setText(QW.QApplication.translate("MainWindow", "New", None, -1))
         self.action_open.setText(QW.QApplication.translate("MainWindow", "Open", None, -1))
         self.action_import.setText(QW.QApplication.translate("MainWindow", "Import", None, -1))
@@ -394,4 +411,7 @@ class MainWindowUI():
         self.action_iast_multi_lvp.setText(QW.QApplication.translate("MainWindow", "Multicomponent uptake v. pressure", None, -1))
         self.action_adsorbates.setText(QW.QApplication.translate("MainWindow", "pyGAPS Adsorbates", None, -1))
         self.action_materials.setText(QW.QApplication.translate("MainWindow", "pyGAPS Materials", None, -1))
+        self.action_theme_auto.setText(QW.QApplication.translate("MainWindow", "Auto", None, -1))
+        self.action_theme_dark.setText(QW.QApplication.translate("MainWindow", "Dark", None, -1))
+        self.action_theme_light.setText(QW.QApplication.translate("MainWindow", "Light", None, -1))
         # yapf: enable

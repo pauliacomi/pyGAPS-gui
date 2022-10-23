@@ -96,6 +96,10 @@ class MainWindow(QW.QMainWindow):
         self.ui.action_adsorbates.triggered.connect(self.adsorbate_explorer)
         self.ui.action_materials.triggered.connect(self.material_explorer)
 
+        self.ui.action_theme_auto.triggered.connect(partial(self.color_theme, "auto"))
+        self.ui.action_theme_dark.triggered.connect(partial(self.color_theme, "dark"))
+        self.ui.action_theme_light.triggered.connect(partial(self.color_theme, "light"))
+
     def load_recent_files(self):
         """Get recent files from the settings, and place them in the menu."""
         settings = QC.QSettings()
@@ -479,6 +483,13 @@ class MainWindow(QW.QMainWindow):
         from pygapsgui.views.MaterialView import MaterialListDialog
         dialog = MaterialListDialog(parent=self)
         dialog.exec()
+
+    def color_theme(self, theme):
+        """Set theme in settings."""
+        settings = QC.QSettings()
+        settings.setValue("theme", theme)
+        from pygapsgui.utilities.color_theme import set_theme
+        set_theme()
 
     ########################################################
     # About / examples

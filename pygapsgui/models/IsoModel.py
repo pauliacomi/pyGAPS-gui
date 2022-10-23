@@ -18,10 +18,8 @@ class IsoModel(QG.QStandardItem):
         # checkable
         self.setCheckable(True)
         self.setCheckState(QC.Qt.Unchecked)
-        # bg
-        self.setBackground(QG.QColor('#beaed4'))
 
     def setData(self, isotherm, *args, **kwargs):
         if isinstance(isotherm, pg.ModelIsotherm):
-            self.setBackground(QG.QColor('#7fc97f'))
+            self.setForeground(QG.QColor('#fe79c7'))
         super().setData(isotherm, *args, **kwargs)
