@@ -26,7 +26,6 @@ class IsoEditPointWidget(QW.QWidget):
     def set_datatable_model(self, datatable_model=None):
         """Create and link the datatable model."""
         self.datatable_model = IsoDataTableModel(datatable_model)
-        self.datatable_model.dataChanged.connect(self.changed)
         self.table_view.setModel(self.datatable_model)
 
     def setup_UI(self):
@@ -141,6 +140,7 @@ class IsoEditPointWidget(QW.QWidget):
                 event.accept()
             if event.key() == QC.Qt.Key_V and (event.modifiers() & QC.Qt.ControlModifier):
                 clipboard_to_table(self.table_view)
+                self.changed.emit()
                 event.accept()
             else:
                 super().keyPressEvent(event)

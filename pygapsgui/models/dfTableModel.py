@@ -8,7 +8,7 @@ class dfTableModel(QC.QAbstractTableModel):
     def __init__(self, data=None, parent=None):
         super().__init__(parent)
         if data is None:
-            data = pd.DataFrame({"pressure": [0], "loading": [0], "branch": [0]})
+            data = pd.DataFrame({"pressure": [0.0], "loading": [0.0], "branch": [0]})
         self._data = data
 
     def rowCount(self, index=QC.QModelIndex()):
@@ -35,7 +35,7 @@ class dfTableModel(QC.QAbstractTableModel):
         self.layoutChanged.emit()
 
     def data(self, index=QC.QModelIndex(), role=QC.Qt.DisplayRole):
-        """Gets data at a specific index."""
+        """Get data at a specific index."""
         if not index.isValid():
             return None
 
@@ -51,11 +51,41 @@ class dfTableModel(QC.QAbstractTableModel):
             return False
 
         if role == QC.Qt.EditRole:
+            dtype = self._data.dtypes[index.column()]
+
+            if dtype in (np.float32, np.float64):
+                value = float(value)
+            elif dtype in (np.int32, np.int64):
+                value = int(value)
+
             self._data.iloc[index.row(), index.column()] = value
             self.dataChanged.emit(index, index)
             return True
 
         return False
+
+    def setDataRange(self, index, values, role: int = QC.Qt.EditRole, append=False) -> bool:
+        """Intercept setdata to correctly set ads/des for branches"""
+        if not index.isValid():
+            return False
+
+        row0 = index.row()
+        col0 = index.column()
+        current_index = index
+
+        if append:
+            rows_needed = self.rowCount() - row0
+            if len(values) > rows_needed:
+                self.insertRows(self.rowCount(), len(values) - rows_needed)
+
+        self.blockSignals(True)
+        for i, row in enumerate(values):
+            for j, col in enumerate(row):
+                current_index = self.index(row0 + i, col0 + j)
+                self.setData(current_index, col, role)
+        self.blockSignals(False)
+        self.dataChanged.emit(index, current_index)
+        return True
 
     def setColumnData(self, col, values, role: int = QC.Qt.EditRole) -> bool:
         """Set data of a whole column."""

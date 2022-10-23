@@ -16,12 +16,8 @@ def clipboard_to_table(table):
 
     text = QW.QApplication.clipboard().text()
 
-    # TODO Slow and does not work with numbers
-    for i, row in enumerate(text.split('\n')):
-        if not row:
-            return
-        for j, col in enumerate(row.split('\t')):
-            model.setData(model.index(row0 + i, col0 + j), col)
+    data = [list(row.split('\t')) for row in text.split('\n') if row]
+    model.setDataRange(model.index(row0, col0), data, append=True)
 
 
 def table_to_clipboard(table):
