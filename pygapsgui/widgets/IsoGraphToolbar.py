@@ -5,7 +5,7 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
-from pygapsgui import get_res_path
+from pygapsgui.utilities.resources import get_resource
 
 
 class IsoGraphToolbar(NavigationToolbar):
@@ -37,7 +37,7 @@ class IsoGraphToolbar(NavigationToolbar):
         Otherwas pass it to the main function.
         """
         if name.startswith("pg"):
-            pm = QG.QPixmap(get_res_path(name[3:], "icons"))
+            pm = QG.QPixmap(get_resource("icons/" + name[3:]))
             _setDevicePixelRatio(pm, _devicePixelRatioF(self))
             if self.palette().color(self.backgroundRole()).value() < 128:
                 icon_color = self.palette().color(self.foregroundRole())

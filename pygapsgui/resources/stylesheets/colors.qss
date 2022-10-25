@@ -1,0 +1,14 @@
+:root{
+--primary: rgb(40, 44, 52);
+--opposing :#e4e7eb;
+--disabled-bg :rgb(114, 123, 130);
+--grey1 :rgb(33, 37, 43);
+--grey2 : rgb(75, 76, 83);
+--highlight1 : #aa55ff;
+--highlight1 : #8ab4f7;
+--highlight2 : rgb(127, 167, 229);
+--highlight3 : rgb(109, 139, 190);
+--highlight4 : rgb(133, 160, 206);
+--highlight4 : #341f48;
+--highlight4 : #44464d;
+}

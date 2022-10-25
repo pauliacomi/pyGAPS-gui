@@ -26,14 +26,6 @@ def exception_hook(exctype, exc, trace):
     sys._excepthook(exctype, exc, trace)
 
 
-# Resources
-def get_res_path(file, ftype=None):
-    """Convenience function to locate resources."""
-    if ftype:
-        return str(pathlib.Path(__file__).parent / 'resources' / ftype / file)
-    return str(pathlib.Path(__file__).parent / 'resources' / file)
-
-
 def process_cl_args():
     """Process known arguments."""
     import argparse
@@ -63,6 +55,7 @@ def process_cl_args():
 
     parsed_args, unparsed_args = parser.parse_known_args()
     return parsed_args, unparsed_args
+
 
 def main():
     """Main app entrypoint."""
@@ -95,9 +88,10 @@ def main():
     splash.showMessage("Loading resources...", 40)
     from pygapsgui.utilities.color_theme import set_theme
     set_theme()
+    from pygapsgui.utilities.resources import get_resource
     icon = QG.QIcon()
-    icon.addFile(get_res_path('main_icon.png'), QC.QSize(48, 48))
-    icon.addFile(get_res_path('main_icon.png'), QC.QSize(100, 100))
+    icon.addFile(get_resource('main_icon.png'), QC.QSize(48, 48))
+    icon.addFile(get_resource('main_icon.png'), QC.QSize(100, 100))
     app.setWindowIcon(icon)
 
     # Init pygaps
