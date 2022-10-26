@@ -50,8 +50,8 @@ COLORS_LIGHT = {
     "dark": "#4d5157",
     "light": "#f8f9fa",
     "primary": "#aa55ff",
-    "primary-lighter": "#aa55ff",
-    "primary-darker": "#aa55ff",
+    "primary-lighter": "#EF85FF",
+    "primary-darker": "#8F29A6",
     "secondary": "#0081db",
     "secondary-lighter": "rgb(133, 160, 206)",
     "secondary-darker": "rgb(109, 139, 190)",
@@ -61,19 +61,19 @@ COLORS_LIGHT = {
     "disabled-bg": "#dadce0",
     "disabled-fg": "#babdc2",
 }
-#
+
+COLORS = COLORS_DARK
 
 
-def _replace_colors(match: re.Match, color_dict: dict) -> str:
+def _replace_colors(match: re.Match) -> str:
     color_type = match.group().replace("$color{", "").replace("}", "")
-    return color_dict[color_type]
+    return COLORS[color_type]
 
 
-def _parse_colors(stylesheet: str, theme: str) -> "dict[str, str]":
+def _parse_colors(stylesheet: str) -> "dict[str, str]":
     """Parse `$color{...}` placeholder in template stylesheet."""
     matches = _PATTERN_COLORS.finditer(stylesheet)
-    color_dict = COLORS_DARK if theme == "dark" else COLORS_LIGHT
-    return {match.group(): _replace_colors(match, color_dict) for match in matches}
+    return {match.group(): _replace_colors(match) for match in matches}
 
 
 def _replace_rounded(match: re.Match) -> str:
@@ -144,12 +144,14 @@ def _parse_env_patch(stylesheet: str) -> "dict[str, str]":
 @QC.Slot()
 def theme_apply(theme) -> None:
     """Apply a custom theme."""
-
+    global COLORS
     qss = None
     if theme == 'light':
         qss = "stylesheets/light.qss"
+        COLORS = COLORS_LIGHT
     elif theme == 'dark':
         qss = "stylesheets/dark.qss"
+        COLORS = COLORS_DARK
     else:
         raise ValueError("Theme can only be light/dark.")
 
@@ -157,7 +159,7 @@ def theme_apply(theme) -> None:
         stylesheet = f.read()
 
     # Highlights
-    replacements_color = _parse_colors(stylesheet, theme)
+    replacements_color = _parse_colors(stylesheet)
     stylesheet = _multi_replace(stylesheet, replacements_color)
     # Radius
     replacements_radius = _parse_radius(stylesheet, "rounded")
@@ -168,69 +170,6 @@ def theme_apply(theme) -> None:
     stylesheet = _multi_replace(stylesheet, replacements_env)
     # Set
     QW.QApplication.instance().setStyleSheet(stylesheet)
-
-    # TODO complete palette
-    # import qdarktheme
-    # palette = qdarktheme.load_palette(theme.lower())
-
-    palette = QG.QPalette()
-    # base
-    palette.setColor(QG.QPalette.ColorRole.WindowText, QG.QColor("#4d5157"))
-    palette.setColor(QG.QPalette.ColorRole.Button, QG.QColor("#f8f9fa"))
-    palette.setColor(QG.QPalette.ColorRole.Text, QG.QColor("#4d5157"))
-    palette.setColor(QG.QPalette.ColorRole.ButtonText, QG.QColor("#0081db"))
-    palette.setColor(QG.QPalette.ColorRole.Base, QG.QColor("#f8f9fa"))
-    palette.setColor(QG.QPalette.ColorRole.Window, QG.QColor("#f8f9fa"))
-    palette.setColor(QG.QPalette.ColorRole.Highlight, QG.QColor("#0081db"))
-    palette.setColor(QG.QPalette.ColorRole.HighlightedText, QG.QColor("#f8f9fa"))
-    palette.setColor(QG.QPalette.ColorRole.Link, QG.QColor("#f8f9fa"))
-    palette.setColor(QG.QPalette.ColorRole.AlternateBase, QG.QColor("#e9ecef"))
-    palette.setColor(QG.QPalette.ColorRole.ToolTipBase, QG.QColor("#ffffff"))
-    palette.setColor(QG.QPalette.ColorRole.ToolTipText, QG.QColor("#4d5157"))
-    palette.setColor(QG.QPalette.ColorRole.LinkVisited, QG.QColor("#660098"))
-    palette.setColor(QG.QPalette.ColorRole.ToolTipText, QG.QColor("#ffffff"))
-    palette.setColor(QG.QPalette.ColorRole.ToolTipBase, QG.QColor("#4d5157"))
-    if hasattr(QG.QPalette.ColorRole, "Foreground"):
-        palette.setColor(QG.QPalette.ColorRole.Foreground, QG.QColor("#4d5157"))  # type: ignore
-    if hasattr(QG.QPalette.ColorRole, "PlaceholderText"):
-        palette.setColor(QG.QPalette.ColorRole.PlaceholderText, QG.QColor("#696a6c"))
-
-    palette.setColor(QG.QPalette.ColorRole.Light, QG.QColor("#dadce0"))
-    palette.setColor(QG.QPalette.ColorRole.Midlight, QG.QColor("#dadce0"))
-    palette.setColor(QG.QPalette.ColorRole.Dark, QG.QColor("#4d5157"))
-    palette.setColor(QG.QPalette.ColorRole.Mid, QG.QColor("#dadce0"))
-    palette.setColor(QG.QPalette.ColorRole.Shadow, QG.QColor("#dadce0"))
-
-    # disabled
-    palette.setColor(
-        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.WindowText, QG.QColor("#babdc2")
-    )
-    palette.setColor(
-        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.Text, QG.QColor("#babdc2")
-    )
-    palette.setColor(
-        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.ButtonText, QG.QColor("#dadce0")
-    )
-    palette.setColor(
-        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.Highlight, QG.QColor("#dadce0")
-    )
-    palette.setColor(
-        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.HighlightedText,
-        QG.QColor("#babdc2")
-    )
-    palette.setColor(
-        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.Link, QG.QColor("#babdc2")
-    )
-    palette.setColor(
-        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.LinkVisited, QG.QColor("#babdc2")
-    )
-
-    # inactive
-    palette.setColor(
-        QG.QPalette.ColorGroup.Inactive, QG.QPalette.ColorRole.Highlight, QG.QColor("#e4e6f2")
-    )
-
-    QW.QApplication.instance().setPalette(palette)
 
     # TODO add matplotlib theme change support
     # import matplotlib.pyplot as plt

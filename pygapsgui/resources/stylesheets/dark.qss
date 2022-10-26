@@ -138,11 +138,12 @@ QMenuBar::item:pressed {
     padding-bottom: 0;
 }
 QToolBar {
-    background: $color{neutral-grey};
+    background: $color{neutral-light};
     padding: 1px;
     font-weight: bold;
     spacing: 2px;
     margin: 1px;
+    border-radius: $radius{4px};
 }
 QToolBar::handle:horizontal {
     width: 20px;
@@ -165,17 +166,17 @@ QToolBar::separator:vertical {
 }
 QToolBar > QToolButton {
     background: transparent;
-    padding: 3px;
+    padding: 1px;
     border-radius: $radius{4px};
 }
 QToolBar > QToolButton:hover,
 QToolBar > QToolButton::menu-button:hover {
-    background: $color{neutral-grey};
+    background: $color{secondary-lighter};
 }
 QToolBar > QToolButton:pressed,
 QToolBar > QToolButton::menu-button:pressed,
 QToolBar > QToolButton:checked {
-    background: $color{neutral-grey};
+    background: $color{secondary-lighter};
 }
 QToolBar > QToolButton#qt_toolbar_ext_button {
     image: url(${path}/dark/svg/double_arrow__icon-foreground.svg);
@@ -351,8 +352,8 @@ QPushButton:default {
     padding: 5px 9px;
 }
 QPushButton:default {
-    color: $color{dark};
-    background: $color{primary};
+    color: $color{light};
+    background: $color{primary-darker};
 }
 QPushButton:hover,
 QPushButton:flat:hover {
@@ -369,10 +370,11 @@ QPushButton:flat:checked {
     background: rgba(46.000, 70.000, 94.000, 0.733);
 }
 QPushButton:default:hover {
-    background: $color{secondary};
+    color: $color{light};
+    background: $color{primary};
 }
 QPushButton:default:pressed {
-    background: $color{secondary-darker};
+    background: $color{secondary-lighter};
 }
 QPushButton:default:disabled {
     background: $color{disabled-fg};

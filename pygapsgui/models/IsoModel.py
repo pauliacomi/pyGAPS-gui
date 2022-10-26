@@ -2,6 +2,7 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 
 import pygaps as pg
+from pygapsgui.utilities.color_theme import COLORS
 
 
 class IsoModel(QG.QStandardItem):
@@ -21,5 +22,5 @@ class IsoModel(QG.QStandardItem):
 
     def setData(self, isotherm, *args, **kwargs):
         if isinstance(isotherm, pg.ModelIsotherm):
-            self.setForeground(QG.QColor('#fe79c7'))
+            self.setForeground(QG.QColor(COLORS['primary-lighter']))
         super().setData(isotherm, *args, **kwargs)

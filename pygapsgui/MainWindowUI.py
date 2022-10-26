@@ -200,7 +200,6 @@ class MainWindowUI():
         # Submenu
         self.menu_theme = QW.QMenu(self.menubar)
         self.menu_theme.setObjectName("menu_theme")
-        self.menu_options.addAction(self.menu_theme.menuAction())
 
         self.menu_help = QW.QMenu(self.menubar)
         self.menu_help.setObjectName("menu_help")
@@ -347,6 +346,7 @@ class MainWindowUI():
         self.menu_options.addActions([
             self.action_adsorbates,
             self.action_materials,
+            self.menu_theme.menuAction(),
         ])
         self.menu_theme.addActions([
             self.action_theme_auto,
