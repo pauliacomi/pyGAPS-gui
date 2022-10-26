@@ -30,15 +30,15 @@ def _compare_v(v1: str, operator: str, v2: str) -> bool:
     return OPERATORS[operator](v1_list, v2_list)
 
 
-COLORS = {
+COLORS_DARK = {
     "dark": "rgb(40, 44, 52)",
     "light": "#e4e7eb",
-    "primary": "#aa55ff",
-    "primary-lighter": "#aa55ff",
-    "primary-darker": "#aa55ff",
-    "secondary": "rgb(127, 167, 229)",
-    "secondary-lighter": "rgb(133, 160, 206)",
-    "secondary-darker": "rgb(109, 139, 190)",
+    "primary": "#F954FF",
+    "primary-lighter": "#EF85FF",
+    "primary-darker": "#8F29A6",
+    "secondary": "#5a6496",
+    "secondary-lighter": "#959EC9",
+    "secondary-darker": "#4D5382",
     "neutral-dark": "rgb(33, 37, 43)",
     "neutral-grey": "rgb(75, 76, 83)",
     "neutral-light": "rgb(114, 123, 130)",
@@ -46,16 +46,34 @@ COLORS = {
     "disabled-fg": "#53575b",
 }
 
+COLORS_LIGHT = {
+    "dark": "#4d5157",
+    "light": "#f8f9fa",
+    "primary": "#aa55ff",
+    "primary-lighter": "#aa55ff",
+    "primary-darker": "#aa55ff",
+    "secondary": "#0081db",
+    "secondary-lighter": "rgb(133, 160, 206)",
+    "secondary-darker": "rgb(109, 139, 190)",
+    "neutral-dark": "#777b84",
+    "neutral-grey": "#c4c5c6",
+    "neutral-light": "#dadce0",
+    "disabled-bg": "#dadce0",
+    "disabled-fg": "#babdc2",
+}
+#
 
-def _replace_colors(match: re.Match) -> str:
+
+def _replace_colors(match: re.Match, color_dict: dict) -> str:
     color_type = match.group().replace("$color{", "").replace("}", "")
-    return COLORS[color_type]
+    return color_dict[color_type]
 
 
-def _parse_colors(stylesheet: str) -> "dict[str, str]":
+def _parse_colors(stylesheet: str, theme: str) -> "dict[str, str]":
     """Parse `$color{...}` placeholder in template stylesheet."""
     matches = _PATTERN_COLORS.finditer(stylesheet)
-    return {match.group(): _replace_colors(match) for match in matches}
+    color_dict = COLORS_DARK if theme == "dark" else COLORS_LIGHT
+    return {match.group(): _replace_colors(match, color_dict) for match in matches}
 
 
 def _replace_rounded(match: re.Match) -> str:
@@ -128,9 +146,9 @@ def theme_apply(theme) -> None:
     """Apply a custom theme."""
 
     qss = None
-    if theme.lower() == 'light':
+    if theme == 'light':
         qss = "stylesheets/light.qss"
-    elif theme.lower() == 'dark':
+    elif theme == 'dark':
         qss = "stylesheets/dark.qss"
     else:
         raise ValueError("Theme can only be light/dark.")
@@ -139,7 +157,7 @@ def theme_apply(theme) -> None:
         stylesheet = f.read()
 
     # Highlights
-    replacements_color = _parse_colors(stylesheet)
+    replacements_color = _parse_colors(stylesheet, theme)
     stylesheet = _multi_replace(stylesheet, replacements_color)
     # Radius
     replacements_radius = _parse_radius(stylesheet, "rounded")
@@ -202,7 +220,7 @@ def set_theme():
 
     if theme_setting == "auto":
         import darkdetect
-        theme_apply(darkdetect.theme())
+        theme_apply(darkdetect.theme().lower())
         theme_listener(theme_callback)
     else:
         theme_apply(theme_setting)

@@ -13,7 +13,7 @@ QToolBar * {
 QWidget {
     background: $color{dark};
     color: $color{light};
-    selection-background-color: $color{primary};
+    selection-background-color: $color{secondary-lighter};
     selection-color: $color{dark};
 }
 QWidget:disabled {
@@ -170,12 +170,12 @@ QToolBar > QToolButton {
 }
 QToolBar > QToolButton:hover,
 QToolBar > QToolButton::menu-button:hover {
-    background: #44464a;
+    background: $color{neutral-grey};
 }
 QToolBar > QToolButton:pressed,
 QToolBar > QToolButton::menu-button:pressed,
 QToolBar > QToolButton:checked {
-    background: #4f5054;
+    background: $color{neutral-grey};
 }
 QToolBar > QToolButton#qt_toolbar_ext_button {
     image: url(${path}/dark/svg/double_arrow__icon-foreground.svg);
@@ -191,6 +191,7 @@ QMenu {
     background: $color{neutral-dark};
     padding: 8px 0;
     border: 1px solid $color{neutral-grey};
+    border-radius: $radius{4px};
 }
 QMenu::separator {
     margin: 4px 0;
@@ -201,7 +202,7 @@ QMenu::item {
     padding: 4px 28px;
 }
 QMenu::item:selected {
-    background: $color{secondary-lighter};
+    background: $color{secondary};
 }
 QMenu::icon {
     padding-left: 10px;
@@ -232,17 +233,17 @@ QScrollBar:vertical {
     $env_patch{"os": "Darwin", "value": "width: 7px;"};
 }
 QScrollBar::handle {
-    background: rgba(84.000, 86.000, 86.000, 0.737);
+    background: $color{secondary};
     border-radius: $radius{3px};
 }
 QScrollBar::handle:hover {
-    background: rgba(114.000, 115.000, 115.000, 0.827);
+    background: $color{secondary-darker};
 }
 QScrollBar::handle:pressed {
-    background: rgba(143.000, 145.000, 145.000, 0.933);
+    background: $color{primary};
 }
 QScrollBar::handle:disabled {
-    background-color: #3b3e43;
+    background-color: $color{neutral-dark};
 }
 QScrollBar::handle:horizontal {
     min-width: 8px;
@@ -496,7 +497,7 @@ QSlider::handle:disabled {
     background: $color{disabled-fg};
 }
 QSlider::add-page {
-    background: $color{secondary};
+    background: $color{secondary-lighter};
 }
 QSlider::handle:hover {
     background: $color{secondary};
@@ -754,7 +755,7 @@ QTextEdit:selected,
 QPlainTextEdit:focus,
 QPlainTextEdit:selected {
     border: 1px solid $color{primary};
-    selection-background-color: #12507b;
+    selection-background-color: $color{secondary-darker};
 }
 QTextEdit:!focus,
 QPlainTextEdit:!focus {
@@ -778,7 +779,7 @@ QTreeView::branch:selected:!active {
 }
 QAbstractItemView::item:selected,
 QTreeView::branch:selected {
-    background: $color{secondary-lighter};
+    background: $color{secondary-darker};
     color: $color{light};
 }
 QAbstractItemView::item:!selected:hover,
