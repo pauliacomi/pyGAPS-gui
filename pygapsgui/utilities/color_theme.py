@@ -170,8 +170,65 @@ def theme_apply(theme) -> None:
     QW.QApplication.instance().setStyleSheet(stylesheet)
 
     # TODO complete palette
-    import qdarktheme
-    palette = qdarktheme.load_palette(theme.lower())
+    # import qdarktheme
+    # palette = qdarktheme.load_palette(theme.lower())
+
+    palette = QG.QPalette()
+    # base
+    palette.setColor(QG.QPalette.ColorRole.WindowText, QG.QColor("#4d5157"))
+    palette.setColor(QG.QPalette.ColorRole.Button, QG.QColor("#f8f9fa"))
+    palette.setColor(QG.QPalette.ColorRole.Text, QG.QColor("#4d5157"))
+    palette.setColor(QG.QPalette.ColorRole.ButtonText, QG.QColor("#0081db"))
+    palette.setColor(QG.QPalette.ColorRole.Base, QG.QColor("#f8f9fa"))
+    palette.setColor(QG.QPalette.ColorRole.Window, QG.QColor("#f8f9fa"))
+    palette.setColor(QG.QPalette.ColorRole.Highlight, QG.QColor("#0081db"))
+    palette.setColor(QG.QPalette.ColorRole.HighlightedText, QG.QColor("#f8f9fa"))
+    palette.setColor(QG.QPalette.ColorRole.Link, QG.QColor("#f8f9fa"))
+    palette.setColor(QG.QPalette.ColorRole.AlternateBase, QG.QColor("#e9ecef"))
+    palette.setColor(QG.QPalette.ColorRole.ToolTipBase, QG.QColor("#ffffff"))
+    palette.setColor(QG.QPalette.ColorRole.ToolTipText, QG.QColor("#4d5157"))
+    palette.setColor(QG.QPalette.ColorRole.LinkVisited, QG.QColor("#660098"))
+    palette.setColor(QG.QPalette.ColorRole.ToolTipText, QG.QColor("#ffffff"))
+    palette.setColor(QG.QPalette.ColorRole.ToolTipBase, QG.QColor("#4d5157"))
+    if hasattr(QG.QPalette.ColorRole, "Foreground"):
+        palette.setColor(QG.QPalette.ColorRole.Foreground, QG.QColor("#4d5157"))  # type: ignore
+    if hasattr(QG.QPalette.ColorRole, "PlaceholderText"):
+        palette.setColor(QG.QPalette.ColorRole.PlaceholderText, QG.QColor("#696a6c"))
+
+    palette.setColor(QG.QPalette.ColorRole.Light, QG.QColor("#dadce0"))
+    palette.setColor(QG.QPalette.ColorRole.Midlight, QG.QColor("#dadce0"))
+    palette.setColor(QG.QPalette.ColorRole.Dark, QG.QColor("#4d5157"))
+    palette.setColor(QG.QPalette.ColorRole.Mid, QG.QColor("#dadce0"))
+    palette.setColor(QG.QPalette.ColorRole.Shadow, QG.QColor("#dadce0"))
+
+    # disabled
+    palette.setColor(
+        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.WindowText, QG.QColor("#babdc2")
+    )
+    palette.setColor(
+        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.Text, QG.QColor("#babdc2")
+    )
+    palette.setColor(
+        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.ButtonText, QG.QColor("#dadce0")
+    )
+    palette.setColor(
+        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.Highlight, QG.QColor("#dadce0")
+    )
+    palette.setColor(
+        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.HighlightedText,
+        QG.QColor("#babdc2")
+    )
+    palette.setColor(
+        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.Link, QG.QColor("#babdc2")
+    )
+    palette.setColor(
+        QG.QPalette.ColorGroup.Disabled, QG.QPalette.ColorRole.LinkVisited, QG.QColor("#babdc2")
+    )
+
+    # inactive
+    palette.setColor(
+        QG.QPalette.ColorGroup.Inactive, QG.QPalette.ColorRole.Highlight, QG.QColor("#e4e6f2")
+    )
 
     QW.QApplication.instance().setPalette(palette)
 
