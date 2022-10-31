@@ -31,7 +31,7 @@ def _compare_v(v1: str, operator: str, v2: str) -> bool:
 
 
 COLORS_DARK = {
-    "dark": "rgb(40, 44, 52)",
+    "dark": "#282c34",
     "light": "#e4e7eb",
     "primary": "#F954FF",
     "primary-lighter": "#EF85FF",
@@ -39,9 +39,9 @@ COLORS_DARK = {
     "secondary": "#5a6496",
     "secondary-lighter": "#959EC9",
     "secondary-darker": "#4D5382",
-    "neutral-dark": "rgb(33, 37, 43)",
-    "neutral-grey": "rgb(75, 76, 83)",
-    "neutral-light": "rgb(114, 123, 130)",
+    "neutral-dark": "#21252b",
+    "neutral-grey": "#4b4c53",
+    "neutral-light": "#727b82",
     "disabled-bg": "#697177",
     "disabled-fg": "#53575b",
 }
@@ -175,6 +175,10 @@ def theme_apply(theme) -> None:
     import matplotlib.pyplot as plt
     if theme == "dark":
         plt.style.use('dark_background')
+        plt.rcParams.update({
+            "figure.facecolor": COLORS["dark"],
+            "axes.facecolor": COLORS["neutral-grey"],
+        })
     elif theme == "light":
         plt.style.use('default')
     # TODO finalize changing mpl theme in main iso graph
