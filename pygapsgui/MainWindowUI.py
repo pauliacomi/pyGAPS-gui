@@ -9,7 +9,6 @@ from pygapsgui.views.IsoListView import IsoListView
 from pygapsgui.widgets.IsoPropWidget import IsoPropWidget
 from pygapsgui.widgets.IsoUnitWidget import IsoUnitWidget
 from pygapsgui.widgets.MetadataEditWidget import MetadataEditWidget
-from pygapsgui.widgets.SciDoubleSpinbox import SciFloatDelegate
 
 
 class MainWindowUI():
