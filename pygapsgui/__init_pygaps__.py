@@ -1,5 +1,4 @@
-def init_pygaps():
-    import pygaps
+def init_matplotlib():
     # Tweak pyGAPS graph settings for a GUI
     from pygaps.graphing.mpl_styles import BASE_STYLE
     from pygaps.graphing.mpl_styles import ISO_STYLE
@@ -11,3 +10,8 @@ def init_pygaps():
         'lines.markersize': 6,
         'legend.fontsize': 7,
     })
+
+
+def init_pygaps():
+    import pygaps
+    init_matplotlib()

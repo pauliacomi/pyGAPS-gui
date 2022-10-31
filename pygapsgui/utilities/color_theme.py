@@ -171,12 +171,13 @@ def theme_apply(theme) -> None:
     # Set
     QW.QApplication.instance().setStyleSheet(stylesheet)
 
+    # Matplotlib theme
+    import matplotlib.pyplot as plt
+    if theme == "dark":
+        plt.style.use('dark_background')
+    elif theme == "light":
+        plt.style.use('default')
     # TODO add matplotlib theme change support
-    # import matplotlib.pyplot as plt
-    # if theme == "dark":
-    #     plt.style.use('dark_background')
-    # elif theme == "light":
-    #     plt.style.use('default')
 
 
 def theme_callback(theme) -> None:
