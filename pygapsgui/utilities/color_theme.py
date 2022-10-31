@@ -166,7 +166,7 @@ def theme_apply(theme) -> None:
     stylesheet = _multi_replace(stylesheet, replacements_radius)
     # Env
     replacements_env = _parse_env_patch(stylesheet)
-    replacements_env["${path}"] = _RESOURCES_BASE_DIR  # TODO remove all refs here
+    replacements_env["${path}"] = _RESOURCES_BASE_DIR
     stylesheet = _multi_replace(stylesheet, replacements_env)
     # Set
     QW.QApplication.instance().setStyleSheet(stylesheet)
@@ -177,7 +177,7 @@ def theme_apply(theme) -> None:
         plt.style.use('dark_background')
     elif theme == "light":
         plt.style.use('default')
-    # TODO add matplotlib theme change support
+    # TODO finalize changing mpl theme in main iso graph
 
 
 def theme_callback(theme) -> None:
