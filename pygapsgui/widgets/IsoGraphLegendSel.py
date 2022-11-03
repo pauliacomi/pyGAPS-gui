@@ -1,27 +1,37 @@
 from qtpy import QtCore as QC
+from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
+
+from pygapsgui.widgets.UtilityWidgets import MovableListWidget
 
 
 class IsoGraphLegendSel(QW.QDialog):
     """Dialog that allows a selection of what isotherm data will be plotted on the x/y1/y2 axes."""
 
-    changed = False
+    changed: bool = False
+    default: "list[str]" = [
+        "material",
+        "adsorbate",
+        "temperature",
+        "branch",
+        "key",
+    ]  # do not modify
+    available: "list[str]" = None
 
-    def __init__(self, current, available, *args, **kwargs) -> None:
+    def __init__(self, current, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        self.current = current if current else []
-        self.available = available
+        self.current = current if current else self.default.copy()
 
-        self.setup_UI()
         self.setupData()
+        self.setup_UI()
         self.connect_signals()
 
     def setup_UI(self):
         """Create and set-up static UI elements."""
         self.data_layout = QW.QFormLayout(self)
-        self.list_options = QW.QListWidget()
-        # self.list_options.setDragDropMode(QW.QAbstractItemView.InternalMove) # TODO drag and drop to arrange?
+        self.list_widget = MovableListWidget()
+        self.list_widget.label.setText("Metadata:")
         self.top_label = QW.QLabel("Select which keys are part of the legend.")
 
         for text in self.available:
@@ -31,10 +41,10 @@ class IsoGraphLegendSel(QW.QDialog):
                 item.setCheckState(QC.Qt.Checked)
             else:
                 item.setCheckState(QC.Qt.Unchecked)
-            self.list_options.addItem(item)
+            self.list_widget.list.addItem(item)
 
         self.data_layout.addWidget(self.top_label)
-        self.data_layout.addWidget(self.list_options)
+        self.data_layout.addWidget(self.list_widget)
 
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
@@ -43,7 +53,8 @@ class IsoGraphLegendSel(QW.QDialog):
         self.data_layout.addWidget(self.button_box)
 
     def setupData(self):
-        pass
+        """Refresh or select available keys."""
+        self.available = self.current + [key for key in self.default if key not in self.current]
 
     def connect_signals(self):
         """Connect permanent signals."""
@@ -51,7 +62,8 @@ class IsoGraphLegendSel(QW.QDialog):
         self.button_box.rejected.connect(self.reject)
 
     def get_checked(self):
-        lw = self.list_options
+        """Get a list of all list checked items."""
+        lw = self.list_widget.list
         checked = [
             lw.item(x).text() for x in range(lw.count()) if lw.item(x).checkState() is QC.Qt.Checked
         ]

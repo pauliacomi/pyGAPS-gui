@@ -219,3 +219,91 @@ class HeightHeaderView(QW.QHeaderView):
         metrics = QG.QFontMetrics(self.fontMetrics())
         rect = metrics.boundingRect(QC.QRect(), alignment, text)
         return rect.size()
+
+
+class MovableListWidget(QW.QWidget):
+    """Widget containing a QListWidget with item moving/ordering functionality."""
+
+    UP = -1
+    DOWN = 1
+
+    item_added = QC.Signal(str)
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.setup_UI()
+
+    def setup_UI(self):
+        self.list = QW.QListWidget()
+        self.list.setDragDropMode(QW.QAbstractItemView.InternalMove)
+
+        self.button_up = QW.QPushButton("▲")
+        self.button_up.clicked.connect(self.move_item_up)
+        self.button_up.setFocusPolicy(QC.Qt.NoFocus)
+        self.button_down = QW.QPushButton("▼")
+        self.button_down.clicked.connect(self.move_item_down)
+        self.button_down.setFocusPolicy(QC.Qt.NoFocus)
+
+        self.label = QW.QLabel()
+        self.edit = QW.QLineEdit()
+        self.edit.installEventFilter(self)
+        self.button_add = QW.QPushButton("+")
+        self.button_add.clicked.connect(self.add_item)
+        self.button_del = QW.QPushButton("-")
+        self.button_del.clicked.connect(self.delete_item)
+
+        _layout = QW.QVBoxLayout(self)
+        _layout.addWidget(self.list)
+        _layout_buttons = QW.QHBoxLayout()
+        _layout_buttons.addWidget(self.button_up)
+        _layout_buttons.addWidget(self.button_down)
+        _layout.addLayout(_layout_buttons)
+        _layout_add = QW.QHBoxLayout()
+        _layout_add.addWidget(self.label)
+        _layout_add.addWidget(self.edit)
+        _layout_add.addWidget(self.button_add)
+        _layout_add.addWidget(self.button_del)
+        _layout.addLayout(_layout_add)
+
+    def eventFilter(self, source, event):
+        """Handle enter on editbox."""
+        if (event.type() == QC.QEvent.KeyPress and source is self.edit):
+            keyEvent = QG.QKeyEvent(event)
+            if keyEvent.key() == QC.Qt.Key_Enter or keyEvent.key() == QC.Qt.Key_Return:
+                self.add_item()
+                return True
+        return super().eventFilter(source, event)
+
+    def move_item(self, direction):
+        """Move current item."""
+        current_row = self.list.currentRow()
+        current_item = self.list.takeItem(current_row)
+        self.list.insertItem(current_row + direction, current_item)
+        if self.list.item(current_row + direction):
+            self.list.setCurrentRow(current_row + direction)
+        else:
+            self.list.setCurrentRow(current_row)
+        self.list.setFocus()
+
+    def move_item_up(self):
+        """Move current up."""
+        self.move_item(self.UP)
+
+    def move_item_down(self):
+        """Move current down."""
+        self.move_item(self.DOWN)
+
+    def add_item(self):
+        """Adding a value."""
+        item = QW.QListWidgetItem(self.edit.text())
+        item.setFlags(item.flags() | QC.Qt.ItemIsUserCheckable)
+        item.setCheckState(QC.Qt.Checked)
+        self.list.addItem(item)
+        self.edit.clear()
+
+    def delete_item(self):
+        """Delete current item."""
+        current_row = self.list.currentRow()
+        current_item = self.list.takeItem(current_row)
+        del current_item
