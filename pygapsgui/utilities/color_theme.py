@@ -205,8 +205,12 @@ def theme_listener(callback: typing.Callable[[str], None]) -> None:
     import threading
     import darkdetect
 
-    THEME_DAEMON = threading.Thread(target=darkdetect.listener, args=(callback, ))
-    THEME_DAEMON.daemon = True
+    THEME_DAEMON = threading.Thread(
+        name='ThemeListener',
+        target=darkdetect.listener,
+        args=(callback, ),
+        daemon=True,
+    )
     THEME_DAEMON.start()
 
 
