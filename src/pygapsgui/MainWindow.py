@@ -505,9 +505,8 @@ class MainWindow(QW.QMainWindow):
             qm.Yes | qm.No,
         )
         if ret == qm.Yes:
-            import pygapsgui.resources.sample_data as sd
-            folder = pathlib.Path(sd.__file__).parent
-            filepaths = tuple(folder.glob("*.json"))
+            from pygapsgui.utilities.resources import get_resource_content
+            filepaths = get_resource_content("sample_data", "*.json")
             self.open_iso(filepaths)
 
     def about(self):
