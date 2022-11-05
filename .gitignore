@@ -124,7 +124,7 @@ Dockerfile
 entrypoint-*
 
 # Versioning scm
-scr/pygapsgui/_version.py
+src/pygapsgui/_version.py
 
 # local tools
 toolchain
