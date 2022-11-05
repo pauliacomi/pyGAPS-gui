@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 # versioning: setuptools_scm
 [tool.setuptools_scm]
-write_to = "pygapsgui/_version.py"
+write_to = "src/pygapsgui/_version.py"
 local_scheme = 'dirty-tag'
 fallback_version = '0.2.0'
 
