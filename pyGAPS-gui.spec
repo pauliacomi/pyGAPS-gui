@@ -1,13 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
+# This file tells pyinstaller how to collect the program
 
 import pathlib
 from sys import platform
-
-folder = pathlib.Path.cwd()
-
 from importlib.metadata import version, PackageNotFoundError
 
+# we need to deterimine the versions of the two components (pygaps and pygapsgui)
+# this will allow us to set executable title appropriately
+
 import pygaps
+
 pgversion = version("pygaps")
 
 try:
@@ -18,30 +20,9 @@ except PackageNotFoundError:
 
 pygaps_dir = pathlib.Path(pygaps.__file__).parent
 
-extra_datas = [
-    ("LICENSE", "."),
-    ("LICENSE.rtf", "."),
-    ("pygapsgui/resources", "pygapsgui/resources"),
-    (str(pygaps_dir / "data"), "pygaps/data"),
-]
-
-# Modules that should not be in the distribution
-extra_excludes = [
-    # installed in path
-    'pyinstaller',
-    'setuptools'
-]
-
-# DLLs that should not be in the distribution
-extra_exclude_dll = [
-    # 'Qt6dbus.dll',
-    # 'Qt6Network.dll',
-    # 'Qt6Qml.dll',
-    # 'Qt6Quick.dll',
-    # 'Qt6WebSockets.dll',
-]
-
-# Modules that SHOULD be in the distribution but may not get picked up
+#
+# Pyinstaller may miss some imports.
+# Here we manually list some that may get lost.
 extra_imports = [
     'numpy',
     'pandas',
@@ -53,21 +34,74 @@ extra_imports = [
 extra_models = [f"pygaps.modelling.{m.stem}" for m in (pygaps_dir / "modelling").glob("*.py")]
 extra_imports = extra_imports + extra_models
 
+#
+# Pyinstaller loses track of non-python resources.
+# To addres this we manually specify important stuff.
+extra_datas = [
+    ("LICENSE", "."),
+    ("LICENSE.rtf", "."),
+    ("src/pygapsgui/resources", "pygapsgui/resources"),
+    (str(pygaps_dir / "data"), "pygaps/data"),
+]
+
+#
+# Pyinstaller often includes packages it shouldn't.
+# Normally the collection takes place in a virtual
+# environment with no extraneous python packages.
+# However, there are a few which are needed for collection
+# but not for the final bundle. Those are removed here.
+extra_excludes = [
+    # installed in path
+    'pyinstaller',
+    'setuptools'
+]
+
+#
+# Pyinstaller includes all DLLs it can.
+# Often we might not want some functionality from QT
+# We can remove the specific DLLs here, if needed.
+extra_exclude_dll = [
+    # 'Qt6dbus.dll',
+    # 'Qt6Network.dll',
+    # 'Qt6Qml.dll',
+    # 'Qt6Quick.dll',
+    # 'Qt6WebSockets.dll',
+]
+
+#
+# Some variables
+folder = pathlib.Path.cwd()
 block_cipher = None
 
-a = Analysis(['pyGAPS-gui.py'],
-             pathex=[folder],
-             binaries=[],
-             datas=extra_datas,
-             hiddenimports=extra_imports,
-             hookspath=[],
-             runtime_hooks=[],
-             excludes=extra_excludes,
-             win_no_prefer_redirects=False,
-             win_private_assemblies=False,
-             cipher=block_cipher,
-             noarchive=False)
+#
+# Run analysis script
+a = Analysis(
+    ['pyGAPS-gui.py'],
+    pathex=[folder],
+    binaries=[],
+    datas=extra_datas,
+    hiddenimports=extra_imports,
+    hookspath=[],
+    runtime_hooks=[],
+    hooksconfig={
+        "matplotlib": {
+            "backends": [
+                "QtAgg",
+                "PDF",
+                "SVG",
+                "PS",
+            ],  # collect the correct backend
+        },
+    },
+    excludes=extra_excludes,
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False
+)
 
+#
+# Iteratively remove unneeded binaries
 to_keep = []
 
 # Iterate through the list of included binaries.
@@ -80,12 +114,16 @@ for (dest, source, kind) in a.binaries:
 # Replace list of data files with filtered one.
 a.binaries = to_keep
 
+#
+# run compression
 pyz = PYZ(
     a.pure,
     a.zipped_data,
     cipher=block_cipher,
 )
 
+#
+# run exe creation
 exe = EXE(
     pyz,
     a.scripts,
@@ -97,9 +135,11 @@ exe = EXE(
     strip=False,
     upx=True,
     console=False,
-    icon="pygapsgui/resources/main_icon.ico",
+    icon="src/pygapsgui/resources/main_icon.ico",
 )
 
+#
+# run collection
 coll = COLLECT(
     exe,
     a.binaries,
@@ -111,9 +151,11 @@ coll = COLLECT(
     name=f'pyGAPS-gui v{pggversion} (with pyGAPS v{pgversion})',
 )
 
+#
+# run mac specific
 if platform == "darwin":
     app = BUNDLE(
         coll,
         name=f'pyGAPS-gui v{pggversion}.app',
-        icon="pygapsgui/resources/main_icon.ico",
+        icon="src/pygapsgui/resources/main_icon.ico",
     )

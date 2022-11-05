@@ -39,10 +39,10 @@ jobs:
         pip install .[build]
         conda list
 
-    # - name: Check install from cli
-    #   run: |
-    #     pygapsgui --test
-    #     pygapsgui --version
+    - name: Check install from cli
+      run: |
+        pygapsgui --test
+        pygapsgui --version
 
     - name: Run PyInstaller
       run: |
