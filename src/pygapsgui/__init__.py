@@ -74,8 +74,7 @@ def main():
         try:
             version = im_version("pygapsgui")
         except PackageNotFoundError:
-            import src.pygapsgui as pygapsgui
-            version = pygapsgui.__version__
+            from src.pygapsgui._version import __version__ as version
         print(version)
         sys.exit()
 
