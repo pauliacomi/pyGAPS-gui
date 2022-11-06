@@ -122,7 +122,9 @@ dmypy.json
 
 Dockerfile
 entrypoint-*
-pygapsgui/_version.py
+
+# Versioning scm
+src/pygapsgui/_version.py
 
 # local tools
 toolchain

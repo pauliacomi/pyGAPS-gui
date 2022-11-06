@@ -2,6 +2,7 @@
 
 <?define ProductName="pyGAPS-gui" ?>
 <?define ProductVersion="{major}.{minor}.{micro}" ?>
+<?define ProductVersionShort="{major}.{minor}" ?>
 <?define UpgradeCode="3b4bdb09-19b1-4155-8799-d97fd49f6c05" ?>
 <?define Manufacturer="Paul Iacomi" ?>
 
@@ -28,7 +29,7 @@
         <!-- Package general properties -->
         <Package Id="*"
                  Description="Windows Installer for $(var.ProductName) $(var.ProductVersion)"
-                 Keywords="Scientific, Adsorption"
+                 Keywords="Scientific, Adsorption, Isotherms"
                  InstallerVersion="500"
                  Compressed="yes"
                  Languages="1033"
@@ -124,7 +125,7 @@
             <!-- There's a single "feature": pygaps -->
             <Feature Id="MainProgram"
                      Title="$(var.ProductName)"
-                     Description="Install pyGAPS-gui"
+                     Description="Install pyGAPS-gui $(var.ProductVersion)"
                      Level='1'>
                 <!-- Main executable and components -->
                 <ComponentRef Id="MainExecutable" />
