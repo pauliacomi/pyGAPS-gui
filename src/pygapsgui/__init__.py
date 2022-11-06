@@ -69,8 +69,13 @@ def main():
     qt_args = sys.argv[:1] + unparsed_args
 
     if parsed_args.version:
-        from importlib.metadata import version
-        print(version("pygapsgui"))
+        from importlib.metadata import PackageNotFoundError
+        from importlib.metadata import version as im_version
+        try:
+            version = im_version("pygapsgui")
+        except PackageNotFoundError:
+            from src.pygapsgui._version import __version__ as version
+        print(version)
         sys.exit()
 
     # Create application
