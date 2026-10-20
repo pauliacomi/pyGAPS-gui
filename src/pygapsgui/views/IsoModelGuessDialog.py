@@ -1,11 +1,5 @@
-from qtpy import PYSIDE6
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
-
-if PYSIDE6:
-    import PySide6.QtSvgWidgets as QS
-else:
-    from qtpy import QtSvg as QS
 
 from pygapsgui.views.IsoGraphView import IsoModelGraphView
 from pygapsgui.widgets.SpinBoxSlider import QHSpinBoxSlider

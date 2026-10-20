@@ -1,9 +1,9 @@
 from itertools import zip_longest
 
 import numpy
-from qtpy import PYSIDE6
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
+from qtpy import QtSvgWidgets as QS
 from qtpy import QtWidgets as QW
 
 from pygaps.modelling import _MODELS
@@ -11,12 +11,6 @@ from pygaps.modelling import get_isotherm_model
 from pygaps.modelling import model_from_dict
 from pygapsgui.utilities.tex2svg import tex2svg
 from pygapsgui.widgets.SpinBoxLimitSlider import QHSpinBoxLimitSlider
-
-if PYSIDE6:
-    import PySide6.QtSvgWidgets as QS
-else:
-    from qtpy import QtSvg as QS
-
 from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 from pygapsgui.widgets.UtilityWidgets import LimitEdit

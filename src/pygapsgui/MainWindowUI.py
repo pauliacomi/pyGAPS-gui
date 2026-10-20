@@ -1,9 +1,8 @@
-import qtpy
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
-import pygapsgui.widgets.resources_rc
+import pygapsgui.widgets.resources_rc  # noqa: F401  (registers the :/res icons)
 from pygapsgui.views.IsoGraphView import IsoListGraphView
 from pygapsgui.views.IsoListView import IsoListView
 from pygapsgui.widgets.IsoPropWidget import IsoPropWidget
@@ -45,11 +44,7 @@ class MainWindowUI():
         QC.QMetaObject.connectSlotsByName(main_window)
 
         # Move on screen to reasonable location with 2:1 aspect ratio
-        if qtpy.API in qtpy.PYQT6_API:
-            screen = self.screen()
-        else:
-            screen = QG.QGuiApplication.primaryScreen()
-        geometry = screen.availableGeometry()
+        geometry = main_window.screen().availableGeometry()
         height = geometry.height() * 0.75
         width = geometry.width() * 0.8
         width = min(width, height * 2)
@@ -206,7 +201,7 @@ class MainWindowUI():
 
         # Defining menu actions
         # new
-        self.action_new = QW.QAction(main_window)
+        self.action_new = QG.QAction(main_window)
         icon = QG.QIcon()
         icon.addPixmap(QG.QPixmap(":/res/icons/05_Edit_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.action_new.setIcon(icon)
@@ -214,7 +209,7 @@ class MainWindowUI():
         self.action_new.setShortcut("Ctrl+N")
 
         # open
-        self.action_open = QW.QAction(main_window)
+        self.action_open = QG.QAction(main_window)
         icon = QG.QIcon()
         icon.addPixmap(QG.QPixmap(":/res/icons/10_Search_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.action_open.setIcon(icon)
@@ -222,7 +217,7 @@ class MainWindowUI():
         self.action_open.setShortcut("Ctrl+O")
 
         # import
-        self.action_import = QW.QAction(main_window)
+        self.action_import = QG.QAction(main_window)
         self.action_import.setObjectName("action_import")
         icon = QG.QIcon()
         icon.addPixmap(QG.QPixmap(":/res/icons/16_Copy_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
@@ -230,7 +225,7 @@ class MainWindowUI():
         self.action_import.setShortcut("Ctrl+I")
 
         # save
-        self.action_save = QW.QAction(main_window)
+        self.action_save = QG.QAction(main_window)
         icon = QG.QIcon()
         icon.addPixmap(QG.QPixmap(":/res/icons/04_Save_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.action_save.setIcon(icon)
@@ -238,7 +233,7 @@ class MainWindowUI():
         self.action_save.setShortcut("Ctrl+S")
 
         # quit
-        self.action_quit = QW.QAction(main_window)
+        self.action_quit = QG.QAction(main_window)
         icon = QG.QIcon()
         icon.addPixmap(QG.QPixmap(":/res/icons/14_Delete_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.action_quit.setIcon(icon)
@@ -246,56 +241,56 @@ class MainWindowUI():
         self.action_quit.setShortcut("Ctrl+Q")
 
         # characterisation
-        self.action_area_bet = QW.QAction(main_window)
+        self.action_area_bet = QG.QAction(main_window)
         self.action_area_bet.setObjectName("actionBET_Surface_Area")
-        self.action_area_lang = QW.QAction(main_window)
+        self.action_area_lang = QG.QAction(main_window)
         self.action_area_lang.setObjectName("actionLangmuir_Surface_Area")
-        self.action_da_plot = QW.QAction(main_window)
+        self.action_da_plot = QG.QAction(main_window)
         self.action_da_plot.setObjectName("action_da_plot")
-        self.action_dr_plot = QW.QAction(main_window)
+        self.action_dr_plot = QG.QAction(main_window)
         self.action_dr_plot.setObjectName("action_dr_plot")
-        self.action_t_plot = QW.QAction(main_window)
+        self.action_t_plot = QG.QAction(main_window)
         self.action_t_plot.setObjectName("action_t_plot")
-        self.action_alpha_s_plot = QW.QAction(main_window)
+        self.action_alpha_s_plot = QG.QAction(main_window)
         self.action_alpha_s_plot.setObjectName("action_alpha_s_plot")
-        self.action_psd_micro = QW.QAction(main_window)
+        self.action_psd_micro = QG.QAction(main_window)
         self.action_psd_micro.setObjectName("action_psd_micro")
-        self.action_psd_meso = QW.QAction(main_window)
+        self.action_psd_meso = QG.QAction(main_window)
         self.action_psd_meso.setObjectName("action_psd_meso")
-        self.action_psd_kernel = QW.QAction(main_window)
+        self.action_psd_kernel = QG.QAction(main_window)
         self.action_psd_kernel.setObjectName("action_psd_kernel")
-        self.action_isosteric = QW.QAction(main_window)
+        self.action_isosteric = QG.QAction(main_window)
         self.action_isosteric.setObjectName("action_isosteric")
 
         # modelling
-        self.action_model_by = QW.QAction(main_window)
+        self.action_model_by = QG.QAction(main_window)
         self.action_model_by.setObjectName("action_model_by")
-        self.action_model_guess = QW.QAction(main_window)
+        self.action_model_guess = QG.QAction(main_window)
         self.action_model_guess.setObjectName("action_model_guess")
 
         # prediction
-        self.action_iast_binary_vle = QW.QAction(main_window)
+        self.action_iast_binary_vle = QG.QAction(main_window)
         self.action_iast_binary_vle.setObjectName("action_iast_binary_vle")
-        self.action_iast_binary_svp = QW.QAction(main_window)
+        self.action_iast_binary_svp = QG.QAction(main_window)
         self.action_iast_binary_svp.setObjectName("action_iast_binary_svp")
-        self.action_iast_multi_lvp = QW.QAction(main_window)
+        self.action_iast_multi_lvp = QG.QAction(main_window)
         self.action_iast_multi_lvp.setObjectName("action_iast_multi_lvp")
 
         # options
-        self.action_adsorbates = QW.QAction(main_window)
+        self.action_adsorbates = QG.QAction(main_window)
         self.action_adsorbates.setObjectName("action_adsorbates")
-        self.action_materials = QW.QAction(main_window)
+        self.action_materials = QG.QAction(main_window)
         self.action_materials.setObjectName("action_materials")
-        self.action_theme_light = QW.QAction(main_window)
+        self.action_theme_light = QG.QAction(main_window)
         self.action_theme_light.setObjectName("action_theme_light")
-        self.action_theme_dark = QW.QAction(main_window)
+        self.action_theme_dark = QG.QAction(main_window)
         self.action_theme_dark.setObjectName("action_theme_dark")
-        self.action_theme_auto = QW.QAction(main_window)
+        self.action_theme_auto = QG.QAction(main_window)
         self.action_theme_auto.setObjectName("action_theme_auto")
 
         # about and example
-        self.action_examples = QW.QAction(main_window)
-        self.action_about = QW.QAction(main_window)
+        self.action_examples = QG.QAction(main_window)
+        self.action_about = QG.QAction(main_window)
         icon = QG.QIcon()
         icon.addPixmap(QG.QPixmap(":/res/icons/15_Tick_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
         self.action_about.setIcon(icon)

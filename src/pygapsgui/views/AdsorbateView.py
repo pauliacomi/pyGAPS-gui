@@ -1,11 +1,6 @@
-from qtpy import PYSIDE6
 from qtpy import QtCore as QC
+from qtpy import QtSvgWidgets as QS
 from qtpy import QtWidgets as QW
-
-if PYSIDE6:
-    import PySide6.QtSvgWidgets as QS
-else:
-    from qtpy import QtSvg as QS
 
 from pygaps import ADSORBATE_LIST
 from pygaps import Adsorbate

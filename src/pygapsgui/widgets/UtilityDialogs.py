@@ -1,47 +1,31 @@
 import pathlib
 
-from qtpy import QT5
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
 from pygapsgui.widgets.UtilityWidgets import CollapsibleBox
 
-# the arguments to these functions are differently named
-# depending on whether we are on QT5 or QT6
-if QT5:
-    dirvar = "directory"
-else:
-    dirvar = "dir"
-
 
 def open_files_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
     """Abstract dialog for file opening."""
-    filenames = QW.QFileDialog.getOpenFileNames(
-        **{
-            "parent": parent,
-            "caption": caption,
-            dirvar: directory,
-            "filter": filter,
-        }
+    filenames, _ = QW.QFileDialog.getOpenFileNames(
+        parent=parent,
+        caption=caption,
+        dir=directory,
+        filter=filter,
     )
-    if isinstance(filenames, tuple):  # PyQt5 returns a tuple...
-        filenames = filenames[0]
     return tuple(map(pathlib.Path, filenames))
 
 
 def save_file_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
     """Abstract dialog for file saving."""
-    filename = QW.QFileDialog.getSaveFileName(
-        **{
-            "parent": parent,
-            "caption": caption,
-            dirvar: directory,
-            "filter": filter,
-        }
+    filename, _ = QW.QFileDialog.getSaveFileName(
+        parent=parent,
+        caption=caption,
+        dir=directory,
+        filter=filter,
     )
-    if isinstance(filename, tuple):  # PyQt5 returns a tuple...
-        filename = filename[0]
     if filename:
         return pathlib.Path(filename)
 
@@ -49,13 +33,13 @@ def save_file_dialog(parent, caption, directory, filter=None) -> "list[pathlib.P
 def error_dialog(error: str):
     """Call general error/warning dialog."""
     errorbox = ErrorMessageBox(error)
-    errorbox.exec_()
+    errorbox.exec()
 
 
 def error_detail_dialog(error: str, trace: str):
     """In-depth (with traceback) error dialog."""
     errorbox = ErrorMessageBox(error, trace)
-    errorbox.exec_()
+    errorbox.exec()
 
 
 class ErrorMessageBox(QW.QDialog):
@@ -106,7 +90,7 @@ class ErrorMessageBox(QW.QDialog):
 def help_dialog(function):
     """Display a dialog with online help."""
     help = HelpDialog(function)
-    help.exec_()
+    help.exec()
 
 
 class HelpDialog(QW.QDialog):

@@ -42,11 +42,9 @@ def test_open_multiple_and_delete(main_window):
     assert iso_count(main_window) == 2
 
 
-@pytest.mark.qt_no_exception_capture
-@pytest.mark.xfail(strict=True, reason="MainWindow.examples uses QMessageBox.Yes on an instance, removed in Qt6")
 def test_example_data(main_window, monkeypatch):
     from qtpy import QtWidgets as QW
-    monkeypatch.setattr(QW.QMessageBox, "question", lambda *args, **kwargs: QW.QMessageBox.Yes)
+    monkeypatch.setattr(QW.QMessageBox, "question", lambda *args, **kwargs: QW.QMessageBox.StandardButton.Yes)
 
     main_window.ui.action_examples.trigger()
 

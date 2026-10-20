@@ -125,7 +125,7 @@ class MainWindow(QW.QMainWindow):
         """Get recent files from the settings, and place them in the menu."""
         if not self.recent_file_actions:
             for ind in range(self.recent_files_no):
-                recent_file_action = QW.QAction(self)
+                recent_file_action = QG.QAction(self)
                 recent_file_action.setVisible(False)
                 recent_file_action.triggered.connect(partial(self.open_recent, ind))
                 self.recent_file_actions.append(recent_file_action)
@@ -514,14 +514,14 @@ class MainWindow(QW.QMainWindow):
 
     def examples(self):
         """Load example data."""
-        qm = QW.QMessageBox()
-        ret = qm.question(
+        buttons = QW.QMessageBox.StandardButton
+        ret = QW.QMessageBox.question(
             self,
             'Question',
             "Do you want to load some example data?",
-            qm.Yes | qm.No,
+            buttons.Yes | buttons.No,
         )
-        if ret == qm.Yes:
+        if ret == buttons.Yes:
             from pygapsgui.utilities.resources import get_resource_content
             filepaths = get_resource_content("sample_data", "*.json")
             self.open_iso(filepaths)
