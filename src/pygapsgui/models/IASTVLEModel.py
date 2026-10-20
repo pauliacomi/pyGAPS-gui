@@ -1,6 +1,6 @@
 import pygaps
 from pygaps.graphing.iast_graphs import plot_iast_vle
-from pygaps.iast import iast_binary_vle
+from pygaps.prediction.iast import iast_binary_vle
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog

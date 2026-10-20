@@ -35,6 +35,8 @@ dependencies = [
     "matplotlib>=3.5.2",
     "rapidfuzz>=2",
     "pygaps>=4.6.1,<5",
+    # pyGAPS 4.6.1 AIF parsing uses pandas.to_numeric(errors="ignore"), removed in pandas 3.
+    "pandas<3",
     "docutils",
 ]
 dynamic = ["version"]
