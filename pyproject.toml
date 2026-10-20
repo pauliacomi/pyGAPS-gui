@@ -56,6 +56,11 @@ docs = [
     "sphinx-copybutton",
     "furo",
 ]
+test = [
+    "pytest>=8",
+    "pytest-qt>=4.4",
+    "packaging>=23",
+]
 
 [project.scripts]
 pygapsgui = "pygapsgui:main"
@@ -77,6 +82,16 @@ where = ["src"]
 version_file = "src/pygapsgui/_version.py"
 local_scheme = 'dirty-tag'
 fallback_version = '0.2.0'
+
+# testing: pytest
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tst"]
+pythonpath = ["."]
+addopts = ["-ra", "--strict-markers", "--import-mode=importlib"]
+qt_api = "pyside6"
+xfail_strict = true
+filterwarnings = ["error::pytest.PytestUnraisableExceptionWarning"]
 
 
 # linting: pylint
