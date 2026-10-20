@@ -1,3 +1,4 @@
+import os
 import pathlib
 from functools import partial
 
@@ -11,6 +12,9 @@ from pygapsgui.models.IsoListModel import IsoListModel
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 from pygapsgui.widgets.UtilityDialogs import open_files_dialog
 from pygapsgui.widgets.UtilityDialogs import save_file_dialog
+
+RECENT_FILES_KEY = "recentFilePaths"
+LEGACY_RECENT_FILES_KEY = "recentFiles"
 
 
 class MainWindow(QW.QMainWindow):
@@ -100,40 +104,53 @@ class MainWindow(QW.QMainWindow):
         self.ui.action_theme_dark.triggered.connect(partial(self.color_theme, "dark"))
         self.ui.action_theme_light.triggered.connect(partial(self.color_theme, "light"))
 
+    def get_recent_paths(self):
+        """Read the recent file paths from the settings as a list of strings."""
+        settings = QC.QSettings()
+
+        if not settings.contains(RECENT_FILES_KEY) and settings.contains(LEGACY_RECENT_FILES_KEY):
+            # Older versions pickled pathlib objects, which PySide6 >= 6.12
+            # refuses to deserialize (PYSIDE-3331). Convert them when possible.
+            try:
+                legacy_paths = settings.value(LEGACY_RECENT_FILES_KEY, [], type=list)
+                recent_paths = [str(path) for path in legacy_paths if isinstance(path, (str, os.PathLike))]
+            except RuntimeError:
+                recent_paths = []
+            settings.remove(LEGACY_RECENT_FILES_KEY)
+            settings.setValue(RECENT_FILES_KEY, recent_paths[:self.recent_files_no])
+
+        return [str(path) for path in settings.value(RECENT_FILES_KEY, [], type=list)]
+
     def load_recent_files(self):
         """Get recent files from the settings, and place them in the menu."""
-        settings = QC.QSettings()
-        recent_paths = settings.value("recentFiles", [])
+        if not self.recent_file_actions:
+            for ind in range(self.recent_files_no):
+                recent_file_action = QW.QAction(self)
+                recent_file_action.setVisible(False)
+                recent_file_action.triggered.connect(partial(self.open_recent, ind))
+                self.recent_file_actions.append(recent_file_action)
+                self.ui.menu_recent.addAction(recent_file_action)
 
-        for ind in range(self.recent_files_no):
-            recent_file_action = QW.QAction()
-            recent_file_action.setVisible(False)
-            recent_file_action.triggered.connect(partial(self.open_recent, ind))
-            self.recent_file_actions.append(recent_file_action)
+        recent_paths = self.get_recent_paths()
 
-        for recent_file_action in self.recent_file_actions:
-            self.ui.menu_recent.addAction(recent_file_action)
-
-        cutoff = min(self.recent_files_no, len(recent_paths))
-
-        for ind in range(cutoff):
-            self.recent_file_actions[ind].setText(recent_paths[ind].name)
-            self.recent_file_actions[ind].setData(recent_paths[ind])
-            self.recent_file_actions[ind].setVisible(True)
+        for ind, recent_file_action in enumerate(self.recent_file_actions):
+            if ind < len(recent_paths):
+                recent_file_action.setText(pathlib.Path(recent_paths[ind]).name)
+                recent_file_action.setData(recent_paths[ind])
+                recent_file_action.setVisible(True)
+            else:
+                recent_file_action.setVisible(False)
 
     def update_recent_files(self, filepaths):
         """Update the recent files with the argument filepaths."""
-        settings = QC.QSettings()
-        recent_paths = settings.value("recentFiles", [])
+        recent_paths = self.get_recent_paths()
 
-        for filepath in filepaths:
+        for filepath in map(str, filepaths):
             if filepath in recent_paths:
                 recent_paths.remove(filepath)
             recent_paths.insert(0, filepath)
 
-        recent_paths = recent_paths[:self.recent_files_no]
-
-        settings.setValue("recentFiles", recent_paths)
+        QC.QSettings().setValue(RECENT_FILES_KEY, recent_paths[:self.recent_files_no])
 
         self.load_recent_files()
 
@@ -181,7 +198,7 @@ class MainWindow(QW.QMainWindow):
     def open_recent(self, index=None):
         """Open the recent file in memory."""
         if index is not None:
-            self.open_iso([self.recent_file_actions[index].data()])
+            self.open_iso([pathlib.Path(self.recent_file_actions[index].data())])
 
     def import_iso(self, filepaths=None, ftype=None):
         """Import isotherm from manufacturer files."""
