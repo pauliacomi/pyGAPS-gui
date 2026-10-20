@@ -3,7 +3,6 @@ import operator as ope
 import pathlib
 import platform
 import re
-import typing
 
 import qtpy
 from qtpy import QtCore as QC
@@ -184,34 +183,37 @@ def theme_apply(theme) -> None:
     # TODO finalize changing mpl theme in main iso graph
 
 
-def theme_callback(theme) -> None:
-    """Callback for theme_listener."""
+def system_theme() -> str:
+    """Return the system color scheme as 'dark' or 'light'."""
+    scheme = QG.QGuiApplication.styleHints().colorScheme()
+    if scheme == QC.Qt.ColorScheme.Dark:
+        return "dark"
+    if scheme == QC.Qt.ColorScheme.Light:
+        return "light"
+    # Unknown scheme: infer it from the platform palette.
+    window = QG.QGuiApplication.palette().color(QG.QPalette.ColorRole.Window)
+    return "dark" if window.lightness() < 128 else "light"
+
+
+def theme_callback(_scheme=None) -> None:
+    """Re-apply the system theme when it changes, if set to follow it."""
     settings = QC.QSettings()
     theme_setting = settings.value("theme", "auto")
     if theme_setting == "auto":
-        theme_apply(theme)
+        theme_apply(system_theme())
 
 
-# Global thread for theme switching
-THEME_DAEMON = None
+THEME_LISTENING = False
 
 
-def theme_listener(callback: typing.Callable[[str], None]) -> None:
-    """Add a listener that automatically changes theme."""
-    global THEME_DAEMON
-    if THEME_DAEMON:
+def theme_listener() -> None:
+    """Follow system color scheme changes (signal emitted in the GUI thread)."""
+    global THEME_LISTENING
+    if THEME_LISTENING:
         return
 
-    import threading
-    import darkdetect
-
-    THEME_DAEMON = threading.Thread(
-        name='ThemeListener',
-        target=darkdetect.listener,
-        args=(callback, ),
-        daemon=True,
-    )
-    THEME_DAEMON.start()
+    QG.QGuiApplication.styleHints().colorSchemeChanged.connect(theme_callback)
+    THEME_LISTENING = True
 
 
 def set_theme():
@@ -224,8 +226,7 @@ def set_theme():
         return
 
     if theme_setting == "auto":
-        import darkdetect
-        theme_apply(darkdetect.theme().lower())
-        theme_listener(theme_callback)
+        theme_apply(system_theme())
+        theme_listener()
     else:
         theme_apply(theme_setting)
