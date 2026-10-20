@@ -15,8 +15,7 @@ pgversion = version("pygaps")
 try:
     pggversion = version("pygapsgui")
 except PackageNotFoundError:
-    import pygapsgui
-    pggversion = pygapsgui.__version__
+    from pygapsgui._version import __version__ as pggversion
 
 pygaps_dir = pathlib.Path(pygaps.__file__).parent
 
@@ -76,7 +75,7 @@ folder = pathlib.Path.cwd()
 # Run analysis script
 a = Analysis(
     ['pyGAPS-gui.py'],
-    pathex=[folder],
+    pathex=[folder / "src"],
     binaries=[],
     datas=extra_datas,
     hiddenimports=extra_imports,
