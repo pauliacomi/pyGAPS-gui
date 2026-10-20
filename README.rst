@@ -24,8 +24,11 @@ section.
     <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui.msi">
         <img src="https://img.shields.io/badge/download-windows-blue.svg" alt="Win link" />
     </a>
-    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-macos.zip">
-        <img src="https://img.shields.io/badge/download-mac-lightgrey" alt="Mac link" />
+    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-macos-arm64.zip">
+        <img src="https://img.shields.io/badge/download-mac%20(Apple%20silicon)-lightgrey" alt="Mac Apple silicon link" />
+    </a>
+    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-macos-x86_64.zip">
+        <img src="https://img.shields.io/badge/download-mac%20(Intel)-lightgrey" alt="Mac Intel link" />
     </a>
     <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-linux-x86_64.tar.gz">
         <img src="https://img.shields.io/badge/download-linux-orange" alt="Linux link" />
