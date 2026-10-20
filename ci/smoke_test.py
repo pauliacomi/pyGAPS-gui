@@ -5,6 +5,7 @@ import pathlib
 import shutil
 import subprocess
 import sys
+import sysconfig
 
 
 def main():
@@ -24,7 +25,7 @@ def main():
             raise RuntimeError(f"Expected one bundled executable, found {executables}")
         command = [str(executables[0].resolve())]
     else:
-        executable = shutil.which("pygapsgui", path=str(pathlib.Path(sys.executable).parent))
+        executable = shutil.which("pygapsgui", path=sysconfig.get_path("scripts"))
         if executable is None:
             raise RuntimeError("The pygapsgui console entry point is not installed")
         command = [executable]
