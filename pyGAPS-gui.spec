@@ -71,7 +71,6 @@ extra_exclude_dll = [
 #
 # Some variables
 folder = pathlib.Path.cwd()
-block_cipher = None
 
 #
 # Run analysis script
@@ -94,9 +93,6 @@ a = Analysis(
         },
     },
     excludes=extra_excludes,
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False
 )
 
@@ -118,8 +114,6 @@ a.binaries = to_keep
 # run compression
 pyz = PYZ(
     a.pure,
-    a.zipped_data,
-    cipher=block_cipher,
 )
 
 #
@@ -135,6 +129,7 @@ exe = EXE(
     strip=False,
     upx=True,
     console=False,
+    contents_directory=".",
     icon="src/pygapsgui/resources/main_icon.ico",
 )
 
@@ -143,7 +138,6 @@ exe = EXE(
 coll = COLLECT(
     exe,
     a.binaries,
-    a.zipfiles,
     a.datas,
     strip=False,
     upx=False,

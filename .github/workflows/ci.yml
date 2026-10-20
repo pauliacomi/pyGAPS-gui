@@ -1,0 +1,155 @@
+name: Test, build and release
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025, macos-15]
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: macos-15-intel
+            python: "3.14"
+    env:
+      QT_API: pyside6
+      QT_QPA_PLATFORM: offscreen
+      PYTHONWARNINGS: default
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: |
+            setup.cfg
+            pyproject.toml
+      - name: Install Linux Qt dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libglib2.0-0t64 libxkbcommon0
+      - name: Install
+        run: python -m pip install .
+      - name: Check dependencies
+        run: python -m pip check
+      - name: Check release packaging
+        run: python -m unittest discover -s tst -p "test_*.py"
+      - name: Check version and startup
+        run: python ci/smoke_test.py
+
+  build:
+    name: Bundle / ${{ matrix.platform }}
+    needs: test
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            platform: win-x86_64
+          - os: ubuntu-24.04
+            platform: linux-x86_64
+          - os: macos-15
+            platform: macos-arm64
+          - os: macos-15-intel
+            platform: macos-x86_64
+    env:
+      QT_API: pyside6
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: |
+            setup.cfg
+            pyproject.toml
+      - name: Install Linux Qt dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libglib2.0-0t64 libxkbcommon0
+      - name: Install build dependencies
+        run: python -m pip install ".[build]"
+      - name: Build bundle
+        run: python -m PyInstaller --noconfirm pyGAPS-gui.spec
+      - name: Check bundled version and startup
+        run: python ci/smoke_test.py --bundle
+      - uses: actions/setup-dotnet@v6
+        if: runner.os == 'Windows'
+        with:
+          global-json-file: global.json
+      - name: Install WiX
+        if: runner.os == 'Windows'
+        env:
+          DOTNET_ROLL_FORWARD: Major
+        shell: pwsh
+        run: |
+          dotnet tool restore
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $version = (Get-Content '.config\dotnet-tools.json' -Raw | ConvertFrom-Json).tools.wix.version
+          dotnet tool run wix extension add "WixToolset.UI.wixext/$version"
+      - name: Make MSI and ZIP
+        if: runner.os == 'Windows'
+        env:
+          DOTNET_ROLL_FORWARD: Major
+        shell: pwsh
+        run: |
+          $folder = (Get-Item 'dist\pyGAPS-gui v*').FullName
+          python ci\collect_dist.py msi zip "$folder"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet tool run wix build dist\pyGAPS-gui.wxs -arch x64 -ext WixToolset.UI.wixext -culture en-US -bindpath dist -out dist\pyGAPS-gui.msi
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item "$folder.zip" 'dist\pyGAPS-gui-win-x86_64.zip'
+      - name: Make Linux archive
+        if: runner.os == 'Linux'
+        working-directory: dist
+        run: tar -czf pyGAPS-gui-linux-x86_64.tar.gz "pyGAPS-gui v"*
+      - name: Make macOS archive
+        if: runner.os == 'macOS'
+        working-directory: dist
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: ditto -c -k --sequesterRsrc --keepParent "pyGAPS-gui v"*.app "pyGAPS-gui-${PLATFORM}.zip"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.platform }}
+          path: |
+            dist/*.msi
+            dist/*.zip
+            dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: release
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v3
+        with:
+          fail_on_unmatched_files: true
+          files: |
+            release/*.msi
+            release/*.zip
+            release/*.tar.gz

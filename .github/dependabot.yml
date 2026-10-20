@@ -6,3 +6,20 @@ updates:
     interval: weekly
     time: "04:00"
   open-pull-requests-limit: 10
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "04:00"
+  open-pull-requests-limit: 10
+- package-ecosystem: dotnet-sdk
+  directory: "/"
+  schedule:
+    interval: weekly
+- package-ecosystem: nuget
+  directory: "/.config"
+  schedule:
+    interval: weekly
+  ignore:
+    - dependency-name: wix
+      update-types: ["version-update:semver-major"]
