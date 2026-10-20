@@ -31,7 +31,7 @@ class IsoListModel(QG.QStandardItemModel):
         # Can never uncheck a selected item so we re-mark it as checked
         if item.index() == self.index_selected:
             self.blockSignals(True)
-            item.setCheckState(QC.Qt.Checked)
+            item.setCheckState(QC.Qt.CheckState.Checked)
             self.blockSignals(False)
             return
         # Otherwise emit change
@@ -54,7 +54,7 @@ class IsoListModel(QG.QStandardItemModel):
             new_item.userCheckState = new_item.checkState()
 
             self.blockSignals(True)
-            new_item.setCheckState(QC.Qt.Checked)
+            new_item.setCheckState(QC.Qt.CheckState.Checked)
             self.blockSignals(False)
 
             # store index
@@ -63,8 +63,8 @@ class IsoListModel(QG.QStandardItemModel):
             # improve performance by emitting check change only if something changed
             # TODO what about when it is deleted?
             if (
-                old_item and old_item.checkState() == QC.Qt.Checked
-                and new_item.userCheckState == QC.Qt.Checked
+                old_item and old_item.checkState() == QC.Qt.CheckState.Checked
+                and new_item.userCheckState == QC.Qt.CheckState.Checked
             ):
                 return
             self.checked_changed.emit()
@@ -75,7 +75,7 @@ class IsoListModel(QG.QStandardItemModel):
         return [
             self.item(row).data()
             for row in range(self.rowCount())
-            if self.item(row).checkState() == QC.Qt.Checked
+            if self.item(row).checkState() == QC.Qt.CheckState.Checked
         ]
 
     def check_all(self):
@@ -87,7 +87,7 @@ class IsoListModel(QG.QStandardItemModel):
         self.blockSignals(True)
         for row in range(nrows):
             item = self.item(row)
-            item.setCheckState(QC.Qt.Checked)
+            item.setCheckState(QC.Qt.CheckState.Checked)
         self.blockSignals(False)
 
         self.layoutChanged.emit()  # let models know something changed
@@ -104,7 +104,7 @@ class IsoListModel(QG.QStandardItemModel):
             item = self.item(row)
             # only untick non-selected isotherms
             if item.index() != self.index_selected:
-                item.setCheckState(QC.Qt.Unchecked)
+                item.setCheckState(QC.Qt.CheckState.Unchecked)
         self.blockSignals(False)
 
         self.layoutChanged.emit()  # let models know something changed
@@ -115,7 +115,7 @@ class IsoListModel(QG.QStandardItemModel):
         # LayoutChanged called automatically BEFORE actual removal
         # Therefore must ensure old isotherm is not ticked
         self.blockSignals(True)
-        self.item(row).setCheckState(QC.Qt.Unchecked)
+        self.item(row).setCheckState(QC.Qt.CheckState.Unchecked)
         self.blockSignals(False)
 
         # Call method for removal

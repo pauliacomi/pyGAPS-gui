@@ -169,7 +169,7 @@ class MainWindow(QW.QMainWindow):
             return
         ret = dialog.exec()
 
-        if ret == QW.QDialog.Accepted and model.full_isotherm:
+        if ret == QW.QDialog.DialogCode.Accepted and model.full_isotherm:
             iso = model.full_isotherm
             name = f"{iso.material} {iso.adsorbate} {iso.temperature}"
             self.iso_controller.add_isotherm(name, iso)
@@ -260,7 +260,7 @@ class MainWindow(QW.QMainWindow):
         model = AreaBETModel(isotherm, dialog)
         if model.success:
             ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
+            if ret == QW.QDialog.DialogCode.Accepted:
                 # TODO There may be no results!!!
                 results = model.result_dict()
                 self.iso_controller.metadata_save_bulk(results)
@@ -276,7 +276,7 @@ class MainWindow(QW.QMainWindow):
         model = AreaLangModel(isotherm, dialog)
         if model.success:
             ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
+            if ret == QW.QDialog.DialogCode.Accepted:
                 results = model.result_dict()
                 self.iso_controller.metadata_save_bulk(results)
 
@@ -291,7 +291,7 @@ class MainWindow(QW.QMainWindow):
         model = PlotTModel(isotherm, dialog)
         if model.success:
             ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
+            if ret == QW.QDialog.DialogCode.Accepted:
                 results = model.result_dict()
                 self.iso_controller.metadata_save_bulk(results)
 
@@ -316,7 +316,7 @@ class MainWindow(QW.QMainWindow):
         model = PlotAlphaSModel(isotherm, ref_isotherm, dialog)
         if model.success:
             ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
+            if ret == QW.QDialog.DialogCode.Accepted:
                 results = model.result_dict()
                 self.iso_controller.metadata_save_bulk(results)
 
@@ -339,7 +339,7 @@ class MainWindow(QW.QMainWindow):
         model = DADRModel(isotherm, dialog, ptype=ptype)
         if model.success:
             ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
+            if ret == QW.QDialog.DialogCode.Accepted:
                 results = model.result_dict()
                 self.iso_controller.metadata_save_bulk(results)
 
@@ -354,7 +354,7 @@ class MainWindow(QW.QMainWindow):
         model = PSDMicroModel(isotherm, dialog)
         if model.success:
             ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
+            if ret == QW.QDialog.DialogCode.Accepted:
                 results = model.result_dict()
                 self.iso_controller.metadata_save_bulk(results)
 
@@ -369,7 +369,7 @@ class MainWindow(QW.QMainWindow):
         model = PSDMesoModel(isotherm, dialog)
         if model.success:
             ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
+            if ret == QW.QDialog.DialogCode.Accepted:
                 results = model.result_dict()
                 self.iso_controller.metadata_save_bulk(results)
 
@@ -384,7 +384,7 @@ class MainWindow(QW.QMainWindow):
         model = PSDKernelModel(isotherm, dialog)
         if model.success:
             ret = dialog.exec()
-            if ret == QW.QDialog.Accepted:
+            if ret == QW.QDialog.DialogCode.Accepted:
                 results = model.result_dict()
                 self.iso_controller.metadata_save_bulk(results)
 
@@ -415,7 +415,7 @@ class MainWindow(QW.QMainWindow):
             return
         ret = dialog.exec()
 
-        if ret == QW.QDialog.Accepted and model.model_isotherm:
+        if ret == QW.QDialog.DialogCode.Accepted and model.model_isotherm:
             name = f"{isotherm.material} {isotherm.adsorbate} {model.model_isotherm.model.name}"
             self.iso_controller.add_isotherm(name, model.model_isotherm)
             self.iso_controller.select_last_iso()
@@ -433,7 +433,7 @@ class MainWindow(QW.QMainWindow):
             return
         ret = dialog.exec()
 
-        if ret == QW.QDialog.Accepted and model.model_isotherm:
+        if ret == QW.QDialog.DialogCode.Accepted and model.model_isotherm:
             name = f"{isotherm.material} {isotherm.adsorbate} {model.model_isotherm.model.name}"
             self.iso_controller.add_isotherm(name, model.model_isotherm)
             self.iso_controller.select_last_iso()

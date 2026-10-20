@@ -42,7 +42,7 @@ class AdsorbateView(QW.QWidget):
         self.alias_label = QW.QLabel()
         self.alias_value = QW.QListWidget()
         self.alias_value.setSizePolicy(
-            QW.QSizePolicy(QW.QSizePolicy.Minimum, QW.QSizePolicy.Minimum)
+            QW.QSizePolicy(QW.QSizePolicy.Policy.Minimum, QW.QSizePolicy.Policy.Minimum)
         )
         self.formula_label = QW.QLabel()
         self.formula_value = QS.QSvgWidget()
@@ -86,7 +86,7 @@ class AdsorbateView(QW.QWidget):
             self.alias_value.sizeHintForRow(0) * 4 + 2 * self.alias_value.frameWidth()
         )
         self.formula_value.load(tex2svg(self.adsorbate.formula))
-        aspectRatioMode = QC.Qt.AspectRatioMode(QC.Qt.KeepAspectRatio)
+        aspectRatioMode = QC.Qt.AspectRatioMode(QC.Qt.AspectRatioMode.KeepAspectRatio)
         self.formula_value.renderer().setAspectRatioMode(aspectRatioMode)
         if self.adsorbate.properties.get("backend_name"):
             backend = "Yes"
@@ -140,8 +140,8 @@ class AdsorbateDialog(QW.QDialog):
 
         # Button box
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Ok)
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
@@ -193,8 +193,8 @@ class AdsorbateListDialog(QW.QDialog):
 
         # Button box
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Ok | QW.QDialogButtonBox.StandardButton.Close)
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):

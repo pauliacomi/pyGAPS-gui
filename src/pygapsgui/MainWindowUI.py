@@ -57,7 +57,7 @@ class MainWindowUI():
         # create a groupbox to contain the iso explorer
         self.explorer_group = QW.QGroupBox()
         self.explorer_group.setObjectName("explorer_group")
-        size_policy = QW.QSizePolicy(QW.QSizePolicy.Expanding, QW.QSizePolicy.Expanding)
+        size_policy = QW.QSizePolicy(QW.QSizePolicy.Policy.Expanding, QW.QSizePolicy.Policy.Expanding)
         size_policy.setHorizontalStretch(1)  # relative 1 col
         self.explorer_group.setSizePolicy(size_policy)
         self.main_layout.addWidget(self.explorer_group)
@@ -93,7 +93,7 @@ class MainWindowUI():
         # create a groupbox for details of one isotherm
         self.properties_group = QW.QGroupBox()
         self.properties_group.setObjectName("properties_group")
-        size_policy = QW.QSizePolicy(QW.QSizePolicy.Expanding, QW.QSizePolicy.Expanding)
+        size_policy = QW.QSizePolicy(QW.QSizePolicy.Policy.Expanding, QW.QSizePolicy.Policy.Expanding)
         size_policy.setHorizontalStretch(2)  # relative 2 col
         self.properties_group.setSizePolicy(size_policy)
         self.main_layout.addWidget(self.properties_group)
@@ -142,7 +142,7 @@ class MainWindowUI():
         # create a groupbox for the isotherm plot
         self.graph_group = QW.QGroupBox(self.central_widget)
         self.graph_group.setObjectName("graph_group")
-        size_policy = QW.QSizePolicy(QW.QSizePolicy.Preferred, QW.QSizePolicy.Expanding)
+        size_policy = QW.QSizePolicy(QW.QSizePolicy.Policy.Preferred, QW.QSizePolicy.Policy.Expanding)
         size_policy.setHorizontalStretch(3)  # relative 3 columns
         self.graph_group.setSizePolicy(size_policy)
         self.main_layout.addWidget(self.graph_group)
@@ -203,7 +203,7 @@ class MainWindowUI():
         # new
         self.action_new = QG.QAction(main_window)
         icon = QG.QIcon()
-        icon.addPixmap(QG.QPixmap(":/res/icons/05_Edit_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        icon.addPixmap(QG.QPixmap(":/res/icons/05_Edit_48x48.png"), QG.QIcon.Mode.Normal, QG.QIcon.State.Off)
         self.action_new.setIcon(icon)
         self.action_new.setObjectName("action_new")
         self.action_new.setShortcut("Ctrl+N")
@@ -211,7 +211,7 @@ class MainWindowUI():
         # open
         self.action_open = QG.QAction(main_window)
         icon = QG.QIcon()
-        icon.addPixmap(QG.QPixmap(":/res/icons/10_Search_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        icon.addPixmap(QG.QPixmap(":/res/icons/10_Search_48x48.png"), QG.QIcon.Mode.Normal, QG.QIcon.State.Off)
         self.action_open.setIcon(icon)
         self.action_open.setObjectName("action_open")
         self.action_open.setShortcut("Ctrl+O")
@@ -220,14 +220,14 @@ class MainWindowUI():
         self.action_import = QG.QAction(main_window)
         self.action_import.setObjectName("action_import")
         icon = QG.QIcon()
-        icon.addPixmap(QG.QPixmap(":/res/icons/16_Copy_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        icon.addPixmap(QG.QPixmap(":/res/icons/16_Copy_48x48.png"), QG.QIcon.Mode.Normal, QG.QIcon.State.Off)
         self.action_import.setIcon(icon)
         self.action_import.setShortcut("Ctrl+I")
 
         # save
         self.action_save = QG.QAction(main_window)
         icon = QG.QIcon()
-        icon.addPixmap(QG.QPixmap(":/res/icons/04_Save_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        icon.addPixmap(QG.QPixmap(":/res/icons/04_Save_48x48.png"), QG.QIcon.Mode.Normal, QG.QIcon.State.Off)
         self.action_save.setIcon(icon)
         self.action_save.setObjectName("action_save")
         self.action_save.setShortcut("Ctrl+S")
@@ -235,7 +235,7 @@ class MainWindowUI():
         # quit
         self.action_quit = QG.QAction(main_window)
         icon = QG.QIcon()
-        icon.addPixmap(QG.QPixmap(":/res/icons/14_Delete_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        icon.addPixmap(QG.QPixmap(":/res/icons/14_Delete_48x48.png"), QG.QIcon.Mode.Normal, QG.QIcon.State.Off)
         self.action_quit.setIcon(icon)
         self.action_quit.setObjectName("action_quit")
         self.action_quit.setShortcut("Ctrl+Q")
@@ -292,7 +292,7 @@ class MainWindowUI():
         self.action_examples = QG.QAction(main_window)
         self.action_about = QG.QAction(main_window)
         icon = QG.QIcon()
-        icon.addPixmap(QG.QPixmap(":/res/icons/15_Tick_48x48.png"), QG.QIcon.Normal, QG.QIcon.Off)
+        icon.addPixmap(QG.QPixmap(":/res/icons/15_Tick_48x48.png"), QG.QIcon.Mode.Normal, QG.QIcon.State.Off)
         self.action_about.setIcon(icon)
         self.action_about.setObjectName("action_about")
 

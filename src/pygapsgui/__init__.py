@@ -65,9 +65,9 @@ def main():
         test_settings_dir = QC.QTemporaryDir()
         if not test_settings_dir.isValid():
             raise RuntimeError("Could not create temporary startup-test settings directory")
-        QC.QSettings.setDefaultFormat(QC.QSettings.IniFormat)
+        QC.QSettings.setDefaultFormat(QC.QSettings.Format.IniFormat)
         QC.QSettings.setPath(
-            QC.QSettings.IniFormat, QC.QSettings.UserScope, test_settings_dir.path()
+            QC.QSettings.Format.IniFormat, QC.QSettings.Scope.UserScope, test_settings_dir.path()
         )
     qt_args = sys.argv[:1] + unparsed_args
 

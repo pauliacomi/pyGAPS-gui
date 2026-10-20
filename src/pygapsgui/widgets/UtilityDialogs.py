@@ -53,12 +53,12 @@ class ErrorMessageBox(QW.QDialog):
 
         self.text_label = QW.QLabel()
         self.text_label.setWordWrap(True)
-        self.text_label.setAlignment(QC.Qt.AlignCenter | QC.Qt.AlignVCenter)
+        self.text_label.setAlignment(QC.Qt.AlignmentFlag.AlignCenter | QC.Qt.AlignmentFlag.AlignVCenter)
         self.text_label.setText(text)
 
         self.scroll_area = QW.QScrollArea()
         self.scroll_area.setWidget(self.text_label)
-        self.scroll_area.setFrameShape(QW.QFrame.NoFrame)
+        self.scroll_area.setFrameShape(QW.QFrame.Shape.NoFrame)
         self.scroll_area.setWidgetResizable(True)
 
         if trace:
@@ -76,8 +76,8 @@ class ErrorMessageBox(QW.QDialog):
             self.details_box.setContentLayout(details_layout)
 
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Ok)
         self.button_box.accepted.connect(self.close)
 
         _layout = QW.QVBoxLayout(self)

@@ -77,7 +77,7 @@ class RangeGenWidget(QW.QWidget):
         h_header = HeightHeaderView()
         self.range_table.setHorizontalHeader(h_header)
         vertical_header = self.range_table.verticalHeader()
-        vertical_header.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
+        vertical_header.setSectionResizeMode(QW.QHeaderView.ResizeMode.ResizeToContents)
         _layout.addWidget(self.range_label)
         _layout.addWidget(self.range_table)
 
@@ -135,7 +135,7 @@ class RangeGenWidget(QW.QWidget):
         # populate table
         self.range_model.setRowCount(npoints)
         index = self.range_model.index(0, prop)
-        self.range_model.setColumnData(index.column(), rng, role=QC.Qt.EditRole)
+        self.range_model.setColumnData(index.column(), rng, role=QC.Qt.ItemDataRole.EditRole)
 
     def save(self):
         self.data = self.range_model._data
@@ -174,8 +174,8 @@ class RangeGenDialog(QW.QDialog):
 
         # Button box
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Cancel | QW.QDialogButtonBox.Ok)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Cancel | QW.QDialogButtonBox.StandardButton.Ok)
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):

@@ -34,23 +34,23 @@ class dfTableModel(QC.QAbstractTableModel):
         self.dataChanged.emit(QC.QModelIndex(), QC.QModelIndex())
         self.layoutChanged.emit()
 
-    def data(self, index=QC.QModelIndex(), role=QC.Qt.DisplayRole):
+    def data(self, index=QC.QModelIndex(), role=QC.Qt.ItemDataRole.DisplayRole):
         """Get data at a specific index."""
         if not index.isValid():
             return None
 
-        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+        if role in [QC.Qt.ItemDataRole.DisplayRole, QC.Qt.ItemDataRole.EditRole]:
             return self._data.values[index.row()][index.column()]
 
-        if role == QC.Qt.TextAlignmentRole:
-            return QC.Qt.AlignCenter
+        if role == QC.Qt.ItemDataRole.TextAlignmentRole:
+            return QC.Qt.AlignmentFlag.AlignCenter
 
-    def setData(self, index, value, role: int = QC.Qt.EditRole) -> bool:
+    def setData(self, index, value, role: int = QC.Qt.ItemDataRole.EditRole) -> bool:
         """Set data of a cell."""
         if not index.isValid():
             return False
 
-        if role == QC.Qt.EditRole:
+        if role == QC.Qt.ItemDataRole.EditRole:
             dtype = self._data.dtypes[index.column()]
 
             if dtype in (np.float32, np.float64):
@@ -64,7 +64,7 @@ class dfTableModel(QC.QAbstractTableModel):
 
         return False
 
-    def setDataRange(self, index, values, role: int = QC.Qt.EditRole, append=False) -> bool:
+    def setDataRange(self, index, values, role: int = QC.Qt.ItemDataRole.EditRole, append=False) -> bool:
         """Intercept setdata to correctly set ads/des for branches"""
         if not index.isValid():
             return False
@@ -87,14 +87,14 @@ class dfTableModel(QC.QAbstractTableModel):
         self.dataChanged.emit(index, current_index)
         return True
 
-    def setColumnData(self, col, values, role: int = QC.Qt.EditRole) -> bool:
+    def setColumnData(self, col, values, role: int = QC.Qt.ItemDataRole.EditRole) -> bool:
         """Set data of a whole column."""
         start = self.index(0, col)
         end = self.index(self._data.shape[0] - 1, col)
         if not start.isValid() or not end.isValid():
             return False
 
-        if role == QC.Qt.EditRole:
+        if role == QC.Qt.ItemDataRole.EditRole:
             colname = self._data.columns[col]
             self._data[colname] = values
             self.dataChanged.emit(start, end)
@@ -108,22 +108,22 @@ class dfTableModel(QC.QAbstractTableModel):
         self._data = self._data.astype({colname: dtype})
         return True
 
-    def headerData(self, section, orientation, role=QC.Qt.DisplayRole):
+    def headerData(self, section, orientation, role=QC.Qt.ItemDataRole.DisplayRole):
         """Get data from the header."""
-        if role != QC.Qt.DisplayRole:
+        if role != QC.Qt.ItemDataRole.DisplayRole:
             return None
-        if orientation == QC.Qt.Horizontal:
+        if orientation == QC.Qt.Orientation.Horizontal:
             return self._data.columns[section]
-        if orientation == QC.Qt.Vertical:
+        if orientation == QC.Qt.Orientation.Vertical:
             return self._data.index[section] + 1
 
-    def setHeaderData(self, section, orientation, value, role=QC.Qt.EditRole) -> bool:
+    def setHeaderData(self, section, orientation, value, role=QC.Qt.ItemDataRole.EditRole) -> bool:
         """Set data in the header as df columns, only horizontal."""
-        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
-            if orientation == QC.Qt.Horizontal:
+        if role in [QC.Qt.ItemDataRole.DisplayRole, QC.Qt.ItemDataRole.EditRole]:
+            if orientation == QC.Qt.Orientation.Horizontal:
                 old_col = self._data.columns[section]
                 self._data.rename(columns={old_col: value}, inplace=True)
-                self.headerDataChanged.emit(QC.Qt.Horizontal, section, section)
+                self.headerDataChanged.emit(QC.Qt.Orientation.Horizontal, section, section)
 
     def insertRows(self, row: int, count: int, parent=QC.QModelIndex()) -> bool:
         """Convenience/fast function for row insertion."""
@@ -172,4 +172,4 @@ class dfTableModel(QC.QAbstractTableModel):
 
     def flags(self, index=QC.QModelIndex()):
         """Set flags for the model."""
-        return QC.Qt.ItemIsEnabled | QC.Qt.ItemIsSelectable | QC.Qt.ItemIsEditable
+        return QC.Qt.ItemFlag.ItemIsEnabled | QC.Qt.ItemFlag.ItemIsSelectable | QC.Qt.ItemFlag.ItemIsEditable

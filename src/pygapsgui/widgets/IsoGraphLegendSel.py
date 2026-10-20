@@ -36,11 +36,11 @@ class IsoGraphLegendSel(QW.QDialog):
 
         for text in self.available:
             item = QW.QListWidgetItem(text)
-            item.setFlags(item.flags() | QC.Qt.ItemIsUserCheckable)
+            item.setFlags(item.flags() | QC.Qt.ItemFlag.ItemIsUserCheckable)
             if text in self.current:
-                item.setCheckState(QC.Qt.Checked)
+                item.setCheckState(QC.Qt.CheckState.Checked)
             else:
-                item.setCheckState(QC.Qt.Unchecked)
+                item.setCheckState(QC.Qt.CheckState.Unchecked)
             self.list_widget.list.addItem(item)
 
         self.data_layout.addWidget(self.top_label)
@@ -48,8 +48,8 @@ class IsoGraphLegendSel(QW.QDialog):
 
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Close)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Ok | QW.QDialogButtonBox.StandardButton.Close)
         self.data_layout.addWidget(self.button_box)
 
     def setupData(self):
@@ -65,6 +65,6 @@ class IsoGraphLegendSel(QW.QDialog):
         """Get a list of all list checked items."""
         lw = self.list_widget.list
         checked = [
-            lw.item(x).text() for x in range(lw.count()) if lw.item(x).checkState() is QC.Qt.Checked
+            lw.item(x).text() for x in range(lw.count()) if lw.item(x).checkState() is QC.Qt.CheckState.Checked
         ]
         return checked

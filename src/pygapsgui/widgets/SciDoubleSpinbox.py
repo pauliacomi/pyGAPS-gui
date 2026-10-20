@@ -54,7 +54,7 @@ class ScientificDoubleSpinBox(QW.QDoubleSpinBox):
         self.setMaximum(np.inf)
         self.validator = FloatValidator()
         self.setDecimals(1000)
-        self.setAlignment(QC.Qt.AlignCenter)
+        self.setAlignment(QC.Qt.AlignmentFlag.AlignCenter)
 
     def validate(self, text, position):
         """Passthrough to validator."""

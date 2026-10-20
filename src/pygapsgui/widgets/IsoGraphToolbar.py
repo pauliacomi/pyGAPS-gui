@@ -39,7 +39,7 @@ class IsoGraphToolbar(NavigationToolbar):
             pm.setDevicePixelRatio(self.devicePixelRatioF())
             if self.palette().color(self.backgroundRole()).value() < 128:
                 icon_color = self.palette().color(self.foregroundRole())
-                mask = pm.createMaskFromColor(QG.QColor('black'), QC.Qt.MaskOutColor)
+                mask = pm.createMaskFromColor(QG.QColor('black'), QC.Qt.MaskMode.MaskOutColor)
                 pm.fill(icon_color)
                 pm.setMask(mask)
             return QG.QIcon(pm)

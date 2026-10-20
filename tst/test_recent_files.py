@@ -41,7 +41,7 @@ def test_legacy_value_is_migrated(qtbot):
     writer = (
         "import pathlib, sys\n"
         "from qtpy import QtCore as QC\n"
-        "settings = QC.QSettings(sys.argv[1], QC.QSettings.IniFormat)\n"
+        "settings = QC.QSettings(sys.argv[1], QC.QSettings.Format.IniFormat)\n"
         f"settings.setValue({LEGACY_RECENT_FILES_KEY!r}, [pathlib.Path('legacy.aif')])\n"
         "settings.sync()\n"
     )

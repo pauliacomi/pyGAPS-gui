@@ -18,8 +18,8 @@ def isolated_settings(qapp, tmp_path):
     """Keep QSettings away from the developer's real application settings."""
     qapp.setOrganizationName("pyGAPS-test")
     qapp.setApplicationName("pyGAPS-gui-test")
-    QC.QSettings.setDefaultFormat(QC.QSettings.IniFormat)
-    QC.QSettings.setPath(QC.QSettings.IniFormat, QC.QSettings.UserScope, str(tmp_path / "settings"))
+    QC.QSettings.setDefaultFormat(QC.QSettings.Format.IniFormat)
+    QC.QSettings.setPath(QC.QSettings.Format.IniFormat, QC.QSettings.Scope.UserScope, str(tmp_path / "settings"))
     QC.QSettings().clear()
     yield
     QC.QSettings().clear()
@@ -35,8 +35,8 @@ def dialog_errors(monkeypatch):
     def fake_exec(self, *args, **kwargs):
         if isinstance(self, ErrorMessageBox):
             errors.append(self.text_label.text())
-            return QW.QDialog.Rejected
-        return QW.QDialog.Accepted
+            return QW.QDialog.DialogCode.Rejected
+        return QW.QDialog.DialogCode.Accepted
 
     for name in ("exec", "exec_"):
         if hasattr(QW.QDialog, name):
