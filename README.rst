@@ -24,8 +24,11 @@ section.
     <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui.msi">
         <img src="https://img.shields.io/badge/download-windows-blue.svg" alt="Win link" />
     </a>
-    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-macos.zip">
-        <img src="https://img.shields.io/badge/download-mac-lightgrey" alt="Mac link" />
+    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-macos-arm64.zip">
+        <img src="https://img.shields.io/badge/download-mac%20(Apple%20silicon)-lightgrey" alt="Mac Apple silicon link" />
+    </a>
+    <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-macos-x86_64.zip">
+        <img src="https://img.shields.io/badge/download-mac%20(Intel)-lightgrey" alt="Mac Intel link" />
     </a>
     <a style="text-decoration:none" href="https://github.com/pauliacomi/pyGAPS-gui/releases/latest/download/pyGAPS-gui-linux-x86_64.tar.gz">
         <img src="https://img.shields.io/badge/download-linux-orange" alt="Linux link" />
@@ -68,9 +71,12 @@ To install the development version of pyGAPS-gui, pull this GitHub repo.
 
    git clone https://github.com/pauliacomi/pyGAPS-gui
 
-Setup a virtual environment and install pyGAPS. For example using
-``venv`` on linux: Due to some dependency hell, **pyGAPS-gui requires
-Python 3.8**.
+Set up a virtual environment and install pyGAPS-gui. Python 3.8 is no longer
+supported. CI targets Python 3.9 through 3.14; Python 3.14 is recommended for
+development and is used to build release bundles. Python 3.9 is retained for
+compatibility despite being end-of-life.
+
+Using ``venv`` on Linux or macOS:
 
 .. code:: bash
 
@@ -79,13 +85,13 @@ Python 3.8**.
    source ./.venv/bin/activate
    pip install .
 
-Or using ``conda`` on Windows:
+Or using ``venv`` on Windows:
 
 .. code:: pwsh
 
    cd pyGAPS-gui
-   conda create -p ./.venv python=3.8
-   conda activate ./.venv
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
    pip install .
 
 Then run the app:

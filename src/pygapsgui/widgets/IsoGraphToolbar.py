@@ -1,6 +1,4 @@
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.backends.qt_compat import _devicePixelRatioF
-from matplotlib.backends.qt_compat import _setDevicePixelRatio
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
@@ -38,10 +36,10 @@ class IsoGraphToolbar(NavigationToolbar):
         """
         if name.startswith("pg"):
             pm = QG.QPixmap(get_resource("icons/" + name[3:]))
-            _setDevicePixelRatio(pm, _devicePixelRatioF(self))
+            pm.setDevicePixelRatio(self.devicePixelRatioF())
             if self.palette().color(self.backgroundRole()).value() < 128:
                 icon_color = self.palette().color(self.foregroundRole())
-                mask = pm.createMaskFromColor(QG.QColor('black'), QC.Qt.MaskOutColor)
+                mask = pm.createMaskFromColor(QG.QColor('black'), QC.Qt.MaskMode.MaskOutColor)
                 pm.fill(icon_color)
                 pm.setMask(mask)
             return QG.QIcon(pm)

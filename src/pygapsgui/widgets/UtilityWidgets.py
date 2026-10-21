@@ -9,21 +9,21 @@ class EditAlignRight(QW.QLineEdit):
     """Right-aligned LineEdit."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignVCenter)
+        self.setAlignment(QC.Qt.AlignmentFlag.AlignRight | QC.Qt.AlignmentFlag.AlignVCenter)
 
 
 class LabelAlignRight(QW.QLabel):
     """Right-aligned Label."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignVCenter)
+        self.setAlignment(QC.Qt.AlignmentFlag.AlignRight | QC.Qt.AlignmentFlag.AlignVCenter)
 
 
 class LabelAlignCenter(QW.QLabel):
     """Center-aligned Label."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setAlignment(QC.Qt.AlignCenter | QC.Qt.AlignVCenter)
+        self.setAlignment(QC.Qt.AlignmentFlag.AlignCenter | QC.Qt.AlignmentFlag.AlignVCenter)
 
 
 class LabelResult(QW.QLabel):
@@ -31,9 +31,9 @@ class LabelResult(QW.QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.setFrameStyle(QW.QFrame.Panel | QW.QFrame.Sunken)
-        self.setAlignment(QC.Qt.AlignHCenter | QC.Qt.AlignVCenter)
-        self.setTextInteractionFlags(QC.Qt.TextSelectableByMouse)
+        self.setFrameStyle(QW.QFrame.Shape.Panel | QW.QFrame.Shadow.Sunken)
+        self.setAlignment(QC.Qt.AlignmentFlag.AlignHCenter | QC.Qt.AlignmentFlag.AlignVCenter)
+        self.setTextInteractionFlags(QC.Qt.TextInteractionFlag.TextSelectableByMouse)
 
 
 class LabelOutput(QW.QTextEdit):
@@ -41,8 +41,8 @@ class LabelOutput(QW.QTextEdit):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.setFrameStyle(QW.QFrame.Panel | QW.QFrame.Sunken)
-        self.setAlignment(QC.Qt.AlignLeft | QC.Qt.AlignTop)
+        self.setFrameStyle(QW.QFrame.Shape.Panel | QW.QFrame.Shadow.Sunken)
+        self.setAlignment(QC.Qt.AlignmentFlag.AlignLeft | QC.Qt.AlignmentFlag.AlignTop)
         self.setReadOnly(True)
         self.setMinimumSize(50, 80)
 
@@ -60,17 +60,17 @@ class FloatStandardItem(QG.QStandardItem):
 
     def type(self) -> int:
         """Expects custom type."""
-        return QG.QStandardItem.UserType + 1
+        return QG.QStandardItem.ItemType.UserType + 1
 
-    def setData(self, value, role: int = QC.Qt.DisplayRole) -> None:
+    def setData(self, value, role: int = QC.Qt.ItemDataRole.DisplayRole) -> None:
         """Just store data as float."""
-        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+        if role in [QC.Qt.ItemDataRole.DisplayRole, QC.Qt.ItemDataRole.EditRole]:
             self.val = value
         self.emitDataChanged()
 
-    def data(self, role: int = QC.Qt.DisplayRole):
+    def data(self, role: int = QC.Qt.ItemDataRole.DisplayRole):
         """Get back same float."""
-        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+        if role in [QC.Qt.ItemDataRole.DisplayRole, QC.Qt.ItemDataRole.EditRole]:
             return self.val
 
 
@@ -125,15 +125,15 @@ class CollapsibleBox(QW.QWidget):
         super().__init__(*args, **kwargs)
 
         self.toggle_button = QW.QToolButton(text=title, checkable=True, checked=False)
-        self.toggle_button.setToolButtonStyle(QC.Qt.ToolButtonTextBesideIcon)
-        self.toggle_button.setArrowType(QC.Qt.RightArrow)
+        self.toggle_button.setToolButtonStyle(QC.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.toggle_button.setArrowType(QC.Qt.ArrowType.RightArrow)
         self.toggle_button.toggled.connect(self.on_pressed)
 
         self.toggle_animation = QC.QParallelAnimationGroup(self)
 
         self.content_area = QW.QScrollArea(maximumHeight=0, minimumHeight=0)
         self.content_area.setWidgetResizable(True)
-        self.content_area.setSizePolicy(QW.QSizePolicy.Expanding, QW.QSizePolicy.Expanding)
+        self.content_area.setSizePolicy(QW.QSizePolicy.Policy.Expanding, QW.QSizePolicy.Policy.Expanding)
 
         _layout = QW.QVBoxLayout(self)
         _layout.setSpacing(0)
@@ -157,9 +157,9 @@ class CollapsibleBox(QW.QWidget):
     def on_pressed(self):
         """Animate and toggle open/closed."""
         checked = self.toggle_button.isChecked()
-        self.toggle_button.setArrowType(QC.Qt.DownArrow if checked else QC.Qt.RightArrow)
+        self.toggle_button.setArrowType(QC.Qt.ArrowType.DownArrow if checked else QC.Qt.ArrowType.RightArrow)
         self.toggle_animation.setDirection(
-            QC.QAbstractAnimation.Forward if checked else QC.QAbstractAnimation.Backward
+            QC.QAbstractAnimation.Direction.Forward if checked else QC.QAbstractAnimation.Direction.Backward
         )
         self.toggle_animation.start()
 
@@ -207,14 +207,14 @@ class CollapsibleBox(QW.QWidget):
 class HeightHeaderView(QW.QHeaderView):
     """A table QHeaderView which wraps and adapts to text height."""
     def __init__(self, parent=None):
-        super().__init__(QC.Qt.Horizontal, parent=parent)
-        self.setSectionResizeMode(QW.QHeaderView.Stretch)
+        super().__init__(QC.Qt.Orientation.Horizontal, parent=parent)
+        self.setSectionResizeMode(QW.QHeaderView.ResizeMode.Stretch)
         self.setStretchLastSection(True)
-        self.setDefaultAlignment(QC.Qt.AlignCenter | QC.Qt.Alignment(QC.Qt.TextWordWrap))
+        self.setDefaultAlignment(QC.Qt.AlignmentFlag.AlignCenter | QC.Qt.Alignment(QC.Qt.TextFlag.TextWordWrap))
 
     def sectionSizeFromContents(self, logicalIndex):
         """Tweak bounding rectangle based on data."""
-        text = self.model().headerData(logicalIndex, self.orientation(), QC.Qt.DisplayRole)
+        text = self.model().headerData(logicalIndex, self.orientation(), QC.Qt.ItemDataRole.DisplayRole)
         alignment = self.defaultAlignment()
         metrics = QG.QFontMetrics(self.fontMetrics())
         rect = metrics.boundingRect(QC.QRect(), alignment, text)
@@ -236,14 +236,14 @@ class MovableListWidget(QW.QWidget):
 
     def setup_UI(self):
         self.list = QW.QListWidget()
-        self.list.setDragDropMode(QW.QAbstractItemView.InternalMove)
+        self.list.setDragDropMode(QW.QAbstractItemView.DragDropMode.InternalMove)
 
         self.button_up = QW.QPushButton("▲")
         self.button_up.clicked.connect(self.move_item_up)
-        self.button_up.setFocusPolicy(QC.Qt.NoFocus)
+        self.button_up.setFocusPolicy(QC.Qt.FocusPolicy.NoFocus)
         self.button_down = QW.QPushButton("▼")
         self.button_down.clicked.connect(self.move_item_down)
-        self.button_down.setFocusPolicy(QC.Qt.NoFocus)
+        self.button_down.setFocusPolicy(QC.Qt.FocusPolicy.NoFocus)
 
         self.label = QW.QLabel()
         self.edit = QW.QLineEdit()
@@ -268,9 +268,9 @@ class MovableListWidget(QW.QWidget):
 
     def eventFilter(self, source, event):
         """Handle enter on editbox."""
-        if (event.type() == QC.QEvent.KeyPress and source is self.edit):
+        if (event.type() == QC.QEvent.Type.KeyPress and source is self.edit):
             keyEvent = QG.QKeyEvent(event)
-            if keyEvent.key() == QC.Qt.Key_Enter or keyEvent.key() == QC.Qt.Key_Return:
+            if keyEvent.key() == QC.Qt.Key.Key_Enter or keyEvent.key() == QC.Qt.Key.Key_Return:
                 self.add_item()
                 return True
         return super().eventFilter(source, event)
@@ -297,8 +297,8 @@ class MovableListWidget(QW.QWidget):
     def add_item(self):
         """Adding a value."""
         item = QW.QListWidgetItem(self.edit.text())
-        item.setFlags(item.flags() | QC.Qt.ItemIsUserCheckable)
-        item.setCheckState(QC.Qt.Checked)
+        item.setFlags(item.flags() | QC.Qt.ItemFlag.ItemIsUserCheckable)
+        item.setCheckState(QC.Qt.CheckState.Checked)
         self.list.addItem(item)
         self.edit.clear()
 

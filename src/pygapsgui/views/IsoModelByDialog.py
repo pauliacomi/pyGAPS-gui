@@ -59,8 +59,8 @@ class IsoModelByDialog(QW.QDialog):
 
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Cancel)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Save | QW.QDialogButtonBox.StandardButton.Cancel)
         _layout.addWidget(self.button_box, 3, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:

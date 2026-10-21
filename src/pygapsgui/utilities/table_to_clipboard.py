@@ -23,7 +23,7 @@ def clipboard_to_table(table):
 def table_to_clipboard(table):
     """Copies selected table to keyboard."""
     mime = table_selection_to_mime_data(table)
-    QW.QApplication.clipboard().setMimeData(mime, QG.QClipboard.Clipboard)
+    QW.QApplication.clipboard().setMimeData(mime, QG.QClipboard.Mode.Clipboard)
 
 
 def mime_data_to_table(table):
@@ -56,7 +56,7 @@ def table_selection_to_list(table):
     for row in rows:
         line = []
         for col in columns:
-            val = model.index(row, col).data(role=QC.Qt.DisplayRole)
+            val = model.index(row, col).data(role=QC.Qt.ItemDataRole.DisplayRole)
             line.append("" if val is None else str(val))
         lines.append(line)
 

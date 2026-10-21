@@ -1,0 +1,6 @@
+[flake8]
+# E266: too many leading '#' for block comment
+ignore = E266, E402, W503, W504, E126
+max-line-length = 200
+exclude = .tox,.eggs,ci/templates,build,dist
+docstring_style = numpy

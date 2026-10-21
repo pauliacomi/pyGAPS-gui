@@ -39,7 +39,7 @@ class QSpinBoxSlider(QW.QWidget):
         self.slider = QW.QSlider(self)
         self.slider.setRange(self.minv, self.maxv)
         self.slider.setSingleStep(self.step)
-        self.slider.setOrientation(QC.Qt.Horizontal)
+        self.slider.setOrientation(QC.Qt.Orientation.Horizontal)
         self.slider.setTracking(False)
         self.slider.valueChanged.connect(self.handleSlider)
 

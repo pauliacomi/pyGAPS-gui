@@ -8,7 +8,6 @@
 ##
 ################################################################################
 
-import qtpy
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
@@ -20,10 +19,7 @@ class SplashScreen(QW.QSplashScreen):
         super().__init__(*args, **kwargs)
         self.setGeometry(0, 0, 680, 400)
         self.setup_UI()
-        if qtpy.API in qtpy.PYQT6_API:
-            screen = self.screen()
-        else:
-            screen = QG.QGuiApplication.primaryScreen()
+        screen = self.screen()
         self.move(screen.availableGeometry().center() - self.frameGeometry().center())
 
     def drawContents(self, painter: QG.QPainter) -> None:
@@ -41,8 +37,8 @@ class SplashScreen(QW.QSplashScreen):
             self.setObjectName("SplashScreen")
 
         # General window formats
-        self.setWindowFlag(QC.Qt.FramelessWindowHint)
-        self.setAttribute(QC.Qt.WA_TranslucentBackground)
+        self.setWindowFlag(QC.Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(QC.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         # Declare fonts
         font_large = QG.QFont()
@@ -68,8 +64,8 @@ class SplashScreen(QW.QSplashScreen):
             "	border-radius: 10px;\n"
             "}"
         )
-        self.dropShadowFrame.setFrameShape(QW.QFrame.StyledPanel)
-        self.dropShadowFrame.setFrameShadow(QW.QFrame.Raised)
+        self.dropShadowFrame.setFrameShape(QW.QFrame.Shape.StyledPanel)
+        self.dropShadowFrame.setFrameShadow(QW.QFrame.Shadow.Raised)
         self.shadow = QW.QGraphicsDropShadowEffect(self)
         self.shadow.setBlurRadius(20)
         self.shadow.setXOffset(0)
@@ -82,14 +78,14 @@ class SplashScreen(QW.QSplashScreen):
         self.label_title.setGeometry(QC.QRect(0, 90, 661, 90))
         self.label_title.setFont(font_large)
         self.label_title.setStyleSheet("color: rgb(254, 121, 199);")
-        self.label_title.setAlignment(QC.Qt.AlignCenter)
+        self.label_title.setAlignment(QC.Qt.AlignmentFlag.AlignCenter)
 
         self.label_description = QW.QLabel(self.dropShadowFrame)
         self.label_description.setObjectName("label_description")
         self.label_description.setGeometry(QC.QRect(0, 180, 661, 31))
         self.label_description.setFont(font_med1)
         self.label_description.setStyleSheet("color: rgb(98, 114, 164);")
-        self.label_description.setAlignment(QC.Qt.AlignCenter)
+        self.label_description.setAlignment(QC.Qt.AlignmentFlag.AlignCenter)
 
         self.progressbar = QW.QProgressBar(self.dropShadowFrame)
         self.progressbar.setObjectName("progressbar")
@@ -114,13 +110,13 @@ class SplashScreen(QW.QSplashScreen):
         self.label_loading.setGeometry(QC.QRect(0, 320, 661, 21))
         self.label_loading.setFont(font_med2)
         self.label_loading.setStyleSheet("color: rgb(98, 114, 164);")
-        self.label_loading.setAlignment(QC.Qt.AlignCenter)
+        self.label_loading.setAlignment(QC.Qt.AlignmentFlag.AlignCenter)
         self.label_credits = QW.QLabel(self.dropShadowFrame)
         self.label_credits.setObjectName("label_credits")
         self.label_credits.setGeometry(QC.QRect(20, 350, 621, 21))
         self.label_credits.setFont(font_small)
         self.label_credits.setStyleSheet("color: rgb(98, 114, 164);")
-        self.label_credits.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignTrailing | QC.Qt.AlignVCenter)
+        self.label_credits.setAlignment(QC.Qt.AlignmentFlag.AlignRight | QC.Qt.AlignmentFlag.AlignTrailing | QC.Qt.AlignmentFlag.AlignVCenter)
 
         # Layout
         self._layout = QW.QVBoxLayout(self)

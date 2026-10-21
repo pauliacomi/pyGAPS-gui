@@ -128,3 +128,4 @@ src/pygapsgui/_version.py
 
 # local tools
 toolchain
+.wix/
