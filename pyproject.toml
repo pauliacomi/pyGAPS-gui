@@ -1,16 +1,97 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
-    "setuptools_scm[toml]>=3.4",
+    "setuptools>=77",
+    "setuptools-scm>=8",
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "pygapsgui"
+description = "GUI for pyGAPS"
+readme = "README.rst"
+license = "AGPL-3.0-only"
+license-files = ["LICENSE"]
+authors = [{ name = "Paul Iacomi", email = "mail@pauliacomi.com" }]
+requires-python = ">=3.9"
+keywords = ["adsorption", "characterization", "porous materials"]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+dependencies = [
+    "pyside6>=6.8.3",
+    "qtpy>=2.0.1",
+    "matplotlib>=3.5.2",
+    "rapidfuzz>=2",
+    "pygaps>=4.6.1,<5",
+    # pyGAPS 4.6.1 AIF parsing uses pandas.to_numeric(errors="ignore"), removed in pandas 3.
+    "pandas<3",
+    "docutils",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+build = [
+    "pyinstaller>=6.16",
+    "packaging>=23",
+]
+docs = [
+    "pygments>=2.11",
+    "docutils>=0.11",
+    "doc8",
+    "pandoc",
+    "restructuredtext-lint",
+    "sphinx>=4.0",
+    "sphinx-copybutton",
+    "furo",
+]
+test = [
+    "pytest>=8",
+    "pytest-qt>=4.4",
+    "packaging>=23",
+]
+
+[project.scripts]
+pygapsgui = "pygapsgui:main"
+
+[project.urls]
+Homepage = "https://github.com/pauliacomi/pyGAPS-gui"
+Source = "https://github.com/pauliacomi/pyGAPS-gui"
+Issues = "https://github.com/pauliacomi/pyGAPS-gui/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.txt", "*.rst"]
+"pygapsgui.resources" = ["**/*"]
+
 # versioning: setuptools_scm
 [tool.setuptools_scm]
-write_to = "src/pygapsgui/_version.py"
+version_file = "src/pygapsgui/_version.py"
 local_scheme = 'dirty-tag'
 fallback_version = '0.2.0'
+
+# testing: pytest
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tst"]
+pythonpath = ["."]
+addopts = ["-ra", "--strict-markers", "--import-mode=importlib"]
+qt_api = "pyside6"
+xfail_strict = true
+filterwarnings = ["error::pytest.PytestUnraisableExceptionWarning"]
 
 
 # linting: pylint

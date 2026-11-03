@@ -41,14 +41,14 @@ class IsoEditPointWidget(QW.QWidget):
         self.table_view.setItemDelegate(str_delegate)
         self.table_view.setItemDelegateForColumn(0, sci_delegate)
         self.table_view.setItemDelegateForColumn(1, sci_delegate)
-        self.table_view.setSelectionMode(QW.QAbstractItemView.ContiguousSelection)
+        self.table_view.setSelectionMode(QW.QAbstractItemView.SelectionMode.ContiguousSelection)
         _layout.addWidget(self.table_view)
 
         # table view Headers
         self.horizontal_header = self.table_view.horizontalHeader()
         self.vertical_header = self.table_view.verticalHeader()
-        self.horizontal_header.setSectionResizeMode(QW.QHeaderView.Stretch)
-        self.vertical_header.setSectionResizeMode(QW.QHeaderView.ResizeToContents)
+        self.horizontal_header.setSectionResizeMode(QW.QHeaderView.ResizeMode.Stretch)
+        self.vertical_header.setSectionResizeMode(QW.QHeaderView.ResizeMode.ResizeToContents)
 
         # Edit functions
         edit_widget = QW.QWidget()
@@ -111,7 +111,7 @@ class IsoEditPointWidget(QW.QWidget):
         layout.addWidget(btn)
         btn.pressed.connect(dialog.accept)
         ret = dialog.exec()
-        if ret != QW.QDialog.Accepted:
+        if ret != QW.QDialog.DialogCode.Accepted:
             return
         if not input.text():
             return
@@ -122,7 +122,7 @@ class IsoEditPointWidget(QW.QWidget):
         self.datatable_model.insertColumn(ncols)
         if dtype == "text":
             self.datatable_model.setColumnDtype(ncols, "object")
-        self.datatable_model.setHeaderData(ncols, QC.Qt.Horizontal, input.text())
+        self.datatable_model.setHeaderData(ncols, QC.Qt.Orientation.Horizontal, input.text())
         self.changed.emit()
 
     def del_col(self):
@@ -135,10 +135,10 @@ class IsoEditPointWidget(QW.QWidget):
     def keyPressEvent(self, event):
         """Handle copy/paste."""
         if self.table_view.hasFocus():
-            if event.key() == QC.Qt.Key_C and (event.modifiers() & QC.Qt.ControlModifier):
+            if event.key() == QC.Qt.Key.Key_C and (event.modifiers() & QC.Qt.KeyboardModifier.ControlModifier):
                 table_to_clipboard(self.table_view)
                 event.accept()
-            if event.key() == QC.Qt.Key_V and (event.modifiers() & QC.Qt.ControlModifier):
+            if event.key() == QC.Qt.Key.Key_V and (event.modifiers() & QC.Qt.KeyboardModifier.ControlModifier):
                 clipboard_to_table(self.table_view)
                 self.changed.emit()
                 event.accept()
@@ -188,8 +188,8 @@ class IsoEditPointDialog(QW.QDialog):
 
         # Button box
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Cancel)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Ok | QW.QDialogButtonBox.StandardButton.Cancel)
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):

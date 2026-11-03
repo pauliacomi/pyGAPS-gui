@@ -9,20 +9,20 @@ _BRANCH_CHOICES = {"ads": False, "des": True, "0": False, "1": True, "False": Fa
 
 class IsoDataTableModel(dfTableModel):
     """Overload a dataframe table model to display isotherm adsorption data."""
-    def data(self, index=QC.QModelIndex(), role=QC.Qt.DisplayRole):
+    def data(self, index=QC.QModelIndex(), role=QC.Qt.ItemDataRole.DisplayRole):
         """Intercept data to display ads/des for branches"""
-        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+        if role in [QC.Qt.ItemDataRole.DisplayRole, QC.Qt.ItemDataRole.EditRole]:
             if self._data.columns[index.column()] == "branch":
                 val = self._data.values[index.row()][index.column()]
                 return "des" if val else "ads"
         return super().data(index, role)
 
-    def setData(self, index, value, role: int = QC.Qt.EditRole) -> bool:
+    def setData(self, index, value, role: int = QC.Qt.ItemDataRole.EditRole) -> bool:
         """Intercept setdata to correctly set ads/des for branches"""
         if not index.isValid():
             return False
 
-        if role == QC.Qt.EditRole:
+        if role == QC.Qt.ItemDataRole.EditRole:
             if self._data.columns[index.column()] == "branch":
                 if value in ("ads", "des", "0", "1", "False", "True"):
                     self._data.iloc[index.row(), index.column()] = _BRANCH_CHOICES[value]

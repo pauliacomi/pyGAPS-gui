@@ -13,12 +13,12 @@ class IsoListView(QW.QListView):
 
         # Setup properties
         self.setUniformItemSizes(True)
-        self.setMovement(QW.QListView.Static)
-        self.setEditTriggers(QW.QAbstractItemView.DoubleClicked)
-        self.setSelectionBehavior(QW.QAbstractItemView.SelectItems)
-        self.setSelectionMode(QW.QAbstractItemView.SingleSelection)
-        self.setDragDropMode(QW.QAbstractItemView.NoDragDrop)
-        self.setContextMenuPolicy(QC.Qt.CustomContextMenu)
+        self.setMovement(QW.QListView.Movement.Static)
+        self.setEditTriggers(QW.QAbstractItemView.EditTrigger.DoubleClicked)
+        self.setSelectionBehavior(QW.QAbstractItemView.SelectionBehavior.SelectItems)
+        self.setSelectionMode(QW.QAbstractItemView.SelectionMode.SingleSelection)
+        self.setDragDropMode(QW.QAbstractItemView.DragDropMode.NoDragDrop)
+        self.setContextMenuPolicy(QC.Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
 
     def show_context_menu(self, point):
@@ -41,10 +41,10 @@ class IsoListView(QW.QListView):
 
     def keyPressEvent(self, event):
         """Override to add custom handler for keypresses."""
-        if event.key() == QC.Qt.Key_Delete:
+        if event.key() == QC.Qt.Key.Key_Delete:
             self.model().removeRow(self.currentIndex().row())
             return
-        if event.key() == QC.Qt.Key_F2:
+        if event.key() == QC.Qt.Key.Key_F2:
             self.edit(self.currentIndex())
             return
         super().keyPressEvent(event)
@@ -60,12 +60,12 @@ class IsoListView(QW.QListView):
     #     selection_model.blockSignals(False)
     #     old_index = self.model().index(start - 1, 0)
     #     new_index = self.model().index(self.selection, 0)
-    #     selection_model.select(new_index, QC.QItemSelectionModel.ClearAndSelect)
+    #     selection_model.select(new_index, QC.QItemSelectionModel.SelectionFlag.ClearAndSelect)
     #     selection_model.currentChanged.emit(new_index, old_index)
 
     # def rowsInserted(self, parent: QC.QModelIndex, start: int, end: int) -> None:
     #     self.selection = start
     #     if end > start:
     #         self.selection = start - 1
-    #     self.model().item(self.selection).setCheckState(QC.Qt.Unchecked)
+    #     self.model().item(self.selection).setCheckState(QC.Qt.CheckState.Unchecked)
     #     return super().rowsInserted(parent, start, end)

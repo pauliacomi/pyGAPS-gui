@@ -29,30 +29,30 @@ class MetadataTableModel(QC.QAbstractTableModel):
         """Get number of columns, always three."""
         return 3
 
-    def data(self, index, role=QC.Qt.DisplayRole):
+    def data(self, index, role=QC.Qt.ItemDataRole.DisplayRole):
         """Data display function."""
         if not index.isValid():
             return
 
-        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+        if role in [QC.Qt.ItemDataRole.DisplayRole, QC.Qt.ItemDataRole.EditRole]:
             return self.params[index.row()][index.column()]
 
-        if role == QC.Qt.TextAlignmentRole:
-            return QC.Qt.AlignCenter
+        if role == QC.Qt.ItemDataRole.TextAlignmentRole:
+            return QC.Qt.AlignmentFlag.AlignCenter
 
-    def rowData(self, index, role=QC.Qt.DisplayRole):
+    def rowData(self, index, role=QC.Qt.ItemDataRole.DisplayRole):
         """Row data return function."""
         if not index.isValid():
             return
-        if role in [QC.Qt.DisplayRole, QC.Qt.EditRole]:
+        if role in [QC.Qt.ItemDataRole.DisplayRole, QC.Qt.ItemDataRole.EditRole]:
             return self.params[index.row()]
 
-    def headerData(self, section, orientation, role=QC.Qt.DisplayRole):
+    def headerData(self, section, orientation, role=QC.Qt.ItemDataRole.DisplayRole):
         """Header display function."""
-        if role != QC.Qt.DisplayRole:
+        if role != QC.Qt.ItemDataRole.DisplayRole:
             return None
 
-        if orientation == QC.Qt.Horizontal:
+        if orientation == QC.Qt.Orientation.Horizontal:
             if section == 0:
                 return "Name"
             elif section == 1:
@@ -61,7 +61,7 @@ class MetadataTableModel(QC.QAbstractTableModel):
                 return "Type"
             else:
                 return ""
-        elif orientation == QC.Qt.Vertical:
+        elif orientation == QC.Qt.Orientation.Vertical:
             return section
 
     def setData(self, index, value, role):
@@ -69,7 +69,7 @@ class MetadataTableModel(QC.QAbstractTableModel):
         if not index.isValid():
             return False
 
-        if role == QC.Qt.EditRole:
+        if role == QC.Qt.ItemDataRole.EditRole:
             if index.column() == 0:
                 if value not in [p[0] for p in self.params]:
                     self.params.insert(index.row(), [value, None, None])
@@ -88,7 +88,7 @@ class MetadataTableModel(QC.QAbstractTableModel):
         """Set data of a whole row."""
         for col in range(len(data)):
             index = self.createIndex(row, col)
-            self.setData(index, data[col], role=QC.Qt.EditRole)
+            self.setData(index, data[col], role=QC.Qt.ItemDataRole.EditRole)
 
     def removeRows(self, position, rows=1, index=QC.QModelIndex()):
         """Delete a row from the model. Removes attribute from coreclass."""
@@ -126,5 +126,5 @@ class MetadataTableModel(QC.QAbstractTableModel):
     def flags(self, index):
         """Set flags for the model."""
         if index.column() == 2:
-            return QC.Qt.ItemIsSelectable
-        return QC.Qt.ItemIsEnabled | QC.Qt.ItemIsSelectable
+            return QC.Qt.ItemFlag.ItemIsSelectable
+        return QC.Qt.ItemFlag.ItemIsEnabled | QC.Qt.ItemFlag.ItemIsSelectable

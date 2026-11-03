@@ -4,7 +4,7 @@ from qtpy import QtWidgets as QW
 import pygaps
 from pygaps.graphing.iast_graphs import plot_iast
 from pygaps.graphing.labels import label_units_iso
-from pygaps.iast.pgiast import iast_point_fraction
+from pygaps.prediction.iast import iast_point_fraction
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 

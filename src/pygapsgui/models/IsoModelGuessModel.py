@@ -50,9 +50,9 @@ class IsoModelGuessModel():
         for model in _MODELS:
             item = QW.QListWidgetItem(model)
             if model in _GUESS_MODELS:
-                item.setCheckState(QC.Qt.Checked)
+                item.setCheckState(QC.Qt.CheckState.Checked)
             else:
-                item.setCheckState(QC.Qt.Unchecked)
+                item.setCheckState(QC.Qt.CheckState.Unchecked)
             self.view.model_list.addItem(item)
         self.view.branch_dropdown.addItems(["ads", "des"])
         self.view.branch_dropdown.setCurrentText(self.branch)
@@ -108,9 +108,9 @@ class IsoModelGuessModel():
         """Call pyGAPS to perform main calculation."""
         self.model_attempts = []
         checked_models = [
-            self.view.model_list.item(row).data(QC.Qt.DisplayRole)
+            self.view.model_list.item(row).data(QC.Qt.ItemDataRole.DisplayRole)
             for row in range(self.view.model_list.count())
-            if self.view.model_list.item(row).checkState() == QC.Qt.Checked
+            if self.view.model_list.item(row).checkState() == QC.Qt.CheckState.Checked
         ]
         with log_hook:
             try:

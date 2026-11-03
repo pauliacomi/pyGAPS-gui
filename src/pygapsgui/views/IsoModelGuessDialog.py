@@ -1,11 +1,5 @@
-from qtpy import PYSIDE6
 from qtpy import QtCore as QC
 from qtpy import QtWidgets as QW
-
-if PYSIDE6:
-    import PySide6.QtSvgWidgets as QS
-else:
-    from qtpy import QtSvg as QS
 
 from pygapsgui.views.IsoGraphView import IsoModelGraphView
 from pygapsgui.widgets.SpinBoxSlider import QHSpinBoxSlider
@@ -67,8 +61,8 @@ class IsoModelGuessDialog(QW.QDialog):
 
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Save | QW.QDialogButtonBox.Cancel)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Save | QW.QDialogButtonBox.StandardButton.Cancel)
         _layout.addWidget(self.button_box, 3, 0, 1, 2)
 
     def sizeHint(self) -> QC.QSize:

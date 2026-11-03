@@ -52,8 +52,8 @@ class PlotTDialog(QW.QDialog):
         self.res_text_layout = QW.QGridLayout(self.res_text_box)
 
         self.res_table = QW.QTableWidget(0, 5, self)
-        self.res_table.horizontalHeader().setSectionResizeMode(QW.QHeaderView.Stretch)
-        self.res_table.verticalHeader().setSectionResizeMode(QW.QHeaderView.ResizeToContents)
+        self.res_table.horizontalHeader().setSectionResizeMode(QW.QHeaderView.ResizeMode.Stretch)
+        self.res_table.verticalHeader().setSectionResizeMode(QW.QHeaderView.ResizeMode.ResizeToContents)
         self.res_table.setMinimumHeight(100)
         self.res_text_layout.addWidget(self.res_table, 0, 0, 1, 4)
 
@@ -63,13 +63,13 @@ class PlotTDialog(QW.QDialog):
 
         # Bottom buttons
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.addButton("Save as metadata", QW.QDialogButtonBox.AcceptRole)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.addButton("Save as metadata", QW.QDialogButtonBox.ButtonRole.AcceptRole)
         self.export_btn = self.button_box.addButton(
-            "Export results", QW.QDialogButtonBox.ActionRole
+            "Export results", QW.QDialogButtonBox.ButtonRole.ActionRole
         )
-        self.button_box.addButton("Help", QW.QDialogButtonBox.HelpRole)
-        self.button_box.addButton("Cancel", QW.QDialogButtonBox.RejectRole)
+        self.button_box.addButton("Help", QW.QDialogButtonBox.ButtonRole.HelpRole)
+        self.button_box.addButton("Cancel", QW.QDialogButtonBox.ButtonRole.RejectRole)
         _layout.addWidget(self.button_box)
 
     def sizeHint(self) -> QC.QSize:

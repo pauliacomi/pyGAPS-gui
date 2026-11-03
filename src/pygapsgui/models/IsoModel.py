@@ -9,7 +9,7 @@ class IsoModel(QG.QStandardItem):
     """Overloading a standard item to store an isotherm."""
 
     # Whether the user has checked it purposefully
-    userCheckState = QC.Qt.Unchecked
+    userCheckState = QC.Qt.CheckState.Unchecked
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -18,7 +18,7 @@ class IsoModel(QG.QStandardItem):
         self.setDragEnabled(True)
         # checkable
         self.setCheckable(True)
-        self.setCheckState(QC.Qt.Unchecked)
+        self.setCheckState(QC.Qt.CheckState.Unchecked)
 
     def setData(self, isotherm, *args, **kwargs):
         if isinstance(isotherm, pg.ModelIsotherm):

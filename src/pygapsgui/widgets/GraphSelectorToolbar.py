@@ -64,7 +64,7 @@ class VSelectorToolbar(SelectorToolbar):
         self.addWidget(self.slider)
 
         size_policy = QW.QSizePolicy(
-            QW.QSizePolicy.MinimumExpanding,
-            QW.QSizePolicy.MinimumExpanding,
+            QW.QSizePolicy.Policy.MinimumExpanding,
+            QW.QSizePolicy.Policy.MinimumExpanding,
         )
         self.setSizePolicy(size_policy)

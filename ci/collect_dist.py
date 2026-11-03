@@ -29,6 +29,7 @@ import uuid
 from io import StringIO
 
 from importlib.metadata import version, PackageNotFoundError
+from packaging.version import Version
 
 try:
     pggversion = version("pygapsgui")
@@ -47,7 +48,7 @@ def zipit(dist_dir, work_dir):
         for root, dirs, files in os.walk(dist_dir):
             for f in files:
                 diskname = os.path.join(root, f)
-                zipname = os.path.relpath(diskname)
+                zipname = os.path.relpath(diskname, work_dir)
                 zf.write(diskname, arcname=zipname)
 
     print("Distribution is located at {0}".format(dist_dir + '.zip'))
@@ -77,7 +78,7 @@ def construct_msi_strings(dist_dir, work_dir):
     for root, dirs, files in os.walk(dist_dir, topdown=True):
 
         # Create a basic path to our source
-        start = root.replace(work_dir + '\\', '')
+        start = os.path.relpath(root, work_dir)
 
         parent, thisdir = os.path.split(root)
         while parent != curdir[-1][0] and curdir[-1][1] != topElement:
@@ -157,7 +158,7 @@ def msi(dist_dir, work_dir):
     # Write out the WiX file to the parent directory of the distro
     print("Generating WiX Input File")
     out_wix_path = os.path.join(work_dir, 'pyGAPS-gui.wxs')
-    version_tuple = pggversion.split(".")
+    version_tuple = (Version(pggversion).release + (0, 0, 0))[:3]
     print(
         f"Generated WiX file for version: {version_tuple[0]}.{version_tuple[1]}.{version_tuple[2]}"
     )

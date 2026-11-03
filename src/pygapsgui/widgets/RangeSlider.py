@@ -80,7 +80,7 @@ class QRangeSlider(QW.QWidget):
         else:
             self.setValues([0.3, 0.6])
 
-        self.setFocusPolicy(QC.Qt.ClickFocus)
+        self.setFocusPolicy(QC.Qt.FocusPolicy.ClickFocus)
 
     def emitRange(self):
         """Emits the rangeChanged signal, if the range has actually changed."""
@@ -102,15 +102,15 @@ class QRangeSlider(QW.QWidget):
 
         # move bars based on arrow keys
         moving_max = False
-        if key == QC.Qt.Key_Up:
+        if key == QC.Qt.Key.Key_Up:
             self.max_val += self.single_step
             moving_max = True
-        elif key == QC.Qt.Key_Down:
+        elif key == QC.Qt.Key.Key_Down:
             self.max_val -= self.single_step
             moving_max = True
-        elif key == QC.Qt.Key_Left:
+        elif key == QC.Qt.Key.Key_Left:
             self.min_val -= self.single_step
-        elif key == QC.Qt.Key_Right:
+        elif key == QC.Qt.Key.Key_Right:
             self.min_val += self.single_step
 
         # update (if necessary) based on allowed range
@@ -367,22 +367,22 @@ class QHRangeSlider(QRangeSlider):
         h = self.height()
 
         # background
-        painter.setPen(QC.Qt.gray)
-        painter.setBrush(QC.Qt.lightGray)
+        painter.setPen(QC.Qt.GlobalColor.gray)
+        painter.setBrush(QC.Qt.GlobalColor.lightGray)
         painter.drawRect(2, 2, w - 4, h - 4)
 
         # range bar
-        painter.setPen(QC.Qt.darkGray)
-        painter.setBrush(QC.Qt.darkGray)
+        painter.setPen(QC.Qt.GlobalColor.darkGray)
+        painter.setBrush(QC.Qt.GlobalColor.darkGray)
         painter.drawRect(self.display_min - 1, 5, self.display_max - self.display_min + 2, h - 10)
 
         # min & max tabs
-        painter.setPen(QC.Qt.black)
-        painter.setBrush(QC.Qt.gray)
+        painter.setPen(QC.Qt.GlobalColor.black)
+        painter.setBrush(QC.Qt.GlobalColor.gray)
         painter.drawRect(self.display_min - self.bar_width, 1, self.bar_width, h - 2)
 
-        painter.setPen(QC.Qt.black)
-        painter.setBrush(QC.Qt.gray)
+        painter.setPen(QC.Qt.GlobalColor.black)
+        painter.setBrush(QC.Qt.GlobalColor.gray)
         painter.drawRect(self.display_max, 1, self.bar_width, h - 2)
 
     def rangeSliderSize(self):
@@ -424,24 +424,24 @@ class QVRangeSlider(QRangeSlider):
         h = self.height()
 
         # background
-        painter.setPen(QC.Qt.gray)
-        painter.setBrush(QC.Qt.lightGray)
+        painter.setPen(QC.Qt.GlobalColor.gray)
+        painter.setBrush(QC.Qt.GlobalColor.lightGray)
         painter.drawRect(2, 2, w - 4, h - 4)
 
         # range bar
-        painter.setPen(QC.Qt.darkGray)
-        painter.setBrush(QC.Qt.darkGray)
+        painter.setPen(QC.Qt.GlobalColor.darkGray)
+        painter.setBrush(QC.Qt.GlobalColor.darkGray)
         painter.drawRect(
             5, h - self.display_max - 1, w - 10, self.display_max - self.display_min + 1
         )
 
         # min & max tabs
-        painter.setPen(QC.Qt.black)
-        painter.setBrush(QC.Qt.gray)
+        painter.setPen(QC.Qt.GlobalColor.black)
+        painter.setBrush(QC.Qt.GlobalColor.gray)
         painter.drawRect(1, h - self.display_max - self.bar_width - 1, w - 2, self.bar_width)
 
-        painter.setPen(QC.Qt.black)
-        painter.setBrush(QC.Qt.gray)
+        painter.setPen(QC.Qt.GlobalColor.black)
+        painter.setBrush(QC.Qt.GlobalColor.gray)
         painter.drawRect(1, h - self.display_min - 1, w - 2, self.bar_width)
 
     def rangeSliderSize(self):
@@ -493,8 +493,8 @@ class QSpinBoxRangeSlider(QW.QWidget):
 
         # Make range slider take as much of the space as possible.
         size_policy = QW.QSizePolicy(
-            QW.QSizePolicy.MinimumExpanding,
-            QW.QSizePolicy.MinimumExpanding,
+            QW.QSizePolicy.Policy.MinimumExpanding,
+            QW.QSizePolicy.Policy.MinimumExpanding,
         )
         self.range_slider.setSizePolicy(size_policy)
 

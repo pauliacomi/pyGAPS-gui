@@ -1,6 +1,6 @@
 import numpy
 
-from pygaps.characterisation.isosteric_enth import isosteric_enthalpy
+from pygaps.characterisation.enth_sorp_clapeyron import enthalpy_sorption_clapeyron
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
@@ -88,7 +88,7 @@ class IsostericModel():
         """Call pyGAPS to perform main calculation."""
         with log_hook:
             try:
-                self.results = isosteric_enthalpy(
+                self.results = enthalpy_sorption_clapeyron(
                     self.isotherms,
                     branch=self.branch,
                     loading_points=self.loading_points,
@@ -170,4 +170,4 @@ class IsostericModel():
     def help_dialog(self):
         """Display a dialog with the pyGAPS help."""
         from pygapsgui.widgets.UtilityDialogs import help_dialog
-        help_dialog(isosteric_enthalpy)
+        help_dialog(enthalpy_sorption_clapeyron)

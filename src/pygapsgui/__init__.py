@@ -1,15 +1,9 @@
 import pathlib
 import sys
 
-import qtpy
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
-
-# Scaling for high dpi screens DEPRECATED in QT6
-if qtpy.API in (qtpy.PYQT5_API + qtpy.PYSIDE2_API):
-    QW.QApplication.setAttribute(QC.Qt.AA_EnableHighDpiScaling, True)
-    QW.QApplication.setAttribute(QC.Qt.AA_UseHighDpiPixmaps, True)
 
 
 def exception_hook(exctype, exc, trace):
@@ -60,12 +54,21 @@ def process_cl_args():
 def main():
     """Main app entrypoint."""
 
-    # Set custom exception hook
-    sys._excepthook = sys.excepthook
-    sys.excepthook = exception_hook
-
     # Process cli arguments
     parsed_args, unparsed_args = process_cl_args()
+    # CI failures must reach stderr instead of opening a blocking error dialog.
+    if not parsed_args.test:
+        sys._excepthook = sys.excepthook
+        sys.excepthook = exception_hook
+    else:
+        # Do not read or alter a developer's saved application settings.
+        test_settings_dir = QC.QTemporaryDir()
+        if not test_settings_dir.isValid():
+            raise RuntimeError("Could not create temporary startup-test settings directory")
+        QC.QSettings.setDefaultFormat(QC.QSettings.Format.IniFormat)
+        QC.QSettings.setPath(
+            QC.QSettings.Format.IniFormat, QC.QSettings.Scope.UserScope, test_settings_dir.path()
+        )
     qt_args = sys.argv[:1] + unparsed_args
 
     if parsed_args.version:
@@ -74,7 +77,7 @@ def main():
         try:
             version = im_version("pygapsgui")
         except PackageNotFoundError:
-            from src.pygapsgui._version import __version__ as version
+            from pygapsgui._version import __version__ as version
         print(version)
         sys.exit()
 
@@ -127,4 +130,4 @@ def main():
         sys.exit()
 
     # Execute
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

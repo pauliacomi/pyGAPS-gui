@@ -1,9 +1,9 @@
 from itertools import zip_longest
 
 import numpy
-from qtpy import PYSIDE6
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
+from qtpy import QtSvgWidgets as QS
 from qtpy import QtWidgets as QW
 
 from pygaps.modelling import _MODELS
@@ -11,12 +11,6 @@ from pygaps.modelling import get_isotherm_model
 from pygaps.modelling import model_from_dict
 from pygapsgui.utilities.tex2svg import tex2svg
 from pygapsgui.widgets.SpinBoxLimitSlider import QHSpinBoxLimitSlider
-
-if PYSIDE6:
-    import PySide6.QtSvgWidgets as QS
-else:
-    from qtpy import QtSvg as QS
-
 from pygapsgui.widgets.UtilityWidgets import LabelAlignCenter
 from pygapsgui.widgets.UtilityWidgets import LabelAlignRight
 from pygapsgui.widgets.UtilityWidgets import LimitEdit
@@ -112,7 +106,7 @@ class IsoEditModelWidget(QW.QWidget):
         param_box_widget = QW.QWidget()
         self.param_layout = QW.QVBoxLayout(param_box_widget)
         self.scroll_area = QW.QScrollArea()
-        self.scroll_area.setFrameStyle(QW.QFrame.NoFrame)
+        self.scroll_area.setFrameStyle(QW.QFrame.Shape.NoFrame)
         self.scroll_area.setWidget(param_box_widget)
         self.scroll_area.setWidgetResizable(True)
         self.param_box_layout.addWidget(self.scroll_area)
@@ -134,7 +128,7 @@ class IsoEditModelWidget(QW.QWidget):
         if self.current_model.formula:
             self.model_formula.setVisible(True)
             self.model_formula.load(tex2svg(self.current_model.formula))
-            aspectRatioMode = QC.Qt.AspectRatioMode(QC.Qt.KeepAspectRatio)
+            aspectRatioMode = QC.Qt.AspectRatioMode(QC.Qt.AspectRatioMode.KeepAspectRatio)
             self.model_formula.renderer().setAspectRatioMode(aspectRatioMode)
         else:
             self.model_formula.setVisible(False)
@@ -259,8 +253,8 @@ class IsoEditModelDialog(QW.QDialog):
 
         # Button box
         self.button_box = QW.QDialogButtonBox()
-        self.button_box.setOrientation(QC.Qt.Horizontal)
-        self.button_box.setStandardButtons(QW.QDialogButtonBox.Ok | QW.QDialogButtonBox.Cancel)
+        self.button_box.setOrientation(QC.Qt.Orientation.Horizontal)
+        self.button_box.setStandardButtons(QW.QDialogButtonBox.StandardButton.Ok | QW.QDialogButtonBox.StandardButton.Cancel)
         _layout.addWidget(self.button_box)
 
     def connect_signals(self):
