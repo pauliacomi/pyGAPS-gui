@@ -108,7 +108,7 @@ jobs:
           $folder = (Get-Item 'dist\pyGAPS-gui v*').FullName
           python ci\collect_dist.py msi zip "$folder"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet tool run wix build dist\pyGAPS-gui.wxs -arch x64 -ext WixToolset.UI.wixext -culture en-US -bindpath dist -out dist\pyGAPS-gui.msi
+          dotnet tool run wix build dist\pyGAPS-gui.wxs -arch x64 -ext WixToolset.UI.wixext -culture en-US -loc ci\wixui.en-us.wxl -bindpath dist -out dist\pyGAPS-gui.msi
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Move-Item "$folder.zip" 'dist\pyGAPS-gui-win-x86_64.zip'
       - name: Make Linux archive

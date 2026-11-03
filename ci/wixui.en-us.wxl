@@ -1,0 +1,4 @@
+<WixLocalization Culture="en-US" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+    <String Id="AdvancedWelcomeEulaDlgDescriptionPerMachine" Value="Click Install to install pyGAPS-gui or update it if already installed. Click Advanced to change installation options." />
+    <String Id="AdvancedWelcomeEulaDlgDescriptionPerUser" Value="Click Install to install pyGAPS-gui or update it if already installed. Click Advanced to change installation options." />
+</WixLocalization>
