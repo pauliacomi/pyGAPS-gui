@@ -71,10 +71,7 @@ To install the development version of pyGAPS-gui, pull this GitHub repo.
 
    git clone https://github.com/pauliacomi/pyGAPS-gui
 
-Set up a virtual environment and install pyGAPS-gui. Python 3.8 is no longer
-supported. CI targets Python 3.9 through 3.14; Python 3.14 is recommended for
-development and is used to build release bundles. Python 3.9 is retained for
-compatibility despite being end-of-life.
+Set up a virtual environment and install pyGAPS-gui. Python 3.14 is recommended.
 
 Using ``venv`` on Linux or macOS:
 

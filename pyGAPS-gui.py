@@ -1,4 +1,4 @@
-from pygapsgui import main
+from src.pygapsgui import main
 
 if __name__ == '__main__':
 
