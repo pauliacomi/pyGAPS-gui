@@ -42,6 +42,27 @@ def test_open_multiple_and_delete(main_window):
     assert iso_count(main_window) == 2
 
 
+def test_delete_last_isotherm_clears_display(main_window):
+    main_window.open_iso(ISOTHERM_FILES[:1])
+    editor = main_window.ui.prop_extra_edit_widget
+    assert editor.metadata_table_model is not None
+
+    main_window.iso_controller.delete_current_iso()
+
+    assert iso_count(main_window) == 0
+    assert main_window.iso_controller.iso_current is None
+    assert editor.metadata_table_model is None
+    assert editor.metadata_table_view.model() is None
+    assert not editor.save_button.isEnabled()
+    assert not main_window.ui.iso_graph.ax.lines
+    main_window.iso_controller.delete_current_iso()
+
+    main_window.open_iso(ISOTHERM_FILES[:1])
+    assert editor.metadata_table_model is not None
+    assert editor.save_button.isEnabled()
+    assert main_window.ui.iso_graph.ax.lines
+
+
 def test_example_data(main_window, monkeypatch):
     from qtpy import QtWidgets as QW
     monkeypatch.setattr(QW.QMessageBox, "question", lambda *args, **kwargs: QW.QMessageBox.StandardButton.Yes)

@@ -24,6 +24,7 @@ class MetadataEditWidget(QW.QWidget):
         self.setup_UI()
         self.connect_signals()
         self.translate_UI()
+        self.set_model(None)
 
     def setup_UI(self):
         """Create and set-up static UI elements."""
@@ -71,9 +72,16 @@ class MetadataEditWidget(QW.QWidget):
 
     def set_model(self, coreclass):
         """Connect a suitable model."""
-        self.metadata_table_model = MetadataTableModel(coreclass)
+        previous_model = self.metadata_table_model
+        self.metadata_table_model = MetadataTableModel(coreclass, self) if coreclass is not None else None
         self.metadata_table_view.setModel(self.metadata_table_model)
-        self.metadata_table_view.selectionModel().selectionChanged.connect(self.metadata_select)
+        if previous_model is not None:
+            previous_model.deleteLater()
+        self.clear()
+        self.save_button.setEnabled(coreclass is not None)
+        self.delete_button.setEnabled(coreclass is not None)
+        if self.metadata_table_model is not None:
+            self.metadata_table_view.selectionModel().selectionChanged.connect(self.metadata_select)
 
     def display(self, name, value, mtype):
         """Display one metadata."""

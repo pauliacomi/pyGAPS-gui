@@ -38,7 +38,6 @@ class IsoController():
 
         # Store ref to model and define other models
         self.iso_list_model = iso_list_model
-        self.metadata_table_model = None
 
         # Connect model/view
         self.list_view.setModel(self.iso_list_model)
@@ -138,8 +137,7 @@ class IsoController():
         self.unit_widget.clear()
 
         # Other metadata
-        self.mw_widget.prop_extra_edit_widget.clear()
-        self.metadata_table_model.deleteLater()
+        self.mw_widget.prop_extra_edit_widget.set_model(None)
 
         # Graph
         self.graph_view.update()
@@ -389,4 +387,7 @@ class IsoController():
 
     def delete_current_iso(self):
         """Remove current isotherm from model."""
-        self.iso_list_model.removeRow(self.list_view.currentIndex().row())
+        index = self.list_view.currentIndex()
+        if index.isValid():
+            self.iso_list_model.removeRow(index.row())
+            self.graph_view.update()
