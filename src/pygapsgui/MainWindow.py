@@ -50,6 +50,7 @@ class MainWindow(QW.QMainWindow):
         self.recent_files_no = 8
         self.recent_file_actions = []
         self.load_recent_files()
+        self.sync_theme_actions()
 
         # Display state
         self.ui.statusbar.showMessage('Ready', 5000)
@@ -110,7 +111,6 @@ class MainWindow(QW.QMainWindow):
         self.ui.action_theme_light.triggered.connect(partial(self.color_theme, "light"))
         from pygapsgui.utilities.color_theme import theme_events
         theme_events.changed.connect(self.sync_theme_actions)
-        self.sync_theme_actions()
 
     def sync_theme_actions(self):
         theme = QC.QSettings().value("theme", "auto")
