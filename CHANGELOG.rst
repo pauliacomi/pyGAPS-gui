@@ -9,6 +9,8 @@ Unreleased
 - Require Python 3.10 or newer and pyGAPS 5. Remove the pandas 2-only constraint.
 - Fix deleting the last isotherm, clearing its metadata and graph, and deleting
   with no selection.
+- Propagate unexpected analysis errors instead of suppressing them, preserve
+  calculation warnings on failure, and escape log messages for both themes.
 
 0.5.0 (2022-03-13)
 ------------------

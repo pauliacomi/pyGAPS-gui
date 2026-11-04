@@ -7,6 +7,8 @@ from pygaps.units.converter_mode import _MATERIAL_MODE
 from pygaps.units.converter_mode import _PRESSURE_MODE
 from pygaps.units.converter_unit import _TEMPERATURE_UNITS
 from pygapsgui.utilities.log_hook import log_hook
+from pygapsgui.utilities.log_hook import calculation_error
+from pygaps.utilities.exceptions import pgError
 
 
 class IsoCreateModel():
@@ -174,8 +176,8 @@ class IsoCreateModel():
                     )
 
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Model failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e, "Model failed!")
                 return False
             self.output += log_hook.get_logs()
             return True

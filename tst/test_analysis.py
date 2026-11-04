@@ -102,3 +102,24 @@ def test_analysis_needs_selection(main_window, dialog_errors):
     main_window.ui.action_iast_binary_vle.trigger()
 
     assert dialog_errors == ["Select two isotherms."]
+
+
+@pytest.mark.parametrize(
+    ("model_name", "dialog_name", "function"),
+    [
+        ("AreaBETModel", "AreaBETDialog", "area_BET_raw"),
+        ("AreaLangModel", "AreaLangDialog", "area_langmuir_raw"),
+    ],
+)
+def test_unexpected_calculation_errors_propagate(main_window, monkeypatch, model_name, dialog_name, function):
+    module = importlib.import_module(f"pygapsgui.models.{model_name}")
+    view_module = importlib.import_module(f"pygapsgui.views.{dialog_name}")
+    view = getattr(view_module, dialog_name)(parent=main_window)
+    model = getattr(module, model_name)(open_files(main_window, N2_77K), view)
+
+    def broken_api(*args, **kwargs):
+        raise TypeError("API mismatch")
+
+    monkeypatch.setattr(module, function, broken_api)
+    with pytest.raises(TypeError, match="API mismatch"):
+        model.calculate()

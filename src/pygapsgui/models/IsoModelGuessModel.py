@@ -6,6 +6,8 @@ from pygaps.modelling import _GUESS_MODELS
 from pygaps.modelling import _MODELS
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
+from pygapsgui.utilities.log_hook import calculation_error
+from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -126,13 +128,13 @@ class IsoModelGuessModel():
                             **self.iso_params,
                         )
                         self.model_attempts.append(isotherm)
-                    except CalculationError as err:
+                    except pgError as err:
                         log_hook.logger.info(
-                            f'<font color="red">Modelling using {model} failed.</font>'
+                            f'Modelling using {model} failed: {err}'
                         )
                 # We catch any errors or warnings and display them to the user
-            except Exception as err:
-                self.output += f'<font color="red">Model fitting failed! <br> {err}</font>'
+            except pgError as err:
+                self.output += calculation_error(err, "Model fitting failed!")
                 return False
             self.output += log_hook.get_logs()
 

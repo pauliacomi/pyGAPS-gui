@@ -6,6 +6,8 @@ from pygaps.graphing.iast_graphs import plot_iast
 from pygaps.graphing.labels import label_units_iso
 from pygaps.prediction.iast import iast_point_fraction
 from pygapsgui.utilities.log_hook import log_hook
+from pygapsgui.utilities.log_hook import calculation_error
+from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -90,8 +92,8 @@ class IASTModel():
                 self.pressures = pressures_t
                 self.fractions = fractions
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Model failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e, "Model failed!")
                 return False
             self.output += log_hook.get_logs()
             return True

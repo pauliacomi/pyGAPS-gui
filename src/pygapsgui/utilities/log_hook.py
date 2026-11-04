@@ -1,7 +1,18 @@
 import logging
+from html import escape
+from io import StringIO
 
 logging.captureWarnings(True)
-from io import StringIO
+
+
+class LogFormatter(logging.Formatter):
+    def format(self, record):
+        message = escape(record.getMessage())
+        if record.levelno >= logging.ERROR:
+            return f'<font color="red">Error: {message}</font>'
+        if record.levelno >= logging.WARNING:
+            return f'<font color="magenta">Warning: {message}</font>'
+        return message
 
 
 class LogFilter():
@@ -27,20 +38,20 @@ class LogHook():
         self.infohandler = logging.StreamHandler(stream=self.log_stream)
         self.infohandler.setLevel(logging.INFO)
         self.infohandler.addFilter(LogFilter(logging.INFO))
-        info_fmt = logging.Formatter("<font color=\"black\">%(message)s</font>")
+        info_fmt = LogFormatter()
         self.infohandler.setFormatter(info_fmt)
         self.warninghandler = logging.StreamHandler(stream=self.log_stream)
         self.warninghandler.setLevel(logging.WARNING)
         self.warninghandler.addFilter(LogFilter(logging.WARNING))
-        warning_fmt = logging.Formatter("<font color=\"magenta\">Warning: %(message)s</font>")
+        warning_fmt = LogFormatter()
         self.warninghandler.setFormatter(warning_fmt)
         self.errorhandler = logging.StreamHandler(stream=self.log_stream)
         self.errorhandler.setLevel(logging.ERROR)
-        self.errorhandler.addFilter(LogFilter(logging.ERROR))
-        error_fmt = logging.Formatter("<font color=\"red\">Error: %(message)s</font>")
+        error_fmt = LogFormatter()
         self.errorhandler.setFormatter(error_fmt)
 
     def __enter__(self):
+        self.get_logs()
         self.logger.addHandler(self.infohandler)
         self.logger.addHandler(self.warninghandler)
         self.logger.addHandler(self.errorhandler)
@@ -50,7 +61,7 @@ class LogHook():
         self.logger.removeHandler(self.infohandler)
         self.logger.removeHandler(self.warninghandler)
         self.logger.removeHandler(self.errorhandler)
-        return True
+        return False
 
     def get_logs(self):
         """Get all logs during the capture as a string."""
@@ -64,3 +75,8 @@ class LogHook():
 
 
 log_hook = LogHook()
+
+
+def calculation_error(error, heading="Calculation failed!"):
+    """Include captured warnings with an escaped calculation error."""
+    return log_hook.get_logs() + f'<font color="red">{escape(heading)}<br>{escape(str(error))}</font>'

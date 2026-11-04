@@ -3,6 +3,8 @@ from pygaps.data import KERNELS
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.utilities.log_hook import log_hook
+from pygapsgui.utilities.log_hook import calculation_error
+from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -113,8 +115,8 @@ class PSDKernelModel():
                 )
                 self.limit_indices = self.results.get('limits')
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e)
                 return False
             self.output += log_hook.get_logs()
             return True

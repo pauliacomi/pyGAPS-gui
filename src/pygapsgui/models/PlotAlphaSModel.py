@@ -8,6 +8,8 @@ from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 from pygapsgui.utilities.log_hook import log_hook
+from pygapsgui.utilities.log_hook import calculation_error
+from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -124,8 +126,8 @@ class PlotAlphaSModel():
                 )
                 if self.ref_branch == 'des':
                     self.reference_loading = self.reference_loading[::-1]
-            except Exception as err:
-                self.output += '<font color="red">Error: The reference isotherm does not cover the same pressure range! <br></font>'
+            except pgError as err:
+                self.output += calculation_error(err, "The reference isotherm does not cover the same pressure range!")
                 self.output_log()
                 return False
 
@@ -171,8 +173,8 @@ class PlotAlphaSModel():
                 )
 
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e)
                 return False
             self.output += log_hook.get_logs()
             return True
@@ -231,16 +233,23 @@ class PlotAlphaSModel():
     def select_area(self, area_type):
         """Handle reference area selection."""
         with log_hook:
-            if area_type == "BET":
-                self.reference_area = area_BET(self.ref_isotherm).get('area')
-                self.view.refarea_input.setReadOnly(True)
-                self.view.refarea_input.setText(f"{self.reference_area:.4g}")
-            elif area_type == "Langmuir":
-                self.reference_area = area_langmuir(self.ref_isotherm).get('area')
-                self.view.refarea_input.setReadOnly(True)
-                self.view.refarea_input.setText(f"{self.reference_area:.4g}")
-            else:
-                self.view.refarea_input.setReadOnly(False)
+            try:
+                if area_type == "BET":
+                    self.reference_area = area_BET(self.ref_isotherm).get('area')
+                    self.view.refarea_input.setReadOnly(True)
+                    self.view.refarea_input.setText(f"{self.reference_area:.4g}")
+                elif area_type == "Langmuir":
+                    self.reference_area = area_langmuir(self.ref_isotherm).get('area')
+                    self.view.refarea_input.setReadOnly(True)
+                    self.view.refarea_input.setText(f"{self.reference_area:.4g}")
+                else:
+                    self.view.refarea_input.setReadOnly(False)
+            except pgError as err:
+                self.reference_area = None
+                self.view.refarea_input.clear()
+                self.output += calculation_error(err, "Reference area calculation failed!")
+                self.output_log()
+                return
             self.output += log_hook.get_logs()
 
         if self.prepare_values():

@@ -1,5 +1,7 @@
 from pygaps import ModelIsotherm
 from pygapsgui.utilities.log_hook import log_hook
+from pygapsgui.utilities.log_hook import calculation_error
+from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -125,8 +127,8 @@ class IsoModelByModel():
                         **self.isotherm_params,
                     )
             # We catch any errors or warnings and display them to the user
-            except Exception as err:
-                self.output += f'<font color="red">Model fitting failed! <br> {err}</font>'
+            except pgError as err:
+                self.output += calculation_error(err, "Model fitting failed!")
                 return False
             self.output += log_hook.get_logs()
             self.output += self.view.model_edit.current_model.__str__().replace("\n", "<br>")
