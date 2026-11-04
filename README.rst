@@ -71,7 +71,11 @@ To install the development version of pyGAPS-gui, pull this GitHub repo.
 
    git clone https://github.com/pauliacomi/pyGAPS-gui
 
-Set up a virtual environment and install pyGAPS-gui. Python 3.14 is recommended.
+Set up a virtual environment and install pyGAPS-gui. Python 3.10 or newer is
+required; Python 3.14 is recommended. This branch targets the work-in-progress
+pyGAPS 5 API, not pyGAPS 4. Until pyGAPS 5 is released, install its development
+checkout first. The temporary version override below lets pip resolve the
+``pygaps>=5,<6`` requirement; it does not make this a released pyGAPS build.
 
 Using ``venv`` on Linux or macOS:
 
@@ -80,6 +84,7 @@ Using ``venv`` on Linux or macOS:
    cd pyGAPS-gui
    python -m venv ./.venv
    source ./.venv/bin/activate
+   SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PYGAPS=5.0.0 pip install "git+https://github.com/pauliacomi/pyGAPS.git@master"
    pip install .
 
 Or using ``venv`` on Windows:
@@ -89,6 +94,9 @@ Or using ``venv`` on Windows:
    cd pyGAPS-gui
    python -m venv .venv
    .\.venv\Scripts\Activate.ps1
+   $env:SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PYGAPS = "5.0.0"
+   pip install "git+https://github.com/pauliacomi/pyGAPS.git@master"
+   Remove-Item Env:\SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PYGAPS
    pip install .
 
 Then run the app:

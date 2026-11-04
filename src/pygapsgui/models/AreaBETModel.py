@@ -135,24 +135,21 @@ class AreaBETModel():
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
-            # TODO Should put all these into a dictionary
             try:
-                (
-                    self.bet_area,
-                    self.c_const,
-                    self.n_monolayer,
-                    self.p_monolayer,
-                    self.slope,
-                    self.intercept,
-                    self.min_point,
-                    self.max_point,
-                    self.corr_coef,
-                ) = area_BET_raw(
-                    self.pressure,
-                    self.loading,
-                    self.cross_section,
-                    p_limits=self.limits,
-                )
+                results = area_BET_raw({
+                    "pressure": self.pressure,
+                    "loading": self.loading,
+                    "cross_section": self.cross_section,
+                    "p_limits": self.limits,
+                })
+                self.bet_area = results["area"]
+                self.c_const = results["c_const"]
+                self.n_monolayer = results["n_monolayer"]
+                self.p_monolayer = results["p_monolayer"]
+                self.slope = results["bet_slope"]
+                self.intercept = results["bet_intercept"]
+                self.min_point, self.max_point = results["p_limit_indices"]
+                self.corr_coef = results["corr_coef"]
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'

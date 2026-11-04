@@ -131,21 +131,19 @@ class AreaLangModel():
         """Call pyGAPS to perform main calculation."""
         with log_hook:
             try:
-                (
-                    self.lang_area,
-                    self.k_const,
-                    self.n_monolayer,
-                    self.slope,
-                    self.intercept,
-                    self.min_point,
-                    self.max_point,
-                    self.corr_coef,
-                ) = area_langmuir_raw(
-                    self.pressure,
-                    self.loading,
-                    self.cross_section,
-                    p_limits=self.limits,
-                )
+                results = area_langmuir_raw({
+                    "pressure": self.pressure,
+                    "loading": self.loading,
+                    "cross_section": self.cross_section,
+                    "p_limits": self.limits,
+                })
+                self.lang_area = results["area"]
+                self.k_const = results["langmuir_const"]
+                self.n_monolayer = results["n_monolayer"]
+                self.slope = results["langmuir_slope"]
+                self.intercept = results["langmuir_intercept"]
+                self.min_point, self.max_point = results["p_limit_indices"]
+                self.corr_coef = results["corr_coef"]
             # We catch any errors or warnings and display them to the user
             except Exception as e:
                 self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
