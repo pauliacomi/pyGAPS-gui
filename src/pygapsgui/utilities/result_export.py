@@ -1,23 +1,27 @@
 import os
+import traceback
 
 import pandas
+from qtpy import QtCore as QC
 
-from pygapsgui.widgets.UtilityDialogs import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_detail_dialog
 from pygapsgui.widgets.UtilityDialogs import save_file_dialog
 
 
 def serialize(obj: dict, how: str = "H", parent=None):
 
-    # TODO get last directory here too
+    settings = QC.QSettings()
     filename = save_file_dialog(
-        parent, "Export results", '.', filter=";;".join([
+        parent, "Export results", settings.value("resultExportDirectory", "."), filter=";;".join([
             'CSV (*.csv)',
             'JSON (*.json)',
         ])
     )
 
     if filename and filename != '':
+        settings.setValue("resultExportDirectory", str(filename.parent))
         _, ext = os.path.splitext(filename)
+        ext = ext.lower()
         try:
             if ext == '.csv':
                 with open(filename, 'w', newline='', encoding='utf-8') as f:
@@ -53,9 +57,9 @@ def serialize(obj: dict, how: str = "H", parent=None):
                         json.dump(obj, f)
                         return True
             else:
-                raise Exception("Unknown file save format.")
+                raise ValueError("Unknown file save format. Use .csv or .json.")
 
         except Exception as e:
-            error_dialog(str(e))
+            error_detail_dialog(str(e), traceback.format_exc())
 
     return False

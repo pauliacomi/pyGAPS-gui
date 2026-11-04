@@ -8,6 +8,7 @@ from pygaps.units.converter_mode import _PRESSURE_MODE
 from pygaps.units.converter_unit import _TEMPERATURE_UNITS
 from pygaps.utilities import exceptions as pge
 from pygapsgui.models.IsoModel import IsoModel
+from pygapsgui.utilities.isotherm_files import ISOTHERM_FORMATS
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -309,49 +310,29 @@ class IsoController():
     def load(self, path, name, ext):
         """Use pygaps parsing to load an isotherm and add it to the model."""
 
-        isotherm = None
-
         import pygaps.parsing as pgp
-        if ext == '.csv':
-            isotherm = pgp.isotherm_from_csv(path)
-        elif ext == '.json':
-            isotherm = pgp.isotherm_from_json(path)
-        elif ext == '.xls':
-            isotherm = pgp.isotherm_from_xl(path)
-        elif ext == '.aif':
-            isotherm = pgp.isotherm_from_aif(path)
-        else:
-            raise Exception(f"Unknown isotherm type '{ext}'.")
-
-        if not isotherm:
-            return
-
+        file_format = ISOTHERM_FORMATS.get(ext.lower())
+        if file_format is None:
+            raise ValueError(f"Unknown isotherm type '{ext}'.")
+        isotherm = getattr(pgp, file_format[1])(path)
         self.add_isotherm(name, isotherm)
 
     def load_import(self, path, name, settings):
         """Use pygaps parsing to import an isotherm and add it to the model."""
-        isotherm = None
-
         import pygaps.parsing as pgp
-        try:
-            isotherm = pgp.isotherm_from_commercial(path=path, **settings)
-        except pge.ParsingError as exc:
-            error_dialog(str(exc))
-        except BaseException as exc:
-            error_dialog(str(exc))
-
-        if not isotherm:
-            return
-
+        isotherm = pgp.isotherm_from_commercial(path=path, **settings)
         self.add_isotherm(name, isotherm)
 
     def add_isotherm(self, name, isotherm):
         """Wrap an isotherm in an IsoModel and add to the IsothermListModel."""
 
-        # Add adsorbates to the list
+        # Register custom materials and adsorbates used by loaded isotherms.
         if isotherm.material not in pygaps.MATERIAL_LIST:
             pygaps.MATERIAL_LIST.append(isotherm.material)
             self.refresh_material_edit(isotherm.material.name)
+        if isotherm.adsorbate not in pygaps.ADSORBATE_LIST:
+            pygaps.ADSORBATE_LIST.append(isotherm.adsorbate)
+            self.mw_widget.adsorbate_input.addItem(isotherm.adsorbate.name)
 
         # Create the model to store the isotherm
         iso_model = IsoModel(name)
@@ -365,16 +346,10 @@ class IsoController():
         isotherm = self.iso_current
 
         import pygaps.parsing as pgp
-        if ext == '.csv':
-            pgp.isotherm_to_csv(isotherm, path)
-        elif ext == '.json':
-            pgp.isotherm_to_json(isotherm, path)
-        elif ext in ['.xls', '.xlsx']:
-            pgp.isotherm_to_xl(isotherm, path)
-        elif ext == '.aif':
-            pgp.isotherm_to_aif(isotherm, path)
-        else:
-            raise Exception("Unknown file save format.")
+        file_format = ISOTHERM_FORMATS.get(ext.lower())
+        if file_format is None or file_format[2] is None:
+            raise ValueError("Unknown file save format. Use .aif, .json, .csv or .xlsx.")
+        getattr(pgp, file_format[2])(isotherm, path)
 
     ########################################################
     # Selecting, deleting, isotherms from list

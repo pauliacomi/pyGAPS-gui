@@ -11,7 +11,10 @@ from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IsoModelGuessModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation
+
+
+class IsoModelGuessModel(AnalysisModel):
     """Automatic isotherm fit by several models: QT MVC Model."""
 
     isotherm = None
@@ -38,6 +41,7 @@ class IsoModelGuessModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         if isinstance(isotherm, ModelIsotherm):
@@ -76,6 +80,7 @@ class IsoModelGuessModel():
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
+        self.set_result_valid(False)
         self.iso_params = self.isotherm.to_dict()
         pressure = self.isotherm.pressure(
             branch=self.branch,
@@ -106,6 +111,7 @@ class IsoModelGuessModel():
         self.limits = [left, right]
         self.prepare_values()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         self.model_attempts = []
@@ -173,6 +179,7 @@ class IsoModelGuessModel():
 
     def select_branch(self):
         """Handle isotherm branch selection."""
+        self.set_result_valid(False)
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.model_isotherm = None

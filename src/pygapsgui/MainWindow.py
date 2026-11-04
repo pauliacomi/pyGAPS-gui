@@ -1,5 +1,6 @@
 import os
 import pathlib
+import traceback
 from functools import partial
 
 from qtpy import QtCore as QC
@@ -10,8 +11,10 @@ from pygapsgui.controllers.IsoController import IsoController
 from pygapsgui.MainWindowUI import MainWindowUI
 from pygapsgui.models.IsoListModel import IsoListModel
 from pygapsgui.widgets.UtilityDialogs import error_dialog
+from pygapsgui.widgets.UtilityDialogs import error_detail_dialog
 from pygapsgui.widgets.UtilityDialogs import open_files_dialog
 from pygapsgui.widgets.UtilityDialogs import save_file_dialog
+from pygapsgui.utilities.isotherm_files import OPEN_FILTER, SAVE_FILTER, ISOTHERM_FORMATS
 
 RECENT_FILES_KEY = "recentFilePaths"
 LEGACY_RECENT_FILES_KEY = "recentFiles"
@@ -182,23 +185,53 @@ class MainWindow(QW.QMainWindow):
                 self,
                 "Load an isotherm",
                 str(self.last_dir) if self.last_dir else '.',
-                filter='pyGAPS isotherms (*.aif *.json *.csv *.xls)'
+                filter=OPEN_FILTER
             )
             if not filepaths:
                 return
 
-        for fp in filepaths:
-            self.last_dir = fp.parent
-            self.iso_controller.load(fp, fp.stem, fp.suffix)
-        self.iso_controller.select_last_iso()
+        self.load_isotherm_files(filepaths)
 
-        # Update in recent files
-        self.update_recent_files(filepaths)
+    def load_isotherm_files(self, filepaths, import_settings=None):
+        """Continue a batch after failures and record only successful opens."""
+        loaded, failed, traces = [], [], []
+        settings = QC.QSettings()
+        recent_imports = settings.value("recentImportSettings", {})
+        for filepath in filepaths:
+            fp = pathlib.Path(filepath)
+            self.last_dir = fp.parent
+            try:
+                if import_settings is None:
+                    self.iso_controller.load(fp, fp.stem, fp.suffix)
+                else:
+                    self.iso_controller.load_import(fp, fp.stem, import_settings)
+            except Exception as error:
+                failed.append(f"{fp.name}: {error}")
+                traces.append(traceback.format_exc())
+            else:
+                loaded.append(fp)
+                if import_settings is None:
+                    recent_imports.pop(str(fp), None)
+                else:
+                    recent_imports[str(fp)] = import_settings
+        if loaded:
+            self.iso_controller.select_last_iso()
+            self.update_recent_files(loaded)
+        recent_imports = {path: value for path, value in recent_imports.items() if path in self.get_recent_paths()}
+        settings.setValue("recentImportSettings", recent_imports)
+        self.ui.statusbar.showMessage(f"Loaded {len(loaded)} isotherms; {len(failed)} failed.", 5000)
+        if failed:
+            error_detail_dialog(
+                f"Loaded {len(loaded)} isotherms; {len(failed)} failed.\n" + "\n".join(failed),
+                "\n\n".join(traces),
+            )
 
     def open_recent(self, index=None):
         """Open the recent file in memory."""
         if index is not None:
-            self.open_iso([pathlib.Path(self.recent_file_actions[index].data())])
+            path = pathlib.Path(self.recent_file_actions[index].data())
+            import_settings = QC.QSettings().value("recentImportSettings", {}).get(str(path))
+            self.load_isotherm_files([path], import_settings)
 
     def import_iso(self, filepaths=None, ftype=None):
         """Import isotherm from manufacturer files."""
@@ -213,10 +246,19 @@ class MainWindow(QW.QMainWindow):
             if not filepaths:
                 return
 
-        for fp in filepaths:
-            self.last_dir = fp.parent
-            self.iso_controller.load_import(fp, fp.stem, ftype)
-        self.iso_controller.select_last_iso()
+        self.load_isotherm_files(filepaths, ftype)
+
+    def open_folder(self, folder):
+        """Open supported files from a directory, reporting directory errors."""
+        try:
+            filepaths = sorted(
+                path for path in pathlib.Path(folder).iterdir()
+                if path.is_file() and path.suffix.lower() in ISOTHERM_FORMATS
+            )
+        except OSError as error:
+            error_detail_dialog(f"Cannot open folder: {error}", traceback.format_exc())
+            return
+        self.load_isotherm_files(filepaths)
 
     def save_iso(self, filepath=None):
         """Save isotherm to file."""
@@ -232,18 +274,19 @@ class MainWindow(QW.QMainWindow):
                 self,
                 "Save an isotherm",
                 suggested_name,
-                filter=";;".join([
-                    'AIF Isotherm (*.aif)',
-                    'pyGAPS JSON Isotherm (*.json)',
-                    'pyGAPS CSV Isotherm (*.csv)',
-                    'pyGAPS Excel Isotherm (*.xls)',
-                ])
+                filter=SAVE_FILTER
             )
             if not filepath:
                 return
 
+        filepath = pathlib.Path(filepath)
         self.last_dir = filepath.parent
-        self.iso_controller.save(filepath, filepath.suffix)
+        try:
+            self.iso_controller.save(filepath, filepath.suffix)
+        except Exception as error:
+            error_detail_dialog(f"Could not save {filepath.name}: {error}", traceback.format_exc())
+            return
+        self.ui.statusbar.showMessage(f"Saved {filepath.name}.", 5000)
 
     ########################################################
     # Characterisation / modelling / etc
@@ -261,9 +304,7 @@ class MainWindow(QW.QMainWindow):
         if model.success:
             ret = dialog.exec()
             if ret == QW.QDialog.DialogCode.Accepted:
-                # TODO There may be no results!!!
-                results = model.result_dict()
-                self.iso_controller.metadata_save_bulk(results)
+                self.save_analysis_results(model)
 
     def area_langmuir(self):
         """Start Langmuir area dialog."""
@@ -277,8 +318,7 @@ class MainWindow(QW.QMainWindow):
         if model.success:
             ret = dialog.exec()
             if ret == QW.QDialog.DialogCode.Accepted:
-                results = model.result_dict()
-                self.iso_controller.metadata_save_bulk(results)
+                self.save_analysis_results(model)
 
     def t_plot(self):
         """Start t-plot dialog."""
@@ -292,8 +332,7 @@ class MainWindow(QW.QMainWindow):
         if model.success:
             ret = dialog.exec()
             if ret == QW.QDialog.DialogCode.Accepted:
-                results = model.result_dict()
-                self.iso_controller.metadata_save_bulk(results)
+                self.save_analysis_results(model)
 
     def alpha_s_plot(self):
         """Start alpha-s plot dialog."""
@@ -317,8 +356,7 @@ class MainWindow(QW.QMainWindow):
         if model.success:
             ret = dialog.exec()
             if ret == QW.QDialog.DialogCode.Accepted:
-                results = model.result_dict()
-                self.iso_controller.metadata_save_bulk(results)
+                self.save_analysis_results(model)
 
     def dr_plot(self):
         """Start DR dialog. Calls a generic function."""
@@ -340,8 +378,7 @@ class MainWindow(QW.QMainWindow):
         if model.success:
             ret = dialog.exec()
             if ret == QW.QDialog.DialogCode.Accepted:
-                results = model.result_dict()
-                self.iso_controller.metadata_save_bulk(results)
+                self.save_analysis_results(model)
 
     def psd_micro(self):
         """Start microporous PSD dialog."""
@@ -355,8 +392,7 @@ class MainWindow(QW.QMainWindow):
         if model.success:
             ret = dialog.exec()
             if ret == QW.QDialog.DialogCode.Accepted:
-                results = model.result_dict()
-                self.iso_controller.metadata_save_bulk(results)
+                self.save_analysis_results(model)
 
     def psd_meso(self):
         """Start mesoporous PSD dialog."""
@@ -370,8 +406,7 @@ class MainWindow(QW.QMainWindow):
         if model.success:
             ret = dialog.exec()
             if ret == QW.QDialog.DialogCode.Accepted:
-                results = model.result_dict()
-                self.iso_controller.metadata_save_bulk(results)
+                self.save_analysis_results(model)
 
     def psd_kernel(self):
         """Start kernel fitting PSD dialog."""
@@ -385,8 +420,14 @@ class MainWindow(QW.QMainWindow):
         if model.success:
             ret = dialog.exec()
             if ret == QW.QDialog.DialogCode.Accepted:
-                results = model.result_dict()
-                self.iso_controller.metadata_save_bulk(results)
+                self.save_analysis_results(model)
+
+    def save_analysis_results(self, model):
+        """Only persist results from the current successful calculation."""
+        if not model.has_result:
+            error_dialog("No valid calculation results to save.")
+            return
+        self.iso_controller.metadata_save_bulk(model.result_dict())
 
     def isosteric(self):
         """Start isosteric enthalpy dialog."""
@@ -415,7 +456,7 @@ class MainWindow(QW.QMainWindow):
             return
         ret = dialog.exec()
 
-        if ret == QW.QDialog.DialogCode.Accepted and model.model_isotherm:
+        if ret == QW.QDialog.DialogCode.Accepted and model.has_result and model.model_isotherm:
             name = f"{isotherm.material} {isotherm.adsorbate} {model.model_isotherm.model.name}"
             self.iso_controller.add_isotherm(name, model.model_isotherm)
             self.iso_controller.select_last_iso()
@@ -433,7 +474,7 @@ class MainWindow(QW.QMainWindow):
             return
         ret = dialog.exec()
 
-        if ret == QW.QDialog.DialogCode.Accepted and model.model_isotherm:
+        if ret == QW.QDialog.DialogCode.Accepted and model.has_result and model.model_isotherm:
             name = f"{isotherm.material} {isotherm.adsorbate} {model.model_isotherm.model.name}"
             self.iso_controller.add_isotherm(name, model.model_isotherm)
             self.iso_controller.select_last_iso()

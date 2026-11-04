@@ -5,7 +5,10 @@ from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IsoModelByModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation
+
+
+class IsoModelByModel(AnalysisModel):
     """Fit an isotherm by a specific isotherm model: QT MVC Model."""
 
     isotherm = None
@@ -29,6 +32,7 @@ class IsoModelByModel():
         self.isotherm = isotherm
         self.isotherm_params = isotherm.to_dict()
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         if isinstance(isotherm, ModelIsotherm):
@@ -89,6 +93,7 @@ class IsoModelByModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         self.model_isotherm = None

@@ -12,7 +12,10 @@ from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class DADRModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
+
+
+class DADRModel(AnalysisModel):
     """Dubinin-Astakov and Dubinin-Radushkevich calculations: QT MVC Model."""
 
     isotherm = None
@@ -41,6 +44,7 @@ class DADRModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
         self.ptype = ptype
 
         if self.ptype == "DR":
@@ -97,6 +101,7 @@ class DADRModel():
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
+        self.set_result_valid(False)
         # Loading and pressure
         self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
             self.isotherm, self.branch, {
@@ -129,6 +134,7 @@ class DADRModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
@@ -225,6 +231,7 @@ class DADRModel():
         self.prepare_values()
         self.calc_auto()
 
+    @result_dictionary
     def result_dict(self):
         """Return a dictionary of results."""
         results = {
@@ -241,6 +248,7 @@ class DADRModel():
             results["DR Exponent"] = self.exp
         return results
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.microp_volume:

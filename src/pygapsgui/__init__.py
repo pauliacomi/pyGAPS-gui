@@ -118,9 +118,7 @@ def main():
         mainwnd.open_iso(filepaths)
 
     elif parsed_args.folder:
-        folder = pathlib.Path(parsed_args.folder)
-        filepaths = [x for x in folder.iterdir() if not x.is_dir()]
-        mainwnd.open_iso(filepaths)
+        mainwnd.open_folder(parsed_args.folder)
 
     # Show and finish
     mainwnd.show()

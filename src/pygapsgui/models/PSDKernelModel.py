@@ -8,7 +8,10 @@ from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class PSDKernelModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
+
+
+class PSDKernelModel(AnalysisModel):
     """Pore size distribution calculations with kernel fitting: QT MVC Model."""
 
     # Refs
@@ -32,6 +35,7 @@ class PSDKernelModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
 
         # view setup
         self.view.setWindowTitle(
@@ -96,9 +100,11 @@ class PSDKernelModel():
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
+        self.set_result_valid(False)
         # Pressure
         self.pressure = self.isotherm.pressure(branch=self.branch)
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
@@ -172,6 +178,7 @@ class PSDKernelModel():
         self.plot_clear()
         self.prepare_values()
 
+    @result_dictionary
     def result_dict(self):
         """Return a dictionary of results."""
         return {
@@ -183,6 +190,7 @@ class PSDKernelModel():
             self.results.get("pore_volume_cumulative"),
         }
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:

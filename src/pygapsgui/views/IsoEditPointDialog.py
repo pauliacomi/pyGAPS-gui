@@ -138,7 +138,7 @@ class IsoEditPointWidget(QW.QWidget):
             if event.key() == QC.Qt.Key.Key_C and (event.modifiers() & QC.Qt.KeyboardModifier.ControlModifier):
                 table_to_clipboard(self.table_view)
                 event.accept()
-            if event.key() == QC.Qt.Key.Key_V and (event.modifiers() & QC.Qt.KeyboardModifier.ControlModifier):
+            elif event.key() == QC.Qt.Key.Key_V and (event.modifiers() & QC.Qt.KeyboardModifier.ControlModifier):
                 clipboard_to_table(self.table_view)
                 self.changed.emit()
                 event.accept()

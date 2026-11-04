@@ -8,7 +8,10 @@ from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IASTVLEModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_export
+
+
+class IASTVLEModel(AnalysisModel):
     """IAST vapour-liquid equilibrium prediction: QT MVC Model."""
 
     isotherms = None
@@ -30,6 +33,7 @@ class IASTVLEModel():
         # Save refs
         self.isotherms = isotherms
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         # None
@@ -72,6 +76,7 @@ class IASTVLEModel():
         if self.view.calc_autobox.isChecked():
             self.calc_auto()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         self.total_pressure = self.view.pressure_input.value()
@@ -129,9 +134,11 @@ class IASTVLEModel():
 
     def select_branch(self):
         """Handle isotherm branch selection."""
+        self.set_result_valid(False)
         self.branch = self.view.branch_dropdown.currentText()
         self.plot_clear()
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:

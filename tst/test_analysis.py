@@ -123,3 +123,46 @@ def test_unexpected_calculation_errors_propagate(main_window, monkeypatch, model
     monkeypatch.setattr(module, function, broken_api)
     with pytest.raises(TypeError, match="API mismatch"):
         model.calculate()
+
+
+@pytest.mark.parametrize(
+    ("model_name", "dialog_name", "function"),
+    [
+        ("AreaBETModel", "AreaBETDialog", "area_BET_raw"),
+        ("AreaLangModel", "AreaLangDialog", "area_langmuir_raw"),
+    ],
+)
+def test_failed_recalculation_invalidates_results(
+    main_window, monkeypatch, dialog_errors, model_name, dialog_name, function,
+):
+    from pygaps.utilities.exceptions import CalculationError
+    from qtpy import QtWidgets as QW
+
+    module = importlib.import_module(f"pygapsgui.models.{model_name}")
+    view_module = importlib.import_module(f"pygapsgui.views.{dialog_name}")
+    view = getattr(view_module, dialog_name)(parent=main_window)
+    model = getattr(module, model_name)(open_files(main_window, N2_77K), view)
+    assert model.has_result
+    assert model.result_dict()
+
+    def failed(*args, **kwargs):
+        raise CalculationError("not enough points <3")
+
+    monkeypatch.setattr(module, function, failed)
+    model.calc_auto()
+
+    assert not model.has_result
+    save_buttons = [
+        button for button in view.button_box.buttons()
+        if view.button_box.buttonRole(button) == QW.QDialogButtonBox.ButtonRole.AcceptRole
+    ]
+    assert save_buttons and all(not button.isEnabled() for button in save_buttons)
+    assert not view.export_btn.isEnabled()
+    with pytest.raises(CalculationError, match="No valid"):
+        model.result_dict()
+    assert not model.export_results()
+    original = dict(model.isotherm.properties)
+    main_window.save_analysis_results(model)
+    assert model.isotherm.properties == original
+    assert len(dialog_errors) == 2
+    assert "not enough points <3" in view.output.toPlainText()

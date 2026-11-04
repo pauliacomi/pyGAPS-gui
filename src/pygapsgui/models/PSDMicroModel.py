@@ -10,7 +10,10 @@ from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class PSDMicroModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
+
+
+class PSDMicroModel(AnalysisModel):
     """Pore size distribution calculations with mean potential theory: QT MVC Model."""
 
     # Refs
@@ -35,6 +38,7 @@ class PSDMicroModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         try:
@@ -107,6 +111,7 @@ class PSDMicroModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
@@ -173,10 +178,12 @@ class PSDMicroModel():
 
     def select_branch(self):
         """Handle isotherm branch selection."""
+        self.set_result_valid(False)
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.plot_clear()
 
+    @result_dictionary
     def result_dict(self):
         """Return a dictionary of results."""
         return {
@@ -188,6 +195,7 @@ class PSDMicroModel():
             self.results.get("pore_volume_cumulative"),
         }
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:

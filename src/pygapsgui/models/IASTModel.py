@@ -11,7 +11,10 @@ from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IASTModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_export
+
+
+class IASTModel(AnalysisModel):
     """IAST general multicomponent prediction: QT MVC Model."""
 
     isotherms = None
@@ -31,6 +34,7 @@ class IASTModel():
         # Save refs
         self.isotherms = isotherms
         self.view = view
+        self.set_result_valid(False)
 
         if any(isinstance(i, pygaps.PointIsotherm) for i in isotherms):
             self.output = '<font color="magenta">Careful, using PointIsotherms interpolates then numerically calculates spreading pressure. Calculations may be slow.</font>'
@@ -65,6 +69,7 @@ class IASTModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
 
@@ -127,9 +132,11 @@ class IASTModel():
 
     def select_branch(self):
         """Handle isotherm branch selection."""
+        self.set_result_valid(False)
         self.branch = self.view.branch_dropdown.currentText()
         self.plot_clear()
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if self.results is None:

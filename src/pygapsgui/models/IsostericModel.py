@@ -8,7 +8,10 @@ from pygaps.utilities.exceptions import pgError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IsostericModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_export
+
+
+class IsostericModel(AnalysisModel):
     """Isosteric enthalpy calculations: QT MVC Model."""
 
     # Refs
@@ -31,6 +34,7 @@ class IsostericModel():
         # Save refs
         self.isotherms = isotherms
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
 
@@ -86,6 +90,7 @@ class IsostericModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
@@ -153,6 +158,7 @@ class IsostericModel():
         self.loading_point_no = self.view.points_input.value()
         self.calc_auto()
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:

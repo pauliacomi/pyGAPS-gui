@@ -11,7 +11,10 @@ from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class AreaLangModel():
+from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
+
+
+class AreaLangModel(AnalysisModel):
     """Langmuir specific area calculations: QT MVC Model."""
 
     isotherm = None
@@ -45,6 +48,7 @@ class AreaLangModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         try:
@@ -97,6 +101,7 @@ class AreaLangModel():
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
+        self.set_result_valid(False)
         # Loading and pressure
         self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
             self.isotherm, self.branch, {
@@ -129,6 +134,7 @@ class AreaLangModel():
             self.plot_clear()
             self.output_log()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
@@ -211,6 +217,7 @@ class AreaLangModel():
         self.prepare_values()
         self.calc_auto()
 
+    @result_dictionary
     def result_dict(self):
         """Return a dictionary of results."""
         return {
@@ -225,6 +232,7 @@ class AreaLangModel():
             "Langmuir pressure limits": self.limits
         }
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.lang_area:
