@@ -1,12 +1,10 @@
-from qtpy import QtCore as QC
-from qtpy import QtWidgets as QW
 
 import pygaps
 from pygaps.units.converter_mode import _LOADING_MODE
 from pygaps.units.converter_mode import _MATERIAL_MODE
 from pygaps.units.converter_mode import _PRESSURE_MODE
 from pygaps.units.converter_unit import _TEMPERATURE_UNITS
-from pygaps.utilities import exceptions as pge
+
 from pygapsgui.models.IsoModel import IsoModel
 from pygapsgui.utilities.isotherm_files import ISOTHERM_FORMATS
 from pygapsgui.widgets.UtilityDialogs import error_dialog
@@ -149,7 +147,7 @@ class IsoController():
             return
         try:
             self.iso_current.convert_pressure(mode_to=mode_to, unit_to=unit_to)
-        except Exception as err:
+        except Exception:
             error_dialog(
                 "Cannot convert relative pressure. Common causes are supercritical "
                 "adsorbates or those without a thermodynamic backend. If "

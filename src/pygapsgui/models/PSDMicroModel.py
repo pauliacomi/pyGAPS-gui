@@ -4,13 +4,15 @@ from pygaps.characterisation.psd_micro import _PORE_GEOMETRIES
 from pygaps.characterisation.psd_micro import psd_microporous
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
 
 
 class PSDMicroModel(AnalysisModel):

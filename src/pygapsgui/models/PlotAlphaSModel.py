@@ -1,19 +1,20 @@
-from qtpy import QtWidgets as QW
-
 from pygaps.characterisation.alphas_plots import alpha_s
 from pygaps.characterisation.alphas_plots import alpha_s_raw
 from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
-from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
+from qtpy import QtWidgets as QW
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
 
 
 class PlotAlphaSModel(AnalysisModel):
@@ -100,8 +101,6 @@ class PlotAlphaSModel(AnalysisModel):
         if self.prepare_values():
             # calculate reference area
             self.select_area("BET")
-            # run calculation
-            self.calc_auto()
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
@@ -168,6 +167,8 @@ class PlotAlphaSModel(AnalysisModel):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
             try:
+                if self.reference_area is None:
+                    raise CalculationError("Select or calculate a valid reference area first.")
                 self.results, self.alphas_curve = alpha_s_raw(
                     self.loading,
                     self.reference_loading,

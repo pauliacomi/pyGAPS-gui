@@ -64,6 +64,13 @@ COLORS_LIGHT = {
 COLORS = COLORS_DARK
 
 
+class ThemeEvents(QC.QObject):
+    changed = QC.Signal()
+
+
+theme_events = ThemeEvents()
+
+
 def _replace_colors(match: re.Match) -> str:
     color_type = match.group().replace("$color{", "").replace("}", "")
     return COLORS[color_type]
@@ -180,7 +187,7 @@ def theme_apply(theme) -> None:
         })
     elif theme == "light":
         plt.style.use('default')
-    # TODO finalize changing mpl theme in main iso graph
+    theme_events.changed.emit()
 
 
 def system_theme() -> str:

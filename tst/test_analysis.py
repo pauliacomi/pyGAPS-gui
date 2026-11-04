@@ -166,3 +166,44 @@ def test_failed_recalculation_invalidates_results(
     assert model.isotherm.properties == original
     assert len(dialog_errors) == 2
     assert "not enough points <3" in view.output.toPlainText()
+
+
+def test_empty_results_cannot_be_saved(main_window, monkeypatch):
+    import numpy as np
+
+    from pygapsgui.models import PlotTModel as module
+    from pygapsgui.views.PlotTDialog import PlotTDialog
+
+    view = PlotTDialog(parent=main_window)
+    model = module.PlotTModel(open_files(main_window, N2_77K), view)
+    monkeypatch.setattr(module, "t_plot_raw", lambda *args, **kwargs: ([], np.array([])))
+
+    model.calc_auto()
+
+    assert not model.has_result
+    assert view.res_table.rowCount() == 0
+    assert "No calculation results" in view.output.toPlainText()
+
+
+def test_alpha_s_reference_failure_is_reported(main_window, monkeypatch):
+    from pygaps.utilities.exceptions import CalculationError
+
+    from pygapsgui.models import PlotAlphaSModel as module
+    from pygapsgui.views.PlotAlphaSDialog import PlotAlphaSDialog
+
+    open_files(main_window, MICROPOROUS_N2_77K, N2_77K)
+    target = main_window.iso_controller.iso_current
+    reference = main_window.iso_model.item(0).data()
+
+    def failed(*args, **kwargs):
+        raise CalculationError("reference fit failed")
+
+    monkeypatch.setattr(module, "area_BET", failed)
+    view = PlotAlphaSDialog(parent=main_window)
+    model = module.PlotAlphaSModel(target, reference, view)
+
+    assert not model.has_result
+    assert "reference fit failed" in view.output.toPlainText()
+    model.calc_auto()
+    assert not model.has_result
+    assert "valid reference area" in view.output.toPlainText()

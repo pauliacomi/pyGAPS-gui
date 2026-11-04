@@ -19,6 +19,9 @@ Unreleased
 - Infer missing save suffixes from the selected format, report write failures,
   and remember the results export directory.
 - Avoid forwarding handled copy shortcuts to the point editor's base widget.
+- Restyle existing plots, legends, fit lines and model-isotherm list entries
+  when switching themes, while preserving graph data and zoom. Show the selected
+  theme in the menu.
 
 0.5.0 (2022-03-13)
 ------------------

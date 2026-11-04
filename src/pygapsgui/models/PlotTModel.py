@@ -1,19 +1,20 @@
-from qtpy import QtWidgets as QW
-
 from pygaps.characterisation.models_thickness import _THICKNESS_MODELS
 from pygaps.characterisation.models_thickness import get_thickness_model
 from pygaps.characterisation.t_plots import t_plot
 from pygaps.characterisation.t_plots import t_plot_raw
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
-from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
+from qtpy import QtWidgets as QW
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
 
 
 class PlotTModel(AnalysisModel):

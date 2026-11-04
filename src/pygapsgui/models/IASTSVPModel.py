@@ -1,16 +1,16 @@
-from qtpy import QtWidgets as QW
 
 import pygaps
 from pygaps.graphing.iast_graphs import plot_iast_svp
 from pygaps.graphing.labels import label_units_iso
 from pygaps.prediction.iast import iast_binary_svp
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_export
 
 
 class IASTSVPModel(AnalysisModel):

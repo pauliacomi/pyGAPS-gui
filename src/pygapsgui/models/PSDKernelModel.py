@@ -1,14 +1,16 @@
 from pygaps.characterisation.psd_kernel import psd_dft
 from pygaps.data import KERNELS
 from pygaps.graphing.calc_graphs import psd_plot
-from pygaps.utilities.exceptions import CalculationError
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities import color_theme
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
 
 
 class PSDKernelModel(AnalysisModel):
@@ -156,7 +158,8 @@ class PSDKernelModel(AnalysisModel):
         self.view.iso_graph.ax.plot(
             self.pressure[self.limit_indices[0]:self.limit_indices[1] + 1],
             self.results['kernel_loading'],
-            c='yellow',
+            c=color_theme.COLORS["primary"],
+            gid="pygapsgui-fit",
             label="fit",
         )
 

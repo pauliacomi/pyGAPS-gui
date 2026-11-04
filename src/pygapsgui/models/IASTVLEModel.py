@@ -1,14 +1,14 @@
 import pygaps
 from pygaps.graphing.iast_graphs import plot_iast_vle
 from pygaps.prediction.iast import iast_binary_vle
-from pygaps.utilities.exceptions import CalculationError
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_export
 
 
 class IASTVLEModel(AnalysisModel):

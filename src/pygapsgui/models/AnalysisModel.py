@@ -1,8 +1,8 @@
 from functools import wraps
 
+from pygaps.utilities.exceptions import CalculationError
 from qtpy import QtWidgets as QW
 
-from pygaps.utilities.exceptions import CalculationError
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
@@ -21,6 +21,8 @@ class AnalysisModel:
             for name, widget in vars(self.view).items():
                 if name.startswith("result_") and isinstance(widget, QW.QLabel):
                     widget.clear()
+            if hasattr(self.view, "res_table"):
+                self.view.res_table.setRowCount(0)
         for button in self.view.button_box.buttons():
             if self.view.button_box.buttonRole(button) == QW.QDialogButtonBox.ButtonRole.AcceptRole:
                 button.setEnabled(valid)
@@ -33,6 +35,9 @@ def calculation(method):
     def run(self, *args, **kwargs):
         self.set_result_valid(False)
         valid = bool(method(self, *args, **kwargs))
+        if valid and self.results is not None and len(self.results) == 0:
+            self.output += "No calculation results were produced.<br>"
+            valid = False
         self.set_result_valid(valid)
         return valid
     return run

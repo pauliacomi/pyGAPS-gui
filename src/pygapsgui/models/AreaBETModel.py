@@ -10,12 +10,15 @@ from pygaps.graphing.calc_graphs import roq_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import pgError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
-from pygapsgui.utilities.log_hook import log_hook
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities import color_theme
 from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_dictionary, result_export
 
 
 class AreaBETModel(AnalysisModel):
@@ -189,7 +192,8 @@ class AreaBETModel(AnalysisModel):
         self.view.iso_graph.ax.plot(
             self.pressure,
             simple_bet(self.pressure, self.n_monolayer * 1000, self.c_const),
-            c='yellow',
+            c=color_theme.COLORS["primary"],
+            gid="pygapsgui-fit",
             label="fit",
         )
 

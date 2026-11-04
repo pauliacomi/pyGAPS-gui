@@ -1,17 +1,15 @@
-from qtpy import QtCore as QC
-from qtpy import QtWidgets as QW
-
 from pygaps import ModelIsotherm
 from pygaps.modelling import _GUESS_MODELS
 from pygaps.modelling import _MODELS
-from pygaps.utilities.exceptions import CalculationError
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation
 
 
 class IsoModelGuessModel(AnalysisModel):

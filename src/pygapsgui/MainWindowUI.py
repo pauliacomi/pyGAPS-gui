@@ -287,6 +287,11 @@ class MainWindowUI():
         self.action_theme_dark.setObjectName("action_theme_dark")
         self.action_theme_auto = QG.QAction(main_window)
         self.action_theme_auto.setObjectName("action_theme_auto")
+        self.theme_action_group = QG.QActionGroup(main_window)
+        self.theme_action_group.setExclusive(True)
+        for action in (self.action_theme_light, self.action_theme_dark, self.action_theme_auto):
+            action.setCheckable(True)
+            self.theme_action_group.addAction(action)
 
         # about and example
         self.action_examples = QG.QAction(main_window)

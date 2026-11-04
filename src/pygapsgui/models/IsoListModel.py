@@ -1,6 +1,8 @@
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 
+from pygapsgui.utilities.color_theme import theme_events
+
 
 class IsoListModel(QG.QStandardItemModel):
     """
@@ -25,6 +27,18 @@ class IsoListModel(QG.QStandardItemModel):
         super().__init__(*args, **kwargs)
         # this emits when any checked are changed
         self.itemChanged.connect(self.handle_check_change)
+        theme_events.changed.connect(self.apply_theme)
+
+    def apply_theme(self):
+        """Update item colours without treating them as check-state changes."""
+        with QC.QSignalBlocker(self):
+            for row in range(self.rowCount()):
+                self.item(row).apply_theme()
+        if self.rowCount():
+            self.dataChanged.emit(
+                self.index(0, 0), self.index(self.rowCount() - 1, 0),
+                [QC.Qt.ItemDataRole.ForegroundRole],
+            )
 
     def handle_check_change(self, item):
         """If an item got checked, we need to check why."""

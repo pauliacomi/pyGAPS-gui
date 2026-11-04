@@ -6,9 +6,10 @@ from pygaps.units.converter_mode import _LOADING_MODE
 from pygaps.units.converter_mode import _MATERIAL_MODE
 from pygaps.units.converter_mode import _PRESSURE_MODE
 from pygaps.units.converter_unit import _TEMPERATURE_UNITS
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 
 
 class IsoCreateModel():
@@ -159,6 +160,7 @@ class IsoCreateModel():
 
     def create_iso(self):
         """Call pyGAPS to perform main calculation."""
+        self.full_isotherm = None
         with log_hook:
             try:
                 if self.iso_type == 0:

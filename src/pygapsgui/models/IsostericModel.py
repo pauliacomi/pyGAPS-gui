@@ -1,14 +1,14 @@
 import numpy
-
 from pygaps.characterisation.enth_sorp_clapeyron import enthalpy_sorption_clapeyron
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
-from pygapsgui.utilities.log_hook import log_hook
-from pygapsgui.utilities.log_hook import calculation_error
 from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
+from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
-
-
-from pygapsgui.models.AnalysisModel import AnalysisModel, calculation, result_export
 
 
 class IsostericModel(AnalysisModel):

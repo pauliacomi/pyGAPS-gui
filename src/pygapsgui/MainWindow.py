@@ -10,11 +10,13 @@ from qtpy import QtWidgets as QW
 from pygapsgui.controllers.IsoController import IsoController
 from pygapsgui.MainWindowUI import MainWindowUI
 from pygapsgui.models.IsoListModel import IsoListModel
-from pygapsgui.widgets.UtilityDialogs import error_dialog
+from pygapsgui.utilities.isotherm_files import ISOTHERM_FORMATS
+from pygapsgui.utilities.isotherm_files import OPEN_FILTER
+from pygapsgui.utilities.isotherm_files import SAVE_FILTER
 from pygapsgui.widgets.UtilityDialogs import error_detail_dialog
+from pygapsgui.widgets.UtilityDialogs import error_dialog
 from pygapsgui.widgets.UtilityDialogs import open_files_dialog
 from pygapsgui.widgets.UtilityDialogs import save_file_dialog
-from pygapsgui.utilities.isotherm_files import OPEN_FILTER, SAVE_FILTER, ISOTHERM_FORMATS
 
 RECENT_FILES_KEY = "recentFilePaths"
 LEGACY_RECENT_FILES_KEY = "recentFiles"
@@ -106,6 +108,14 @@ class MainWindow(QW.QMainWindow):
         self.ui.action_theme_auto.triggered.connect(partial(self.color_theme, "auto"))
         self.ui.action_theme_dark.triggered.connect(partial(self.color_theme, "dark"))
         self.ui.action_theme_light.triggered.connect(partial(self.color_theme, "light"))
+        from pygapsgui.utilities.color_theme import theme_events
+        theme_events.changed.connect(self.sync_theme_actions)
+        self.sync_theme_actions()
+
+    def sync_theme_actions(self):
+        theme = QC.QSettings().value("theme", "auto")
+        for name in ("light", "dark", "auto"):
+            getattr(self.ui, f"action_theme_{name}").setChecked(name == theme)
 
     def get_recent_paths(self):
         """Read the recent file paths from the settings as a list of strings."""
