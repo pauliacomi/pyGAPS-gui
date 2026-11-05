@@ -1,4 +1,5 @@
 import pathlib
+import re
 
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
@@ -18,16 +19,29 @@ def open_files_dialog(parent, caption, directory, filter=None) -> "list[pathlib.
     return tuple(map(pathlib.Path, filenames))
 
 
-def save_file_dialog(parent, caption, directory, filter=None) -> "list[pathlib.Path]":
+def save_file_dialog(parent, caption, directory, filter=None) -> pathlib.Path | None:
     """Abstract dialog for file saving."""
-    filename, _ = QW.QFileDialog.getSaveFileName(
+    filename, selected_filter = QW.QFileDialog.getSaveFileName(
         parent=parent,
         caption=caption,
         dir=directory,
         filter=filter,
     )
     if filename:
-        return pathlib.Path(filename)
+        path = pathlib.Path(filename)
+        if not path.suffix:
+            suffix = re.search(r"\*(\.[A-Za-z0-9]+)", selected_filter or (filter or "").split(";;")[0])
+            if suffix is not None:
+                path = path.with_suffix(suffix.group(1))
+                if path.exists():
+                    answer = QW.QMessageBox.question(
+                        parent, "Confirm overwrite", f"{path.name} already exists. Replace it?",
+                        QW.QMessageBox.StandardButton.Yes | QW.QMessageBox.StandardButton.No,
+                        QW.QMessageBox.StandardButton.No,
+                    )
+                    if answer != QW.QMessageBox.StandardButton.Yes:
+                        return None
+        return path
 
 
 def error_dialog(error: str):

@@ -1,14 +1,19 @@
-from qtpy import QtWidgets as QW
 
 import pygaps
 from pygaps.graphing.iast_graphs import plot_iast_svp
 from pygaps.graphing.labels import label_units_iso
 from pygaps.prediction.iast import iast_binary_svp
+from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IASTSVPModel():
+class IASTSVPModel(AnalysisModel):
     """IAST selectivity versus pressure prediction: QT MVC Model."""
 
     isotherms = None
@@ -30,6 +35,7 @@ class IASTSVPModel():
         # Save refs
         self.isotherms = isotherms
         self.view = view
+        self.set_result_valid(False)
 
         if any(isinstance(i, pygaps.PointIsotherm) for i in isotherms):
             self.output = '<font color="magenta">Careful, using PointIsotherms interpolates then numerically calculates spreading pressure.</font>'
@@ -49,6 +55,9 @@ class IASTSVPModel():
         # connect signals
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.data_table.set_data(props=["Pressure"], data=self.pressure_points)
+        self.view.data_table.changed.connect(self.invalidate_results)
+        self.view.adsorbate_input.currentIndexChanged.connect(self.invalidate_results)
+        self.view.fraction_slider.changed.connect(self.invalidate_results)
         self.view.calc_button.clicked.connect(self.calc_auto)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)
@@ -65,6 +74,7 @@ class IASTSVPModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         self.pressure_points = self.view.data_table.data["Pressure"].to_numpy()
@@ -90,8 +100,8 @@ class IASTSVPModel():
                     warningoff=False,
                 )
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Model failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e, "Model failed!")
                 return False
             self.output += log_hook.get_logs()
             return True
@@ -126,9 +136,11 @@ class IASTSVPModel():
 
     def select_branch(self):
         """Handle isotherm branch selection."""
+        self.set_result_valid(False)
         self.branch = self.view.branch_dropdown.currentText()
         self.plot_clear()
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:

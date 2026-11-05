@@ -1,12 +1,17 @@
 import numpy
-
 from pygaps.characterisation.enth_sorp_clapeyron import enthalpy_sorption_clapeyron
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
+from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IsostericModel():
+class IsostericModel(AnalysisModel):
     """Isosteric enthalpy calculations: QT MVC Model."""
 
     # Refs
@@ -29,6 +34,7 @@ class IsostericModel():
         # Save refs
         self.isotherms = isotherms
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
 
@@ -46,6 +52,7 @@ class IsostericModel():
         self.view.iso_graph.set_isotherms(self.isotherms)
 
         # connect signals
+        self.view.points_input.valueChanged.connect(self.invalidate_results)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.points_input.lineEdit().editingFinished.connect(self.select_points)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
@@ -60,10 +67,16 @@ class IsostericModel():
 
     def calc_auto(self):
         """Automatic calculation."""
+        self.loading_point_no = self.view.points_input.value()
         self.limits = None
         self.loading_points = None
         if self.calculate():
             self.limits = (self.results["loading"][0], self.results["loading"][-1])
+            if len(self.results["loading"]) != self.loading_point_no:
+                self.calc_with_limits(*self.limits)
+                if self.has_result:
+                    self.slider_reset()
+                return
             self.slider_reset()
             self.output_log()
             self.output_results()
@@ -84,6 +97,7 @@ class IsostericModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
@@ -94,8 +108,8 @@ class IsostericModel():
                     loading_points=self.loading_points,
                 )
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e)
                 self.limits = None
                 return False
             self.output += log_hook.get_logs()
@@ -146,11 +160,15 @@ class IsostericModel():
         self.calc_auto()
 
     # TODO: Point number/exact selection
-    def select_points(self, npoints):
+    def select_points(self):
         """Handle point number selection signal."""
         self.loading_point_no = self.view.points_input.value()
-        self.calc_auto()
+        if self.limits:
+            self.calc_with_limits(*self.limits)
+        else:
+            self.calc_auto()
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:

@@ -1,15 +1,18 @@
-from qtpy import QtCore as QC
-from qtpy import QtWidgets as QW
-
 from pygaps import ModelIsotherm
 from pygaps.modelling import _GUESS_MODELS
 from pygaps.modelling import _MODELS
-from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import pgError
+from qtpy import QtCore as QC
+from qtpy import QtWidgets as QW
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IsoModelGuessModel():
+class IsoModelGuessModel(AnalysisModel):
     """Automatic isotherm fit by several models: QT MVC Model."""
 
     isotherm = None
@@ -36,6 +39,7 @@ class IsoModelGuessModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         if isinstance(isotherm, ModelIsotherm):
@@ -64,6 +68,7 @@ class IsoModelGuessModel():
         self.limits = self.view.iso_graph.x_range
 
         # connect signals
+        self.view.model_list.itemChanged.connect(self.invalidate_results)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.x_select.slider.rangeChanged.connect(self.calculate_with_limits)
         self.view.calc_auto_button.clicked.connect(self.calculate_auto)
@@ -74,6 +79,7 @@ class IsoModelGuessModel():
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
+        self.set_result_valid(False)
         self.iso_params = self.isotherm.to_dict()
         pressure = self.isotherm.pressure(
             branch=self.branch,
@@ -104,6 +110,7 @@ class IsoModelGuessModel():
         self.limits = [left, right]
         self.prepare_values()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         self.model_attempts = []
@@ -126,13 +133,13 @@ class IsoModelGuessModel():
                             **self.iso_params,
                         )
                         self.model_attempts.append(isotherm)
-                    except CalculationError as err:
+                    except pgError as err:
                         log_hook.logger.info(
-                            f'<font color="red">Modelling using {model} failed.</font>'
+                            f'Modelling using {model} failed: {err}'
                         )
                 # We catch any errors or warnings and display them to the user
-            except Exception as err:
-                self.output += f'<font color="red">Model fitting failed! <br> {err}</font>'
+            except pgError as err:
+                self.output += calculation_error(err, "Model fitting failed!")
                 return False
             self.output += log_hook.get_logs()
 
@@ -171,6 +178,7 @@ class IsoModelGuessModel():
 
     def select_branch(self):
         """Handle isotherm branch selection."""
+        self.set_result_valid(False)
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.model_isotherm = None

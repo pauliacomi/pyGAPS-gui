@@ -4,11 +4,18 @@ from pygaps.characterisation.psd_micro import _PORE_GEOMETRIES
 from pygaps.characterisation.psd_micro import psd_microporous
 from pygaps.graphing.calc_graphs import psd_plot
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class PSDMicroModel():
+class PSDMicroModel(AnalysisModel):
     """Pore size distribution calculations with mean potential theory: QT MVC Model."""
 
     # Refs
@@ -33,6 +40,7 @@ class PSDMicroModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         try:
@@ -66,6 +74,9 @@ class PSDMicroModel():
         self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
+        self.view.model_dropdown.currentIndexChanged.connect(self.invalidate_results)
+        self.view.geometry_dropdown.currentIndexChanged.connect(self.invalidate_results)
+        self.view.amodel_dropdown.currentIndexChanged.connect(self.invalidate_results)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
@@ -105,6 +116,7 @@ class PSDMicroModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
@@ -123,8 +135,8 @@ class PSDMicroModel():
                 self.limit_indices = self.results.get('limits')
 
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e)
                 return False
             self.output += log_hook.get_logs()
             return True
@@ -171,10 +183,12 @@ class PSDMicroModel():
 
     def select_branch(self):
         """Handle isotherm branch selection."""
+        self.set_result_valid(False)
         self.branch = self.view.branch_dropdown.currentText()
         self.view.iso_graph.branch = self.branch
         self.plot_clear()
 
+    @result_dictionary
     def result_dict(self):
         """Return a dictionary of results."""
         return {
@@ -186,6 +200,7 @@ class PSDMicroModel():
             self.results.get("pore_volume_cumulative"),
         }
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:

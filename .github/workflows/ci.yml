@@ -5,6 +5,10 @@ on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
 
+env:
+  # Use the same pyGAPS 5 development snapshot for tests and release bundles.
+  PYGAPS_REF: ee5168eaa4cebe8eede2877a9cb80fd860abc3e5
+
 jobs:
   test:
     name: Python ${{ matrix.python }} / ${{ matrix.os }}
@@ -14,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-2025, macos-15]
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         include:
           - os: macos-15-intel
             python: "3.14"
@@ -36,6 +40,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libglib2.0-0t64 libxkbcommon0
+      - name: Install work-in-progress pyGAPS 5
+        env:
+          # Remove this override when pyGAPS 5 is tagged and available on PyPI.
+          SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PYGAPS: "5.0.0"
+        run: python -m pip install "git+https://github.com/pauliacomi/pyGAPS.git@${{ env.PYGAPS_REF }}"
       - name: Install
         run: python -m pip install ".[test]"
       - name: Check dependencies
@@ -79,6 +88,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libglib2.0-0t64 libxkbcommon0
+      - name: Install work-in-progress pyGAPS 5
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PYGAPS: "5.0.0"
+        run: python -m pip install "git+https://github.com/pauliacomi/pyGAPS.git@${{ env.PYGAPS_REF }}"
       - name: Install build dependencies
         run: python -m pip install ".[build]"
       - name: Build bundle

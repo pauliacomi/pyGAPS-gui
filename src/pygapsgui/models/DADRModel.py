@@ -5,12 +5,19 @@ from pygaps.characterisation.dr_da_plots import log_p_exp
 from pygaps.characterisation.dr_da_plots import log_v_adj
 from pygaps.graphing.calc_graphs import dra_plot
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import pgError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class DADRModel():
+class DADRModel(AnalysisModel):
     """Dubinin-Astakov and Dubinin-Radushkevich calculations: QT MVC Model."""
 
     isotherm = None
@@ -39,6 +46,7 @@ class DADRModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
         self.ptype = ptype
 
         if self.ptype == "DR":
@@ -95,6 +103,7 @@ class DADRModel():
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
+        self.set_result_valid(False)
         # Loading and pressure
         self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
             self.isotherm, self.branch, {
@@ -127,6 +136,7 @@ class DADRModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
@@ -152,8 +162,8 @@ class DADRModel():
                 if self.ptype == "DA":
                     self.exponent = exp
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e)
                 return False
             self.output += log_hook.get_logs()
             return True
@@ -223,6 +233,7 @@ class DADRModel():
         self.prepare_values()
         self.calc_auto()
 
+    @result_dictionary
     def result_dict(self):
         """Return a dictionary of results."""
         results = {
@@ -239,6 +250,7 @@ class DADRModel():
             results["DR Exponent"] = self.exp
         return results
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.microp_volume:

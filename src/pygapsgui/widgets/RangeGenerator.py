@@ -11,6 +11,7 @@ from pygapsgui.widgets.UtilityWidgets import HeightHeaderView
 class RangeGenWidget(QW.QWidget):
     """Collection of widgets that allow a defined range of data to be created."""
     data = None
+    changed = QC.Signal()
 
     def __init__(self, props=None, data=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -97,6 +98,7 @@ class RangeGenWidget(QW.QWidget):
         self.range_model = dfTableModel(self.data)
         self.range_table.setModel(self.range_model)
         self.range_model.dataChanged.connect(self.save)
+        self.changed.emit()
 
     def handle_propchange(self):
         prop = self.prop_value.currentIndex()
@@ -139,6 +141,7 @@ class RangeGenWidget(QW.QWidget):
 
     def save(self):
         self.data = self.range_model._data
+        self.changed.emit()
 
     def translate_UI(self):
         """Set static UI text through QT translation."""

@@ -1,9 +1,14 @@
 from pygaps import ModelIsotherm
+from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IsoModelByModel():
+class IsoModelByModel(AnalysisModel):
     """Fit an isotherm by a specific isotherm model: QT MVC Model."""
 
     isotherm = None
@@ -27,6 +32,7 @@ class IsoModelByModel():
         self.isotherm = isotherm
         self.isotherm_params = isotherm.to_dict()
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         if isinstance(isotherm, ModelIsotherm):
@@ -87,6 +93,7 @@ class IsoModelByModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         self.model_isotherm = None
@@ -125,8 +132,8 @@ class IsoModelByModel():
                         **self.isotherm_params,
                     )
             # We catch any errors or warnings and display them to the user
-            except Exception as err:
-                self.output += f'<font color="red">Model fitting failed! <br> {err}</font>'
+            except pgError as err:
+                self.output += calculation_error(err, "Model fitting failed!")
                 return False
             self.output += log_hook.get_logs()
             self.output += self.view.model_edit.current_model.__str__().replace("\n", "<br>")

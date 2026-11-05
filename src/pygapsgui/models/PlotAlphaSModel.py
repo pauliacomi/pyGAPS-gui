@@ -1,17 +1,23 @@
-from qtpy import QtWidgets as QW
-
 from pygaps.characterisation.alphas_plots import alpha_s
 from pygaps.characterisation.alphas_plots import alpha_s_raw
 from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
 from pygaps.graphing.calc_graphs import tp_plot
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import pgError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
+from qtpy import QtWidgets as QW
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class PlotAlphaSModel():
+class PlotAlphaSModel(AnalysisModel):
     """Alpha-s plot calculations: QT MVC Model."""
 
     isotherm = None
@@ -40,6 +46,7 @@ class PlotAlphaSModel():
         self.isotherm = isotherm
         self.ref_isotherm = ref_isotherm
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         try:
@@ -73,6 +80,8 @@ class PlotAlphaSModel():
         self.view.refbranch_dropdown.setCurrentText(self.ref_branch)
 
         # connect signals
+        self.view.refarea_input.textEdited.connect(self.invalidate_results)
+        self.view.pressure_input.textEdited.connect(self.invalidate_results)
         self.view.refarea_dropdown.currentTextChanged.connect(self.select_area)
         self.view.refarea_input.editingFinished.connect(self.select_area_specify)
         self.view.branch_dropdown.currentTextChanged.connect(self.select_branch)
@@ -94,11 +103,10 @@ class PlotAlphaSModel():
         if self.prepare_values():
             # calculate reference area
             self.select_area("BET")
-            # run calculation
-            self.calc_auto()
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
+        self.set_result_valid(False)
         # Loading and pressure
         self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
             self.isotherm, self.branch, {
@@ -124,8 +132,8 @@ class PlotAlphaSModel():
                 )
                 if self.ref_branch == 'des':
                     self.reference_loading = self.reference_loading[::-1]
-            except Exception as err:
-                self.output += '<font color="red">Error: The reference isotherm does not cover the same pressure range! <br></font>'
+            except pgError as err:
+                self.output += calculation_error(err, "The reference isotherm does not cover the same pressure range!")
                 self.output_log()
                 return False
 
@@ -156,10 +164,13 @@ class PlotAlphaSModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
             try:
+                if self.reference_area is None:
+                    raise CalculationError("Select or calculate a valid reference area first.")
                 self.results, self.alphas_curve = alpha_s_raw(
                     self.loading,
                     self.reference_loading,
@@ -171,8 +182,8 @@ class PlotAlphaSModel():
                 )
 
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e)
                 return False
             self.output += log_hook.get_logs()
             return True
@@ -230,17 +241,25 @@ class PlotAlphaSModel():
 
     def select_area(self, area_type):
         """Handle reference area selection."""
+        self.set_result_valid(False)
         with log_hook:
-            if area_type == "BET":
-                self.reference_area = area_BET(self.ref_isotherm).get('area')
-                self.view.refarea_input.setReadOnly(True)
-                self.view.refarea_input.setText(f"{self.reference_area:.4g}")
-            elif area_type == "Langmuir":
-                self.reference_area = area_langmuir(self.ref_isotherm).get('area')
-                self.view.refarea_input.setReadOnly(True)
-                self.view.refarea_input.setText(f"{self.reference_area:.4g}")
-            else:
-                self.view.refarea_input.setReadOnly(False)
+            try:
+                if area_type == "BET":
+                    self.reference_area = area_BET(self.ref_isotherm).get('area')
+                    self.view.refarea_input.setReadOnly(True)
+                    self.view.refarea_input.setText(f"{self.reference_area:.4g}")
+                elif area_type == "Langmuir":
+                    self.reference_area = area_langmuir(self.ref_isotherm).get('area')
+                    self.view.refarea_input.setReadOnly(True)
+                    self.view.refarea_input.setText(f"{self.reference_area:.4g}")
+                else:
+                    self.view.refarea_input.setReadOnly(False)
+            except pgError as err:
+                self.reference_area = None
+                self.view.refarea_input.clear()
+                self.output += calculation_error(err, "Reference area calculation failed!")
+                self.output_log()
+                return
             self.output += log_hook.get_logs()
 
         if self.prepare_values():
@@ -273,6 +292,7 @@ class PlotAlphaSModel():
         if self.prepare_values():
             self.calc_auto()
 
+    @result_dictionary
     def result_dict(self):
         """Return a dictionary of results."""
         return {
@@ -291,6 +311,7 @@ class PlotAlphaSModel():
             for e, result in enumerate(self.results)
         }
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:

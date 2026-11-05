@@ -12,12 +12,11 @@ readme = "README.rst"
 license = "AGPL-3.0-only"
 license-files = ["LICENSE"]
 authors = [{ name = "Paul Iacomi", email = "mail@pauliacomi.com" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = ["adsorption", "characterization", "porous materials"]
 classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -34,9 +33,7 @@ dependencies = [
     "qtpy>=2.0.1",
     "matplotlib>=3.5.2",
     "rapidfuzz>=2",
-    "pygaps>=4.6.1,<5",
-    # pyGAPS 4.6.1 AIF parsing uses pandas.to_numeric(errors="ignore"), removed in pandas 3.
-    "pandas<3",
+    "pygaps>=5,<6",
     "docutils",
 ]
 dynamic = ["version"]

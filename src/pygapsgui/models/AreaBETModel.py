@@ -8,12 +8,20 @@ from pygaps.characterisation.area_bet import simple_bet
 from pygaps.graphing.calc_graphs import bet_plot
 from pygaps.graphing.calc_graphs import roq_plot
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import pgError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_dictionary
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities import color_theme
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class AreaBETModel():
+class AreaBETModel(AnalysisModel):
     """BET specific area calculations: QT MVC Model."""
 
     isotherm = None
@@ -47,6 +55,7 @@ class AreaBETModel():
         # Save refs
         self.isotherm = isotherm
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         try:
@@ -100,6 +109,7 @@ class AreaBETModel():
 
     def prepare_values(self):
         """Preliminary calculation of values that rarely change."""
+        self.set_result_valid(False)
         # Loading and pressure
         self.pressure, self.loading = get_iso_loading_and_pressure_ordered(
             self.isotherm, self.branch, {
@@ -132,30 +142,28 @@ class AreaBETModel():
             self.output_log()
             self.plot_clear()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         with log_hook:
-            # TODO Should put all these into a dictionary
             try:
-                (
-                    self.bet_area,
-                    self.c_const,
-                    self.n_monolayer,
-                    self.p_monolayer,
-                    self.slope,
-                    self.intercept,
-                    self.min_point,
-                    self.max_point,
-                    self.corr_coef,
-                ) = area_BET_raw(
-                    self.pressure,
-                    self.loading,
-                    self.cross_section,
-                    p_limits=self.limits,
-                )
+                results = area_BET_raw({
+                    "pressure": self.pressure,
+                    "loading": self.loading,
+                    "cross_section": self.cross_section,
+                    "p_limits": self.limits,
+                })
+                self.bet_area = results["area"]
+                self.c_const = results["c_const"]
+                self.n_monolayer = results["n_monolayer"]
+                self.p_monolayer = results["p_monolayer"]
+                self.slope = results["bet_slope"]
+                self.intercept = results["bet_intercept"]
+                self.min_point, self.max_point = results["p_limit_indices"]
+                self.corr_coef = results["corr_coef"]
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Calculation failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e)
                 return False
             self.output += log_hook.get_logs()
             return True
@@ -184,7 +192,8 @@ class AreaBETModel():
         self.view.iso_graph.ax.plot(
             self.pressure,
             simple_bet(self.pressure, self.n_monolayer * 1000, self.c_const),
-            c='yellow',
+            c=color_theme.COLORS["primary"],
+            gid="pygapsgui-fit",
             label="fit",
         )
 
@@ -236,6 +245,7 @@ class AreaBETModel():
         self.prepare_values()
         self.calc_auto()
 
+    @result_dictionary
     def result_dict(self):
         """Return a dictionary of results."""
         return {
@@ -249,6 +259,7 @@ class AreaBETModel():
             "BET pressure limits": self.limits
         }
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.bet_area:

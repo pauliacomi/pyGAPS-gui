@@ -1,8 +1,12 @@
+from matplotlib import rcParams
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.colors import to_rgba
 from matplotlib.figure import Figure
+from matplotlib.text import Text
 from qtpy import QtWidgets as QW
 
+from pygapsgui.utilities import color_theme
 from pygapsgui.widgets.GraphSelectorToolbar import HSelectorToolbar
 from pygapsgui.widgets.GraphSelectorToolbar import VSelectorToolbar
 
@@ -36,6 +40,32 @@ class GraphView(QW.QWidget):
         self.x_range_select = x_range_select
         self.y_range_select = y_range_select
         self.setup_UI()
+        color_theme.theme_events.changed.connect(self.apply_theme)
+
+    def apply_theme(self):
+        """Restyle existing artists without losing data, limits or selectors."""
+        foreground = rcParams["text.color"]
+        monochrome = {to_rgba("black"), to_rgba("white")}
+        self.figure.set_facecolor(rcParams["figure.facecolor"])
+        for ax in self.figure.axes:
+            ax.set_facecolor(rcParams["axes.facecolor"])
+            ax.tick_params(axis="both", which="both", colors=foreground)
+            for spine in ax.spines.values():
+                spine.set_color(rcParams["axes.edgecolor"])
+            for text in ax.findobj(Text):
+                if to_rgba(text.get_color()) in monochrome:
+                    text.set_color(foreground)
+            legend = ax.get_legend()
+            lines = list(ax.lines) + (legend.get_lines() if legend is not None else [])
+            for line in lines:
+                if line.get_gid() == "pygapsgui-fit":
+                    line.set_color(color_theme.COLORS["primary"])
+                elif to_rgba(line.get_color()) in monochrome:
+                    line.set_color(foreground)
+            if legend is not None:
+                legend.get_frame().set_facecolor(rcParams["axes.facecolor"])
+                legend.get_frame().set_edgecolor(rcParams["axes.edgecolor"])
+        self.canvas.draw_idle()
 
     def setup_UI(self):
         """Create and set-up static UI elements."""

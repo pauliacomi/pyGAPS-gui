@@ -1,12 +1,17 @@
 import pygaps
 from pygaps.graphing.iast_graphs import plot_iast_vle
 from pygaps.prediction.iast import iast_binary_vle
-from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import pgError
+
+from pygapsgui.models.AnalysisModel import AnalysisModel
+from pygapsgui.models.AnalysisModel import calculation
+from pygapsgui.models.AnalysisModel import result_export
+from pygapsgui.utilities.log_hook import calculation_error
 from pygapsgui.utilities.log_hook import log_hook
 from pygapsgui.widgets.UtilityDialogs import error_dialog
 
 
-class IASTVLEModel():
+class IASTVLEModel(AnalysisModel):
     """IAST vapour-liquid equilibrium prediction: QT MVC Model."""
 
     isotherms = None
@@ -28,6 +33,7 @@ class IASTVLEModel():
         # Save refs
         self.isotherms = isotherms
         self.view = view
+        self.set_result_valid(False)
 
         # Fail condition
         # None
@@ -49,6 +55,7 @@ class IASTVLEModel():
         self.view.branch_dropdown.setCurrentText(self.branch)
 
         # connect signals
+        self.view.adsorbate_input.currentIndexChanged.connect(self.invalidate_results)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.calc_button.clicked.connect(self.calc_auto)
         self.view.pressure_input.valueChanged.connect(self.calc_autobox)
@@ -67,9 +74,11 @@ class IASTVLEModel():
             self.plot_clear()
 
     def calc_autobox(self):
+        self.invalidate_results()
         if self.view.calc_autobox.isChecked():
             self.calc_auto()
 
+    @calculation
     def calculate(self):
         """Call pyGAPS to perform main calculation."""
         self.total_pressure = self.view.pressure_input.value()
@@ -91,8 +100,8 @@ class IASTVLEModel():
                     warningoff=False,
                 )
             # We catch any errors or warnings and display them to the user
-            except Exception as e:
-                self.output += f'<font color="red">Model failed! <br> {e}</font>'
+            except pgError as e:
+                self.output += calculation_error(e, "Model failed!")
                 return False
             self.output += log_hook.get_logs()
             return True
@@ -127,9 +136,11 @@ class IASTVLEModel():
 
     def select_branch(self):
         """Handle isotherm branch selection."""
+        self.set_result_valid(False)
         self.branch = self.view.branch_dropdown.currentText()
         self.plot_clear()
 
+    @result_export
     def export_results(self):
         """Save results as a file."""
         if not self.results:
