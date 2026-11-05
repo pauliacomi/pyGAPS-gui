@@ -26,7 +26,7 @@ class IsoListModel(QG.QStandardItemModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # this emits when any checked are changed
-        self.itemChanged.connect(self.handle_check_change)
+        self.dataChanged.connect(self.handle_data_change)
         theme_events.changed.connect(self.apply_theme)
 
     def apply_theme(self):
@@ -39,6 +39,13 @@ class IsoListModel(QG.QStandardItemModel):
                 self.index(0, 0), self.index(self.rowCount() - 1, 0),
                 [QC.Qt.ItemDataRole.ForegroundRole],
             )
+
+    def handle_data_change(self, top_left, bottom_right, roles):
+        """Only check-state changes affect which isotherms are plotted."""
+        if roles and QC.Qt.ItemDataRole.CheckStateRole not in roles:
+            return
+        for row in range(top_left.row(), bottom_right.row() + 1):
+            self.handle_check_change(self.item(row))
 
     def handle_check_change(self, item):
         """If an item got checked, we need to check why."""

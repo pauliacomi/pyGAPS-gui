@@ -78,7 +78,7 @@ def test_existing_graph_restyles_without_losing_state(main_window, qtbot):
         assert to_rgba(secondary.yaxis.label.get_color()) == to_rgba(foreground)
         assert to_rgba(legend.get_texts()[0].get_color()) == to_rgba(foreground)
         assert to_rgba(line.get_color()) == to_rgba(foreground)
-        assert tuple(scatter.get_facecolors()[0]) == to_rgba(foreground)
+        assert tuple(scatter.get_facecolors()[0]) == to_rgba("black")
         assert fit.get_color() == color_theme.COLORS["primary"]
         assert tuple(graph.ax.lines) == lines
         assert (graph.ax.get_xlim(), graph.ax.get_ylim()) == limits
@@ -100,3 +100,42 @@ def test_existing_and_new_model_items_follow_theme(main_window, data_dir):
     assert item.foreground().color().name() == color_theme.COLORS["primary"].lower()
     main_window.iso_controller.add_isotherm("new model", model_iso)
     assert main_window.iso_model.item(1).foreground() == item.foreground()
+
+
+def test_theme_preserves_multi_isotherm_zoom(main_window, data_dir, qtbot):
+    main_window.open_iso([
+        data_dir / "json" / "SiO2 N2 77.json",
+        data_dir / "json" / "Takeda 5A N2 77.json",
+    ])
+    main_window.iso_model.check_all()
+    graph = main_window.ui.iso_graph
+    graph.ax.set_xlim(0.05, 0.3)
+    graph.ax.set_ylim(1, 3)
+    limits = graph.ax.get_xlim(), graph.ax.get_ylim()
+    lines = tuple(graph.ax.lines)
+    with qtbot.assertNotEmitted(main_window.iso_model.checked_changed):
+        for theme in ("light", "dark", "light"):
+            main_window.color_theme(theme)
+            assert (graph.ax.get_xlim(), graph.ax.get_ylim()) == limits
+            assert tuple(graph.ax.lines) == lines
+    with qtbot.waitSignal(main_window.iso_model.checked_changed):
+        main_window.iso_model.item(0).setCheckState(QC.Qt.CheckState.Unchecked)
+
+
+def test_theme_preserves_semantic_marker_colours(main_window):
+    graph = main_window.ui.iso_graph
+    line, = graph.ax.plot(
+        [1, 2], [3, 4], color="blue", marker="o",
+        markerfacecolor="white", markeredgecolor="blue", label="desorption",
+    )
+    scatter = graph.ax.scatter([1, 2], [4, 5], c=[0, 1], cmap="gray")
+    graph.canvas.draw()
+    colours = scatter.get_facecolors().copy()
+    legend = graph.ax.legend()
+    for theme in ("dark", "light", "dark"):
+        main_window.color_theme(theme)
+        graph.canvas.draw()
+        assert line.get_markerfacecolor() == "white"
+        assert line.get_markeredgecolor() == "blue"
+        assert legend.get_lines()[0].get_markerfacecolor() == "white"
+        assert (scatter.get_facecolors() == colours).all()

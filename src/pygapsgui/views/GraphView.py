@@ -62,21 +62,6 @@ class GraphView(QW.QWidget):
                     line.set_color(color_theme.COLORS["primary"])
                 elif to_rgba(line.get_color()) in monochrome:
                     line.set_color(foreground)
-                for get_color, set_color in (
-                    (line.get_markerfacecolor, line.set_markerfacecolor),
-                    (line.get_markeredgecolor, line.set_markeredgecolor),
-                ):
-                    color = get_color()
-                    if not (isinstance(color, str) and color == "auto") and to_rgba(color) in monochrome:
-                        set_color(foreground)
-            for collection in ax.collections:
-                for get_colors, set_colors in (
-                    (collection.get_facecolors, collection.set_facecolors),
-                    (collection.get_edgecolors, collection.set_edgecolors),
-                ):
-                    colors = get_colors()
-                    if len(colors):
-                        set_colors([to_rgba(foreground) if tuple(color) in monochrome else color for color in colors])
             if legend is not None:
                 legend.get_frame().set_facecolor(rcParams["axes.facecolor"])
                 legend.get_frame().set_edgecolor(rcParams["axes.edgecolor"])
