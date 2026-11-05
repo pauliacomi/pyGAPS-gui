@@ -33,6 +33,14 @@ def save_file_dialog(parent, caption, directory, filter=None) -> pathlib.Path | 
             suffix = re.search(r"\*(\.[A-Za-z0-9]+)", selected_filter or (filter or "").split(";;")[0])
             if suffix is not None:
                 path = path.with_suffix(suffix.group(1))
+                if path.exists():
+                    answer = QW.QMessageBox.question(
+                        parent, "Confirm overwrite", f"{path.name} already exists. Replace it?",
+                        QW.QMessageBox.StandardButton.Yes | QW.QMessageBox.StandardButton.No,
+                        QW.QMessageBox.StandardButton.No,
+                    )
+                    if answer != QW.QMessageBox.StandardButton.Yes:
+                        return None
         return path
 
 
