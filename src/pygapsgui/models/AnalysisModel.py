@@ -11,6 +11,12 @@ class AnalysisModel:
 
     has_result = False
 
+    def invalidate_results(self, *_args):
+        """Discard the displayed calculation when one of its inputs changes."""
+        if self.has_result:
+            self.set_result_valid(False)
+            self.plot_clear()
+
     def set_result_valid(self, valid):
         self.has_result = valid
         if not valid:

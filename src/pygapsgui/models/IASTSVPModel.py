@@ -55,6 +55,9 @@ class IASTSVPModel(AnalysisModel):
         # connect signals
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.data_table.set_data(props=["Pressure"], data=self.pressure_points)
+        self.view.data_table.changed.connect(self.invalidate_results)
+        self.view.adsorbate_input.currentIndexChanged.connect(self.invalidate_results)
+        self.view.fraction_slider.changed.connect(self.invalidate_results)
         self.view.calc_button.clicked.connect(self.calc_auto)
         self.view.button_box.accepted.connect(self.export_results)
         self.view.button_box.rejected.connect(self.view.reject)

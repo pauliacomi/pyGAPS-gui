@@ -68,6 +68,7 @@ class IsoModelGuessModel(AnalysisModel):
         self.limits = self.view.iso_graph.x_range
 
         # connect signals
+        self.view.model_list.itemChanged.connect(self.invalidate_results)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.x_select.slider.rangeChanged.connect(self.calculate_with_limits)
         self.view.calc_auto_button.clicked.connect(self.calculate_auto)

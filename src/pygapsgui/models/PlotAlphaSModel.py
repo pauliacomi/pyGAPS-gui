@@ -80,6 +80,8 @@ class PlotAlphaSModel(AnalysisModel):
         self.view.refbranch_dropdown.setCurrentText(self.ref_branch)
 
         # connect signals
+        self.view.refarea_input.textEdited.connect(self.invalidate_results)
+        self.view.pressure_input.textEdited.connect(self.invalidate_results)
         self.view.refarea_dropdown.currentTextChanged.connect(self.select_area)
         self.view.refarea_input.editingFinished.connect(self.select_area_specify)
         self.view.branch_dropdown.currentTextChanged.connect(self.select_branch)

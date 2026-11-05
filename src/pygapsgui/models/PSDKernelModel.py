@@ -59,6 +59,8 @@ class PSDKernelModel(AnalysisModel):
         self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
+        self.view.kernel_dropdown.currentIndexChanged.connect(self.invalidate_results)
+        self.view.smooth_input.valueChanged.connect(self.invalidate_results)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)

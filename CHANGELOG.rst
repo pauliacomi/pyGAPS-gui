@@ -22,6 +22,13 @@ Unreleased
 - Restyle existing plots, legends, fit lines and model-isotherm list entries
   when switching themes, while preserving graph data and zoom. Show the selected
   theme in the menu.
+- Pin CI tests and bundles to the same pyGAPS development commit.
+- Confirm replacement of existing files after inferring a missing save suffix.
+- Preserve multi-isotherm zoom and semantic marker colours during theme changes.
+- Invalidate results after changes to PSD options, IAST tables and composition,
+  model-guess candidates, alpha-s inputs, and isosteric point counts.
+- Fix IAST range generation on current pandas versions and point-count editing
+  for isosteric calculations.
 
 0.5.0 (2022-03-13)
 ------------------

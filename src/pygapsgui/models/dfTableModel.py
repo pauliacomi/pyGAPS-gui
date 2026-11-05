@@ -28,9 +28,9 @@ class dfTableModel(QC.QAbstractTableModel):
         if nrows > self.rowCount():
             newrows = pd.DataFrame(
                 columns=self._data.columns,
-                data=np.empty((nrows - self.rowCount(), self.columnCount())),
+                data=np.full((nrows - self.rowCount(), self.columnCount()), np.nan),
             )
-            self._data = self._data.append(newrows, ignore_index=True)
+            self._data = pd.concat([self._data, newrows], ignore_index=True)
         self.dataChanged.emit(QC.QModelIndex(), QC.QModelIndex())
         self.layoutChanged.emit()
 
@@ -51,7 +51,7 @@ class dfTableModel(QC.QAbstractTableModel):
             return False
 
         if role == QC.Qt.ItemDataRole.EditRole:
-            dtype = self._data.dtypes[index.column()]
+            dtype = self._data.dtypes.iloc[index.column()]
 
             if dtype in (np.float32, np.float64):
                 value = float(value)

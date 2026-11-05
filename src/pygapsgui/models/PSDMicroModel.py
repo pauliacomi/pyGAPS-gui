@@ -74,6 +74,9 @@ class PSDMicroModel(AnalysisModel):
         self.view.iso_graph.set_isotherms([self.isotherm])
 
         # connect signals
+        self.view.model_dropdown.currentIndexChanged.connect(self.invalidate_results)
+        self.view.geometry_dropdown.currentIndexChanged.connect(self.invalidate_results)
+        self.view.amodel_dropdown.currentIndexChanged.connect(self.invalidate_results)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
         self.view.x_select.slider.rangeChanged.connect(self.calc_with_limits)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)

@@ -55,6 +55,7 @@ class IASTVLEModel(AnalysisModel):
         self.view.branch_dropdown.setCurrentText(self.branch)
 
         # connect signals
+        self.view.adsorbate_input.currentIndexChanged.connect(self.invalidate_results)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.calc_button.clicked.connect(self.calc_auto)
         self.view.pressure_input.valueChanged.connect(self.calc_autobox)
@@ -73,6 +74,7 @@ class IASTVLEModel(AnalysisModel):
             self.plot_clear()
 
     def calc_autobox(self):
+        self.invalidate_results()
         if self.view.calc_autobox.isChecked():
             self.calc_auto()
 

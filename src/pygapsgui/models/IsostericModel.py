@@ -52,6 +52,7 @@ class IsostericModel(AnalysisModel):
         self.view.iso_graph.set_isotherms(self.isotherms)
 
         # connect signals
+        self.view.points_input.valueChanged.connect(self.invalidate_results)
         self.view.branch_dropdown.currentIndexChanged.connect(self.select_branch)
         self.view.points_input.lineEdit().editingFinished.connect(self.select_points)
         self.view.calc_auto_button.clicked.connect(self.calc_auto)
@@ -66,10 +67,16 @@ class IsostericModel(AnalysisModel):
 
     def calc_auto(self):
         """Automatic calculation."""
+        self.loading_point_no = self.view.points_input.value()
         self.limits = None
         self.loading_points = None
         if self.calculate():
             self.limits = (self.results["loading"][0], self.results["loading"][-1])
+            if len(self.results["loading"]) != self.loading_point_no:
+                self.calc_with_limits(*self.limits)
+                if self.has_result:
+                    self.slider_reset()
+                return
             self.slider_reset()
             self.output_log()
             self.output_results()
@@ -153,10 +160,13 @@ class IsostericModel(AnalysisModel):
         self.calc_auto()
 
     # TODO: Point number/exact selection
-    def select_points(self, npoints):
+    def select_points(self):
         """Handle point number selection signal."""
         self.loading_point_no = self.view.points_input.value()
-        self.calc_auto()
+        if self.limits:
+            self.calc_with_limits(*self.limits)
+        else:
+            self.calc_auto()
 
     @result_export
     def export_results(self):
